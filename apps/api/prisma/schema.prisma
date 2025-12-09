@@ -1,0 +1,263 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlserver"
+}
+
+model mst_vendor_category {
+  vendor_category_id Int      @id @default(autoincrement())
+  category_name      String   @unique @db.VarChar(255)
+  category_code      String   @unique @db.VarChar(50)
+  description        String?  @db.Text
+  is_active          Boolean  @default(true)
+  created_at         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  mst_vendor               mst_vendor[]
+  mst_checklist_item       mst_checklist_item[]
+  ops_checkin_entry        ops_checkin_entry[]
+
+  @@index([category_code], name: "idx_mst_vendor_category_category_code")
+}
+
+model mst_vendor {
+  vendor_id          Int                     @id @default(autoincrement())
+  vendor_code        String                  @unique @db.VarChar(100)
+  company_name       String                  @db.VarChar(500)
+  vendor_category_id Int
+  is_active          Boolean                 @default(true)
+  last_sync_time     DateTime?
+  sync_source        String?                 @db.VarChar(100)
+  created_at         DateTime                @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at         DateTime                @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  vendor_category mst_vendor_category @relation(fields: [vendor_category_id], references: [vendor_category_id])
+  ops_checkin_entry ops_checkin_entry[]
+
+  @@index([vendor_category_id, is_active], name: "idx_mst_vendor_category_active")
+  @@index([vendor_code], name: "idx_mst_vendor_vendor_code")
+}
+
+model mst_checklist_category {
+  checklist_category_id Int      @id @default(autoincrement())
+  category_name         String   @unique @db.VarChar(255)
+  category_code         String   @unique @db.VarChar(50)
+  display_order         Int
+  icon_name             String?  @db.VarChar(100)
+  color_code            String?  @db.VarChar(50)
+  description           String?  @db.Text
+  is_active             Boolean  @default(true)
+  created_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  mst_checklist_item mst_checklist_item[]
+  ops_checkin_response ops_checkin_response[]
+
+  @@index([is_active, display_order], name: "idx_mst_checklist_category_active_order")
+}
+
+model mst_checklist_item {
+  checklist_item_id     Int      @id @default(autoincrement())
+  checklist_category_id Int
+  item_code             String   @unique @db.VarChar(100)
+  item_text             String   @db.Text
+  item_type             String   @db.VarChar(50)
+  vendor_category_id    Int?
+  display_order         Int
+  is_required           Boolean  @default(true)
+  is_active             Boolean  @default(true)
+  created_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  checklist_category mst_checklist_category @relation(fields: [checklist_category_id], references: [checklist_category_id])
+  vendor_category    mst_vendor_category?   @relation(fields: [vendor_category_id], references: [vendor_category_id])
+  ops_checkin_response ops_checkin_response[]
+
+  @@index([checklist_category_id, is_active, display_order], name: "idx_mst_checklist_item_category_active_order")
+  @@index([item_code], name: "idx_mst_checklist_item_item_code")
+  @@index([item_type, vendor_category_id, is_active], name: "idx_mst_checklist_item_type_vendor_active")
+}
+
+model mst_user {
+  user_id          Int      @id @default(autoincrement())
+  external_user_id String   @unique @db.VarChar(255)
+  username         String   @db.VarChar(255)
+  full_name        String   @db.VarChar(500)
+  role             String   @db.VarChar(50)
+  last_login       DateTime?
+  is_active        Boolean  @default(true)
+  created_at       DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at       DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  ops_verification ops_verification[]
+  ops_timelog      ops_timelog[]
+  cfg_system       cfg_system[]
+  log_audit        log_audit[]
+  log_report_export log_report_export[]
+
+  @@index([external_user_id], name: "idx_mst_user_external_user_id")
+}
+
+model ops_checkin_entry {
+  entry_id                    Int      @id @default(autoincrement())
+  queue_number                String   @unique @db.VarChar(50)
+  vendor_id                   Int
+  driver_name                 String   @db.VarChar(500)
+  snapshot_vendor_category_id Int
+  snapshot_company_name       String   @db.VarChar(500)
+  snapshot_category_name      String   @db.VarChar(255)
+  submission_time             DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  current_status              String   @default("MENUNGGU") @db.VarChar(50)
+  device_identifier           String?  @db.VarChar(255)
+  ip_address                  String?  @db.VarChar(50)
+  has_non_compliant_items     Boolean  @default(false)
+  non_compliant_count         Int      @default(0)
+  created_at                  DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at                  DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  mst_vendor           mst_vendor             @relation(fields: [vendor_id], references: [vendor_id])
+  vendor_category_snap mst_vendor_category    @relation(fields: [snapshot_vendor_category_id], references: [vendor_category_id], onDelete: NoAction, onUpdate: NoAction)
+
+  ops_checkin_response ops_checkin_response[]
+  ops_verification     ops_verification?
+  ops_timelog          ops_timelog?
+  ops_queue_status     ops_queue_status?
+  log_audit            log_audit[]
+
+  @@index([queue_number], name: "idx_ops_checkin_entry_queue_number")
+  @@index([current_status, submission_time], name: "idx_ops_checkin_entry_status_time")
+  @@index([submission_time, vendor_id], name: "idx_ops_checkin_entry_time_vendor")
+  @@index([has_non_compliant_items], name: "idx_ops_checkin_entry_non_compliant")
+}
+
+model ops_checkin_response {
+  response_id         Int      @id @default(autoincrement())
+  entry_id            Int
+  checklist_item_id   Int
+  checklist_category_id Int
+  item_text_snapshot  String   @db.Text
+  item_type           String   @db.VarChar(50)
+  response_value      Boolean
+  is_compliant        Boolean
+  display_order       Int
+  created_at          DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  entry             ops_checkin_entry  @relation(fields: [entry_id], references: [entry_id])
+  checklist_item    mst_checklist_item @relation(fields: [checklist_item_id], references: [checklist_item_id], onDelete: NoAction, onUpdate: NoAction)
+  checklist_category mst_checklist_category @relation(fields: [checklist_category_id], references: [checklist_category_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([entry_id], name: "idx_ops_checkin_response_entry_id")
+  @@index([entry_id, is_compliant], name: "idx_ops_checkin_response_entry_compliant")
+}
+
+model ops_verification {
+  verification_id       Int      @id @default(autoincrement())
+  entry_id              Int      @unique
+  verified_by_user_id   Int
+  verification_status   String   @db.VarChar(50)
+  rejection_reason      String?  @db.Text
+  verification_time     DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  created_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  entry   ops_checkin_entry @relation(fields: [entry_id], references: [entry_id])
+  user    mst_user           @relation(fields: [verified_by_user_id], references: [user_id])
+
+  @@index([entry_id], name: "idx_ops_verification_entry_id")
+  @@index([verification_time, verification_status], name: "idx_ops_verification_time_status")
+}
+
+model ops_timelog {
+  timelog_id         Int      @id @default(autoincrement())
+  entry_id           Int      @unique
+  checkin_time       DateTime?
+  checkout_time      DateTime?
+  checkout_by_user_id Int?
+  duration_minutes   Int?
+  is_checked_out     Boolean  @default(false)
+  created_at         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  entry  ops_checkin_entry @relation(fields: [entry_id], references: [entry_id])
+  user   mst_user?         @relation(fields: [checkout_by_user_id], references: [user_id])
+
+  @@index([entry_id], name: "idx_ops_timelog_entry_id")
+  @@index([is_checked_out, checkin_time], name: "idx_ops_timelog_checkout_time")
+}
+
+model ops_queue_status {
+  queue_status_id     Int      @id @default(autoincrement())
+  entry_id            Int      @unique
+  queue_number        String   @db.VarChar(50)
+  current_status      String   @db.VarChar(50)
+  status_display_text String   @db.VarChar(255)
+  priority_order      Int?
+  estimated_wait_minutes Int?
+  last_updated        DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  entry ops_checkin_entry @relation(fields: [entry_id], references: [entry_id])
+
+  @@index([entry_id], name: "idx_ops_queue_status_entry_id")
+  @@index([current_status, priority_order], name: "idx_ops_queue_status_display")
+}
+
+model log_audit {
+  audit_id        Int      @id @default(autoincrement())
+  entry_id        Int?
+  user_id         Int?
+  action_type     String   @db.VarChar(100)
+  action_description String @db.Text
+  old_value       String?  @db.Text
+  new_value       String?  @db.Text
+  ip_address      String?  @db.VarChar(50)
+  user_agent      String?  @db.VarChar(500)
+  created_at      DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  entry ops_checkin_entry? @relation(fields: [entry_id], references: [entry_id])
+  user  mst_user?          @relation(fields: [user_id], references: [user_id])
+
+  @@index([created_at, action_type], name: "idx_log_audit_time_action")
+  @@index([entry_id], name: "idx_log_audit_entry_id")
+}
+
+model log_report_export {
+  export_id            Int      @id @default(autoincrement())
+  exported_by_user_id  Int
+  report_type          String   @db.VarChar(100)
+  date_from            DateTime @db.Date
+  date_to              DateTime @db.Date
+  filter_criteria      String?  @db.Text
+  total_records        Int
+  file_name            String   @db.VarChar(500)
+  file_path            String?  @db.VarChar(1000)
+  export_time          DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  user mst_user @relation(fields: [exported_by_user_id], references: [user_id])
+
+  @@index([export_time, report_type], name: "idx_log_report_export_time_type")
+}
+
+model cfg_system {
+  config_id        Int      @id @default(autoincrement())
+  config_key       String   @unique @db.VarChar(255)
+  config_value     String   @db.Text
+  config_type      String   @db.VarChar(50)
+  description      String?  @db.Text
+  is_editable      Boolean  @default(true)
+  updated_by_user_id Int?
+  created_at       DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at       DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  user mst_user? @relation(fields: [updated_by_user_id], references: [user_id])
+
+  @@index([config_key], name: "idx_cfg_system_config_key")
+}
+

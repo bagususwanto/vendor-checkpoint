@@ -1,146 +1,149 @@
-import type { Link } from '@repo/api';
-import { Button } from '@repo/ui/button';
-import Image, { type ImageProps } from 'next/image';
+'use client';
 
-import styles from './page.module.css';
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { InteractiveBackground } from '@/components/interactive-background';
+import { CheckCircle2, CircleArrowRight, Search, Shield } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ThemeToggleButton } from '@/components/ui/shadcn-io/theme-toggle-button';
+import { useTheme } from 'next-themes';
 
-type Props = Omit<ImageProps, 'src'> & {
-  srcLight: string;
-  srcDark: string;
-};
+export default function Home() {
+  const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-const ThemeImage = (props: Props) => {
-  const { srcLight, srcDark, ...rest } = props;
-
-  return (
-    <>
-      <Image {...rest} src={srcLight} className="imgLight" />
-      <Image {...rest} src={srcDark} className="imgDark" />
-    </>
-  );
-};
-
-async function getLinks(): Promise<Link[]> {
-  try {
-    const res = await fetch('http://localhost:3000/links', {
-      cache: 'no-store',
-    });
-
-    if (!res.ok) {
-      throw new Error('Failed to fetch links');
-    }
-
-    return res.json();
-  } catch (error) {
-    console.error('Error fetching links:', error);
-    return [];
-  }
-}
-
-export default async function Home() {
-  const links = await getLinks();
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <ThemeImage
-          className={styles.logo}
-          srcLight="turborepo-dark.svg"
-          srcDark="turborepo-light.svg"
-          alt="Turborepo logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>apps/web/app/page.tsx</code>
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="relative min-h-screen">
+      <InteractiveBackground color="59, 130, 246" />
+      {/* Header */}
+      <header className="top-0 z-50 sticky bg-background/95 supports-backdrop-filter:bg-background/60 backdrop-blur border-b">
+        <div className="flex justify-between items-center mx-auto px-4 py-4 container">
+          {/* Left */}
+          <div className="flex items-center gap-3">
+            <div className="flex justify-center items-center bg-primary rounded-lg w-10 h-10">
+              <Shield className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="font-bold text-xl">Vendor Checkpoint</h1>
+              <p className="text-muted-foreground text-xs">
+                PT. Toyota Motor Manufacturing Indonesia
+              </p>
+            </div>
+          </div>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new/clone?demo-description=Learn+to+implement+a+monorepo+with+a+two+Next.js+sites+that+has+installed+three+local+packages.&demo-image=%2F%2Fimages.ctfassets.net%2Fe5382hct74si%2F4K8ZISWAzJ8X1504ca0zmC%2F0b21a1c6246add355e55816278ef54bc%2FBasic.png&demo-title=Monorepo+with+Turborepo&demo-url=https%3A%2F%2Fexamples-basic-web.vercel.sh%2F&from=templates&project-name=Monorepo+with+Turborepo&repository-name=monorepo-turborepo&repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fturborepo%2Ftree%2Fmain%2Fexamples%2Fbasic&root-directory=apps%2Fdocs&skippable-integrations=1&teamSlug=vercel&utm_source=create-turbo"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://turborepo.com/docs?utm_source"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+          {/* Right */}
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={() => router.push('/login')}>
+              Login Staff
+            </Button>
+            {mounted ? (
+              <ThemeToggleButton
+                theme={theme === 'light' ? 'light' : 'dark'}
+                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                variant="circle" // circle | circle-blur | gif | polygon
+                start="center" // origin animasi
+              />
+            ) : (
+              <div className="w-10 h-10" />
+            )}
+          </div>
         </div>
-
-        <Button appName="web" className={styles.secondary}>
-          Open alert
-        </Button>
-
-        {links.length > 0 ? (
-          <div className={styles.ctas}>
-            {links.map((link) => (
-              <a
-                key={link.id}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={link.description}
-                className={styles.secondary}
-              >
-                {link.title}
-              </a>
-            ))}
+      </header>
+      {/* Hero Section */}
+      <section className="mx-auto px-4 py-20 md:py-32 container">
+        <div className="space-y-8 mx-auto max-w-4xl text-center">
+          <div className="inline-flex items-center gap-2 bg-primary/10 mb-4 px-4 py-2 rounded-full font-medium text-primary text-sm">
+            <CheckCircle2 className="w-4 h-4" />
+            Sistem Check-In Vendor Digital
           </div>
-        ) : (
-          <div style={{ color: '#666' }}>
-            No links available. Make sure the NestJS API is running on port
-            3000.
-          </div>
-        )}
-      </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com/templates?search=turborepo&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://turborepo.com?utm_source=create-turbo"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to turborepo.com →
-        </a>
+          <h2 className="bg-clip-text bg-linear-to-br from-foreground to-foreground/70 font-bold text-transparent text-5xl md:text-7xl tracking-tight">
+            Check-In Vendor
+            <br />
+            <span className="text-primary">Lebih Efisien</span>
+          </h2>
+
+          <p className="mx-auto max-w-2xl text-muted-foreground text-xl md:text-2xl">
+            Proses check-in diproses secara otomatis. Sistem langsung
+            menghasilkan nomor antrean.
+          </p>
+
+          <div className="flex sm:flex-row flex-col justify-center gap-4 pt-8">
+            <Button size="xl" onClick={() => router.push('/check-in')}>
+              Mulai Check-In
+              <CircleArrowRight className="size-6" />
+            </Button>
+            <Button
+              size="xl"
+              variant="outline"
+              onClick={() => router.push('/status')}
+            >
+              <Search className="size-6" />
+              Cek Status Antrean
+            </Button>
+          </div>
+        </div>
+      </section>
+      {/* Steps */}
+      <section className="mx-auto px-4 py-20 container">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-16 text-center">
+            <h3 className="mb-4 font-bold text-4xl">3 Langkah Mudah</h3>
+            <p className="text-muted-foreground text-lg">
+              Proses check-in selesai dalam hitungan menit
+            </p>
+          </div>
+
+          <div className="gap-8 grid md:grid-cols-3">
+            <Card className="hover:shadow-lg p-8 transition-shadow">
+              <div className="flex justify-center items-center bg-primary/10 mb-6 rounded-2xl w-14 h-14 font-bold text-primary text-2xl">
+                1
+              </div>
+              <h4 className="mb-3 font-semibold text-2xl">Isi Data</h4>
+              <p className="text-muted-foreground leading-relaxed">
+                Input identitas driver dan informasi perusahaan vendor
+              </p>
+            </Card>
+
+            <Card className="hover:shadow-lg p-8 transition-shadow">
+              <div className="flex justify-center items-center bg-primary/10 mb-6 rounded-2xl w-14 h-14 font-bold text-primary text-2xl">
+                2
+              </div>
+              <h4 className="mb-3 font-semibold text-2xl">Checklist</h4>
+              <p className="text-muted-foreground leading-relaxed">
+                Lengkapi checklist Safety, Quality, Productivity & Environment
+              </p>
+            </Card>
+
+            <Card className="hover:shadow-lg p-8 transition-shadow">
+              <div className="flex justify-center items-center bg-primary/10 mb-6 rounded-2xl w-14 h-14 font-bold text-primary text-2xl">
+                3
+              </div>
+              <h4 className="mb-3 font-semibold text-2xl">Selesai</h4>
+              <p className="text-muted-foreground leading-relaxed">
+                Sistem menghasilkan nomor antrean dan menunggu proses
+                verifikasi.
+              </p>
+            </Card>
+          </div>
+        </div>
+      </section>
+      {/* Footer */}
+      <footer className="mt-16 px-4 py-8 border-t w-full">
+        <div className="flex md:flex-row flex-col justify-between items-center gap-4 mx-auto container">
+          <p className="text-muted-foreground text-sm">
+            © 2025 DX Warehouse. Vendor Checkpoint.
+          </p>
+          <Button variant="link" onClick={() => router.push('/display')}>
+            TV Display Mode
+          </Button>
+        </div>
       </footer>
     </div>
   );
