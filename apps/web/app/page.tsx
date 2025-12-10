@@ -75,7 +75,7 @@ export default function Home() {
           </p>
 
           <div className="flex sm:flex-row flex-col justify-center gap-4 pt-8">
-            <Button size="xl" onClick={() => router.push('/check-in')}>
+            <Button size="xl" onClick={() => router.push('/check-in/step-1')}>
               Mulai Check-In
               <CircleArrowRight className="size-6" />
             </Button>
