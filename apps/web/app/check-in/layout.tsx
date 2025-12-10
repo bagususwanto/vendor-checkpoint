@@ -13,9 +13,9 @@ export default function CheckInLayout({
   const router = useRouter();
 
   const steps = [
-    { path: '/check-in/step-1', label: 'Informasi Dasar' },
-    { path: '/check-in/step-2', label: 'Detail Lengkap' },
-    { path: '/check-in/selesai', label: 'Selesai' },
+    { path: '/check-in/step-1', label: 'Identitas' },
+    { path: '/check-in/step-2', label: 'Pemeriksaan' },
+    { path: '/check-in/step-3', label: 'Konfirmasi' },
   ];
 
   const currentStepIndex = steps.findIndex((step) => step.path === pathname);
@@ -29,8 +29,9 @@ export default function CheckInLayout({
           {/* Back Button */}
           <Button
             variant="ghost"
-            onClick={() => router.push('/')}
+            onClick={() => router.back()}
             className="mb-4"
+            size={'lg'}
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Kembali</span>
@@ -53,13 +54,13 @@ export default function CheckInLayout({
                   <div className="flex flex-col items-center">
                     <div
                       className={`
-                        flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 
+                        flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 
                         ${
                           isCompleted
-                            ? 'bg-accent text-white shadow-lg shadow-accent/30'
+                            ? 'bg-accent text-accent-foreground shadow-lg shadow-accent/30'
                             : isActive
-                              ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                              : 'bg-slate-200 text-slate-400'
+                              ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
+                              : 'bg-muted text-muted-foreground'
                         }
                       `}
                     >
@@ -75,8 +76,8 @@ export default function CheckInLayout({
                     {/* Step Label */}
                     <span
                       className={`
-                        mt-2 text-xs font-medium text-center transition-colors duration-300
-                        ${isActive ? 'text-primary' : isCompleted ? 'text-emerald-600' : 'text-slate-400'}
+                        mt-2 vendor-text font-medium text-center transition-colors duration-300
+                        ${isActive ? 'text-primary' : 'text-foreground/70'}
                       `}
                     >
                       {step.label}
@@ -89,7 +90,7 @@ export default function CheckInLayout({
                       <div
                         className={`
                           h-full transition-all duration-500 rounded-full
-                          ${isCompleted ? 'bg-accent' : 'bg-slate-300'}
+                          ${isCompleted ? 'bg-accent' : 'bg-foreground/20'}
                         `}
                       />
                     </div>
@@ -100,24 +101,22 @@ export default function CheckInLayout({
           </div>
 
           {/* Progress Bar */}
-          <div className="space-y-2">
-            <div className="flex justify-between items-center text-sm">
-              <span className="font-medium text-slate-700">
-                Progress Pengisian
-              </span>
+          {/* <div className="space-y-2">
+            <div className="flex justify-between items-center vendor-text">
+              <span className="font-medium">Progress Pengisian</span>
               <span className="font-semibold text-primary">
                 {Math.round(progressPercent)}%
               </span>
             </div>
-            <div className="relative bg-slate-100 rounded-full h-2 overflow-hidden">
+            <div className="relative bg-foreground/20 rounded-full h-2 overflow-hidden">
               <div
                 className="left-0 absolute inset-y-0 bg-linear-to-r from-primary to-accent shadow-lg rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${progressPercent}%` }}
               >
-                <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                <div className="absolute inset-0 bg-foreground/20 animate-pulse" />
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </header>
 
