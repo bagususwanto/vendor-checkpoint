@@ -30,19 +30,19 @@ export default function CheckInStep1() {
   const companys = [
     {
       label: 'PT. ABC Indonesia',
-      value: 'pt-abc-indonesia',
+      value: '1',
       category: 'BBM',
       vendorCode: 'VND-001',
     },
     {
       label: 'PT. XYZ Indonesia',
-      value: 'pt-xyz-indonesia',
+      value: '2',
       category: 'Chemicals',
       vendorCode: 'VND-002',
     },
     {
       label: 'PT. 123 Indonesia',
-      value: 'pt-123-indonesia',
+      value: '3',
       category: 'BBM',
       vendorCode: 'VND-003',
     },
