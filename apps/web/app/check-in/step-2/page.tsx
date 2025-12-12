@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/accordion';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 export default function CheckInStep2() {
   const router = useRouter();
@@ -129,6 +130,11 @@ export default function CheckInStep2() {
           <CardDescription className="vendor-text">
             Jawab beberapa pertanyaan berikut sebelum memasuki area warehouse.
           </CardDescription>
+          <div className="flex justify-center items-center gap-2 pt-2">
+            <Badge variant="outline" className="px-4 py-1 text-base">
+              Progress: 0/15 Terjawab
+            </Badge>
+          </div>
         </CardHeader>
         <CardContent>
           <form>
@@ -140,6 +146,12 @@ export default function CheckInStep2() {
                 className="space-y-4"
               >
                 {Object.entries(checklistData).map(([key, data]) => {
+                  const progress = {
+                    answered: 0,
+                    total: data.general.length,
+                  };
+                  const isComplete = progress.answered === progress.total;
+
                   return (
                     <AccordionItem
                       key={key}
@@ -153,6 +165,17 @@ export default function CheckInStep2() {
                             <span className="font-semibold vendor-text">
                               {data.label}
                             </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              className="px-2 py-1 text-sm"
+                              variant={isComplete ? 'default' : 'secondary'}
+                            >
+                              {progress.answered}/{progress.total}
+                            </Badge>
+                            {isComplete && (
+                              <Icons.CheckCircle2 className="w-5 h-5 text-success" />
+                            )}
                           </div>
                         </div>
                       </AccordionTrigger>
@@ -170,6 +193,27 @@ export default function CheckInStep2() {
                               <Label className="font-medium text-base">
                                 {question}
                               </Label>
+                              <ToggleGroup
+                                variant={'outline'}
+                                spacing={2}
+                                type="single"
+                                size={'lg'}
+                              >
+                                <ToggleGroupItem
+                                  value="true"
+                                  className="gap-2 data-[state=on]:bg-green-100 hover:bg-green-50 border data-[state=on]:border-green-600 data-[state=on]:text-green-700 hover:text-green-700 active:scale-95 transition-all duration-200"
+                                >
+                                  <Icons.CircleCheck className="size-5" />
+                                  Ya
+                                </ToggleGroupItem>
+                                <ToggleGroupItem
+                                  value="false"
+                                  className="gap-2 data-[state=on]:bg-red-100 hover:bg-red-50 border data-[state=on]:border-red-600 data-[state=on]:text-red-700 hover:text-red-700 active:scale-95 transition-all duration-200"
+                                >
+                                  <Icons.CircleX className="size-5" />
+                                  Tidak
+                                </ToggleGroupItem>
+                              </ToggleGroup>
                             </div>
                           ))}
                         </div>
