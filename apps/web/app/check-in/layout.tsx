@@ -90,7 +90,7 @@ export default function CheckInLayout({
                       <div
                         className={`
                           h-full transition-all duration-500 rounded-full
-                          ${isCompleted ? 'bg-accent' : 'bg-foreground/20'}
+                          ${isCompleted ? 'bg-primary' : 'bg-foreground/20'}
                         `}
                       />
                     </div>
