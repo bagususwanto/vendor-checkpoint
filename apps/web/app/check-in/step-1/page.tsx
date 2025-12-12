@@ -17,12 +17,7 @@ import { ArrowLeft, Building2, CircleArrowRight, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@tanstack/react-form';
 import { VendorIdentitySchema } from '@/lib/schemas/vendor-identity.schema';
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '@/components/ui/field';
+import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { useChecklistStore } from '@/stores/use-checklist.store';
 
 const companys = [
