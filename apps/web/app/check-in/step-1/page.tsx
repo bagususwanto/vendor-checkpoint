@@ -79,7 +79,7 @@ export default function CheckInStep1() {
                   className="h-12 vendor-text"
                   id="fullName"
                   type="text"
-                  placeholder="Budi Santoso"
+                  placeholder="misal: Budi Santoso"
                   required
                 />
               </div>
