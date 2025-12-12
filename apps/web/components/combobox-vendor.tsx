@@ -24,9 +24,7 @@ export function ComboboxVendor({
   return (
     <Combobox
       data={dataOptions}
-      onOpenChange={(open) => console.log('Combobox is open?', open)}
       onValueChange={(newValue) => {
-        console.log('Combobox value:', newValue);
         if (onSelect) {
           onSelect(newValue);
         }
