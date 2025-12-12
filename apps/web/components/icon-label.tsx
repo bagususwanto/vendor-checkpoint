@@ -1,4 +1,4 @@
-import { Label } from '@/components/ui/label';
+import { FieldLabel } from './ui/field';
 
 export default function IconLabel({
   htmlFor,
@@ -15,14 +15,16 @@ export default function IconLabel({
   className?: string;
   classNameIcon?: string;
 }) {
-  // kalau classNameIcon tidak ada, pakai default size
   const iconClasses = classNameIcon?.trim() || 'w-4 h-4 text-muted-foreground';
 
   return (
-    <Label htmlFor={htmlFor} className={`flex items-center gap-2 ${className}`}>
+    <FieldLabel
+      htmlFor={htmlFor}
+      className={`flex items-center gap-2 ${className}`}
+    >
       {Icon && <Icon className={iconClasses} />}
       {children}
       {required && <span className="text-destructive text-xl">*</span>}
-    </Label>
+    </FieldLabel>
   );
 }

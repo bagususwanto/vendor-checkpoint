@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-
 import { ComboboxVendor } from '@/components/combobox-vendor';
 import IconLabel from '@/components/icon-label';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,35 @@ import {
 import { Input } from '@/components/ui/input';
 import { ArrowLeft, Building2, CircleArrowRight, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useForm } from '@tanstack/react-form';
+import { VendorIdentitySchema } from '@/lib/schemas/vendor_identity.schema';
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@/components/ui/field';
+
+const companys = [
+  {
+    label: 'PT. ABC Indonesia',
+    value: '1',
+    category: 'BBM',
+    vendorCode: 'VND-001',
+  },
+  {
+    label: 'PT. XYZ Indonesia',
+    value: '2',
+    category: 'Chemicals',
+    vendorCode: 'VND-002',
+  },
+  {
+    label: 'PT. 123 Indonesia',
+    value: '3',
+    category: 'BBM',
+    vendorCode: 'VND-003',
+  },
+];
 
 export default function CheckInStep1() {
   const router = useRouter();
@@ -27,30 +55,31 @@ export default function CheckInStep1() {
     vendorCode: string;
   } | null>(null);
 
-  const companys = [
-    {
-      label: 'PT. ABC Indonesia',
-      value: '1',
-      category: 'BBM',
-      vendorCode: 'VND-001',
+  const form = useForm({
+    defaultValues: {
+      fullName: '',
+      company: {
+        value: '',
+        category: '',
+        vendorCode: '',
+      },
     },
-    {
-      label: 'PT. XYZ Indonesia',
-      value: '2',
-      category: 'Chemicals',
-      vendorCode: 'VND-002',
+    validators: {
+      onSubmit: VendorIdentitySchema,
     },
-    {
-      label: 'PT. 123 Indonesia',
-      value: '3',
-      category: 'BBM',
-      vendorCode: 'VND-003',
+    onSubmit: async () => {
+      router.push('/check-in/step-2');
     },
-  ];
+  });
 
   const handleSelectVendor = (value: string) => {
     const vendor = companys.find((c) => c.value === value);
     setSelectedVendor(vendor || null);
+    if (vendor) {
+      form.setFieldValue('company.value', vendor.value);
+      form.setFieldValue('company.category', vendor.category);
+      form.setFieldValue('company.vendorCode', vendor.vendorCode);
+    }
   };
 
   return (
@@ -63,43 +92,76 @@ export default function CheckInStep1() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
-            <div className="flex flex-col gap-6">
-              <div className="gap-2 grid">
-                <IconLabel
-                  className="vendor-text"
-                  classNameIcon="w-8 h-8"
-                  htmlFor="fullName"
-                  icon={User}
-                  required
-                >
-                  Nama Lengkap
-                </IconLabel>
-                <Input
-                  className="h-12 vendor-text"
-                  id="fullName"
-                  type="text"
-                  placeholder="misal: Budi Santoso"
-                  required
-                />
-              </div>
-              <div className="gap-2 grid">
-                <IconLabel
-                  className="vendor-text"
-                  classNameIcon="w-8 h-8"
-                  htmlFor="company"
-                  icon={Building2}
-                  required
-                >
-                  Perusahaan
-                </IconLabel>
-                <ComboboxVendor
-                  dataOptions={companys}
-                  type="perusahaan"
-                  onSelect={handleSelectVendor}
-                  value={selectedVendor?.value}
-                />
-              </div>
+          <form
+            id="vendor-identity-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+          >
+            <FieldGroup>
+              <form.Field
+                name="fullName"
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <IconLabel
+                        classNameIcon="w-6 h-6"
+                        htmlFor="fullName"
+                        icon={User}
+                        required
+                      >
+                        Nama Lengkap
+                      </IconLabel>
+                      <Input
+                        className="h-12 vendor-text"
+                        id="fullName"
+                        type="text"
+                        placeholder="misal: Budi Santoso"
+                        autoComplete="off"
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              />
+              <form.Field
+                name="company.value"
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <IconLabel
+                        classNameIcon="w-6 h-6"
+                        htmlFor="company"
+                        icon={Building2}
+                        required
+                      >
+                        Perusahaan
+                      </IconLabel>
+                      <ComboboxVendor
+                        dataOptions={companys}
+                        type="perusahaan"
+                        onSelect={handleSelectVendor}
+                        value={selectedVendor?.value}
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              />
               {selectedVendor && (
                 <Card className="bg-muted/50 border-dashed">
                   <CardHeader>
@@ -125,12 +187,13 @@ export default function CheckInStep1() {
                   </CardContent>
                 </Card>
               )}
-            </div>
+            </FieldGroup>
           </form>
         </CardContent>
         <CardFooter className="flex flex-row justify-between gap-2">
           <Button
             disabled
+            type="button"
             size={'xl'}
             variant="outline"
             className="w-1/2"
@@ -142,8 +205,8 @@ export default function CheckInStep1() {
           <Button
             size={'xl'}
             type="submit"
+            form="vendor-identity-form"
             className="w-1/2"
-            onClick={() => router.push('/check-in/step-2')}
           >
             Lanjut
             <CircleArrowRight className="ml-2 size-6" />
