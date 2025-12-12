@@ -16,13 +16,14 @@ import { Input } from '@/components/ui/input';
 import { ArrowLeft, Building2, CircleArrowRight, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@tanstack/react-form';
-import { VendorIdentitySchema } from '@/lib/schemas/vendor_identity.schema';
+import { VendorIdentitySchema } from '@/lib/schemas/vendor-identity.schema';
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field';
+import { useChecklistStore } from '@/stores/use-checklist.store';
 
 const companys = [
   {
@@ -46,6 +47,7 @@ const companys = [
 ];
 
 export default function CheckInStep1() {
+  const { step1Data, setStep1Data } = useChecklistStore();
   const router = useRouter();
 
   const [selectedVendor, setSelectedVendor] = useState<{
@@ -53,21 +55,27 @@ export default function CheckInStep1() {
     value: string;
     category: string;
     vendorCode: string;
-  } | null>(null);
+  } | null>(() => {
+    if (step1Data?.company.value) {
+      return companys.find((c) => c.value === step1Data.company.value) || null;
+    }
+    return null;
+  });
 
   const form = useForm({
     defaultValues: {
-      fullName: '',
+      fullName: step1Data?.fullName || '',
       company: {
-        value: '',
-        category: '',
-        vendorCode: '',
+        value: step1Data?.company.value || '',
+        category: step1Data?.company.category || '',
+        vendorCode: step1Data?.company.vendorCode || '',
       },
     },
     validators: {
       onSubmit: VendorIdentitySchema,
     },
-    onSubmit: async () => {
+    onSubmit: async ({ value }) => {
+      setStep1Data(value);
       router.push('/check-in/step-2');
     },
   });
