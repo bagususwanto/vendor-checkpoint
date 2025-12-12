@@ -195,7 +195,7 @@ export default function CheckInStep2() {
                               </Label>
                               <ToggleGroup
                                 variant={'outline'}
-                                spacing={6}
+                                spacing={4}
                                 type="single"
                                 size={'lg'}
                               >
