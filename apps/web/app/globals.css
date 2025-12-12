@@ -185,4 +185,7 @@
   .vendor-text {
     @apply text-lg leading-relaxed;
   }
+  .text-success {
+    @apply text-green-600;
+  }
 }
