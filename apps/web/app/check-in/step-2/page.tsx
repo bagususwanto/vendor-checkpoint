@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -18,7 +17,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useForm } from '@tanstack/react-form';
@@ -31,6 +29,8 @@ const checklistData = [
     category_name: 'Safety Delivery',
     display_order: 1,
     id: 'safety',
+    icon: 'Shield',
+    color: 'text-green-600',
     items: [
       {
         checklist_item_id: 1,
@@ -85,6 +85,8 @@ const checklistData = [
     category_name: 'Quality',
     display_order: 2,
     id: 'quality',
+    icon: 'Award',
+    color: 'text-yellow-600',
     items: [
       {
         checklist_item_id: 4,
@@ -126,6 +128,8 @@ const checklistData = [
     category_name: 'Productivity',
     display_order: 3,
     id: 'productivity',
+    icon: 'TrendingUp',
+    color: 'text-blue-600',
     items: [
       {
         checklist_item_id: 6,
@@ -151,6 +155,8 @@ const checklistData = [
     category_name: 'Environment',
     display_order: 4,
     id: 'environment',
+    icon: 'Leaf',
+    color: 'text-teal-600',
     items: [
       {
         checklist_item_id: 9,
@@ -173,28 +179,6 @@ const checklistData = [
     ],
   },
 ];
-
-const categoryUiConfig: Record<
-  string,
-  { icon: React.ElementType; color: string }
-> = {
-  safety: {
-    icon: Icons.Shield,
-    color: 'text-green-600',
-  },
-  quality: {
-    icon: Icons.Award,
-    color: 'text-yellow-600',
-  },
-  productivity: {
-    icon: Icons.TrendingUp,
-    color: 'text-blue-600',
-  },
-  environment: {
-    icon: Icons.Leaf,
-    color: 'text-teal-600',
-  },
-};
 
 export default function CheckInStep2() {
   const router = useRouter();
@@ -243,10 +227,9 @@ export default function CheckInStep2() {
                 className="space-y-4"
               >
                 {checklistData.map((category) => {
-                  const uiConfig =
-                    categoryUiConfig[
-                      category.id as keyof typeof categoryUiConfig
-                    ]!;
+                  const Icon = Icons[
+                    category.icon as keyof typeof Icons
+                  ] as React.ElementType;
 
                   // Filter items
                   const generalItems = category.items.filter(
@@ -275,9 +258,9 @@ export default function CheckInStep2() {
                       <AccordionTrigger className="px-4 hover:no-underline">
                         <div className="flex justify-between items-center pr-4 w-full">
                           <div className="flex items-center gap-3">
-                            <uiConfig.icon
-                              className={`w-5 h-5 ${uiConfig.color}`}
-                            />
+                            {Icon && (
+                              <Icon className={`w-5 h-5 ${category.color}`} />
+                            )}
                             <span className="font-semibold vendor-text">
                               {category.category_name}
                             </span>
