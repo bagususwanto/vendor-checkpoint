@@ -34,7 +34,7 @@ const checklistData = [
     items: [
       {
         checklist_item_id: 1,
-        item_text: 'Apakah driver menggunakan APD (helm, sepatu safety)?',
+        item_text: 'Apakah anda menggunakan APD (helm, sepatu safety)?',
         item_type: 'UMUM',
         is_required: true,
       },
