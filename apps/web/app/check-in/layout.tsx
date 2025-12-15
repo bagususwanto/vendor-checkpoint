@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { CheckCircle2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { InteractiveBackground } from '@/components/interactive-background';
 
 export default function CheckInLayout({
   children,
@@ -23,37 +24,39 @@ export default function CheckInLayout({
     currentStepIndex >= 0 ? ((currentStepIndex + 1) / steps.length) * 100 : 0;
 
   return (
-    <div className="flex flex-col bg-linear-to-br from-background to-muted/20 min-h-screen">
-      <header className="top-0 z-50 sticky bg-background/95 supports-backdrop-filter:bg-background/60 backdrop-blur border-b">
-        <div className="mx-auto px-6 py-5 container">
-          {/* Back Button */}
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="mb-4"
-            size={'lg'}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Kembali</span>
-          </Button>
+    <div className="relative flex flex-col bg-linear-to-br from-background to-muted/20 min-h-screen">
+      <InteractiveBackground color="59, 130, 246" />
+      <div className="z-10 relative flex flex-col min-h-screen">
+        <header className="bg-background/95 supports-backdrop-filter:bg-background/60 backdrop-blur border-b">
+          <div className="mx-auto px-6 py-5 container">
+            {/* Back Button */}
+            <Button
+              variant="ghost"
+              onClick={() => router.back()}
+              className="mb-4"
+              size={'lg'}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Kembali</span>
+            </Button>
 
-          {/* Progress Steps */}
-          <div className="flex justify-between items-center mb-6">
-            {steps.map((step, index) => {
-              const isActive = index === currentStepIndex;
-              const isCompleted = index < currentStepIndex;
+            {/* Progress Steps */}
+            <div className="flex justify-between items-center mb-6">
+              {steps.map((step, index) => {
+                const isActive = index === currentStepIndex;
+                const isCompleted = index < currentStepIndex;
 
-              return (
-                <div
-                  key={step.path}
-                  className={`flex items-start ${
-                    index === steps.length - 1 ? '' : 'flex-1'
-                  }`}
-                >
-                  {/* Step Circle */}
-                  <div className="flex flex-col items-center">
-                    <div
-                      className={`
+                return (
+                  <div
+                    key={step.path}
+                    className={`flex items-start ${
+                      index === steps.length - 1 ? '' : 'flex-1'
+                    }`}
+                  >
+                    {/* Step Circle */}
+                    <div className="flex flex-col items-center">
+                      <div
+                        className={`
                         flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 
                         ${
                           isCompleted
@@ -63,45 +66,45 @@ export default function CheckInLayout({
                               : 'bg-muted text-muted-foreground'
                         }
                       `}
-                    >
-                      {isCompleted ? (
-                        <CheckCircle2 className="w-5 h-5" />
-                      ) : (
-                        <span className="font-semibold text-sm">
-                          {index + 1}
-                        </span>
-                      )}
-                    </div>
+                      >
+                        {isCompleted ? (
+                          <CheckCircle2 className="w-5 h-5" />
+                        ) : (
+                          <span className="font-semibold text-sm">
+                            {index + 1}
+                          </span>
+                        )}
+                      </div>
 
-                    {/* Step Label */}
-                    <span
-                      className={`
+                      {/* Step Label */}
+                      <span
+                        className={`
                         mt-2 vendor-text font-medium text-center transition-colors duration-300
                         ${isActive ? 'text-primary' : 'text-foreground/70'}
                       `}
-                    >
-                      {step.label}
-                    </span>
-                  </div>
-
-                  {/* Connector Line */}
-                  {index < steps.length - 1 && (
-                    <div className="flex-1 mx-2 mt-5 h-0.5">
-                      <div
-                        className={`
-                          h-full transition-all duration-500 rounded-full
-                          ${isCompleted ? 'bg-primary' : 'bg-foreground/20'}
-                        `}
-                      />
+                      >
+                        {step.label}
+                      </span>
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
 
-          {/* Progress Bar */}
-          {/* <div className="space-y-2">
+                    {/* Connector Line */}
+                    {index < steps.length - 1 && (
+                      <div className="flex-1 mx-2 mt-5 h-1">
+                        <div
+                          className={`
+                          h-full transition-all duration-500 rounded-full
+                          ${isCompleted ? 'bg-primary' : 'bg-accent'}
+                        `}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Progress Bar */}
+            {/* <div className="space-y-2">
             <div className="flex justify-between items-center vendor-text">
               <span className="font-medium">Progress Pengisian</span>
               <span className="font-semibold text-primary">
@@ -117,14 +120,15 @@ export default function CheckInLayout({
               </div>
             </div>
           </div> */}
-        </div>
-      </header>
+          </div>
+        </header>
 
-      <main className="flex-1 mx-auto px-6 py-8 w-full max-w-4xl">
-        <div className="slide-in-from-bottom-4 animate-in duration-500 fade-in">
-          {children}
-        </div>
-      </main>
+        <main className="flex-1 mx-auto px-6 py-8 w-full max-w-4xl">
+          <div className="slide-in-from-bottom-4 animate-in duration-500 fade-in">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
