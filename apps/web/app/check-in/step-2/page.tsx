@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress as ProgressBar } from '@/components/ui/progress';
 import { useRouter } from 'next/navigation';
 import * as Icons from 'lucide-react';
@@ -93,7 +93,8 @@ export default function CheckInStep2() {
                   <div className="flex justify-between items-center w-full max-w-md font-medium text-sm">
                     <span>Progress Pengisian</span>
                     <span>
-                      {Math.round(progress)}% ({answerCount}/{totalRequiredItems})
+                      {Math.round(progress)}% ({answerCount}/
+                      {totalRequiredItems})
                     </span>
                   </div>
                   <ProgressBar
@@ -369,28 +370,28 @@ export default function CheckInStep2() {
             <Icons.ArrowLeft className="mr-2 size-6" />
             Kembali
           </Button>
-            <form.Subscribe
-             selector={(state) => state.values.checklistItems}
-             children={(checklistItems) => {
-               const answerCount = requiredItems.reduce((count, item) => {
-                 if (
-                   checklistItems &&
-                   checklistItems[item.checklist_item_id.toString()]
-                 ) {
-                   return count + 1;
-                 }
-                 return count;
-               }, 0);
-               const progress = (answerCount / totalRequiredItems) * 100;
+          <form.Subscribe
+            selector={(state) => state.values.checklistItems}
+            children={(checklistItems) => {
+              const answerCount = requiredItems.reduce((count, item) => {
+                if (
+                  checklistItems &&
+                  checklistItems[item.checklist_item_id.toString()]
+                ) {
+                  return count + 1;
+                }
+                return count;
+              }, 0);
+              const progress = (answerCount / totalRequiredItems) * 100;
 
-               return (
-                 <Button
-                   size={'xl'}
-                   type="submit"
-                   className="w-1/2"
-                   form="checklist-form"
-                   disabled={Math.round(progress) < 100}
-                 >
+              return (
+                <Button
+                  size={'xl'}
+                  type="submit"
+                  className="w-1/2"
+                  form="checklist-form"
+                  disabled={Math.round(progress) < 100}
+                >
                   Lanjut
                   <Icons.CircleArrowRight className="ml-2 size-6" />
                 </Button>
