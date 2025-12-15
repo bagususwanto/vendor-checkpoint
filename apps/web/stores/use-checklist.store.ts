@@ -10,7 +10,7 @@ type Step1Data = {
 };
 
 type Step2Data = {
-  checklistItems: string[];
+  checklistItems: Record<string, string>;
 };
 
 type ChecklistStore = {
