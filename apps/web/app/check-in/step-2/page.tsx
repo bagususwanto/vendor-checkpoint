@@ -58,7 +58,8 @@ export default function CheckInStep2() {
     return [...generalItems, ...specificItems];
   });
 
-  const totalItems = visibleItems.length;
+  const requiredItems = visibleItems.filter((item) => item.is_required);
+  const totalRequiredItems = requiredItems.length;
 
   return (
     <div>
@@ -73,7 +74,7 @@ export default function CheckInStep2() {
           <form.Subscribe
             selector={(state) => state.values.checklistItems}
             children={(checklistItems) => {
-              const answerCount = visibleItems.reduce((count, item) => {
+              const answerCount = requiredItems.reduce((count, item) => {
                 if (
                   checklistItems &&
                   checklistItems[item.checklist_item_id.toString()]
@@ -82,17 +83,17 @@ export default function CheckInStep2() {
                 }
                 return count;
               }, 0);
-              const progress = (answerCount / totalItems) * 100;
+              const progress = (answerCount / totalRequiredItems) * 100;
               const hasFailedItems = Object.entries(checklistItems || {}).some(
                 ([_, value]) => value === 'false',
               );
 
               return (
                 <div className="flex flex-col items-center gap-2 px-4 w-full">
-                  <div className="flex justify-between items-center w-full max-w-md font-medium text-xs">
+                  <div className="flex justify-between items-center w-full max-w-md font-medium text-sm">
                     <span>Progress Pengisian</span>
                     <span>
-                      {Math.round(progress)}% ({answerCount}/{totalItems})
+                      {Math.round(progress)}% ({answerCount}/{totalRequiredItems})
                     </span>
                   </div>
                   <ProgressBar
@@ -368,28 +369,28 @@ export default function CheckInStep2() {
             <Icons.ArrowLeft className="mr-2 size-6" />
             Kembali
           </Button>
-          <form.Subscribe
-            selector={(state) => state.values.checklistItems}
-            children={(checklistItems) => {
-              const answerCount = visibleItems.reduce((count, item) => {
-                if (
-                  checklistItems &&
-                  checklistItems[item.checklist_item_id.toString()]
-                ) {
-                  return count + 1;
-                }
-                return count;
-              }, 0);
-              const progress = (answerCount / totalItems) * 100;
+            <form.Subscribe
+             selector={(state) => state.values.checklistItems}
+             children={(checklistItems) => {
+               const answerCount = requiredItems.reduce((count, item) => {
+                 if (
+                   checklistItems &&
+                   checklistItems[item.checklist_item_id.toString()]
+                 ) {
+                   return count + 1;
+                 }
+                 return count;
+               }, 0);
+               const progress = (answerCount / totalRequiredItems) * 100;
 
-              return (
-                <Button
-                  size={'xl'}
-                  type="submit"
-                  className="w-1/2"
-                  form="checklist-form"
-                  disabled={Math.round(progress) < 100}
-                >
+               return (
+                 <Button
+                   size={'xl'}
+                   type="submit"
+                   className="w-1/2"
+                   form="checklist-form"
+                   disabled={Math.round(progress) < 100}
+                 >
                   Lanjut
                   <Icons.CircleArrowRight className="ml-2 size-6" />
                 </Button>
