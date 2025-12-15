@@ -20,8 +20,6 @@ export default function CheckInLayout({
   ];
 
   const currentStepIndex = steps.findIndex((step) => step.path === pathname);
-  const progressPercent =
-    currentStepIndex >= 0 ? ((currentStepIndex + 1) / steps.length) * 100 : 0;
 
   return (
     <div className="relative flex flex-col bg-linear-to-br from-background to-muted/20 min-h-screen">
@@ -29,7 +27,6 @@ export default function CheckInLayout({
       <div className="z-10 relative flex flex-col min-h-screen">
         <header className="top-0 z-30 sticky bg-background/95 supports-backdrop-filter:bg-background/60 backdrop-blur border-b">
           <div className="mx-auto px-6 py-2 container">
-            {/* Back Button */}
             {/* Back Button */}
             <div className="mb-2">
               <Button
@@ -73,7 +70,7 @@ export default function CheckInLayout({
                         {isCompleted ? (
                           <CheckCircle2 className="w-4 h-4" />
                         ) : (
-                          <span className="font-semibold text-xs text-xs">
+                          <span className="font-semibold text-xs">
                             {index + 1}
                           </span>
                         )}
