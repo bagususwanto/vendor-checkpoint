@@ -168,21 +168,6 @@ export default function CheckInStep2() {
                         0,
                       );
 
-                      const categoryFailedCount = categoryItems.reduce(
-                        (count, item) => {
-                          if (
-                            checklistItems &&
-                            checklistItems[
-                              item.checklist_item_id.toString()
-                            ] === 'false'
-                          ) {
-                            return count + 1;
-                          }
-                          return count;
-                        },
-                        0,
-                      );
-
                       const isComplete =
                         categoryTotal > 0 && categoryAnswered === categoryTotal;
 
@@ -209,22 +194,14 @@ export default function CheckInStep2() {
                                 </span>
                               </div>
                               <div className="flex items-center gap-2">
-                                {categoryFailedCount > 0 ? (
-                                  <Badge
-                                    variant="destructive"
-                                    className="px-2 py-1"
-                                  >
-                                    TIDAK {categoryFailedCount}
-                                  </Badge>
-                                ) : isComplete ? (
-                                  <Icons.CheckCircle2 className="w-5 h-5 text-green-600" />
-                                ) : (
-                                  <Badge
-                                    className="px-2 py-1 text-sm"
-                                    variant="secondary"
-                                  >
-                                    {categoryAnswered}/{categoryTotal}
-                                  </Badge>
+                                <Badge
+                                  className="px-2 py-1 text-sm"
+                                  variant={isComplete ? 'default' : 'secondary'}
+                                >
+                                  {categoryAnswered}/{categoryTotal}
+                                </Badge>
+                                {isComplete && (
+                                  <Icons.CheckCircle2 className="w-6 h-6 text-success" />
                                 )}
                               </div>
                             </div>
