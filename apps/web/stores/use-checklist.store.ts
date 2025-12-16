@@ -4,6 +4,7 @@ type Step1Data = {
   fullName: string;
   company: {
     value: string;
+    label: string;
     category: string;
     vendorCode: string;
   };

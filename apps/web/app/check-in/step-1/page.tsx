@@ -62,6 +62,7 @@ export default function CheckInStep1() {
       fullName: step1Data?.fullName || '',
       company: {
         value: step1Data?.company.value || '',
+        label: step1Data?.company.label || '',
         category: step1Data?.company.category || '',
         vendorCode: step1Data?.company.vendorCode || '',
       },
@@ -70,6 +71,7 @@ export default function CheckInStep1() {
       onSubmit: VendorIdentitySchema,
     },
     onSubmit: async ({ value }) => {
+      console.log('Submitting Step 1 Data:', value);
       setStep1Data(value);
       router.push('/check-in/step-2');
     },
@@ -80,6 +82,7 @@ export default function CheckInStep1() {
     setSelectedVendor(vendor || null);
     if (vendor) {
       form.setFieldValue('company.value', vendor.value);
+      form.setFieldValue('company.label', vendor.label);
       form.setFieldValue('company.category', vendor.category);
       form.setFieldValue('company.vendorCode', vendor.vendorCode);
     }
