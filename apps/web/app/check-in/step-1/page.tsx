@@ -71,7 +71,6 @@ export default function CheckInStep1() {
       onSubmit: VendorIdentitySchema,
     },
     onSubmit: async ({ value }) => {
-      console.log('Submitting Step 1 Data:', value);
       setStep1Data(value);
       router.push('/check-in/step-2');
     },
@@ -171,12 +170,12 @@ export default function CheckInStep1() {
               {selectedVendor && (
                 <Card className="bg-muted/50 border-dashed">
                   <CardHeader>
-                    <CardTitle className="text-lg">Informasi Vendor</CardTitle>
+                    <CardTitle className="text-lg">Informasi Lainnya</CardTitle>
                   </CardHeader>
                   <CardContent className="gap-4 grid grid-cols-2">
                     <div className="gap-1 grid">
                       <span className="font-medium text-muted-foreground text-sm">
-                        Kategori Vendor
+                        Kategori
                       </span>
                       <span className="font-semibold text-base">
                         {selectedVendor.category}
@@ -184,7 +183,7 @@ export default function CheckInStep1() {
                     </div>
                     <div className="gap-1 grid">
                       <span className="font-medium text-muted-foreground text-sm">
-                        Kode Vendor
+                        Kode Perusahaan
                       </span>
                       <span className="font-semibold text-base">
                         {selectedVendor.vendorCode}
