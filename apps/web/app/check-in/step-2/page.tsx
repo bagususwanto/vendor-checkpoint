@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -32,6 +34,10 @@ export default function CheckInStep2() {
   const router = useRouter();
   const { step1Data, step2Data, setStep2Data } = useChecklistStore();
   const vendorCategory = step1Data?.company.category;
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const form = useForm({
     defaultValues: {
