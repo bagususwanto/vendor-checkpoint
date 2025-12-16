@@ -47,6 +47,7 @@ export default function CheckInStep2() {
       onSubmit: CheckInStep2Schema,
     },
     onSubmit: async ({ value }) => {
+      console.log('Submitting Step 2 Data:', value);
       setStep2Data(value);
       router.push('/check-in/step-3');
     },
@@ -139,10 +140,7 @@ export default function CheckInStep2() {
               <form.Subscribe
                 selector={(state) => state.values.checklistItems}
                 children={(checklistItems) => (
-                  <Accordion
-                    type="multiple"
-                    className="space-y-4"
-                  >
+                  <Accordion type="multiple" className="space-y-4">
                     {checklistData.map((category) => {
                       const Icon = Icons[
                         category.icon as unknown as keyof typeof Icons
