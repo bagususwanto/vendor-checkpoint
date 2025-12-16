@@ -134,9 +134,7 @@ export default function CheckInStep2() {
                 selector={(state) => state.values.checklistItems}
                 children={(checklistItems) => (
                   <Accordion
-                    type="single"
-                    defaultValue="safety"
-                    collapsible
+                    type="multiple"
                     className="space-y-4"
                   >
                     {checklistData.map((category) => {

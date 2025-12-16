@@ -4,6 +4,16 @@ import { usePathname, useRouter } from 'next/navigation';
 import { CheckCircle2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { InteractiveBackground } from '@/components/interactive-background';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { useState } from 'react';
+import { useChecklistStore } from '@/stores/use-checklist.store';
 
 export default function CheckInLayout({
   children,
@@ -12,6 +22,8 @@ export default function CheckInLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const { step1Data, step2Data, clearChecklistData } = useChecklistStore();
 
   const steps = [
     { path: '/check-in/step-1', label: 'Identitas' },
@@ -20,6 +32,25 @@ export default function CheckInLayout({
   ];
 
   const currentStepIndex = steps.findIndex((step) => step.path === pathname);
+
+  const handleBack = () => {
+    // If on Step 1, verify if we have any data before going back (which typically goes to home)
+    if (pathname === '/check-in/step-1') {
+      if (step1Data || step2Data) {
+        setShowExitDialog(true);
+      } else {
+        router.push('/');
+      }
+    } else {
+      router.back();
+    }
+  };
+
+  const handleConfirmExit = () => {
+    clearChecklistData();
+    setShowExitDialog(false);
+    router.push('/');
+  };
 
   return (
     <div className="relative flex flex-col bg-linear-to-br from-background to-muted/20 min-h-screen">
@@ -31,7 +62,7 @@ export default function CheckInLayout({
             <div className="mb-2">
               <Button
                 variant="ghost"
-                onClick={() => router.back()}
+                onClick={handleBack}
                 className="px-2 h-8 text-xs"
                 size={'sm'}
               >
@@ -111,6 +142,28 @@ export default function CheckInLayout({
           </div>
         </main>
       </div>
+
+      <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Navigasi</DialogTitle>
+            <DialogDescription>
+              Apakah yakin kembali ke home, data input akan terhapus?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowExitDialog(false)}
+            >
+              Batal
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmExit}>
+              Ya, Kembali ke Home
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
