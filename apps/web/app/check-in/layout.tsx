@@ -60,12 +60,7 @@ export default function CheckInLayout({
           <div className="mx-auto px-6 py-2 container">
             {/* Back Button */}
             <div className="mb-2">
-              <Button
-                variant="ghost"
-                onClick={handleBack}
-                className="px-2 h-8 text-xs"
-                size={'sm'}
-              >
+              <Button variant="ghost" onClick={handleBack}>
                 <ArrowLeft className="mr-1 w-3 h-3" />
                 <span>Kembali</span>
               </Button>
@@ -152,10 +147,7 @@ export default function CheckInLayout({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowExitDialog(false)}
-            >
+            <Button variant="outline" onClick={() => setShowExitDialog(false)}>
               Batal
             </Button>
             <Button variant="destructive" onClick={handleConfirmExit}>
