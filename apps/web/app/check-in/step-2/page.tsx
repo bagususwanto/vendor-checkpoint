@@ -77,7 +77,7 @@ export default function CheckInStep2() {
             Jawab beberapa pertanyaan berikut sebelum memasuki area warehouse.
           </CardDescription>
         </CardHeader>
-        <div className="top-31 z-20 sticky bg-card/80 shadow-sm backdrop-blur-md py-2 border-b w-full transition-all duration-300">
+        <div className="top-32 z-20 sticky bg-card/80 shadow-sm backdrop-blur-md py-2 border-b w-full transition-all duration-300">
           <form.Subscribe
             selector={(state) => state.values.checklistItems}
             children={(checklistItems) => {
