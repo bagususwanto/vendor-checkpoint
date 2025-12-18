@@ -37,7 +37,11 @@ export default function CheckInStep2() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+
+    if (!step1Data) {
+      router.replace('/check-in/step-1');
+    }
+  }, [step1Data, router]);
 
   const form = useForm({
     defaultValues: {

@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -27,6 +29,17 @@ import { transformCheckinData } from '@/lib/utils/transform-checkin-data';
 export default function CheckInStep1() {
   const { step1Data, step2Data } = useChecklistStore();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!step1Data) {
+      router.replace('/check-in/step-1');
+      return;
+    }
+
+    if (!step2Data) {
+      router.replace('/check-in/step-2');
+    }
+  }, [step1Data, step2Data, router]);
 
   return (
     <div>
