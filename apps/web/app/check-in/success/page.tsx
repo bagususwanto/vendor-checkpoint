@@ -26,22 +26,21 @@ export default function CheckInSuccessPage() {
   const handleStatus = () => {
     clearChecklistData();
     // Assuming this is the route for status check, or a placeholder
-    router.push('/queue-status'); 
+    router.push('/queue-status');
   };
 
   if (!successData) return null;
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center p-6 bg-gradient-to-br from-background to-muted/20 overflow-hidden">
+    <div className="relative flex flex-col justify-center items-center bg-linear-to-br from-background to-muted/20 p-6 min-h-screen overflow-hidden">
       <InteractiveBackground color="34, 197, 94" /> {/* Green for success */}
-      
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="relative z-10 w-full max-w-md"
+        className="z-10 relative w-full max-w-md"
       >
-        <SuccessCard 
+        <SuccessCard
           data={successData}
           onCheckStatus={handleStatus}
           onGoHome={handleHome}
