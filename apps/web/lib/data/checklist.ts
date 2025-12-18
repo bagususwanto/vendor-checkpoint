@@ -1,8 +1,6 @@
-
 export const checklistData = [
   {
     category_name: 'Safety Delivery',
-    display_order: 1,
     id: 'safety',
     icon: 'Shield',
     color: 'text-green-600',
@@ -58,7 +56,6 @@ export const checklistData = [
   },
   {
     category_name: 'Quality',
-    display_order: 2,
     id: 'quality',
     icon: 'Award',
     color: 'text-yellow-600',
@@ -101,7 +98,6 @@ export const checklistData = [
   },
   {
     category_name: 'Productivity',
-    display_order: 3,
     id: 'productivity',
     icon: 'TrendingUp',
     color: 'text-blue-600',
@@ -128,7 +124,6 @@ export const checklistData = [
   },
   {
     category_name: 'Environment',
-    display_order: 4,
     id: 'environment',
     icon: 'Leaf',
     color: 'text-teal-600',
