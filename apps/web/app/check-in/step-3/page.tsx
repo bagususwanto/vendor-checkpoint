@@ -22,6 +22,7 @@ import { useRouter } from 'next/navigation';
 import { useChecklistStore } from '@/stores/use-checklist.store';
 import { checklistData } from '@/lib/data/checklist';
 import * as Icons from 'lucide-react';
+import { transformCheckinData } from '@/lib/utils/transform-checkin-data';
 
 export default function CheckInStep1() {
   const { step1Data, step2Data } = useChecklistStore();
@@ -172,9 +173,20 @@ export default function CheckInStep1() {
         <CardFooter>
           <Button
             size={'xl'}
-            type="submit"
-            form="vendor-identity-form"
+            type="button"
             className="w-full"
+            onClick={() => {
+              const { step1Data, step2Data } = useChecklistStore.getState();
+              const payload = transformCheckinData(step1Data, step2Data);
+              
+              if (payload) {
+                alert('Check-in submitted successfully! (See console for payload)');
+                console.log('Submission Payload:', payload);
+                // router.push('/check-in/success'); // Future: Navigate to success page
+              } else {
+                 alert('Failed to submit check-in. Please ensure all steps are completed.');
+              }
+            }}
           >
             Submit
             <SendHorizonal className="ml-2 size-6" />
