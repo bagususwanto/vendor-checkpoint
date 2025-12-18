@@ -24,7 +24,6 @@ export default function CheckInSuccessPage() {
   };
 
   const handleStatus = () => {
-    clearChecklistData();
     // Assuming this is the route for status check, or a placeholder
     router.push('/queue-status');
   };
