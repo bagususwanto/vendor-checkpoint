@@ -1,8 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-import { ComboboxVendor } from '@/components/combobox-vendor';
-import IconLabel from '@/components/icon-label';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -12,11 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import {
-  ArrowLeft,
   Building2,
-  CircleArrowRight,
   SendHorizonal,
   User,
   Tag,
@@ -25,77 +19,13 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useForm } from '@tanstack/react-form';
-import { VendorIdentitySchema } from '@/lib/schemas/vendor-identity.schema';
-import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { useChecklistStore } from '@/stores/use-checklist.store';
 import { checklistData } from '@/lib/data/checklist';
 import * as Icons from 'lucide-react';
 
-const companys = [
-  {
-    label: 'PT. ABC Indonesia',
-    value: '1',
-    category: 'BBM',
-    vendorCode: 'VND-001',
-  },
-  {
-    label: 'PT. XYZ Indonesia',
-    value: '2',
-    category: 'Chemicals',
-    vendorCode: 'VND-002',
-  },
-  {
-    label: 'PT. 123 Indonesia',
-    value: '3',
-    category: 'BBM',
-    vendorCode: 'VND-003',
-  },
-];
-
 export default function CheckInStep1() {
   const { step1Data, step2Data } = useChecklistStore();
   const router = useRouter();
-
-  const [selectedVendor, setSelectedVendor] = useState<{
-    label: string;
-    value: string;
-    category: string;
-    vendorCode: string;
-  } | null>(() => {
-    if (step1Data?.company.value) {
-      return companys.find((c) => c.value === step1Data.company.value) || null;
-    }
-    return null;
-  });
-
-  const form = useForm({
-    defaultValues: {
-      fullName: step1Data?.fullName || '',
-      company: {
-        value: step1Data?.company.value || '',
-        category: step1Data?.company.category || '',
-        vendorCode: step1Data?.company.vendorCode || '',
-      },
-    },
-    validators: {
-      onSubmit: VendorIdentitySchema,
-    },
-    onSubmit: async ({ value }) => {
-      // setStep1Data(value);
-      router.push('/check-in/step-2');
-    },
-  });
-
-  const handleSelectVendor = (value: string) => {
-    const vendor = companys.find((c) => c.value === value);
-    setSelectedVendor(vendor || null);
-    if (vendor) {
-      form.setFieldValue('company.value', vendor.value);
-      form.setFieldValue('company.category', vendor.category);
-      form.setFieldValue('company.vendorCode', vendor.vendorCode);
-    }
-  };
 
   return (
     <div>
@@ -107,7 +37,7 @@ export default function CheckInStep1() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <Card className='bg'>
+          <Card className="bg">
             <CardHeader>
               <CardTitle className="text-lg">Identitas</CardTitle>
             </CardHeader>
@@ -159,7 +89,7 @@ export default function CheckInStep1() {
             <CardHeader>
               <CardTitle className="text-lg">Ringkasan Checklist</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 h-[300px] overflow-y-scroll">
               {checklistData.map((category) => {
                 const Icon = Icons[
                   category.icon as unknown as keyof typeof Icons
