@@ -167,7 +167,8 @@ export default function QueueStatusPage() {
               />
               <Button
                 type="submit"
-                className="mt-4 w-full h-12 text-lg"
+                size="xl"
+                className="mt-4 w-full"
                 disabled={isLoading}
               >
                 {isLoading ? (

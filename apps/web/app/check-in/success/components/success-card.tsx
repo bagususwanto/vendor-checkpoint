@@ -98,7 +98,8 @@ export function SuccessCard({ data, onCheckStatus, onGoHome }: SuccessCardProps)
           <Button 
             onClick={onCheckStatus}
             variant="outline"
-            className="w-full h-11 text-base font-medium"
+            className="w-full"
+            size="lg"
           >
             <Search className="mr-2 w-4 h-4" />
             Cek Status Antrean
@@ -106,7 +107,8 @@ export function SuccessCard({ data, onCheckStatus, onGoHome }: SuccessCardProps)
 
           <Button 
             onClick={onGoHome} 
-            className="w-full h-11 text-base font-medium shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
+            className="w-full"
+            size="lg"
           >
             <Home className="mr-2 w-4 h-4" />
             Kembali ke Beranda
