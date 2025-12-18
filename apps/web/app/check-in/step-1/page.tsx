@@ -24,19 +24,22 @@ const companys = [
   {
     label: 'PT. ABC Indonesia',
     value: '1',
-    category: 'BBM',
+    category_name: 'BBM',
+    category_id: 1,
     vendorCode: 'VND-001',
   },
   {
     label: 'PT. XYZ Indonesia',
     value: '2',
-    category: 'Chemicals',
+    category_name: 'Chemicals',
+    category_id: 2,
     vendorCode: 'VND-002',
   },
   {
     label: 'PT. 123 Indonesia',
     value: '3',
-    category: 'BBM',
+    category_name: 'BBM',
+    category_id: 1,
     vendorCode: 'VND-003',
   },
 ];
@@ -48,7 +51,8 @@ export default function CheckInStep1() {
   const [selectedVendor, setSelectedVendor] = useState<{
     label: string;
     value: string;
-    category: string;
+    category_name: string;
+    category_id: number;
     vendorCode: string;
   } | null>(() => {
     if (step1Data?.company.value) {
@@ -63,7 +67,8 @@ export default function CheckInStep1() {
       company: {
         value: step1Data?.company.value || '',
         label: step1Data?.company.label || '',
-        category: step1Data?.company.category || '',
+        category_name: step1Data?.company.category_name || '',
+        category_id: step1Data?.company.category_id || 0,
         vendorCode: step1Data?.company.vendorCode || '',
       },
     },
@@ -82,7 +87,8 @@ export default function CheckInStep1() {
     if (vendor) {
       form.setFieldValue('company.value', vendor.value);
       form.setFieldValue('company.label', vendor.label);
-      form.setFieldValue('company.category', vendor.category);
+      form.setFieldValue('company.category_name', vendor.category_name);
+      form.setFieldValue('company.category_id', vendor.category_id);
       form.setFieldValue('company.vendorCode', vendor.vendorCode);
     }
   };
@@ -178,7 +184,7 @@ export default function CheckInStep1() {
                         Kategori
                       </span>
                       <span className="font-semibold text-base">
-                        {selectedVendor.category}
+                        {selectedVendor.category_name}
                       </span>
                     </div>
                     <div className="gap-1 grid">

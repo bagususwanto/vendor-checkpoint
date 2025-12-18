@@ -66,7 +66,7 @@ export default function CheckInStep1() {
                   <div>
                     <p className="text-muted-foreground text-sm">Kategori</p>
                     <p className="font-medium text-lg">
-                      {step1Data?.company.category}
+                      {step1Data?.company.category_name}
                     </p>
                   </div>
                 </div>
@@ -95,7 +95,7 @@ export default function CheckInStep1() {
                   category.icon as unknown as keyof typeof Icons
                 ] as React.ElementType;
 
-                const vendorCategory = step1Data?.company.category;
+                const vendorCategory = step1Data?.company.category_name;
                 const generalItems = category.items.filter(
                   (item) => item.item_type === 'UMUM',
                 );

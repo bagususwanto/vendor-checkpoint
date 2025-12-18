@@ -33,7 +33,7 @@ import { Field, FieldError } from '@/components/ui/field';
 export default function CheckInStep2() {
   const router = useRouter();
   const { step1Data, step2Data, setStep2Data } = useChecklistStore();
-  const vendorCategory = step1Data?.company.category;
+  const vendorCategory = step1Data?.company.category_name;
 
   useEffect(() => {
     window.scrollTo(0, 0);
