@@ -107,7 +107,7 @@ export default function Home() {
               <Button
                 size="xl"
                 variant="outline"
-                onClick={() => router.push('/status')}
+                onClick={() => router.push('/queue-status')}
               >
                 <Search className="size-6" />
                 Cek Status Antrean

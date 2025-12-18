@@ -44,4 +44,25 @@ export const checkinPayloadSchema = z.object({
   queue_status: opsQueueStatusSchema,
 });
 
+
 export type CheckinPayload = z.infer<typeof checkinPayloadSchema>;
+
+
+export const queueStatusDataSchema = z.object({
+  queueNumber: z.string(),
+  status: z.string(),
+  statusDisplayText: z.string(),
+  updatedAt: z.string(),
+  companyName: z.string(),
+  driverName: z.string(),
+  submissionTime: z.string(),
+  estimatedWaitTime: z.string().optional(),
+});
+
+export type QueueStatusData = z.infer<typeof queueStatusDataSchema>;
+
+export const queueSearchSchema = z.object({
+  queueNumber: z.string().min(1, 'Nomor antrean harus diisi'),
+});
+
+export type QueueSearch = z.infer<typeof queueSearchSchema>;
