@@ -15,10 +15,17 @@ import { ReviewChecklist } from './components/review-checklist';
 import { ReviewActions } from './components/review-actions';
 
 export default function CheckInStep3() {
-  const { step1Data, step2Data } = useChecklistStore();
+  const { step1Data, step2Data, successData } = useChecklistStore();
   const router = useRouter();
 
   useEffect(() => {
+    // If successData exists, it means we just submitted successfully.
+    // Redirect to success page immediately to avoid race conditions.
+    if (successData) {
+      router.replace('/check-in/success');
+      return;
+    }
+
     if (!step1Data) {
       router.replace('/check-in/step-1');
       return;
@@ -27,7 +34,7 @@ export default function CheckInStep3() {
     if (!step2Data) {
       router.replace('/check-in/step-2');
     }
-  }, [step1Data, step2Data, router]);
+  }, [step1Data, step2Data, successData, router]);
 
   return (
     <div>
@@ -40,9 +47,9 @@ export default function CheckInStep3() {
         </CardHeader>
         <CardContent className="space-y-6">
           <ReviewIdentity step1Data={step1Data} />
-          <ReviewChecklist 
-            step2Data={step2Data} 
-            vendorCategory={step1Data?.company.category_name} 
+          <ReviewChecklist
+            step2Data={step2Data}
+            vendorCategory={step1Data?.company.category_name}
           />
         </CardContent>
         <ReviewActions />

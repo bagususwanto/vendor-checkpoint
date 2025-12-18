@@ -11,7 +11,8 @@ export function ReviewActions() {
   const router = useRouter();
 
   const handleSubmit = () => {
-    const { step1Data, step2Data, setSuccessData } = useChecklistStore.getState();
+    const { step1Data, step2Data, setSuccessData, resetFormData } =
+      useChecklistStore.getState();
     const payload = transformCheckinData(step1Data, step2Data);
 
     if (payload) {
@@ -29,10 +30,9 @@ export function ReviewActions() {
 
       setSuccessData(mockSuccessData);
       router.push('/check-in/success');
+      resetFormData();
     } else {
-      alert(
-        'Gagal memproses data. Pastikan semua data terisi dengan benar.',
-      );
+      alert('Gagal memproses data. Pastikan semua data terisi dengan benar.');
     }
   };
 
