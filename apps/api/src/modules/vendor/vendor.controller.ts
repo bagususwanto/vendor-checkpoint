@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { VendorService } from './vendor.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
+import { FindVendorDto } from './dto/find-vendor.dto';
 
 @Controller('vendor')
 export class VendorController {
@@ -13,8 +23,14 @@ export class VendorController {
   }
 
   @Get()
-  findAll() {
-    return this.vendorService.findAll();
+  findAll(@Query() query: FindVendorDto) {
+    return this.vendorService.findAll(
+      query.page,
+      query.limit,
+      query.search,
+      query.isActive,
+      query.categoryId,
+    );
   }
 
   @Get(':id')

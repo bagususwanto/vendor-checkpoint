@@ -1,11 +1,6 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
-import { HttpService } from '@nestjs/axios';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { mst_vendor } from 'generated/prisma/client';
 import { PaginatedResponse } from '@repo/types';
@@ -30,46 +25,52 @@ export class VendorService {
   //   }
   // }
 
-  async findAll(page = 1, limit = 20): Promise<PaginatedResponse<mst_vendor>> {
-    try {
-      const skip = (page - 1) * limit;
+  async findAll(
+    page = 1,
+    limit = 10,
+    search?: string,
+    isActive?: boolean,
+    categoryId?: number,
+  ): Promise<PaginatedResponse<mst_vendor>> {
+    page = Math.max(1, page);
+    limit = Math.min(Math.max(1, limit), 100);
+    const skip = (page - 1) * limit;
 
-      const [data, total] = await Promise.all([
-        this.prisma.mst_vendor.findMany({
-          skip,
-          take: limit,
-          where: {
-            is_active: true,
-          },
-          orderBy: {
-            created_at: 'desc',
-          },
-        }),
-        this.prisma.mst_vendor.count({
-          where: {
-            is_active: true,
-          },
-        }),
-      ]);
+    const where = {
+      ...(typeof isActive === 'boolean' && {
+        is_active: isActive,
+      }),
+      ...(search && {
+        OR: [
+          { company_name: { contains: search, mode: 'insensitive' } },
+          { vendor_code: { contains: search, mode: 'insensitive' } },
+        ],
+      }),
+      ...(categoryId && {
+        vendor_category_id: categoryId,
+      }),
+    };
 
-      if (!data) {
-        throw new NotFoundException('No vendor data found');
-      }
+    const [data, total] = await Promise.all([
+      this.prisma.mst_vendor.findMany({
+        skip,
+        take: limit,
+        where,
+        orderBy: { created_at: 'desc' },
+      }),
+      this.prisma.mst_vendor.count({ where }),
+    ]);
 
-      return {
-        success: true,
-        data,
-        meta: {
-          total,
-          page,
-          limit,
-          total_pages: Math.ceil(total / limit),
-        },
-      };
-    } catch (error) {
-      // Prisma error, DB error, atau hidup lagi sial
-      throw new InternalServerErrorException('Failed to fetch vendor data');
-    }
+    return {
+      success: true,
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        total_pages: Math.ceil(total / limit),
+      },
+    };
   }
 
   findOne(id: number) {
