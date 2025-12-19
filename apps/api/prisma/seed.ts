@@ -1,4 +1,6 @@
-import { prisma } from '../lib/prisma';
+import { PrismaService } from '../src/common/prisma/prisma.service';
+
+const prisma = new PrismaService();
 
 async function main(): Promise<void> {
   console.log('Starting seed...');
@@ -19,8 +21,8 @@ async function main(): Promise<void> {
         description: 'Material kimia berbahaya',
       },
       {
-        category_name: 'BBM',
-        category_code: 'BBM',
+        category_name: 'Spesific Chemical (BBM)',
+        category_code: 'SPBBM',
         description: 'Bahan bakar minyak',
       },
       {
