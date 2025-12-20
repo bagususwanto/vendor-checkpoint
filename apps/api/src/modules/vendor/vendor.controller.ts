@@ -11,7 +11,7 @@ import {
 import { VendorService } from './vendor.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
-import { FindVendorDto } from './dto/find-vendor.dto';
+import { FindVendorParamsDto } from './dto/find-vendor-params.dto';
 
 @Controller('vendor')
 export class VendorController {
@@ -23,14 +23,8 @@ export class VendorController {
   }
 
   @Get()
-  findAll(@Query() query: FindVendorDto) {
-    return this.vendorService.findAll(
-      query.page,
-      query.limit,
-      query.search,
-      query.isActive,
-      query.categoryId,
-    );
+  findAll(@Query() query: FindVendorParamsDto) {
+    return this.vendorService.findAll(query);
   }
 
   @Get(':id')

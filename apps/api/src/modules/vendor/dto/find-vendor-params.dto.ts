@@ -1,13 +1,14 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsNumber,
   IsOptional,
   IsString,
+  Max,
   Min,
 } from 'class-validator';
 
-export class FindVendorDto {
+export class FindVendorParamsDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
@@ -18,16 +19,19 @@ export class FindVendorDto {
   @Type(() => Number)
   @IsNumber()
   @Min(1)
+  @Max(100)
   limit = 10;
 
   @IsOptional()
   @IsString()
-  search = '';
+  search?: string;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(({ value }) =>
+    value === 'true' ? true : value === 'false' ? false : undefined,
+  )
   @IsBoolean()
-  isActive = true;
+  isActive?: boolean;
 
   @IsOptional()
   @Type(() => Number)
