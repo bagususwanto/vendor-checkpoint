@@ -14,6 +14,11 @@ export const VENDOR_CATEGORIES = [
     category_code: 'SPT',
     description: 'Suku cadang dan peralatan',
   },
+  {
+    category_name: 'General Supplier',
+    category_code: 'GEN',
+    description: 'Supplier umum untuk berbagai kebutuhan',
+  },
 ];
 
 export const CHECKLIST_CATEGORIES = [
@@ -316,6 +321,6 @@ export const MASTER_VENDORS = [
     // Original: vendor_category_id: 2
     // Category 2 in the list above (index 1) is 'Spesific Chemical (BBM)' -> 'SPBBM'.
     // Let's use the code here too for better safety.
-    vendor_category_code: 'SPBBM', 
+    vendor_category_code: 'SPBBM',
   },
 ];

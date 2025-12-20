@@ -5,9 +5,10 @@ import { AppController } from './app.controller';
 import { AuthModule } from './modules/auth/auth.module';
 import { VendorModule } from './modules/vendor/vendor.module';
 import { PrismaModule } from './common/prisma/prisma.module';
+import { ChecklistModule } from './modules/checklist/checklist.module';
 
 @Module({
-  imports: [AuthModule, VendorModule, PrismaModule],
+  imports: [AuthModule, VendorModule, PrismaModule, ChecklistModule],
   controllers: [AppController],
   providers: [AppService],
 })

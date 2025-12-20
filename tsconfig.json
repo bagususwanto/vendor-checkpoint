@@ -6,9 +6,5 @@
       "@repo/shared": ["packages/shared/src"]
     }
   },
-  "references": [
-    { "path": "packages/shared" },
-    { "path": "apps/web" },
-    { "path": "apps/api" }
-  ]
+  "references": [{ "path": "apps/web" }, { "path": "apps/api" }]
 }
