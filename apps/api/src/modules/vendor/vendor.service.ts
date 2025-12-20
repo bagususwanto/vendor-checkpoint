@@ -42,8 +42,8 @@ export class VendorService {
       }),
       ...(search && {
         OR: [
-          { company_name: { contains: search, mode: 'insensitive' } },
-          { vendor_code: { contains: search, mode: 'insensitive' } },
+          { company_name: { contains: search } },
+          { vendor_code: { contains: search } },
         ],
       }),
       ...(categoryId && {
