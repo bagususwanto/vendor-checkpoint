@@ -9,6 +9,7 @@ import { extractSequence } from 'src/common/utils/extract-sequence.util';
 import { ChecklistService } from '../checklist/checklist.service';
 import { getStartOfToday } from 'src/common/utils/today-date.util';
 import { QueueService } from '../queue/queue.service';
+import { TimeLogService } from '../time-log/time-log.service';
 
 @Injectable()
 export class CheckInService {
@@ -18,6 +19,7 @@ export class CheckInService {
     private readonly systemConfigService: SystemConfigService,
     private readonly checklistService: ChecklistService,
     private readonly queueService: QueueService,
+    private readonly timeLogService: TimeLogService,
   ) {}
 
   async create(createCheckInDto: CreateCheckInDto, requestInfo: any) {
@@ -65,7 +67,12 @@ export class CheckInService {
           // 6. Create Queue Status
           await this.queueService.createQueueStatus(tx, checkIn.entry_id, queueNumber);
 
-          // 7. Return Result
+          // 7. Create Time Log
+          await this.timeLogService.create(tx, {
+            entry_id: checkIn.entry_id,
+          });
+
+          // 8. Return Result
           return {
             queue_number: queueNumber,
             company_name: vendor.company_name,

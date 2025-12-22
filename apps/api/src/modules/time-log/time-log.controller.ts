@@ -9,7 +9,7 @@ export class TimeLogController {
 
   @Post()
   create(@Body() createTimeLogDto: CreateTimeLogDto) {
-    return this.timeLogService.create(createTimeLogDto);
+    return this.timeLogService.create(null, createTimeLogDto);
   }
 
   @Get()

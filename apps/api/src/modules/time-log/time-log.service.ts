@@ -1,11 +1,22 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/common/prisma/prisma.service';
 import { CreateTimeLogDto } from './dto/create-time-log.dto';
 import { UpdateTimeLogDto } from './dto/update-time-log.dto';
 
 @Injectable()
 export class TimeLogService {
-  create(createTimeLogDto: CreateTimeLogDto) {
-    return 'This action adds a new timeLog';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(tx: any, createTimeLogDto: CreateTimeLogDto) {
+    const prismaClient = tx || this.prisma;
+    
+    return await prismaClient.ops_timelog.create({
+      data: {
+        entry_id: createTimeLogDto.entry_id,
+        checkin_time: new Date(),
+        is_checked_out: false,
+      },
+    });
   }
 
   findAll() {

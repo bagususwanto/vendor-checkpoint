@@ -5,5 +5,6 @@ import { TimeLogController } from './time-log.controller';
 @Module({
   controllers: [TimeLogController],
   providers: [TimeLogService],
+  exports: [TimeLogService],
 })
 export class TimeLogModule {}
