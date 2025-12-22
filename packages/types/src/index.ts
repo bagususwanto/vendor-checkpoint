@@ -2,4 +2,4 @@ export * from './auth';
 export * from './enums';
 export * from './checkin';
 export * from './paginated-response';
-export * from './find-vendor';
+export * from './vendor';
