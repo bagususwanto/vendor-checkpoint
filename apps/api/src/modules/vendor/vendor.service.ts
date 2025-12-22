@@ -78,7 +78,18 @@ export class VendorService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} vendor`;
+    return this.prisma.mst_vendor.findUnique({
+      where: {
+        vendor_id: id,
+      },
+      include: {
+        vendor_category: {
+          select: {
+            category_name: true,
+          },
+        },
+      },
+    });
   }
 
   update(id: number, updateVendorDto: UpdateVendorDto) {
