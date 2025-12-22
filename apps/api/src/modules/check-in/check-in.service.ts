@@ -89,7 +89,7 @@ export class CheckInService {
               driver_name: createCheckInDto.driver_name,
             }),
           });
-          
+
           // 9. Return Result
           return {
             queue_number: queueNumber,
@@ -220,11 +220,7 @@ export class CheckInService {
         entry_id: entryId,
         checkin_time: new Date(),
         is_checked_out: false,
-        estimated_wait_minutes: 30,
       },
     });
   }
-
-
-
 }
