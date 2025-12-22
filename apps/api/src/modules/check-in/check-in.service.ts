@@ -8,7 +8,7 @@ import { SystemConfigService } from '../system-config/system-config.service';
 import { extractSequence } from 'src/common/utils/extract-sequence.util';
 import { ChecklistService } from '../checklist/checklist.service';
 import { getStartOfToday } from 'src/common/utils/today-date.util';
-import { QueueService } from '../queue/queue.service';
+
 // Removed TimeLogService import
 
 import { AuditService } from '../audit/audit.service';
@@ -20,7 +20,7 @@ export class CheckInService {
     private readonly vendorService: VendorService,
     private readonly systemConfigService: SystemConfigService,
     private readonly checklistService: ChecklistService,
-    private readonly queueService: QueueService,
+
 
     private readonly auditService: AuditService,
   ) {}
@@ -68,10 +68,7 @@ export class CheckInService {
           );
 
           // 6. Create Queue Status
-          await this.queueService.create(tx, {
-            entry_id: checkIn.entry_id,
-            queue_number: queueNumber,
-          });
+          await this.createQueueStatus(tx, checkIn.entry_id, queueNumber);
 
           // 7. Create Time Log
           await this.createTimeLog(tx, checkIn.entry_id);
@@ -220,6 +217,36 @@ export class CheckInService {
         entry_id: entryId,
         checkin_time: new Date(),
         is_checked_out: false,
+      },
+    });
+  }
+
+  private async createQueueStatus(tx: any, entryId: number, queueNumber: string) {
+    const startOfToday = getStartOfToday();
+    const lastPriority = await tx.ops_queue_status.findFirst({
+      where: {
+        last_updated: {
+          gte: startOfToday,
+        },
+      },
+      orderBy: {
+        last_updated: 'desc',
+      },
+      select: {
+        priority_order: true,
+      },
+    });
+
+    const lastPrioritySeq = lastPriority ? lastPriority.priority_order : 0;
+    const nextPriority = lastPrioritySeq + 1;
+
+    await tx.ops_queue_status.create({
+      data: {
+        entry_id: entryId,
+        queue_number: queueNumber,
+        current_status: 'MENUNGGU',
+        status_display_text: 'Menunggu Verifikasi',
+        priority_order: nextPriority,
       },
     });
   }
