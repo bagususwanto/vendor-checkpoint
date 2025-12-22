@@ -7,7 +7,7 @@ import { generateQueueNumber } from 'src/common/utils/queue-number.util.';
 import { SystemConfigService } from '../system-config/system-config.service';
 import { extractSequence } from 'src/common/utils/extract-sequence.util';
 import { ChecklistService } from '../checklist/checklist.service';
-
+import { getStartOfToday } from 'src/common/utils/today-date.util';
 
 @Injectable()
 export class CheckInService {
@@ -17,12 +17,6 @@ export class CheckInService {
     private readonly systemConfigService: SystemConfigService,
     private readonly checklistService: ChecklistService,
   ) {}
-
-  private getStartOfToday(): Date {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    return now;
-  }
 
   async create(createCheckInDto: CreateCheckInDto, requestInfo: any) {
     const maxRetries = 3;
@@ -38,9 +32,8 @@ export class CheckInService {
           const queueNumber = await this.generateFormattedQueueNumber(tx);
 
           // 3. Compliance Check
-          const { hasNonCompliantItems, nonCompliantCount } = this.calculateCompliance(
-            createCheckInDto.checklist_responses,
-          );
+          const { hasNonCompliantItems, nonCompliantCount } =
+            this.calculateCompliance(createCheckInDto.checklist_responses);
 
           // 4. Create CheckIn Entry
           const checkIn = await tx.ops_checkin_entry.create({
@@ -120,7 +113,7 @@ export class CheckInService {
   private async generateFormattedQueueNumber(tx: any) {
     const format =
       await this.systemConfigService.findByConfigKey('QUEUE_FORMAT');
-    const startOfToday = this.getStartOfToday();
+    const startOfToday = getStartOfToday();
 
     const last = await tx.ops_checkin_entry.findFirst({
       where: {
@@ -199,7 +192,7 @@ export class CheckInService {
     entryId: number,
     queueNumber: string,
   ) {
-    const startOfToday = this.getStartOfToday();
+    const startOfToday = getStartOfToday();
     const lastPriority = await tx.ops_queue_status.findFirst({
       where: {
         last_updated: {
