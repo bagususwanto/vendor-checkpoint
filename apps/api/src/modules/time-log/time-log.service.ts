@@ -9,12 +9,13 @@ export class TimeLogService {
 
   async create(tx: any, createTimeLogDto: CreateTimeLogDto) {
     const prismaClient = tx || this.prisma;
-    
+
     return await prismaClient.ops_timelog.create({
       data: {
         entry_id: createTimeLogDto.entry_id,
         checkin_time: new Date(),
         is_checked_out: false,
+        estimated_wait_minutes: 30,
       },
     });
   }
