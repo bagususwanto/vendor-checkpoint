@@ -1,4 +1,4 @@
-function generateQueueNumber(format: string, sequence: number) {
+export function generateQueueNumber(format: string, sequence: number) {
   const now = new Date();
 
   const pad = (num: number, length: number) =>

@@ -2,10 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateChecklistDto } from './dto/create-checklist.dto';
 import { UpdateChecklistDto } from './dto/update-checklist.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
+import { VendorCategoryService } from '../vendor-category/vendor-category.service';
 
 @Injectable()
 export class ChecklistService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly vendorCategoryService: VendorCategoryService,
+  ) {}
 
   create(createChecklistDto: CreateChecklistDto) {
     return 'This action adds a new checklist';
@@ -19,16 +23,23 @@ export class ChecklistService {
     return `This action returns a #${id} checklist`;
   }
 
+  findManyByIds(ids: number[]) {
+    return this.prisma.mst_checklist_item.findMany({
+      where: {
+        checklist_item_id: {
+          in: ids,
+        },
+      },
+    });
+  }
+
   async findByCategory(vendor_category_id: number) {
     // validate vendor_category_id
     if (!vendor_category_id) {
       throw new BadRequestException('vendor_category_id is required');
     }
-    const vendorCategory = await this.prisma.mst_vendor_category.findUnique({
-      where: {
-        vendor_category_id,
-      },
-    });
+    const vendorCategory =
+      await this.vendorCategoryService.findOne(vendor_category_id);
     if (!vendorCategory) {
       throw new BadRequestException('Invalid vendor_category_id');
     }

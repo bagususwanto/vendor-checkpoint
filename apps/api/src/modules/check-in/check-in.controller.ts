@@ -6,18 +6,22 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { CheckInService } from './check-in.service';
 import { CreateCheckInDto } from './dto/create-check-in.dto';
 import { UpdateCheckInDto } from './dto/update-check-in.dto';
+import { getRequestInfo } from 'src/common/utils/request-info.util';
 
 @Controller('check-in')
 export class CheckInController {
   constructor(private readonly checkInService: CheckInService) {}
 
   @Post()
-  create(@Body() createCheckInDto: CreateCheckInDto) {
-    return this.checkInService.create(createCheckInDto);
+  create(@Body() createCheckInDto: CreateCheckInDto, @Req() req: Request) {
+    const requestInfo = getRequestInfo(req);
+
+    return this.checkInService.create(createCheckInDto, requestInfo);
   }
 
   @Get()
