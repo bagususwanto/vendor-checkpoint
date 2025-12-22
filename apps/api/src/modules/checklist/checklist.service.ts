@@ -33,7 +33,7 @@ export class ChecklistService {
       throw new BadRequestException('Invalid vendor_category_id');
     }
 
-    const data = await this.prisma.mst_checklist_category.findMany({
+    return this.prisma.mst_checklist_category.findMany({
       select: {
         checklist_category_id: true,
         category_name: true,
@@ -68,12 +68,6 @@ export class ChecklistService {
         display_order: 'asc',
       },
     });
-
-    return {
-      success: true,
-      message: 'Success fetch checklist by category',
-      data,
-    };
   }
 
   update(id: number, updateChecklistDto: UpdateChecklistDto) {

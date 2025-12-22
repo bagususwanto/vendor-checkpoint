@@ -67,7 +67,6 @@ export class VendorService {
     ]);
 
     return {
-      success: true,
       data,
       meta: {
         total,
