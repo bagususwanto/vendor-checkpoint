@@ -5,7 +5,7 @@ import { VendorModule } from '../vendor/vendor.module';
 import { SystemConfigModule } from '../system-config/system-config.module';
 import { ChecklistModule } from '../checklist/checklist.module';
 import { QueueModule } from '../queue/queue.module';
-import { TimeLogModule } from '../time-log/time-log.module';
+
 import { AuditModule } from '../audit/audit.module';
 
 @Module({
@@ -14,7 +14,7 @@ import { AuditModule } from '../audit/audit.module';
     SystemConfigModule,
     ChecklistModule,
     QueueModule,
-    TimeLogModule,
+
     AuditModule,
   ],
   controllers: [CheckInController],

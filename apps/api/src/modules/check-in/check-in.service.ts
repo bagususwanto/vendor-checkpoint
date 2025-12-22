@@ -9,7 +9,8 @@ import { extractSequence } from 'src/common/utils/extract-sequence.util';
 import { ChecklistService } from '../checklist/checklist.service';
 import { getStartOfToday } from 'src/common/utils/today-date.util';
 import { QueueService } from '../queue/queue.service';
-import { TimeLogService } from '../time-log/time-log.service';
+// Removed TimeLogService import
+
 import { AuditService } from '../audit/audit.service';
 
 @Injectable()
@@ -20,7 +21,7 @@ export class CheckInService {
     private readonly systemConfigService: SystemConfigService,
     private readonly checklistService: ChecklistService,
     private readonly queueService: QueueService,
-    private readonly timeLogService: TimeLogService,
+
     private readonly auditService: AuditService,
   ) {}
 
@@ -73,9 +74,7 @@ export class CheckInService {
           });
 
           // 7. Create Time Log
-          await this.timeLogService.create(tx, {
-            entry_id: checkIn.entry_id,
-          });
+          await this.createTimeLog(tx, checkIn.entry_id);
 
           // 8. Create Audit Log
           await this.auditService.create(tx, {
@@ -214,6 +213,18 @@ export class CheckInService {
       data: responsesData,
     });
   }
+
+  private async createTimeLog(tx: any, entryId: number) {
+    await tx.ops_timelog.create({
+      data: {
+        entry_id: entryId,
+        checkin_time: new Date(),
+        is_checked_out: false,
+        estimated_wait_minutes: 30,
+      },
+    });
+  }
+
 
 
 }
