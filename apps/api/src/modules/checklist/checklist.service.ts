@@ -24,6 +24,14 @@ export class ChecklistService {
     if (!vendor_category_id) {
       throw new BadRequestException('vendor_category_id is required');
     }
+    const vendorCategory = await this.prisma.mst_vendor_category.findUnique({
+      where: {
+        vendor_category_id,
+      },
+    });
+    if (!vendorCategory) {
+      throw new BadRequestException('Invalid vendor_category_id');
+    }
 
     const data = await this.prisma.mst_checklist_category.findMany({
       select: {
