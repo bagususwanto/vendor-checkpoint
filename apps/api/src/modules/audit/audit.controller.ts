@@ -9,7 +9,7 @@ export class AuditController {
 
   @Post()
   create(@Body() createAuditDto: CreateAuditDto) {
-    return this.auditService.create(createAuditDto);
+    return this.auditService.create(null, createAuditDto);
   }
 
   @Get()

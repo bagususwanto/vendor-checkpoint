@@ -6,6 +6,7 @@ import { SystemConfigModule } from '../system-config/system-config.module';
 import { ChecklistModule } from '../checklist/checklist.module';
 import { QueueModule } from '../queue/queue.module';
 import { TimeLogModule } from '../time-log/time-log.module';
+import { AuditModule } from '../audit/audit.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TimeLogModule } from '../time-log/time-log.module';
     ChecklistModule,
     QueueModule,
     TimeLogModule,
+    AuditModule,
   ],
   controllers: [CheckInController],
   providers: [CheckInService],

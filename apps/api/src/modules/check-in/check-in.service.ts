@@ -10,6 +10,7 @@ import { ChecklistService } from '../checklist/checklist.service';
 import { getStartOfToday } from 'src/common/utils/today-date.util';
 import { QueueService } from '../queue/queue.service';
 import { TimeLogService } from '../time-log/time-log.service';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class CheckInService {
@@ -20,6 +21,7 @@ export class CheckInService {
     private readonly checklistService: ChecklistService,
     private readonly queueService: QueueService,
     private readonly timeLogService: TimeLogService,
+    private readonly auditService: AuditService,
   ) {}
 
   async create(createCheckInDto: CreateCheckInDto, requestInfo: any) {
@@ -75,7 +77,21 @@ export class CheckInService {
             entry_id: checkIn.entry_id,
           });
 
-          // 8. Return Result
+          // 8. Create Audit Log
+          await this.auditService.create(tx, {
+            entry_id: checkIn.entry_id,
+            action_type: 'CHECKIN_CREATE',
+            action_description: 'Check-in entry created',
+            ip_address: requestInfo.ipAddress,
+            user_agent: requestInfo.userAgent,
+            new_value: JSON.stringify({
+              queue_number: queueNumber,
+              vendor_id: createCheckInDto.vendor_id,
+              driver_name: createCheckInDto.driver_name,
+            }),
+          });
+          
+          // 9. Return Result
           return {
             queue_number: queueNumber,
             company_name: vendor.company_name,
