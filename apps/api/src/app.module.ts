@@ -10,9 +10,11 @@ import { CheckInModule } from './modules/check-in/check-in.module';
 import { VendorCategoryModule } from './modules/vendor-category/vendor-category.module';
 import { SystemConfigModule } from './modules/system-config/system-config.module';
 import { QueueModule } from './modules/queue/queue.module';
+import { TimeLogModule } from './modules/time-log/time-log.module';
+import { AuditModule } from './modules/audit/audit.module';
 
 @Module({
-  imports: [AuthModule, VendorModule, PrismaModule, ChecklistModule, CheckInModule, VendorCategoryModule, SystemConfigModule, QueueModule],
+  imports: [AuthModule, VendorModule, PrismaModule, ChecklistModule, CheckInModule, VendorCategoryModule, SystemConfigModule, QueueModule, TimeLogModule, AuditModule],
   controllers: [AppController],
   providers: [AppService],
 })
