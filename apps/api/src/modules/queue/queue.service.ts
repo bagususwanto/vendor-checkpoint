@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/common/prisma/prisma.service';
 import { CreateQueueDto } from './dto/create-queue.dto';
 import { UpdateQueueDto } from './dto/update-queue.dto';
 import { getStartOfToday } from 'src/common/utils/today-date.util';
 
 @Injectable()
 export class QueueService {
-  create(createQueueDto: CreateQueueDto) {
-    return 'This action adds a new queue';
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
-  async createQueueStatus(tx: any, entryId: number, queueNumber: string) {
+  async create(tx: any, createQueueDto: CreateQueueDto) {
+    const prismaClient = tx || this.prisma;
     const startOfToday = getStartOfToday();
-    const lastPriority = await tx.ops_queue_status.findFirst({
+    const lastPriority = await prismaClient.ops_queue_status.findFirst({
       where: {
         last_updated: {
           gte: startOfToday,
@@ -28,10 +28,10 @@ export class QueueService {
     const lastPrioritySeq = lastPriority ? lastPriority.priority_order : 0;
     const nextPriority = lastPrioritySeq + 1;
 
-    await tx.ops_queue_status.create({
+    return await prismaClient.ops_queue_status.create({
       data: {
-        entry_id: entryId,
-        queue_number: queueNumber,
+        entry_id: createQueueDto.entry_id,
+        queue_number: createQueueDto.queue_number,
         current_status: 'MENUNGGU',
         status_display_text: 'Menunggu Verifikasi',
         priority_order: nextPriority,

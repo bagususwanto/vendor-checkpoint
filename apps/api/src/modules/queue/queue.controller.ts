@@ -9,7 +9,7 @@ export class QueueController {
 
   @Post()
   create(@Body() createQueueDto: CreateQueueDto) {
-    return this.queueService.create(createQueueDto);
+    return this.queueService.create(null, createQueueDto);
   }
 
   @Get()

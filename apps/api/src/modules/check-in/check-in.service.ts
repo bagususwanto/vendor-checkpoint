@@ -65,7 +65,10 @@ export class CheckInService {
           );
 
           // 6. Create Queue Status
-          await this.queueService.createQueueStatus(tx, checkIn.entry_id, queueNumber);
+          await this.queueService.create(tx, {
+            entry_id: checkIn.entry_id,
+            queue_number: queueNumber,
+          });
 
           // 7. Create Time Log
           await this.timeLogService.create(tx, {
