@@ -44,9 +44,7 @@ export const checkinPayloadSchema = z.object({
   queue_status: opsQueueStatusSchema,
 });
 
-
 export type CheckinPayload = z.infer<typeof checkinPayloadSchema>;
-
 
 export const queueStatusDataSchema = z.object({
   queueNumber: z.string(),
@@ -66,3 +64,16 @@ export const queueSearchSchema = z.object({
 });
 
 export type QueueSearch = z.infer<typeof queueSearchSchema>;
+
+export const checkInSchema = z.object({
+  vendor_id: z.number(),
+  driver_name: z.string(),
+  checklist_responses: z.array(
+    z.object({
+      checklist_item_id: z.number(),
+      response_value: z.boolean(),
+    }),
+  ),
+});
+
+export type CheckIn = z.infer<typeof checkInSchema>;
