@@ -8,6 +8,7 @@ import { SystemConfigService } from '../system-config/system-config.service';
 import { extractSequence } from 'src/common/utils/extract-sequence.util';
 import { ChecklistService } from '../checklist/checklist.service';
 import { getStartOfToday } from 'src/common/utils/today-date.util';
+import { QueueService } from '../queue/queue.service';
 
 @Injectable()
 export class CheckInService {
@@ -16,6 +17,7 @@ export class CheckInService {
     private readonly vendorService: VendorService,
     private readonly systemConfigService: SystemConfigService,
     private readonly checklistService: ChecklistService,
+    private readonly queueService: QueueService,
   ) {}
 
   async create(createCheckInDto: CreateCheckInDto, requestInfo: any) {
@@ -61,7 +63,7 @@ export class CheckInService {
           );
 
           // 6. Create Queue Status
-          await this.createQueueStatus(tx, checkIn.entry_id, queueNumber);
+          await this.queueService.createQueueStatus(tx, checkIn.entry_id, queueNumber);
 
           // 7. Return Result
           return {
@@ -187,37 +189,5 @@ export class CheckInService {
     });
   }
 
-  private async createQueueStatus(
-    tx: any,
-    entryId: number,
-    queueNumber: string,
-  ) {
-    const startOfToday = getStartOfToday();
-    const lastPriority = await tx.ops_queue_status.findFirst({
-      where: {
-        last_updated: {
-          gte: startOfToday,
-        },
-      },
-      orderBy: {
-        last_updated: 'desc',
-      },
-      select: {
-        priority_order: true,
-      },
-    });
 
-    const lastPrioritySeq = lastPriority ? lastPriority.priority_order : 0;
-    const nextPriority = lastPrioritySeq + 1;
-
-    await tx.ops_queue_status.create({
-      data: {
-        entry_id: entryId,
-        queue_number: queueNumber,
-        current_status: 'MENUNGGU',
-        status_display_text: 'Menunggu Verifikasi',
-        priority_order: nextPriority,
-      },
-    });
-  }
 }
