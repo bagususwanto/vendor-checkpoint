@@ -67,7 +67,7 @@ export function VendorIdentityForm() {
   const fetchVendors = async (
     currentPage: number,
     searchTerm: string,
-    isNewSearch: boolean
+    isNewSearch: boolean,
   ) => {
     if (!isNewSearch && isLoading) return;
 
@@ -79,9 +79,8 @@ export function VendorIdentityForm() {
         search: searchTerm,
         isActive: true,
       });
-
       const newVendors = data.data.map((v) => ({
-        label: v.company_name,
+        label: `${v.company_name} (${v.vendor_code})`,
         value: String(v.vendor_id),
         category_name: v.vendor_category?.category_name,
         category_id: v.vendor_category_id,
@@ -89,7 +88,7 @@ export function VendorIdentityForm() {
       }));
 
       setVendors((prev) =>
-        isNewSearch ? newVendors : [...prev, ...newVendors]
+        isNewSearch ? newVendors : [...prev, ...newVendors],
       );
 
       const { total, limit, page: metaPage } = data.meta;
