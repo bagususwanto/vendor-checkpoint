@@ -303,6 +303,12 @@ export const SYSTEM_CONFIGS = [
     config_type: 'STRING',
     description: 'Mode pengurutan di TV Display',
   },
+  {
+    config_key: 'ESTIMATED_WAIT_MINUTES',
+    config_value: '30',
+    config_type: 'INT',
+    description: 'Estimasi waktu tunggu dalam menit (default)',
+  },
 ];
 
 export const ADMIN_USER = {
