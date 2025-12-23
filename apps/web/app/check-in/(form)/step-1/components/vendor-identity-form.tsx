@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@tanstack/react-form';
 import { ArrowLeft, Building2, CircleArrowRight, User } from 'lucide-react';
@@ -14,36 +14,27 @@ import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { VendorIdentitySchema } from '@/lib/schemas/vendor-identity.schema';
 import { useChecklistStore } from '@/stores/use-checklist.store';
 import { VendorInfoCard } from './vendor-info-card';
-
-// Mock data - in a real app this might come from props or an API hook
-const companys = [
-  {
-    label: 'PT. ABC Indonesia',
-    value: '1',
-    category_name: 'BBM',
-    category_id: 1,
-    vendorCode: 'VND-001',
-  },
-  {
-    label: 'PT. XYZ Indonesia',
-    value: '2',
-    category_name: 'Chemicals',
-    category_id: 2,
-    vendorCode: 'VND-002',
-  },
-  {
-    label: 'PT. 123 Indonesia',
-    value: '3',
-    category_name: 'BBM',
-    category_id: 1,
-    vendorCode: 'VND-003',
-  },
-];
+import { axiosInstance } from '@/lib/axios';
 
 export function VendorIdentityForm() {
   const { step1Data, setStep1Data } = useChecklistStore();
   const router = useRouter();
 
+  const [vendors, setVendors] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [search, setSearch] = useState('');
+
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  // Initial Selected Vendor from store
   const [selectedVendor, setSelectedVendor] = useState<{
     label: string;
     value: string;
@@ -52,10 +43,79 @@ export function VendorIdentityForm() {
     vendorCode: string;
   } | null>(() => {
     if (step1Data?.company.value) {
-      return companys.find((c) => c.value === step1Data.company.value) || null;
+      return {
+        label: step1Data.company.label,
+        value: step1Data.company.value,
+        category_name: step1Data.company.category_name,
+        category_id: step1Data.company.category_id,
+        vendorCode: step1Data.company.vendorCode,
+      };
     }
     return null;
   });
+
+  const displayVendors = useMemo(() => {
+    if (
+      selectedVendor &&
+      !vendors.find((v) => v.value === selectedVendor.value)
+    ) {
+      return [selectedVendor, ...vendors];
+    }
+    return vendors;
+  }, [vendors, selectedVendor]);
+
+  const fetchVendors = async (
+    currentPage: number,
+    searchTerm: string,
+    isNewSearch: boolean
+  ) => {
+    if (!isNewSearch && isLoading) return;
+
+    setIsLoading(true);
+    try {
+      const { data } = await axiosInstance.get('/vendor', {
+        params: {
+          page: currentPage,
+          limit: 10,
+          search: searchTerm,
+          isActive: true,
+        },
+      });
+
+      const newVendors = data.data.map((v: any) => ({
+        label: v.company_name,
+        value: String(v.vendor_id),
+        category_name: v.vendor_category?.category_name,
+        category_id: v.vendor_category_id,
+        vendorCode: v.vendor_code,
+      }));
+
+      setVendors((prev) =>
+        isNewSearch ? newVendors : [...prev, ...newVendors]
+      );
+
+      const { total, limit, page: metaPage } = data.meta;
+      const totalPages = Math.ceil(total / limit);
+      setHasMore(metaPage < totalPages);
+    } catch (e) {
+      console.error('Failed to fetch vendors', e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setPage(1);
+    fetchVendors(1, debouncedSearch, true);
+  }, [debouncedSearch]);
+
+  const handleLoadMore = () => {
+    if (!isLoading && hasMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchVendors(nextPage, debouncedSearch, false);
+    }
+  };
 
   const form = useForm({
     defaultValues: {
@@ -78,7 +138,7 @@ export function VendorIdentityForm() {
   });
 
   const handleSelectVendor = (value: string) => {
-    const vendor = companys.find((c) => c.value === value);
+    const vendor = displayVendors.find((c) => c.value === value);
     setSelectedVendor(vendor || null);
     if (vendor) {
       form.setFieldValue('company.value', vendor.value);
@@ -91,31 +151,31 @@ export function VendorIdentityForm() {
 
   return (
     <>
-        <form
+      <form
         id="vendor-identity-form"
         onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
         }}
-        >
+      >
         <FieldGroup>
-            <form.Field
+          <form.Field
             name="fullName"
             children={(field) => {
-                const isInvalid =
+              const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
+              return (
                 <Field data-invalid={isInvalid}>
-                    <IconLabel
+                  <IconLabel
                     classNameIcon="w-6 h-6"
                     htmlFor="fullName"
                     icon={User}
                     required
-                    >
+                  >
                     Nama Lengkap
-                    </IconLabel>
-                    <Input
+                  </IconLabel>
+                  <Input
                     className="h-12 vendor-text"
                     id="fullName"
                     type="text"
@@ -126,73 +186,72 @@ export function VendorIdentityForm() {
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     aria-invalid={isInvalid}
-                    />
-                    {isInvalid && (
-                    <FieldError errors={field.state.meta.errors} />
-                    )}
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
-                );
+              );
             }}
-            />
-            <form.Field
+          />
+          <form.Field
             name="company.value"
             children={(field) => {
-                const isInvalid =
+              const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
+              return (
                 <Field data-invalid={isInvalid}>
-                    <IconLabel
+                  <IconLabel
                     classNameIcon="w-6 h-6"
                     htmlFor="company"
                     icon={Building2}
                     required
-                    >
+                  >
                     Perusahaan
-                    </IconLabel>
-                    <ComboboxVendor
-                    dataOptions={companys}
+                  </IconLabel>
+                  <ComboboxVendor
+                    dataOptions={displayVendors}
                     type="perusahaan"
                     onSelect={handleSelectVendor}
                     value={selectedVendor?.value}
-                    />
-                    {isInvalid && (
-                    <FieldError errors={field.state.meta.errors} />
-                    )}
+                    onSearch={setSearch}
+                    onLoadMore={handleLoadMore}
+                    isLoading={isLoading}
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
-                );
+              );
             }}
+          />
+          {selectedVendor && (
+            <VendorInfoCard
+              categoryName={selectedVendor.category_name}
+              vendorCode={selectedVendor.vendorCode}
             />
-            {selectedVendor && (
-                <VendorInfoCard 
-                    categoryName={selectedVendor.category_name} 
-                    vendorCode={selectedVendor.vendorCode} 
-                />
-            )}
+          )}
         </FieldGroup>
-        </form>
+      </form>
 
-        <CardFooter className="flex flex-row justify-between gap-2 px-0 pt-6">
-            <Button
-                disabled
-                type="button"
-                size={'xl'}
-                variant="outline"
-                className="w-1/2"
-                onClick={() => router.back()}
-            >
-                <ArrowLeft className="mr-2 w-6 h-6" />
-                Kembali
-            </Button>
-            <Button
-                size={'xl'}
-                type="submit"
-                onClick={form.handleSubmit}
-                className="w-1/2"
-            >
-                Lanjut
-                <CircleArrowRight className="ml-2 w-6 h-6" />
-            </Button>
-        </CardFooter>
+      <CardFooter className="flex flex-row justify-between gap-2 px-0 pt-6">
+        <Button
+          disabled
+          type="button"
+          size={'xl'}
+          variant="outline"
+          className="w-1/2"
+          onClick={() => router.back()}
+        >
+          <ArrowLeft className="mr-2 w-6 h-6" />
+          Kembali
+        </Button>
+        <Button
+          size={'xl'}
+          type="submit"
+          onClick={form.handleSubmit}
+          className="w-1/2"
+        >
+          Lanjut
+          <CircleArrowRight className="ml-2 w-6 h-6" />
+        </Button>
+      </CardFooter>
     </>
   );
 }
