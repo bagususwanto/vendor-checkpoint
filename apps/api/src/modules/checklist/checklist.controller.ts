@@ -30,9 +30,9 @@ export class ChecklistController {
     return this.checklistService.findOne(+id);
   }
 
-  @Get('by-category/:vendor_category_id')
-  findByCategory(@Param('vendor_category_id') vendor_category_id: string) {
-    return this.checklistService.findByCategory(+vendor_category_id);
+  @Get('by-category/:vendorCategoryId')
+  findByCategory(@Param('vendorCategoryId') vendorCategoryId: string) {
+    return this.checklistService.findByCategory(+vendorCategoryId);
   }
 
   @Patch(':id')

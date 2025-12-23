@@ -33,15 +33,15 @@ export class ChecklistService {
     });
   }
 
-  async findByCategory(vendor_category_id: number) {
-    // validate vendor_category_id
-    if (!vendor_category_id) {
-      throw new BadRequestException('vendor_category_id is required');
+  async findByCategory(vendorCategoryId: number) {
+    // validate vendorCategoryId
+    if (!vendorCategoryId) {
+      throw new BadRequestException('vendorCategoryId is required');
     }
     const vendorCategory =
-      await this.vendorCategoryService.findOne(vendor_category_id);
+      await this.vendorCategoryService.findOne(vendorCategoryId);
     if (!vendorCategory) {
-      throw new BadRequestException('Invalid vendor_category_id');
+      throw new BadRequestException('Invalid vendorCategoryId');
     }
 
     return this.prisma.mst_checklist_category.findMany({
@@ -63,7 +63,7 @@ export class ChecklistService {
           where: {
             is_active: true,
             OR: [
-              { vendor_category_id }, // item khusus vendor
+              { vendor_category_id: vendorCategoryId }, // item khusus vendor
               { vendor_category_id: null }, // item umum
             ],
           },
