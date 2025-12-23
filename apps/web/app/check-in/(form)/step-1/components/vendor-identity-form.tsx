@@ -14,7 +14,7 @@ import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { VendorIdentitySchema } from '@/lib/schemas/vendor-identity.schema';
 import { useChecklistStore } from '@/stores/use-checklist.store';
 import { VendorInfoCard } from './vendor-info-card';
-import { axiosInstance } from '@/lib/axios';
+import { vendorService } from '@/services/vendor.service';
 
 export function VendorIdentityForm() {
   const { step1Data, setStep1Data } = useChecklistStore();
@@ -73,16 +73,14 @@ export function VendorIdentityForm() {
 
     setIsLoading(true);
     try {
-      const { data } = await axiosInstance.get('/vendor', {
-        params: {
-          page: currentPage,
-          limit: 10,
-          search: searchTerm,
-          isActive: true,
-        },
+      const data = await vendorService.getVendors({
+        page: currentPage,
+        limit: 10,
+        search: searchTerm,
+        isActive: true,
       });
 
-      const newVendors = data.data.map((v: any) => ({
+      const newVendors = data.data.map((v) => ({
         label: v.company_name,
         value: String(v.vendor_id),
         category_name: v.vendor_category?.category_name,
