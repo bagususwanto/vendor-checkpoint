@@ -8,8 +8,12 @@ import { useChecklistStore } from '@/stores/use-checklist.store';
 import { checkInService } from '@/services/check-in.service';
 import { toast } from 'sonner';
 
+import { formatDate } from '@/lib/utils';
+import { useState } from 'react';
+
 export function ReviewActions() {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     const { step1Data, step2Data, setSuccessData, resetFormData } =
@@ -34,17 +38,18 @@ export function ReviewActions() {
     };
 
     try {
+      setIsSubmitting(true);
       const result = await checkInService.submitCheckIn(payload);
 
-      const mockSuccessData = {
-        queueNumber: result.data?.queue_number,
-        companyName: result.data?.company_name,
-        driverName: result.data?.driver_name,
-        status: result.data?.current_status,
-        submitTime: result.data?.submission_time,
+      const successData = {
+        queueNumber: result.queue_number,
+        companyName: result.company_name,
+        driverName: result.driver_name,
+        status: result.current_status,
+        submitTime: formatDate(result.submission_time),
       };
 
-      setSuccessData(mockSuccessData);
+      setSuccessData(successData);
       toast.success('Check-in Berhasil', {
         description: 'Data Anda telah berhasil dikirim.',
       });
@@ -55,6 +60,8 @@ export function ReviewActions() {
       toast.error('Gagal mengirim data', {
         description: 'Terjadi kesalahan saat mengirim data. Silakan coba lagi.',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -65,8 +72,9 @@ export function ReviewActions() {
         type="button"
         className="w-full"
         onClick={handleSubmit}
+        disabled={isSubmitting}
       >
-        Submit
+        {isSubmitting ? 'Mengirim...' : 'Submit'}
         <SendHorizonal className="ml-2 size-6" />
       </Button>
     </CardFooter>

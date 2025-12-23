@@ -4,10 +4,9 @@ import { axiosInstance } from '@/lib/axios';
 export const checkInService = {
   submitCheckIn: async (payload: CheckIn) => {
     try {
-      const response = await axiosInstance.post('/check-in', payload);
-      return response.data;
+      const response = await axiosInstance.post<{ data: any }>('/check-in', payload);
+      return response.data.data;
     } catch (error) {
-      // Re-throw to be handled by the component
       throw error;
     }
   },
