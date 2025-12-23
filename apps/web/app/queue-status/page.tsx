@@ -17,7 +17,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import IconLabel from '@/components/icon-label';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -30,9 +31,11 @@ import {
   type QueueStatusData,
   type QueueSearch,
 } from '@repo/types';
+import { checkInService } from '@/services/check-in.service';
 
 export default function QueueStatusPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [result, setResult] = useState<QueueStatusData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,34 +52,42 @@ export default function QueueStatusPage() {
     },
   });
 
+  useEffect(() => {
+    const queueParam = searchParams.get('queueNumber');
+    if (queueParam) {
+      // Small delay to ensure everything is mounted and ready (optional, but good for UX)
+      // Also avoids hydration mismatches if params are read too early in some setups,
+      // though Next.js 13+ handles this well usually.
+      form.setFieldValue('queueNumber', queueParam);
+      handleCheckStatus({ queueNumber: queueParam });
+    }
+  }, [searchParams]);
+
   async function handleCheckStatus(data: QueueSearch) {
     setIsLoading(true);
     setError(null);
     setResult(null);
 
     try {
-      // TODO: Replace with actual API call to /api/checkins/status/{queueNumber}
-      // Simulating API delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const result = await checkInService.getQueueStatus(data.queueNumber);
 
-      // Mock response for now
-      // Logic for demo: if queueNumber ends with '9', return not found
-      if (data.queueNumber.endsWith('9')) {
-        throw new Error('Nomor antrean tidak ditemukan');
-      }
+      const opsStatus = result.ops_queue_status || {};
 
       setResult({
-        queueNumber: data.queueNumber,
-        status: 'WAITING',
-        statusDisplayText: 'Menunggu Verifikasi',
+        queueNumber: result.queue_number,
+        status: opsStatus.status || 'WAITING', // Fallback or assume it comes from ops_queue_status
+        statusDisplayText: opsStatus.status_display_text || 'Menunggu',
         updatedAt: new Date().toISOString(),
-        companyName: 'PT. Toyota Motor Manufacturing Indonesia',
-        driverName: 'Budi Santoso',
-        submissionTime: new Date(Date.now() - 30 * 60000).toISOString(), // 30 mins ago
-        estimatedWaitTime: '15-30 Menit',
+        companyName: result.snapshot_company_name || result.company_name,
+        driverName: result.driver_name,
+        submissionTime: result.submission_time,
+        estimatedWaitTime: opsStatus.estimated_wait_minutes 
+          ? `${opsStatus.estimated_wait_minutes} Menit` 
+          : undefined,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
+      console.error(err);
+      setError('Nomor antrean tidak ditemukan atau terjadi kesalahan.');
     } finally {
       setIsLoading(false);
     }

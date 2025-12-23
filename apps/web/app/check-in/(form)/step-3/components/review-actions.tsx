@@ -45,7 +45,8 @@ export function ReviewActions() {
         queueNumber: result.queue_number,
         companyName: result.company_name,
         driverName: result.driver_name,
-        status: result.current_status,
+        status_display_text: result.status_display_text,
+        estimatedWaitMinutes: result.estimated_wait_minutes,
         submitTime: formatDate(result.submission_time),
       };
 

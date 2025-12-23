@@ -19,7 +19,8 @@ export type SuccessData = {
   queueNumber: string;
   companyName: string;
   driverName: string;
-  status: string;
+  status_display_text: string;
+  estimatedWaitMinutes: number;
   submitTime: string;
 };
 

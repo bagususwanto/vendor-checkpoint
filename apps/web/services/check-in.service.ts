@@ -10,4 +10,13 @@ export const checkInService = {
       throw error;
     }
   },
+
+  getQueueStatus: async (queueNumber: string) => {
+    try {
+      const response = await axiosInstance.get<{ data: any }>(`/check-in/queue/${queueNumber}`);
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
