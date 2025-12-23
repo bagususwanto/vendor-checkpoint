@@ -15,7 +15,7 @@ import { ReviewChecklist } from './components/review-checklist';
 import { ReviewActions } from './components/review-actions';
 
 export default function CheckInStep3() {
-  const { step1Data, step2Data, successData } = useChecklistStore();
+  const { step1Data, step2Data, successData, checklistCategories } = useChecklistStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function CheckInStep3() {
       return;
     }
 
-    if (!step1Data) {
+    if (!step1Data || !checklistCategories) {
       router.replace('/check-in/step-1');
       return;
     }

@@ -15,15 +15,18 @@ import { VendorIdentitySchema } from '@/lib/schemas/vendor-identity.schema';
 import { useChecklistStore } from '@/stores/use-checklist.store';
 import { VendorInfoCard } from './vendor-info-card';
 import { vendorService } from '@/services/vendor.service';
+import { checklistService } from '@/services/checklist.service';
 
 export function VendorIdentityForm() {
-  const { step1Data, setStep1Data } = useChecklistStore();
+  const { step1Data, setStep1Data, setChecklistCategories } =
+    useChecklistStore();
   const router = useRouter();
 
   const [vendors, setVendors] = useState<any[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [search, setSearch] = useState('');
 
   const [debouncedSearch, setDebouncedSearch] = useState(search);
@@ -129,8 +132,19 @@ export function VendorIdentityForm() {
       onSubmit: VendorIdentitySchema,
     },
     onSubmit: async ({ value }) => {
-      setStep1Data(value);
-      router.push('/check-in/step-2');
+      try {
+        setIsSubmitting(true);
+        const checklistData = await checklistService.getChecklistByCategory(
+          value.company.category_id,
+        );
+        setChecklistCategories(checklistData);
+        setStep1Data(value);
+        router.push('/check-in/step-2');
+      } catch (error) {
+        console.error('Failed to fetch checklist', error);
+      } finally {
+        setIsSubmitting(false);
+      }
     },
   });
 
@@ -229,7 +243,7 @@ export function VendorIdentityForm() {
 
       <CardFooter className="flex flex-row justify-between gap-2 px-0 pt-6">
         <Button
-          disabled
+          disabled={isSubmitting}
           type="button"
           size={'xl'}
           variant="outline"
@@ -244,8 +258,9 @@ export function VendorIdentityForm() {
           type="submit"
           onClick={form.handleSubmit}
           className="w-1/2"
+          disabled={isSubmitting}
         >
-          Lanjut
+          {isSubmitting ? 'Memuat...' : 'Lanjut'}
           <CircleArrowRight className="ml-2 w-6 h-6" />
         </Button>
       </CardFooter>

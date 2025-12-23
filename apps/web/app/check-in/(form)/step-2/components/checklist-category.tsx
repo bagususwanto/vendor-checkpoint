@@ -6,7 +6,6 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { ChecklistItem } from './checklist-item';
-import { ReactFormApi } from '@tanstack/react-form';
 
 interface ChecklistCategoryProps {
   category: {
@@ -29,9 +28,7 @@ export function ChecklistCategory({ category, vendorCategory, checklistItems, fo
     (item) => item.item_type === 'UMUM',
   );
   const specificItems = category.items.filter(
-    (item) =>
-      item.item_type === 'KHUSUS' &&
-      item.category_name === vendorCategory,
+    (item) => item.item_type === 'KHUSUS',
   );
 
   // Calculate category progress

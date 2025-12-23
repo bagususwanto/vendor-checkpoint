@@ -13,15 +13,15 @@ import { ChecklistForm } from './components/checklist-form';
 
 export default function CheckInStep2() {
   const router = useRouter();
-  const { step1Data } = useChecklistStore();
+  const { step1Data, checklistCategories } = useChecklistStore();
 
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    if (!step1Data) {
+    if (!step1Data || !checklistCategories) {
       router.replace('/check-in/step-1');
     }
-  }, [step1Data, router]);
+  }, [step1Data, checklistCategories, router]);
 
   return (
     <div>

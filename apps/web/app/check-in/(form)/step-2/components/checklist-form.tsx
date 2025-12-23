@@ -4,7 +4,6 @@ import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
 import { useChecklistStore } from '@/stores/use-checklist.store';
 import { CheckInStep2Schema } from '@/lib/schemas/check-in-step-2.schema';
-import { checklistData } from '@/lib/data/checklist';
 
 import { Button } from '@/components/ui/button';
 import { CardContent, CardFooter } from '@/components/ui/card';
@@ -16,7 +15,8 @@ import { ChecklistCategory } from './checklist-category';
 
 export function ChecklistForm() {
   const router = useRouter();
-  const { step1Data, step2Data, setStep2Data } = useChecklistStore();
+  const { step1Data, step2Data, setStep2Data, checklistCategories } =
+    useChecklistStore();
   const vendorCategory = step1Data?.company.category_name;
 
   const form = useForm({
@@ -33,19 +33,20 @@ export function ChecklistForm() {
   });
 
   // Calculate progress based on visible items
-  const visibleItems = checklistData.flatMap((category) => {
-    const generalItems = category.items.filter(
-      (item) => item.item_type === 'UMUM',
-    );
-    const specificItems = category.items.filter(
-      (item) =>
-        item.item_type === 'KHUSUS' && item.category_name === vendorCategory,
-    );
-    return [...generalItems, ...specificItems];
-  });
+  const visibleItems = (checklistCategories || []).flatMap(
+    (category) => category.mst_checklist_item,
+  );
 
   const requiredItems = visibleItems.filter((item) => item.is_required);
   const totalRequiredItems = requiredItems.length;
+
+  const categoriesToRender = (checklistCategories || []).map((c) => ({
+    id: String(c.checklist_category_id),
+    category_name: c.category_name,
+    icon: c.icon_name,
+    color: c.color_code,
+    items: c.mst_checklist_item,
+  }));
 
   return (
     <>
@@ -113,13 +114,13 @@ export function ChecklistForm() {
               selector={(state) => state.values.checklistItems}
               children={(checklistItems) => (
                 <Accordion type="multiple" className="space-y-4">
-                  {checklistData.map((category) => (
-                    <ChecklistCategory 
-                        key={category.id}
-                        category={category}
-                        vendorCategory={vendorCategory}
-                        checklistItems={checklistItems as Record<string, string>}
-                        form={form}
+                  {categoriesToRender.map((category) => (
+                    <ChecklistCategory
+                      key={category.id}
+                      category={category}
+                      vendorCategory={vendorCategory}
+                      checklistItems={checklistItems as Record<string, string>}
+                      form={form}
                     />
                   ))}
                 </Accordion>
