@@ -12,6 +12,7 @@ import { CheckInService } from './check-in.service';
 import { CreateCheckInDto } from './dto/create-check-in.dto';
 import { UpdateCheckInDto } from './dto/update-check-in.dto';
 import { getRequestInfo } from 'src/common/utils/request-info.util';
+import { queue } from 'rxjs';
 
 @Controller('check-in')
 export class CheckInController {
@@ -27,6 +28,11 @@ export class CheckInController {
   @Get()
   findAll() {
     return this.checkInService.findAll();
+  }
+
+  @Get('/queue/:queueNumber')
+  findByQueue(@Param('queueNumber') queueNumber: string) {
+    return this.checkInService.findByQueue(queueNumber);
   }
 
   @Get(':id')

@@ -114,6 +114,26 @@ export class CheckInService {
     return `This action returns all checkIn`;
   }
 
+  findByQueue(queueNumber: string) {
+    return this.prisma.ops_checkin_entry.findUnique({
+      where: {
+        queue_number: queueNumber,
+      },
+      select: {
+        queue_number: true,
+        snapshot_company_name: true,
+        driver_name: true,
+        submission_time: true,
+        ops_queue_status: {
+          select: {
+            status_display_text: true,
+            estimated_wait_minutes: true,
+          },
+        },
+      },
+    });
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} checkIn`;
   }
