@@ -309,6 +309,12 @@ export const SYSTEM_CONFIGS = [
     config_type: 'INT',
     description: 'Estimasi waktu tunggu dalam menit (default)',
   },
+  {
+    config_key: 'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT',
+    config_value: 'Menunggu Verifikasi',
+    config_type: 'STRING',
+    description: 'Status menunggu verifikasi di Display',
+  },
 ];
 
 export const ADMIN_USER = {

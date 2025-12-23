@@ -28,6 +28,7 @@ export class CheckInService {
   async create(createCheckInDto: CreateCheckInDto, requestInfo: any) {
     const maxRetries = 3;
     let attempt = 0;
+    const dateNow = new Date();
 
     while (attempt < maxRetries) {
       try {
@@ -51,7 +52,7 @@ export class CheckInService {
               snapshot_vendor_category_id: vendor.vendor_category_id,
               snapshot_company_name: vendor.company_name,
               snapshot_category_name: vendor.vendor_category.category_name,
-              submission_time: new Date(),
+              submission_time: dateNow,
               current_status: 'MENUNGGU',
               ip_address: requestInfo.ipAddress,
               device_identifier: requestInfo.deviceIdentifier,
@@ -87,13 +88,23 @@ export class CheckInService {
             }),
           });
 
+          const estimatedWaitMinutes =
+            await this.systemConfigService.findByConfigKey(
+              'ESTIMATED_WAIT_MINUTES',
+            );
+          const statusDisplayText =
+            await this.systemConfigService.findByConfigKey(
+              'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT',
+            );
+
           // 9. Return Result
           return {
             queue_number: queueNumber,
             company_name: vendor.company_name,
             driver_name: createCheckInDto.driver_name,
-            current_status: 'MENUNGGU',
-            submission_time: new Date(),
+            status_display_text: statusDisplayText.config_value,
+            estimated_wait_minutes: toInt(estimatedWaitMinutes.config_value),
+            submission_time: dateNow,
           };
         });
       } catch (error: any) {
@@ -267,13 +278,16 @@ export class CheckInService {
     const estimatedWaitMinutes = await this.systemConfigService.findByConfigKey(
       'ESTIMATED_WAIT_MINUTES',
     );
+    const statusDisplayText = await this.systemConfigService.findByConfigKey(
+      'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT',
+    );
 
     await tx.ops_queue_status.create({
       data: {
         entry_id: entryId,
         queue_number: queueNumber,
         current_status: 'MENUNGGU',
-        status_display_text: 'Menunggu Verifikasi',
+        status_display_text: statusDisplayText.config_value,
         priority_order: nextPriority,
         estimated_wait_minutes: toInt(estimatedWaitMinutes.config_value),
       },
