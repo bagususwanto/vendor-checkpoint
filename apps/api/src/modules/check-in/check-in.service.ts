@@ -21,7 +21,6 @@ export class CheckInService {
     private readonly systemConfigService: SystemConfigService,
     private readonly checklistService: ChecklistService,
 
-
     private readonly auditService: AuditService,
   ) {}
 
@@ -221,7 +220,11 @@ export class CheckInService {
     });
   }
 
-  private async createQueueStatus(tx: any, entryId: number, queueNumber: string) {
+  private async createQueueStatus(
+    tx: any,
+    entryId: number,
+    queueNumber: string,
+  ) {
     const startOfToday = getStartOfToday();
     const lastPriority = await tx.ops_queue_status.findFirst({
       where: {
@@ -240,6 +243,10 @@ export class CheckInService {
     const lastPrioritySeq = lastPriority ? lastPriority.priority_order : 0;
     const nextPriority = lastPrioritySeq + 1;
 
+    const estimatedWaitMinutes = await this.systemConfigService.findByConfigKey(
+      'ESTIMATED_WAIT_MINUTES',
+    );
+
     await tx.ops_queue_status.create({
       data: {
         entry_id: entryId,
@@ -247,6 +254,7 @@ export class CheckInService {
         current_status: 'MENUNGGU',
         status_display_text: 'Menunggu Verifikasi',
         priority_order: nextPriority,
+        estimated_wait_minutes: estimatedWaitMinutes.config_value,
       },
     });
   }
