@@ -12,6 +12,7 @@ import { getStartOfToday } from 'src/common/utils/today-date.util';
 // Removed TimeLogService import
 
 import { AuditService } from '../audit/audit.service';
+import { toInt } from 'src/common/utils/string-to-int.util';
 
 @Injectable()
 export class CheckInService {
@@ -254,7 +255,7 @@ export class CheckInService {
         current_status: 'MENUNGGU',
         status_display_text: 'Menunggu Verifikasi',
         priority_order: nextPriority,
-        estimated_wait_minutes: estimatedWaitMinutes.config_value,
+        estimated_wait_minutes: toInt(estimatedWaitMinutes.config_value),
       },
     });
   }
