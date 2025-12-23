@@ -119,18 +119,18 @@ async function seedVendors() {
 
 async function main(): Promise<void> {
   console.log('Starting seed...');
-  
+
   try {
     await cleanDatabase();
     await seedVendorCategories();
     await seedChecklistCategories();
     await seedUsers();
     await seedSystemConfig();
-    
+
     // These depend on the categories above
     await seedChecklistItems();
     await seedVendors();
-    
+
     console.log('Seed completed successfully!');
   } catch (error) {
     console.error('Seed execution failed:', error);
