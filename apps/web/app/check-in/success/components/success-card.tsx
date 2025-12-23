@@ -19,7 +19,7 @@ const itemVariants = {
 
 export function SuccessCard({ data, onCheckStatus, onGoHome }: SuccessCardProps) {
   return (
-    <Card className="backdrop-blur-xl bg-background/60 border-white/20 shadow-2xl overflow-hidden w-full max-w-md">
+    <Card className="backdrop-blur-xl bg-background/60 border-white/20 shadow-2xl overflow-hidden w-full max-w-lg">
       <div className="flex flex-col items-center p-8 text-center space-y-6">
         
         {/* Success Icon & Queue Number */}
@@ -126,7 +126,7 @@ function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string
         {icon}
         <span>{label}</span>
       </div>
-      <p className="font-medium text-sm truncate">{value}</p>
+      <p className="font-medium text-sm break-words">{value}</p>
     </div>
   );
 }
