@@ -2,13 +2,13 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateChecklistDto } from './dto/create-checklist.dto';
 import { UpdateChecklistDto } from './dto/update-checklist.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
-import { VendorCategoryService } from '../vendor-category/vendor-category.service';
+import { MaterialCategoryService } from '../material_category/material_category.service';
 
 @Injectable()
 export class ChecklistService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly vendorCategoryService: VendorCategoryService,
+    private readonly materialCategoryService: MaterialCategoryService,
   ) {}
 
   create(createChecklistDto: CreateChecklistDto) {
@@ -33,15 +33,15 @@ export class ChecklistService {
     });
   }
 
-  async findByCategory(vendorCategoryId: number) {
-    // validate vendorCategoryId
-    if (!vendorCategoryId) {
-      throw new BadRequestException('vendorCategoryId is required');
+  async findByCategory(materialCategoryId: number) {
+    // validate materialCategoryId
+    if (!materialCategoryId) {
+      throw new BadRequestException('Material Category is required');
     }
     const vendorCategory =
-      await this.vendorCategoryService.findOne(vendorCategoryId);
+      await this.materialCategoryService.findOne(materialCategoryId);
     if (!vendorCategory) {
-      throw new BadRequestException('Invalid vendorCategoryId');
+      throw new BadRequestException('Invalid materialCategoryId');
     }
 
     return this.prisma.mst_checklist_category.findMany({
@@ -56,15 +56,15 @@ export class ChecklistService {
             checklist_item_id: true,
             item_type: true,
             item_text: true,
-            vendor_category_id: true,
+            material_category_id: true,
             is_required: true,
             display_order: true,
           },
           where: {
             is_active: true,
             OR: [
-              { vendor_category_id: vendorCategoryId }, // item khusus vendor
-              { vendor_category_id: null }, // item umum
+              { material_category_id: materialCategoryId }, // item khusus vendor
+              { material_category_id: null }, // item umum
             ],
           },
           orderBy: {

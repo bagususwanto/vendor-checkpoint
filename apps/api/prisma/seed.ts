@@ -17,14 +17,14 @@ async function cleanDatabase() {
   await prisma.mst_checklist_item.deleteMany({});
   await prisma.mst_checklist_category.deleteMany({});
   await prisma.mst_vendor.deleteMany({}); // Vendors depend on vendor categories
-  await prisma.mst_vendor_category.deleteMany({});
+  await prisma.mst_material_category.deleteMany({});
   await prisma.mst_user.deleteMany({});
   await prisma.cfg_system.deleteMany({});
 }
 
 async function seedVendorCategories() {
   console.log('Creating vendor categories...');
-  await prisma.mst_vendor_category.createMany({
+  await prisma.mst_material_category.createMany({
     data: VENDOR_CATEGORIES,
   });
 }
@@ -39,14 +39,14 @@ async function seedChecklistCategories() {
 async function seedChecklistItems() {
   console.log('Fetching categories for mapping...');
   const cats = await prisma.mst_checklist_category.findMany();
-  const vendorCats = await prisma.mst_vendor_category.findMany();
+  const materialCats = await prisma.mst_material_category.findMany();
 
   const catMap = Object.fromEntries(
     cats.map((c) => [c.category_code, c.checklist_category_id]),
   );
 
-  const vcMap = Object.fromEntries(
-    vendorCats.map((v) => [v.category_code, v.vendor_category_id]),
+  const mcMap = Object.fromEntries(
+    materialCats.map((m) => [m.category_code, m.material_category_id]),
   );
 
   console.log('Creating general checklist items...');
@@ -66,11 +66,11 @@ async function seedChecklistItems() {
   console.log('Creating specific checklist items...');
   const specificItems = SPECIFIC_CHECKLIST_ITEMS.map((item) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { category_code, vendor_category_code, ...rest } = item;
+    const { category_code, material_category_code, ...rest } = item;
     return {
       ...rest,
       checklist_category_id: catMap[item.category_code],
-      vendor_category_id: vcMap[item.vendor_category_code],
+      material_category_id: mcMap[item.material_category_code],
     };
   });
 
@@ -97,23 +97,9 @@ async function seedSystemConfig() {
 
 async function seedVendors() {
   console.log('Creating master vendors...');
-  // We need to fetch vendor categories to map the codes
-  const vendorCats = await prisma.mst_vendor_category.findMany();
-  const vcMap = Object.fromEntries(
-    vendorCats.map((v) => [v.category_code, v.vendor_category_id]),
-  );
-
-  const vendors = MASTER_VENDORS.map((vendor) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { vendor_category_code, ...rest } = vendor;
-    return {
-      ...rest,
-      vendor_category_id: vcMap[vendor.vendor_category_code],
-    };
-  });
 
   await prisma.mst_vendor.createMany({
-    data: vendors,
+    data: MASTER_VENDORS,
   });
 }
 

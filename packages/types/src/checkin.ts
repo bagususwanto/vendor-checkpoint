@@ -20,6 +20,7 @@ export type QueueSearch = z.infer<typeof queueSearchSchema>;
 export const checkInSchema = z.object({
   vendor_id: z.number(),
   driver_name: z.string(),
+  material_category_id: z.number(),
   checklist_responses: z.array(
     z.object({
       checklist_item_id: z.number(),

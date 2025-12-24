@@ -4,18 +4,16 @@ import { CheckInController } from './check-in.controller';
 import { VendorModule } from '../vendor/vendor.module';
 import { SystemConfigModule } from '../system-config/system-config.module';
 import { ChecklistModule } from '../checklist/checklist.module';
-
-
 import { AuditModule } from '../audit/audit.module';
+import { MaterialCategoryModule } from '../material_category/material_category.module';
 
 @Module({
   imports: [
     VendorModule,
     SystemConfigModule,
     ChecklistModule,
-
-
     AuditModule,
+    MaterialCategoryModule,
   ],
   controllers: [CheckInController],
   providers: [CheckInService],

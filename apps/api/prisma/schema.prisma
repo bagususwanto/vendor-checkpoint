@@ -13,37 +13,34 @@ datasource db {
   provider = "sqlserver"
 }
 
-model mst_vendor_category {
-  vendor_category_id Int      @id @default(autoincrement())
-  category_name      String   @unique @db.VarChar(255)
-  category_code      String   @unique @db.VarChar(50)
-  description        String?  @db.Text
-  is_active          Boolean  @default(true)
-  created_at         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
-  updated_at         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+model mst_material_category {
+  material_category_id  Int      @id @default(autoincrement())
+  category_name         String   @unique @db.VarChar(255)
+  category_code         String   @unique @db.VarChar(50)
+  description           String?  @db.Text
+  is_active             Boolean  @default(true)
+  created_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
 
-  mst_vendor               mst_vendor[]
-  mst_checklist_item       mst_checklist_item[]
-  ops_checkin_entry        ops_checkin_entry[]
+  mst_checklist_item mst_checklist_item[]
+  ops_checkin_entry  ops_checkin_entry[]
 
-  @@index([category_code], name: "idx_mst_vendor_category_category_code")
+  @@index([category_code], name: "idx_mst_material_category_category_code")
 }
 
 model mst_vendor {
   vendor_id          Int                     @id @default(autoincrement())
   vendor_code        String                  @unique @db.VarChar(100)
   company_name       String                  @db.VarChar(500)
-  vendor_category_id Int
   is_active          Boolean                 @default(true)
   last_sync_time     DateTime?
   sync_source        String?                 @db.VarChar(100)
   created_at         DateTime                @default(dbgenerated("CURRENT_TIMESTAMP"))
   updated_at         DateTime                @default(dbgenerated("CURRENT_TIMESTAMP"))
 
-  vendor_category mst_vendor_category @relation(fields: [vendor_category_id], references: [vendor_category_id])
   ops_checkin_entry ops_checkin_entry[]
 
-  @@index([vendor_category_id, is_active], name: "idx_mst_vendor_category_active")
+  @@index([is_active], name: "idx_mst_vendor_active")
   @@index([vendor_code], name: "idx_mst_vendor_vendor_code")
 }
 
@@ -71,20 +68,20 @@ model mst_checklist_item {
   item_code             String   @unique @db.VarChar(100)
   item_text             String   @db.Text
   item_type             String   @db.VarChar(50)
-  vendor_category_id    Int?
+  material_category_id  Int?
   display_order         Int
   is_required           Boolean  @default(true)
   is_active             Boolean  @default(true)
   created_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
   updated_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
 
-  checklist_category mst_checklist_category @relation(fields: [checklist_category_id], references: [checklist_category_id])
-  vendor_category    mst_vendor_category?   @relation(fields: [vendor_category_id], references: [vendor_category_id])
+  checklist_category   mst_checklist_category @relation(fields: [checklist_category_id], references: [checklist_category_id])
+  material_category    mst_material_category? @relation(fields: [material_category_id], references: [material_category_id])
   ops_checkin_response ops_checkin_response[]
 
   @@index([checklist_category_id, is_active, display_order], name: "idx_mst_checklist_item_category_active_order")
   @@index([item_code], name: "idx_mst_checklist_item_item_code")
-  @@index([item_type, vendor_category_id, is_active], name: "idx_mst_checklist_item_type_vendor_active")
+  @@index([item_type, material_category_id, is_active], name: "idx_mst_checklist_item_type_material_category_active")
 }
 
 model mst_user {
@@ -112,7 +109,7 @@ model ops_checkin_entry {
   queue_number                String   @unique @db.VarChar(50)
   vendor_id                   Int
   driver_name                 String   @db.VarChar(500)
-  snapshot_vendor_category_id Int
+  material_category_id        Int
   snapshot_company_name       String   @db.VarChar(500)
   snapshot_category_name      String   @db.VarChar(255)
   submission_time             DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
@@ -125,7 +122,7 @@ model ops_checkin_entry {
   updated_at                  DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
 
   mst_vendor           mst_vendor             @relation(fields: [vendor_id], references: [vendor_id])
-  vendor_category_snap mst_vendor_category    @relation(fields: [snapshot_vendor_category_id], references: [vendor_category_id], onDelete: NoAction, onUpdate: NoAction)
+  material_category    mst_material_category  @relation(fields: [material_category_id], references: [material_category_id], onDelete: NoAction, onUpdate: NoAction)
 
   ops_checkin_response ops_checkin_response[]
   ops_verification     ops_verification?

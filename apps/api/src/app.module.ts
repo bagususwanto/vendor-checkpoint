@@ -7,12 +7,21 @@ import { VendorModule } from './modules/vendor/vendor.module';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { ChecklistModule } from './modules/checklist/checklist.module';
 import { CheckInModule } from './modules/check-in/check-in.module';
-import { VendorCategoryModule } from './modules/vendor-category/vendor-category.module';
 import { SystemConfigModule } from './modules/system-config/system-config.module';
 import { AuditModule } from './modules/audit/audit.module';
+import { MaterialCategoryModule } from './modules/material_category/material_category.module';
 
 @Module({
-  imports: [AuthModule, VendorModule, PrismaModule, ChecklistModule, CheckInModule, VendorCategoryModule, SystemConfigModule, AuditModule],
+  imports: [
+    AuthModule,
+    VendorModule,
+    PrismaModule,
+    ChecklistModule,
+    CheckInModule,
+    SystemConfigModule,
+    AuditModule,
+    MaterialCategoryModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

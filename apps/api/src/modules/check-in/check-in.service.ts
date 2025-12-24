@@ -13,6 +13,7 @@ import { getStartOfToday } from 'src/common/utils/today-date.util';
 
 import { AuditService } from '../audit/audit.service';
 import { toInt } from 'src/common/utils/string-to-int.util';
+import { MaterialCategoryService } from '../material_category/material_category.service';
 
 @Injectable()
 export class CheckInService {
@@ -21,8 +22,8 @@ export class CheckInService {
     private readonly vendorService: VendorService,
     private readonly systemConfigService: SystemConfigService,
     private readonly checklistService: ChecklistService,
-
     private readonly auditService: AuditService,
+    private readonly materialCategoryService: MaterialCategoryService,
   ) {}
 
   async create(createCheckInDto: CreateCheckInDto, requestInfo: any) {
@@ -33,8 +34,11 @@ export class CheckInService {
     while (attempt < maxRetries) {
       try {
         return await this.prisma.$transaction(async (tx) => {
-          // 1. Validate Vendor
+          // 1. Validate
           const vendor = await this.validateVendor(createCheckInDto.vendor_id);
+          const materialCategory = await this.validateMaterialCategory(
+            createCheckInDto.material_category_id,
+          );
 
           // 2. Generate Queue Number
           const queueNumber = await this.generateFormattedQueueNumber(tx);
@@ -49,9 +53,9 @@ export class CheckInService {
               queue_number: queueNumber,
               vendor_id: createCheckInDto.vendor_id,
               driver_name: createCheckInDto.driver_name,
-              snapshot_vendor_category_id: vendor.vendor_category_id,
+              material_category_id: createCheckInDto.material_category_id,
               snapshot_company_name: vendor.company_name,
-              snapshot_category_name: vendor.vendor_category.category_name,
+              snapshot_category_name: materialCategory.category_name,
               submission_time: dateNow,
               current_status: 'MENUNGGU',
               ip_address: requestInfo.ipAddress,
@@ -163,6 +167,15 @@ export class CheckInService {
       throw new BadRequestException('Vendor tidak ditemukan');
     }
     return vendor;
+  }
+
+  private async validateMaterialCategory(material_category_id: number) {
+    const materialCategory =
+      await this.materialCategoryService.findOne(material_category_id);
+    if (!materialCategory) {
+      throw new BadRequestException('Material Category tidak ditemukan');
+    }
+    return materialCategory;
   }
 
   private async generateFormattedQueueNumber(tx: any) {

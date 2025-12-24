@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
-import { findVendorResponse, PaginatedResponse } from '@repo/types';
+import { PaginatedResponse } from '@repo/types';
 import { FindVendorParamsDto } from './dto/find-vendor-params.dto';
+import { mst_vendor } from 'generated/prisma/client';
 
 @Injectable()
 export class VendorService {
@@ -27,8 +28,8 @@ export class VendorService {
 
   async findAll(
     query: FindVendorParamsDto,
-  ): Promise<PaginatedResponse<findVendorResponse>> {
-    const { page, limit, search, isActive, categoryId } = query;
+  ): Promise<PaginatedResponse<mst_vendor>> {
+    const { page, limit, search, isActive } = query;
 
     const skip = (page - 1) * limit;
 
@@ -45,19 +46,8 @@ export class VendorService {
       ];
     }
 
-    if (categoryId > 0) {
-      where.vendor_category_id = categoryId;
-    }
-
     const [data, total] = await Promise.all([
       this.prisma.mst_vendor.findMany({
-        include: {
-          vendor_category: {
-            select: {
-              category_name: true,
-            },
-          },
-        },
         skip,
         take: limit,
         where,
@@ -81,13 +71,6 @@ export class VendorService {
     return this.prisma.mst_vendor.findUnique({
       where: {
         vendor_id: id,
-      },
-      include: {
-        vendor_category: {
-          select: {
-            category_name: true,
-          },
-        },
       },
     });
   }
