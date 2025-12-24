@@ -1,11 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { MaterialCategoryService } from './material_category.service';
 import { CreateMaterialCategoryDto } from './dto/create-material_category.dto';
 import { UpdateMaterialCategoryDto } from './dto/update-material_category.dto';
+import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 
 @Controller('material-category')
 export class MaterialCategoryController {
-  constructor(private readonly materialCategoryService: MaterialCategoryService) {}
+  constructor(
+    private readonly materialCategoryService: MaterialCategoryService,
+  ) {}
 
   @Post()
   create(@Body() createMaterialCategoryDto: CreateMaterialCategoryDto) {
@@ -13,8 +25,8 @@ export class MaterialCategoryController {
   }
 
   @Get()
-  findAll() {
-    return this.materialCategoryService.findAll();
+  findAll(@Query() query: PaginatedParamsDto) {
+    return this.materialCategoryService.findAll(query);
   }
 
   @Get(':id')
@@ -23,7 +35,10 @@ export class MaterialCategoryController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMaterialCategoryDto: UpdateMaterialCategoryDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateMaterialCategoryDto: UpdateMaterialCategoryDto,
+  ) {
     return this.materialCategoryService.update(+id, updateMaterialCategoryDto);
   }
 
