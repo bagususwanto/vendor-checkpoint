@@ -17,7 +17,7 @@ export const VENDOR_CATEGORIES = [
   {
     category_name: 'General Supplier',
     category_code: 'GEN',
-    description: 'Supplier umum untuk berbagai kebutuhan',
+    description: 'Material umum untuk berbagai kebutuhan',
   },
 ];
 
