@@ -16,3 +16,11 @@ export function useQueueStatus(queueNumber: string | null) {
     retry: false,
   });
 }
+
+export function useActiveQueues(page: number, limit: number) {
+  return useQuery({
+    queryKey: ['active-queues', page, limit],
+    queryFn: () => checkInService.getActiveQueues({ page, limit }),
+    refetchInterval: 10000,
+  });
+}

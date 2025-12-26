@@ -84,13 +84,13 @@ export function DisplayTableQueue({ queues, title = "Antrean Berikutnya" }: Disp
                 {/* Status */}
                 <div className="col-span-2 text-right">
                   <Badge
-                    variant={queue.status === 'WAITING' ? 'outline' : 'secondary'}
-                    className={queue.status === 'WAITING' 
+                    variant={queue.status === 'MENUNGGU' ? 'outline' : 'secondary'}
+                    className={queue.status === 'MENUNGGU' 
                       ? 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30' 
                       : ''}
                   >
                     <span className="w-2 h-2 rounded-full bg-current" />
-                    {queue.status === 'WAITING' ? 'Menunggu' : queue.status}
+                    {queue.status === 'MENUNGGU' ? 'Menunggu' : queue.status}
                   </Badge>
                 </div>
               </div>

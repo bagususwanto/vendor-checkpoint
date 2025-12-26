@@ -1,4 +1,4 @@
-import { CheckIn } from '@repo/types';
+import { CheckIn, PaginatedResponse } from '@repo/types';
 import { axiosInstance } from '@/lib/axios';
 
 export const checkInService = {
@@ -15,6 +15,18 @@ export const checkInService = {
     try {
       const response = await axiosInstance.get<{ data: any }>(`/check-in/queue/${queueNumber}`);
       return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getActiveQueues: async (params: { page: number; limit: number }) => {
+    try {
+      const response = await axiosInstance.get<PaginatedResponse<any>>(
+        '/check-in/active',
+        { params },
+      );
+      return response.data;
     } catch (error) {
       throw error;
     }

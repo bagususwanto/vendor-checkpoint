@@ -1,5 +1,7 @@
 'use client';
 
+import { useActiveQueues } from '@/hooks/api/use-check-in';
+
 import { DisplayHeaderQueue } from './components/display-header-queue';
 import {
   DisplayCurrentQueue,
@@ -7,70 +9,35 @@ import {
 } from './components/display-current-queue';
 import { DisplayTableQueue } from './components/display-table-queue';
 import { DisplayFooterQueue } from './components/display-footer-queue';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-// Mock Data Generation
-const generateMockQueues = (): QueueItem[] => {
-  return [
-    {
-      queueNumber: '20251226-002',
-      status: 'WAITING',
-      driverName: 'Budi Santoso',
-      companyName: 'PT. Logistik Jaya',
-    },
-    {
-      queueNumber: '20251226-005',
-      status: 'WAITING',
-      driverName: 'Ahmad Dani',
-      companyName: 'CV. Maju Terus',
-    },
-    {
-      queueNumber: '20251226-003',
-      status: 'WAITING',
-      driverName: 'Cipto Mangunkusumo',
-      companyName: 'PT. Sumber Rejeki',
-    },
-    {
-      queueNumber: '20251226-004',
-      status: 'WAITING',
-      driverName: 'Dewi Sartika',
-      companyName: 'PT. Kimia Farma',
-    },
-    {
-      queueNumber: '20251226-007',
-      status: 'WAITING',
-      driverName: 'Eko Patrio',
-      companyName: 'PT. Gudang Garam',
-    },
-    {
-      queueNumber: '20251226-006',
-      status: 'WAITING',
-      driverName: 'Fajar Sadboy',
-      companyName: 'CV. Abadi Jaya',
-    },
-  ];
-};
+// Mock Data Generation Removed
+
 
 export default function TvDisplayPage() {
-  const [currentQueue, setCurrentQueue] = useState<QueueItem | null>({
-    queueNumber: '20251226-001',
-    status: 'CALLED',
-    driverName: 'Siti Badriah',
-    companyName: 'PT. Indofood Sukses Makmur',
-  });
-  const [waitingQueues, setWaitingQueues] = useState<QueueItem[]>([]);
+  const { data: activeQueuesData } = useActiveQueues(1, 10);
+  const allQueues = activeQueuesData?.data || [];
+  
+  const currentQueueData = allQueues.length > 0 ? allQueues[0] : null;
+  const waitingQueuesData = allQueues.length > 0 ? allQueues.slice(1) : [];
 
-  useEffect(() => {
-    // Simulate fetching data
-    setWaitingQueues(generateMockQueues());
+  const currentQueue: QueueItem | null = currentQueueData
+    ? {
+        queueNumber: currentQueueData.queue_number,
+        status: currentQueueData.current_status,
+        driverName: currentQueueData.driver_name,
+        companyName: currentQueueData.snapshot_company_name || '-',
+      }
+    : null;
 
-    // Simulate updating current queue periodically for demo purpose
-    const interval = setInterval(() => {
-      // Logic to rotate queues could go here
-    }, 10000);
+  const waitingQueues: QueueItem[] = waitingQueuesData.map((q) => ({
+    queueNumber: q.queue_number,
+    status: q.current_status,
+    driverName: q.driver_name,
+    companyName: q.snapshot_company_name || '-',
+  }));
 
-    return () => clearInterval(interval);
-  }, []);
+
 
   return (
     <>
