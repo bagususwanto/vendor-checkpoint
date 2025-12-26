@@ -2,6 +2,7 @@
 
 import { QueueItem } from './display-current-queue';
 import { Clock, Users } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface DisplayTableQueueProps {
   queues: QueueItem[];
@@ -82,14 +83,15 @@ export function DisplayTableQueue({ queues, title = "Antrean Berikutnya" }: Disp
 
                 {/* Status */}
                 <div className="col-span-2 text-right">
-                  <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
-                    queue.status === 'WAITING' 
-                      ? 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border border-yellow-500/30' 
-                      : 'bg-muted text-muted-foreground border border-border'
-                  }`}>
+                  <Badge
+                    variant={queue.status === 'WAITING' ? 'outline' : 'secondary'}
+                    className={queue.status === 'WAITING' 
+                      ? 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30' 
+                      : ''}
+                  >
                     <span className="w-2 h-2 rounded-full bg-current" />
                     {queue.status === 'WAITING' ? 'Menunggu' : queue.status}
-                  </span>
+                  </Badge>
                 </div>
               </div>
             ))}
