@@ -17,7 +17,7 @@ export function LandingFooter() {
             <Button
               variant="link"
               className="px-0 text-muted-foreground hover:text-primary"
-              onClick={() => router.push('/display')}
+              onClick={() => router.push('/tv-display')}
             >
               TV Display Mode
             </Button>
