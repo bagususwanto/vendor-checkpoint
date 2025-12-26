@@ -5,7 +5,7 @@ import { SendHorizonal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CardFooter } from '@/components/ui/card';
 import { useChecklistStore } from '@/stores/use-checklist.store';
-import { checkInService } from '@/services/check-in.service';
+import { useSubmitCheckIn } from '@/hooks/api/use-check-in';
 import { toast } from 'sonner';
 
 import { formatDate } from '@/lib/utils';
@@ -13,7 +13,7 @@ import { useState } from 'react';
 
 export function ReviewActions() {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { mutateAsync: submitCheckIn, isPending } = useSubmitCheckIn();
 
   const handleSubmit = async () => {
     const { step1Data, step2Data, setSuccessData, resetFormData } =
@@ -39,8 +39,7 @@ export function ReviewActions() {
     };
 
     try {
-      setIsSubmitting(true);
-      const result = await checkInService.submitCheckIn(payload);
+      const result = await submitCheckIn(payload);
 
       const successData = {
         queueNumber: result.queue_number,
@@ -62,8 +61,6 @@ export function ReviewActions() {
       toast.error('Gagal mengirim data', {
         description: 'Terjadi kesalahan saat mengirim data. Silakan coba lagi.',
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -74,9 +71,9 @@ export function ReviewActions() {
         type="button"
         className="w-full"
         onClick={handleSubmit}
-        disabled={isSubmitting}
+        disabled={isPending}
       >
-        {isSubmitting ? 'Mengirim...' : 'Submit'}
+        {isPending ? 'Mengirim...' : 'Submit'}
         <SendHorizonal className="ml-2 size-6" />
       </Button>
     </CardFooter>

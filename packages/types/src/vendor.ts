@@ -14,3 +14,14 @@ export const findVendorParamsSchema = z.object({
 });
 
 export type FindVendorParams = z.infer<typeof findVendorParamsSchema>;
+
+export type findVendorResponse = {
+  vendor_id: number;
+  company_name: string;
+  vendor_code: string;
+  is_active: boolean;
+  created_at: Date;
+  updated_at: Date;
+  deleted_at: Date | null;
+  vendor_category?: string | null;
+};

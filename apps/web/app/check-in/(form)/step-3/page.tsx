@@ -49,7 +49,6 @@ export default function CheckInStep3() {
           <ReviewIdentity step1Data={step1Data} />
           <ReviewChecklist
             step2Data={step2Data}
-            vendorCategory={step1Data?.company.category_name}
           />
         </CardContent>
         <ReviewActions />

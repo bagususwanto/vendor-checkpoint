@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, Suspense } from 'react';
 import { useForm } from '@tanstack/react-form';
 import {
   Search,
@@ -28,17 +28,16 @@ import {
 } from '@/components/ui/card';
 import {
   queueSearchSchema,
-  type QueueStatusData,
   type QueueSearch,
 } from '@repo/types';
-import { checkInService } from '@/services/check-in.service';
+import { useQueueStatus } from '@/hooks/api/use-check-in';
 
-export default function QueueStatusPage() {
+function QueueStatusContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [result, setResult] = useState<QueueStatusData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [activeQueueNumber, setActiveQueueNumber] = useState<string | null>(null);
+
+  const { data: qStatus, isLoading, error, refetch } = useQueueStatus(activeQueueNumber);
 
   const form = useForm({
     defaultValues: {
@@ -48,50 +47,42 @@ export default function QueueStatusPage() {
       onSubmit: queueSearchSchema,
     },
     onSubmit: async ({ value }) => {
-      await handleCheckStatus(value);
+      handleSearch(value);
     },
   });
 
   useEffect(() => {
     const queueParam = searchParams.get('queueNumber');
     if (queueParam) {
-      // Small delay to ensure everything is mounted and ready (optional, but good for UX)
-      // Also avoids hydration mismatches if params are read too early in some setups,
-      // though Next.js 13+ handles this well usually.
       form.setFieldValue('queueNumber', queueParam);
-      handleCheckStatus({ queueNumber: queueParam });
+      setActiveQueueNumber(queueParam);
     }
   }, [searchParams]);
 
-  async function handleCheckStatus(data: QueueSearch) {
-    setIsLoading(true);
-    setError(null);
-    setResult(null);
-
-    try {
-      const result = await checkInService.getQueueStatus(data.queueNumber);
-
-      const opsStatus = result.ops_queue_status || {};
-
-      setResult({
-        queueNumber: result.queue_number,
-        status: opsStatus.status || 'WAITING', // Fallback or assume it comes from ops_queue_status
-        statusDisplayText: opsStatus.status_display_text || 'Menunggu',
-        updatedAt: new Date().toISOString(),
-        companyName: result.snapshot_company_name || result.company_name,
-        driverName: result.driver_name,
-        submissionTime: result.submission_time,
-        estimatedWaitTime: opsStatus.estimated_wait_minutes 
-          ? `${opsStatus.estimated_wait_minutes} Menit` 
-          : undefined,
-      });
-    } catch (err) {
-      console.error(err);
-      setError('Nomor antrean tidak ditemukan atau terjadi kesalahan.');
-    } finally {
-      setIsLoading(false);
+  function handleSearch(data: QueueSearch) {
+    if (data.queueNumber !== activeQueueNumber) {
+        setActiveQueueNumber(data.queueNumber);
+    } else {
+        refetch();
     }
   }
+
+  const result = useMemo(() => {
+    if (!qStatus) return null;
+    const opsStatus = qStatus.ops_queue_status || {};
+    return {
+        queueNumber: qStatus.queue_number,
+        status: opsStatus.status || 'WAITING',
+        statusDisplayText: opsStatus.status_display_text || 'Menunggu',
+        updatedAt: new Date().toISOString(),
+        companyName: qStatus.snapshot_company_name || qStatus.company_name,
+        driverName: qStatus.driver_name,
+        submissionTime: qStatus.submission_time,
+        estimatedWaitTime: opsStatus.estimated_wait_minutes
+          ? `${opsStatus.estimated_wait_minutes} Menit`
+          : undefined,
+    };
+  }, [qStatus]);
 
   // Helper to determine status color
   const getStatusColor = (status: string) => {
@@ -199,7 +190,7 @@ export default function QueueStatusPage() {
       {error && (
         <Card className="bg-red-500/5 slide-in-from-top-2 border-red-500/20 animate-in fade-in">
           <CardContent className="pt-6 font-medium text-red-600 text-center">
-            {error}
+            {'Nomor antrean tidak ditemukan atau terjadi kesalahan.'}
           </CardContent>
         </Card>
       )}
@@ -298,5 +289,13 @@ export default function QueueStatusPage() {
         </Card>
       )}
     </div>
+  );
+}
+
+export default function QueueStatusPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <QueueStatusContent />
+    </Suspense>
   );
 }

@@ -3,7 +3,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@tanstack/react-form';
-import { ArrowLeft, Building2, CircleArrowRight, User } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, Building2, CircleArrowRight, User, Box } from 'lucide-react';
 import { ComboboxVendor } from '@/components/combobox-vendor';
 import IconLabel from '@/components/icon-label';
 import { Button } from '@/components/ui/button';
@@ -12,25 +13,27 @@ import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { VendorIdentitySchema } from '@/lib/schemas/vendor-identity.schema';
 import { useChecklistStore } from '@/stores/use-checklist.store';
-import { vendorService } from '@/services/vendor.service';
 import { checklistService } from '@/services/checklist.service';
-import { materialCategoryService } from '@/services/material-category.service';
 import { DropdownMaterialCategory } from '@/components/dropdown-material-category';
-import { Box } from 'lucide-react';
+import { useVendors } from '@/hooks/api/use-vendors';
+import { useMaterialCategories } from '@/hooks/api/use-material-categories';
 
 export function VendorIdentityForm() {
-  const { step1Data, setStep1Data, setChecklistCategories } =
-    useChecklistStore();
+  const { step1Data, setStep1Data, setChecklistCategories } = useChecklistStore();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const [vendors, setVendors] = useState<any[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Search States
   const [search, setSearch] = useState('');
-
   const [debouncedSearch, setDebouncedSearch] = useState(search);
+
+  const [materialCategorySearch, setMaterialCategorySearch] = useState('');
+  const [debouncedMaterialCategorySearch, setDebouncedMaterialCategorySearch] =
+    useState('');
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Debounce effects
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
@@ -38,20 +41,56 @@ export function VendorIdentityForm() {
     return () => clearTimeout(handler);
   }, [search]);
 
-  // Material Category State
-  const [materialCategories, setMaterialCategories] = useState<any[]>([]);
-  const [materialCategoryPage, setMaterialCategoryPage] = useState(1);
-  const [hasMoreMaterialCategories, setHasMoreMaterialCategories] = useState(true);
-  const [isMaterialCategoryLoading, setIsMaterialCategoryLoading] = useState(false);
-  const [materialCategorySearch, setMaterialCategorySearch] = useState('');
-  const [debouncedMaterialCategorySearch, setDebouncedMaterialCategorySearch] = useState('');
-
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedMaterialCategorySearch(materialCategorySearch);
     }, 500);
     return () => clearTimeout(handler);
   }, [materialCategorySearch]);
+
+  // Vendors Query
+  const {
+    data: vendorData,
+    fetchNextPage: fetchNextVendors,
+    hasNextPage: hasNextVendors,
+    isFetching: isFetchingVendors,
+  } = useVendors({
+    search: debouncedSearch,
+    isActive: true,
+  });
+
+  const vendors = useMemo(() => {
+    return (
+      vendorData?.pages.flatMap((page) =>
+        page.data.map((v) => ({
+          label: `${v.company_name} (${v.vendor_code})`,
+          value: String(v.vendor_id),
+        }))
+      ) || []
+    );
+  }, [vendorData]);
+
+  // Material Categories Query
+  const {
+    data: materialData,
+    fetchNextPage: fetchNextMaterialCategories,
+    hasNextPage: hasNextMaterialCategories,
+    isFetching: isFetchingMaterialCategories,
+  } = useMaterialCategories({
+    search: debouncedMaterialCategorySearch,
+  });
+
+  const materialCategories = useMemo(() => {
+    return (
+      materialData?.pages.flatMap((page) =>
+        page.data.map((m) => ({
+          label: m.category_name,
+          value: String(m.material_category_id),
+          description: m.description,
+        }))
+      ) || []
+    );
+  }, [materialData]);
 
   // Initial Selected Vendor from store
   const [selectedVendor, setSelectedVendor] = useState<{
@@ -77,106 +116,12 @@ export function VendorIdentityForm() {
     return vendors;
   }, [vendors, selectedVendor]);
 
-  const fetchVendors = async (
-    currentPage: number,
-    searchTerm: string,
-    isNewSearch: boolean,
-  ) => {
-    if (!isNewSearch && isLoading) return;
-
-    setIsLoading(true);
-    try {
-      const data = await vendorService.getVendors({
-        page: currentPage,
-        limit: 10,
-        search: searchTerm,
-        isActive: true,
-      });
-      const newVendors = data.data.map((v) => ({
-        label: `${v.company_name} (${v.vendor_code})`,
-        value: String(v.vendor_id),
-      }));
-
-      setVendors((prev) =>
-        isNewSearch ? newVendors : [...prev, ...newVendors],
-      );
-
-      const { total, limit, page: metaPage } = data.meta;
-      const totalPages = Math.ceil(total / limit);
-      setHasMore(metaPage < totalPages);
-    } catch (e) {
-      console.error('Failed to fetch vendors', e);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    setPage(1);
-    fetchVendors(1, debouncedSearch, true);
-  }, [debouncedSearch]);
-
-  const fetchMaterialCategories = async (
-    currentPage: number,
-    searchTerm: string,
-    isNewSearch: boolean,
-  ) => {
-    if (!isNewSearch && isMaterialCategoryLoading) return;
-
-    setIsMaterialCategoryLoading(true);
-    try {
-      const data = await materialCategoryService.getMaterialCategories({
-        page: currentPage,
-        limit: 10,
-        search: searchTerm,
-      });
-      const newMaterialCategories = data.data.map((m) => ({
-        label: m.category_name,
-        value: String(m.material_category_id),
-        description: m.description,
-      }));
-
-      setMaterialCategories((prev) =>
-        isNewSearch ? newMaterialCategories : [...prev, ...newMaterialCategories],
-      );
-
-      const { total, limit, page: metaPage } = data.meta;
-      const totalPages = Math.ceil(total / limit);
-      setHasMoreMaterialCategories(metaPage < totalPages);
-    } catch (e) {
-      console.error('Failed to fetch material categories', e);
-    } finally {
-      setIsMaterialCategoryLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    setMaterialCategoryPage(1);
-    fetchMaterialCategories(1, debouncedMaterialCategorySearch, true);
-  }, [debouncedMaterialCategorySearch]);
-
-  const handleLoadMoreMaterialCategories = () => {
-    if (!isMaterialCategoryLoading && hasMoreMaterialCategories) {
-      const nextPage = materialCategoryPage + 1;
-      setMaterialCategoryPage(nextPage);
-      fetchMaterialCategories(nextPage, debouncedMaterialCategorySearch, false);
-    }
-  };
-
-  const handleLoadMore = () => {
-    if (!isLoading && hasMore) {
-      const nextPage = page + 1;
-      setPage(nextPage);
-      fetchVendors(nextPage, debouncedSearch, false);
-    }
-  };
-
   const form = useForm({
     defaultValues: {
       fullName: step1Data?.fullName || '',
       company: {
         value: step1Data?.company.value || '',
-        label: step1Data?.company.label || ''
+        label: step1Data?.company.label || '',
       },
       materialCategory: {
         value: step1Data?.materialCategory?.value || '',
@@ -190,9 +135,16 @@ export function VendorIdentityForm() {
     onSubmit: async ({ value }) => {
       try {
         setIsSubmitting(true);
-        const checklistData = await checklistService.getChecklistByCategory(
-          Number(value.materialCategory.value),
-        );
+        // Using queryClient.fetchQuery to bridge the gap between imperative submit and declarative query
+        const checklistData = await queryClient.fetchQuery({
+          queryKey: ['checklist', Number(value.materialCategory.value)],
+          queryFn: () =>
+            checklistService.getChecklistByCategory(
+              Number(value.materialCategory.value)
+            ),
+          staleTime: 60 * 1000,
+        });
+
         setChecklistCategories(checklistData);
         setStep1Data(value);
         router.push('/check-in/step-2');
@@ -277,8 +229,10 @@ export function VendorIdentityForm() {
                     onSelect={handleSelectVendor}
                     value={selectedVendor?.value}
                     onSearch={setSearch}
-                    onLoadMore={handleLoadMore}
-                    isLoading={isLoading}
+                    onLoadMore={() => {
+                        if (hasNextVendors) fetchNextVendors();
+                    }}
+                    isLoading={isFetchingVendors}
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -288,36 +242,44 @@ export function VendorIdentityForm() {
           <form.Field
             name="materialCategory.value"
             children={(field) => {
-               const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-               return (
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
                 <Field data-invalid={isInvalid}>
-                   <IconLabel
-                     classNameIcon="w-6 h-6"
-                     htmlFor="materialCategory"
-                     icon={Box} 
-                     required
-                   >
-                     Kategori Material
-                   </IconLabel>
-                   <DropdownMaterialCategory
-                     options={materialCategories}
-                     value={field.state.value}
-                     onSelect={(val) => {
-                       const mat = materialCategories.find((m) => m.value === val);
-                       if (mat) {
-                         form.setFieldValue('materialCategory.value', mat.value);
-                         form.setFieldValue('materialCategory.label', mat.label);
-                         form.setFieldValue('materialCategory.description', mat.description || '');
-                       }
-                     }}
-                     isLoading={isMaterialCategoryLoading}
-                     onSearch={setMaterialCategorySearch}
-                     onLoadMore={handleLoadMoreMaterialCategories}
-                     hasMore={hasMoreMaterialCategories}
-                   />
-                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  <IconLabel
+                    classNameIcon="w-6 h-6"
+                    htmlFor="materialCategory"
+                    icon={Box}
+                    required
+                  >
+                    Kategori Material
+                  </IconLabel>
+                  <DropdownMaterialCategory
+                    options={materialCategories}
+                    value={field.state.value}
+                    onSelect={(val) => {
+                      const mat = materialCategories.find(
+                        (m) => m.value === val
+                      );
+                      if (mat) {
+                        form.setFieldValue('materialCategory.value', mat.value);
+                        form.setFieldValue('materialCategory.label', mat.label);
+                        form.setFieldValue(
+                          'materialCategory.description',
+                          mat.description || ''
+                        );
+                      }
+                    }}
+                    isLoading={isFetchingMaterialCategories}
+                    onSearch={setMaterialCategorySearch}
+                    onLoadMore={() => {
+                        if (hasNextMaterialCategories) fetchNextMaterialCategories();
+                    }}
+                    hasMore={hasNextMaterialCategories}
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
-               )
+              );
             }}
           />
         </FieldGroup>

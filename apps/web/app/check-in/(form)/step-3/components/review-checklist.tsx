@@ -15,12 +15,10 @@ interface ReviewChecklistProps {
   step2Data: {
     checklistItems: Record<string, string>;
   } | null;
-  vendorCategory: string | undefined;
 }
 
 export function ReviewChecklist({
   step2Data,
-  vendorCategory,
 }: ReviewChecklistProps) {
   const { checklistCategories } = useChecklistStore();
 
