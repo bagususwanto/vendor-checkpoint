@@ -1,13 +1,15 @@
 import { create } from 'zustand';
 
-type Step1Data = {
+export type Step1Data = {
   fullName: string;
   company: {
     value: string;
+    label: string; // This is the company name
+  };
+  materialCategory: {
+    value: string;
     label: string;
-    category_name: string;
-    category_id: number;
-    vendorCode: string;
+    description?: string;
   };
 };
 
@@ -29,7 +31,7 @@ export type ChecklistItem = {
   item_text: string;
   item_type: 'UMUM' | 'KHUSUS';
   is_required: boolean;
-  vendor_category_id?: number | null;
+  material_category_id?: number | null;
   display_order?: number;
 };
 

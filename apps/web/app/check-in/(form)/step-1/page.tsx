@@ -14,9 +14,9 @@ export default function CheckInStep1() {
     <div>
       <Card className="w-full max-w-4xl">
         <CardHeader className="items-center text-center">
-          <CardTitle className="text-2xl">Identitas</CardTitle>
+          <CardTitle className="text-2xl">Identitas & Perusahaan</CardTitle>
           <CardDescription className="vendor-text">
-            Mohon isi data diri dan pilih perusahaan Anda
+            Mohon isi data diri, pilih perusahaan, dan pilih kategori material
           </CardDescription>
         </CardHeader>
         <CardContent>

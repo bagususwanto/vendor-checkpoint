@@ -29,6 +29,7 @@ export function ReviewActions() {
     const payload = {
       vendor_id: Number(step1Data.company.value),
       driver_name: step1Data.fullName,
+      material_category_id: Number(step1Data.materialCategory.value),
       checklist_responses: Object.entries(step2Data.checklistItems).map(
         ([itemId, value]) => ({
           checklist_item_id: Number(itemId),

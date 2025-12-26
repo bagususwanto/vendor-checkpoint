@@ -17,7 +17,7 @@ export function ChecklistForm() {
   const router = useRouter();
   const { step1Data, step2Data, setStep2Data, checklistCategories } =
     useChecklistStore();
-  const vendorCategory = step1Data?.company.category_name;
+  const vendorCategory = step1Data?.materialCategory.label;
 
   const form = useForm({
     defaultValues: {

@@ -7,7 +7,7 @@ export function CheckInSteps() {
   const pathname = usePathname();
 
   const steps = [
-    { path: '/check-in/step-1', label: 'Identitas' },
+    { path: '/check-in/step-1', label: 'Identitas & Perusahaan' },
     { path: '/check-in/step-2', label: 'Pemeriksaan' },
     { path: '/check-in/step-3', label: 'Konfirmasi' },
   ];

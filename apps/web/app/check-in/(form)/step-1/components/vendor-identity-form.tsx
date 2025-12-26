@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@tanstack/react-form';
 import { ArrowLeft, Building2, CircleArrowRight, User } from 'lucide-react';
-
 import { ComboboxVendor } from '@/components/combobox-vendor';
 import IconLabel from '@/components/icon-label';
 import { Button } from '@/components/ui/button';
@@ -13,9 +12,11 @@ import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { VendorIdentitySchema } from '@/lib/schemas/vendor-identity.schema';
 import { useChecklistStore } from '@/stores/use-checklist.store';
-import { VendorInfoCard } from './vendor-info-card';
 import { vendorService } from '@/services/vendor.service';
 import { checklistService } from '@/services/checklist.service';
+import { materialCategoryService } from '@/services/material-category.service';
+import { DropdownMaterialCategory } from '@/components/dropdown-material-category';
+import { Box } from 'lucide-react';
 
 export function VendorIdentityForm() {
   const { step1Data, setStep1Data, setChecklistCategories } =
@@ -37,21 +38,30 @@ export function VendorIdentityForm() {
     return () => clearTimeout(handler);
   }, [search]);
 
+  // Material Category State
+  const [materialCategories, setMaterialCategories] = useState<any[]>([]);
+  const [materialCategoryPage, setMaterialCategoryPage] = useState(1);
+  const [hasMoreMaterialCategories, setHasMoreMaterialCategories] = useState(true);
+  const [isMaterialCategoryLoading, setIsMaterialCategoryLoading] = useState(false);
+  const [materialCategorySearch, setMaterialCategorySearch] = useState('');
+  const [debouncedMaterialCategorySearch, setDebouncedMaterialCategorySearch] = useState('');
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedMaterialCategorySearch(materialCategorySearch);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [materialCategorySearch]);
+
   // Initial Selected Vendor from store
   const [selectedVendor, setSelectedVendor] = useState<{
     label: string;
     value: string;
-    category_name: string;
-    category_id: number;
-    vendorCode: string;
   } | null>(() => {
     if (step1Data?.company.value) {
       return {
         label: step1Data.company.label,
         value: step1Data.company.value,
-        category_name: step1Data.company.category_name,
-        category_id: step1Data.company.category_id,
-        vendorCode: step1Data.company.vendorCode,
       };
     }
     return null;
@@ -85,9 +95,6 @@ export function VendorIdentityForm() {
       const newVendors = data.data.map((v) => ({
         label: `${v.company_name} (${v.vendor_code})`,
         value: String(v.vendor_id),
-        category_name: v.vendor_category?.category_name,
-        category_id: v.vendor_category_id,
-        vendorCode: v.vendor_code,
       }));
 
       setVendors((prev) =>
@@ -109,6 +116,53 @@ export function VendorIdentityForm() {
     fetchVendors(1, debouncedSearch, true);
   }, [debouncedSearch]);
 
+  const fetchMaterialCategories = async (
+    currentPage: number,
+    searchTerm: string,
+    isNewSearch: boolean,
+  ) => {
+    if (!isNewSearch && isMaterialCategoryLoading) return;
+
+    setIsMaterialCategoryLoading(true);
+    try {
+      const data = await materialCategoryService.getMaterialCategories({
+        page: currentPage,
+        limit: 10,
+        search: searchTerm,
+      });
+      const newMaterialCategories = data.data.map((m) => ({
+        label: m.category_name,
+        value: String(m.material_category_id),
+        description: m.description,
+      }));
+
+      setMaterialCategories((prev) =>
+        isNewSearch ? newMaterialCategories : [...prev, ...newMaterialCategories],
+      );
+
+      const { total, limit, page: metaPage } = data.meta;
+      const totalPages = Math.ceil(total / limit);
+      setHasMoreMaterialCategories(metaPage < totalPages);
+    } catch (e) {
+      console.error('Failed to fetch material categories', e);
+    } finally {
+      setIsMaterialCategoryLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setMaterialCategoryPage(1);
+    fetchMaterialCategories(1, debouncedMaterialCategorySearch, true);
+  }, [debouncedMaterialCategorySearch]);
+
+  const handleLoadMoreMaterialCategories = () => {
+    if (!isMaterialCategoryLoading && hasMoreMaterialCategories) {
+      const nextPage = materialCategoryPage + 1;
+      setMaterialCategoryPage(nextPage);
+      fetchMaterialCategories(nextPage, debouncedMaterialCategorySearch, false);
+    }
+  };
+
   const handleLoadMore = () => {
     if (!isLoading && hasMore) {
       const nextPage = page + 1;
@@ -122,10 +176,12 @@ export function VendorIdentityForm() {
       fullName: step1Data?.fullName || '',
       company: {
         value: step1Data?.company.value || '',
-        label: step1Data?.company.label || '',
-        category_name: step1Data?.company.category_name || '',
-        category_id: step1Data?.company.category_id || 0,
-        vendorCode: step1Data?.company.vendorCode || '',
+        label: step1Data?.company.label || ''
+      },
+      materialCategory: {
+        value: step1Data?.materialCategory?.value || '',
+        label: step1Data?.materialCategory?.label || '',
+        description: step1Data?.materialCategory?.description || '',
       },
     },
     validators: {
@@ -135,7 +191,7 @@ export function VendorIdentityForm() {
       try {
         setIsSubmitting(true);
         const checklistData = await checklistService.getChecklistByCategory(
-          value.company.category_id,
+          Number(value.materialCategory.value),
         );
         setChecklistCategories(checklistData);
         setStep1Data(value);
@@ -154,9 +210,6 @@ export function VendorIdentityForm() {
     if (vendor) {
       form.setFieldValue('company.value', vendor.value);
       form.setFieldValue('company.label', vendor.label);
-      form.setFieldValue('company.category_name', vendor.category_name);
-      form.setFieldValue('company.category_id', vendor.category_id);
-      form.setFieldValue('company.vendorCode', vendor.vendorCode);
     }
   };
 
@@ -232,12 +285,41 @@ export function VendorIdentityForm() {
               );
             }}
           />
-          {selectedVendor && (
-            <VendorInfoCard
-              categoryName={selectedVendor.category_name}
-              vendorCode={selectedVendor.vendorCode}
-            />
-          )}
+          <form.Field
+            name="materialCategory.value"
+            children={(field) => {
+               const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+               return (
+                <Field data-invalid={isInvalid}>
+                   <IconLabel
+                     classNameIcon="w-6 h-6"
+                     htmlFor="materialCategory"
+                     icon={Box} 
+                     required
+                   >
+                     Kategori Material
+                   </IconLabel>
+                   <DropdownMaterialCategory
+                     options={materialCategories}
+                     value={field.state.value}
+                     onSelect={(val) => {
+                       const mat = materialCategories.find((m) => m.value === val);
+                       if (mat) {
+                         form.setFieldValue('materialCategory.value', mat.value);
+                         form.setFieldValue('materialCategory.label', mat.label);
+                         form.setFieldValue('materialCategory.description', mat.description || '');
+                       }
+                     }}
+                     isLoading={isMaterialCategoryLoading}
+                     onSearch={setMaterialCategorySearch}
+                     onLoadMore={handleLoadMoreMaterialCategories}
+                     hasMore={hasMoreMaterialCategories}
+                   />
+                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+               )
+            }}
+          />
         </FieldGroup>
       </form>
 
