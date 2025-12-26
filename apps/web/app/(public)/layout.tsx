@@ -10,7 +10,7 @@ export default function QueueStatusLayout({
       <InteractiveBackground color="59, 130, 246" />
       <div className="z-10 relative flex flex-col min-h-screen">
         <main className="flex-1 flex flex-col items-center justify-center p-6 w-full">
-          <div className="w-full max-w-3xl slide-in-from-bottom-4 animate-in duration-500 fade-in">
+          <div className="w-full slide-in-from-bottom-4 animate-in duration-500 fade-in">
             {children}
           </div>
         </main>
