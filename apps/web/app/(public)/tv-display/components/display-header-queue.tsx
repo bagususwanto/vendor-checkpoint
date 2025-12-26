@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from 'next-themes';
 import { Wifi, Maximize, Minimize, ShieldCheck } from 'lucide-react';
 import { ThemeToggleButton } from '@/components/ui/shadcn-io/theme-toggle-button';
+import { Button } from '@/components/ui/button';
 
 export function DisplayHeaderQueue() {
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
@@ -82,20 +83,14 @@ export function DisplayHeaderQueue() {
         />
 
         {/* Fullscreen Button */}
-        <button
+        <Button
+          variant="outline"
           onClick={toggleFullscreen}
-          className="flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 border border-border rounded-full transition-colors"
           title={isFullscreen ? 'Keluar Fullscreen' : 'Fullscreen'}
         >
-          {isFullscreen ? (
-            <Minimize className="w-4 h-4 text-foreground" />
-          ) : (
-            <Maximize className="w-4 h-4 text-foreground" />
-          )}
-          <span className="text-sm font-medium text-foreground">
-            {isFullscreen ? 'Exit' : 'Fullscreen'}
-          </span>
-        </button>
+          {isFullscreen ? <Minimize /> : <Maximize />}
+          {isFullscreen ? 'Exit' : 'Fullscreen'}
+        </Button>
 
         {/* Time Display */}
         <div className="text-right">
