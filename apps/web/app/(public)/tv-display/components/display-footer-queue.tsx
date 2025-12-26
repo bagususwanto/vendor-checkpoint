@@ -7,7 +7,7 @@ interface DisplayFooterQueueProps {
 }
 
 export function DisplayFooterQueue({ 
-  message = "Selamat datang di Vendor Checkpoint  •  Mohon menunggu nomor antrean Anda dipanggil  •  Pastikan dokumen Anda sudah lengkap  •  Siapkan ID Card dan Surat Jalan  •  Hubungi petugas jika memerlukan bantuan" 
+  message = "Selamat datang di Vendor Checkpoint  •  Mohon menunggu nomor antrean Anda dipanggil  •  Pastikan dokumen Anda sudah lengkap  •  Siapkan Kartu Pengenal dan Surat Jalan  •  Hubungi petugas warehouse jika memerlukan bantuan lebih lanjut" 
 }: DisplayFooterQueueProps) {
   return (
     <footer className="relative bg-primary h-14 shrink-0 overflow-hidden">
