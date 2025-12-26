@@ -14,6 +14,8 @@ import { getStartOfToday } from 'src/common/utils/today-date.util';
 import { AuditService } from '../audit/audit.service';
 import { toInt } from 'src/common/utils/string-to-int.util';
 import { MaterialCategoryService } from '../material_category/material_category.service';
+import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
+import { PaginatedResponse, DisplayQueue } from '@repo/types';
 
 @Injectable()
 export class CheckInService {
@@ -147,6 +149,63 @@ export class CheckInService {
         },
       },
     });
+  }
+
+  async findActiveQueue(
+    query: PaginatedParamsDto,
+  ): Promise<PaginatedResponse<DisplayQueue>> {
+    const { page, limit } = query;
+    const skip = (page - 1) * limit;
+    const dateNow = getStartOfToday();
+
+    const [data, total] = await Promise.all([
+      this.prisma.ops_checkin_entry.findMany({
+        skip,
+        take: limit,
+        where: {
+          current_status: {
+            in: ['MENUNGGU', 'DISETUJUI'],
+          },
+          submission_time: {
+            gte: dateNow,
+          },
+        },
+        select: {
+          queue_number: true,
+          current_status: true,
+          driver_name: true,
+          snapshot_company_name: true,
+          ops_queue_status: {
+            select: {
+              priority_order: true,
+              estimated_wait_minutes: true,
+            },
+          },
+        },
+        orderBy: {
+          ops_queue_status: {
+            priority_order: 'asc',
+          },
+        },
+      }),
+      this.prisma.ops_checkin_entry.count({
+        where: {
+          submission_time: {
+            gte: dateNow,
+          },
+        },
+      }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        total_pages: Math.ceil(total / limit),
+      },
+    };
   }
 
   findOne(id: number) {

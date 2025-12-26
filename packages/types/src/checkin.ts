@@ -11,6 +11,17 @@ export type QueueStatusData = {
   estimatedWaitTime?: string;
 };
 
+export type DisplayQueue = {
+  queue_number: string;
+  current_status: string;
+  driver_name: string;
+  snapshot_company_name: string;
+  ops_queue_status: {
+    priority_order: number;
+    estimated_wait_minutes: number;
+  };
+};
+
 export const queueSearchSchema = z.object({
   queueNumber: z.string().min(1, 'Nomor antrean harus diisi'),
 });

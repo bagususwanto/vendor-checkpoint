@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   Req,
+  Query,
 } from '@nestjs/common';
 import { CheckInService } from './check-in.service';
 import { CreateCheckInDto } from './dto/create-check-in.dto';
 import { UpdateCheckInDto } from './dto/update-check-in.dto';
 import { getRequestInfo } from 'src/common/utils/request-info.util';
 import { queue } from 'rxjs';
+import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 
 @Controller('check-in')
 export class CheckInController {
@@ -33,6 +35,11 @@ export class CheckInController {
   @Get('/queue/:queueNumber')
   findByQueue(@Param('queueNumber') queueNumber: string) {
     return this.checkInService.findByQueue(queueNumber);
+  }
+
+  @Get('/active')
+  findActiveQueue(@Query() query: PaginatedParamsDto) {
+    return this.checkInService.findActiveQueue(query);
   }
 
   @Get(':id')
