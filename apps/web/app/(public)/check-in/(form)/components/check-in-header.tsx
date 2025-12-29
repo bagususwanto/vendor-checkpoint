@@ -35,7 +35,7 @@ export function CheckInHeader({ onShowExitDialog }: CheckInHeaderProps) {
         <div className="mb-2">
           <Button variant="ghost" onClick={handleBack}>
             <ArrowLeft className="mr-1 w-3 h-3" />
-            <span>Kembali</span>
+            <span>{pathname === '/check-in/step-1' ? 'Kembali ke Halaman Utama' : 'Kembali'}</span>
           </Button>
         </div>
 
