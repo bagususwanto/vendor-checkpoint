@@ -8,11 +8,19 @@ export const loginSchema = z.object({
 export type LoginType = z.infer<typeof loginSchema>;
 
 export interface JwtPayload {
-  userId: string;
+  userId: number;
   username: string;
   name: string;
+  isProduction: number;
+  isWarehouse: number;
   roleName: string;
-  img?: string | null;
+  anotherWarehouseId: number;
+  img: string | null;
+  plantId: number;
   iat?: number;
   exp?: number;
+}
+
+export interface LoginResponse {
+  accessToken: string;
 }
