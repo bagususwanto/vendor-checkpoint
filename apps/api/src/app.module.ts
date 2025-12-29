@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { AuthModule } from './modules/auth/auth.module';
@@ -10,9 +9,19 @@ import { CheckInModule } from './modules/check-in/check-in.module';
 import { SystemConfigModule } from './modules/system-config/system-config.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { MaterialCategoryModule } from './modules/material_category/material_category.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 10,
+        },
+      ],
+    }),
     AuthModule,
     VendorModule,
     PrismaModule,
@@ -23,6 +32,12 @@ import { MaterialCategoryModule } from './modules/material_category/material_cat
     MaterialCategoryModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
