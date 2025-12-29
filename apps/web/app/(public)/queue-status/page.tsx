@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useMemo, Suspense, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { type QueueSearch } from '@repo/types';
 import { useQueueStatus } from '@/hooks/api/use-check-in';
 import { QueueSearchForm } from './components/queue-search-form';
 import { QueueStatusCard, FormattedQueueStatus } from './components/queue-status-card';
+import { QueueStatusHeader } from './components/queue-status-header';
 
 function QueueStatusContent() {
   const router = useRouter();
@@ -50,17 +50,9 @@ function QueueStatusContent() {
   }, [qStatus]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <Button
-          variant="ghost"
-          className="gap-2 hover:bg-transparent pl-0 text-muted-foreground hover:text-foreground"
-          onClick={() => router.push('/')}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Kembali
-        </Button>
-      </div>
+    <div className="pt-20 space-y-6">
+      <QueueStatusHeader />
+
 
       <div className="space-y-2 text-center">
         <h1 className="font-bold text-3xl tracking-tight">
@@ -80,7 +72,15 @@ function QueueStatusContent() {
       {error && (
         <Card className="bg-red-500/5 slide-in-from-top-2 border-red-500/20 animate-in fade-in">
           <CardContent className="pt-6 font-medium text-red-600 text-center">
-            {'Nomor antrean tidak ditemukan atau terjadi kesalahan.'}
+            {'Terjadi kesalahan saat mencari nomor antrean.'}
+          </CardContent>
+        </Card>
+      )}
+
+      {activeQueueNumber && !isLoading && !error && qStatus === null && (
+        <Card className="bg-orange-500/5 slide-in-from-top-2 border-orange-500/20 animate-in fade-in">
+          <CardContent className="pt-6 font-medium text-orange-600 text-center">
+            {'Nomor antrean tidak ditemukan.'}
           </CardContent>
         </Card>
       )}
