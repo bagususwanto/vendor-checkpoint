@@ -1,57 +1,56 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import { useLoginMutation } from "@/hooks/api/use-auth"
-import { cn } from "@/lib/utils"
-import { ShieldCheck } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import * as React from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { useLoginMutation } from '@/hooks/api/use-auth';
+import { cn } from '@/lib/utils';
+import { ShieldCheck } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<"div">) {
-  const router = useRouter()
-  const loginMutation = useLoginMutation()
+}: React.ComponentProps<'div'>) {
+  const router = useRouter();
+  const loginMutation = useLoginMutation();
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+    event.preventDefault();
 
-    const formData = new FormData(event.currentTarget)
-    const username = formData.get("username") as string
-    const password = formData.get("password") as string
+    const formData = new FormData(event.currentTarget);
+    const username = formData.get('username') as string;
+    const password = formData.get('password') as string;
 
     loginMutation.mutate(
       { username, password },
       {
         onSuccess: () => {
-          toast.success("Login successful")
-          router.push("/")
+          toast.success('Login successful');
+          router.push('/staff/dashboard');
         },
         onError: (error) => {
-          console.error(error)
-          toast.error("Invalid username or password")
+          console.error(error);
+          toast.error('Invalid username or password');
         },
-      }
-    )
+      },
+    );
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8" onSubmit={onSubmit}>
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
-                <a href="#" className="flex flex-col items-center gap-2 font-medium">
+                <a
+                  href="#"
+                  className="flex flex-col items-center gap-2 font-medium"
+                >
                   <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
                     <ShieldCheck className="size-6" />
                   </div>
@@ -88,7 +87,7 @@ export function LoginForm({
               </Field>
               <Field>
                 <Button type="submit" disabled={loginMutation.isPending}>
-                  {loginMutation.isPending ? "Logging in..." : "Login"}
+                  {loginMutation.isPending ? 'Logging in...' : 'Login'}
                 </Button>
               </Field>
             </FieldGroup>
@@ -103,5 +102,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
