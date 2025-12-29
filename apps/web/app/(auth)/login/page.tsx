@@ -1,5 +1,5 @@
-import { LoginForm } from "@/app/login/components/login-form"
 import { InteractiveBackground } from "@/components/interactive-background"
+import { LoginForm } from "./components/login-form"
 
 export default function LoginPage() {
   return (
