@@ -263,7 +263,7 @@ export class CheckInService {
         },
         where,
         orderBy: {
-          submission_time: 'desc',
+          submission_time: 'asc',
         },
       }),
       this.prisma.ops_checkin_entry.count({
