@@ -24,3 +24,26 @@ export function useActiveQueues(page: number, limit: number) {
     refetchInterval: 10000,
   });
 }
+
+export function useVerificationList(
+  page: number,
+  limit: number,
+  search?: string,
+  filter?: {
+    start_date?: string;
+    end_date?: string;
+    material_category_id?: string;
+  },
+) {
+  return useQuery({
+    queryKey: ['verification-list', page, limit, search, filter],
+    queryFn: () =>
+      checkInService.getVerificationList({
+        page,
+        limit,
+        search,
+        filter,
+      }),
+    refetchInterval: 5000, // Refresh every 5 seconds as requested "refresh terus"
+  });
+}
