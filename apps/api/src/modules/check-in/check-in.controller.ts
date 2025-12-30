@@ -13,7 +13,6 @@ import { CheckInService } from './check-in.service';
 import { CreateCheckInDto } from './dto/create-check-in.dto';
 import { UpdateCheckInDto } from './dto/update-check-in.dto';
 import { getRequestInfo } from 'src/common/utils/request-info.util';
-import { queue } from 'rxjs';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 
 @Controller('check-in')
@@ -40,6 +39,11 @@ export class CheckInController {
   @Get('/active')
   findActiveQueue(@Query() query: PaginatedParamsDto) {
     return this.checkInService.findActiveQueue(query);
+  }
+
+  @Get('/verification-list')
+  findVerificationList(@Query() query: PaginatedParamsDto) {
+    return this.checkInService.findVerificationList(query);
   }
 
   @Get(':id')

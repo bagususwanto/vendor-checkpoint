@@ -15,7 +15,7 @@ import { AuditService } from '../audit/audit.service';
 import { toInt } from 'src/common/utils/string-to-int.util';
 import { MaterialCategoryService } from '../material_category/material_category.service';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
-import { PaginatedResponse, DisplayQueue } from '@repo/types';
+import { DisplayQueue, PaginatedResponse, VerificationList } from '@repo/types';
 
 @Injectable()
 export class CheckInService {
@@ -194,6 +194,80 @@ export class CheckInService {
             gte: dateNow,
           },
         },
+      }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        total_pages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async findVerificationList(
+    query: PaginatedParamsDto,
+  ): Promise<PaginatedResponse<VerificationList>> {
+    const { page, limit, search, filter } = query;
+    const skip = (page - 1) * limit;
+    const where: any = {};
+
+    if (search?.trim()) {
+      where.OR = [
+        { queue_number: { contains: search } },
+        { driver_name: { contains: search } },
+        { snapshot_company_name: { contains: search } },
+        { snapshot_category_name: { contains: search } },
+      ];
+    }
+
+    if (filter) {
+      if (filter.start_date || filter.end_date) {
+        where.submission_time = {};
+
+        if (filter.start_date) {
+          where.submission_time.gte = new Date(
+            `${filter.start_date}T00:00:00.000Z`,
+          );
+        }
+
+        if (filter.end_date) {
+          const end = new Date(`${filter.end_date}T23:59:59.999Z`);
+          where.submission_time.lte = end;
+        }
+      }
+
+      if (filter.material_category_id) {
+        where.material_category_id = Number(filter.material_category_id);
+      }
+
+      if (filter.status) {
+        where.current_status = filter.status;
+      }
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.ops_checkin_entry.findMany({
+        skip,
+        take: limit,
+        select: {
+          queue_number: true,
+          driver_name: true,
+          submission_time: true,
+          snapshot_company_name: true,
+          snapshot_category_name: true,
+          current_status: true,
+        },
+        where,
+        orderBy: {
+          submission_time: 'desc',
+        },
+      }),
+      this.prisma.ops_checkin_entry.count({
+        where,
       }),
     ]);
 

@@ -22,6 +22,15 @@ export type DisplayQueue = {
   };
 };
 
+export type VerificationList = {
+  queue_number: string;
+  snapshot_company_name: string;
+  driver_name: string;
+  snapshot_category_name: string;
+  submission_time: Date;
+  current_status: string;
+};
+
 export const queueSearchSchema = z.object({
   queueNumber: z.string().min(1, 'Nomor antrean harus diisi'),
 });
