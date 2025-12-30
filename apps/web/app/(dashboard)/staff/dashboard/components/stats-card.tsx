@@ -17,7 +17,7 @@ export function StatsCard({ stats }: StatsCardProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Check-in</CardTitle>
-          <ListFilter className="h-4 w-4 text-muted-foreground" />
+          <ListFilter className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.total}</div>
@@ -27,7 +27,7 @@ export function StatsCard({ stats }: StatsCardProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Disetujui</CardTitle>
-          <CheckCircle className="h-4 w-4 text-green-500" />
+          <CheckCircle className="h-4 w-4 text-emerald-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.approved}</div>
@@ -40,7 +40,7 @@ export function StatsCard({ stats }: StatsCardProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Ditolak</CardTitle>
-          <XCircle className="h-4 w-4 text-red-500" />
+          <XCircle className="h-4 w-4 text-rose-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.rejected}</div>
@@ -53,7 +53,7 @@ export function StatsCard({ stats }: StatsCardProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Menunggu</CardTitle>
-          <Clock className="h-4 w-4 text-yellow-500" />
+          <Clock className="h-4 w-4 text-orange-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.waiting}</div>
@@ -63,7 +63,7 @@ export function StatsCard({ stats }: StatsCardProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Rata-rata Waktu</CardTitle>
-          <Timer className="h-4 w-4 text-blue-500" />
+          <Timer className="h-4 w-4 text-sky-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.avgLeadTime}</div>

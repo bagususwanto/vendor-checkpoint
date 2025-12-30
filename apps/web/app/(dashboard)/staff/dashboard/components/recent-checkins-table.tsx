@@ -99,10 +99,10 @@ export function RecentCheckinsTable() {
                     }
                     className={
                       checkin.status === 'approved'
-                        ? 'bg-green-500 hover:bg-green-600'
+                        ? 'bg-emerald-500 hover:bg-emerald-600'
                         : checkin.status === 'rejected'
-                          ? 'bg-red-500 hover:bg-red-600'
-                          : 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                          ? 'bg-rose-500 hover:bg-rose-600'
+                          : 'bg-orange-500 hover:bg-orange-600 text-white'
                     }
                   >
                     {checkin.status === 'approved'
