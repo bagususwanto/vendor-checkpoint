@@ -44,6 +44,6 @@ export function useVerificationList(
         search,
         filter,
       }),
-    refetchInterval: 5000, // Refresh every 5 seconds as requested "refresh terus"
+    refetchInterval: 10000, // Refresh every 10 seconds
   });
 }

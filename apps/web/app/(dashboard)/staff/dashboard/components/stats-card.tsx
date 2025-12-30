@@ -2,18 +2,19 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Clock, XCircle, ListFilter, Timer } from 'lucide-react';
+import { useDashboardStats } from '@/hooks/api/use-dashboard';
 
-interface StatsCardProps {
-  stats: {
-    total: number;
-    approved: number;
-    rejected: number;
-    waiting: number;
-    avgLeadTime: string;
-  };
-}
+export function StatsCard() {
+  const { data: stats, isLoading } = useDashboardStats();
 
-export function StatsCard({ stats }: StatsCardProps) {
+  if (isLoading) {
+    return <div>Loading stats...</div>;
+  }
+
+  if (!stats) {
+    return null;
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
       <Card>
@@ -22,7 +23,7 @@ export function StatsCard({ stats }: StatsCardProps) {
           <ListFilter className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.total}</div>
+          <div className="text-2xl font-bold">{stats.total_checkins}</div>
           <p className="text-xs text-muted-foreground">Total keseluruhan</p>
         </CardContent>
       </Card>
@@ -32,10 +33,9 @@ export function StatsCard({ stats }: StatsCardProps) {
           <CheckCircle className="h-4 w-4 text-emerald-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.approved}</div>
+          <div className="text-2xl font-bold">{stats.total_approved}</div>
           <p className="text-xs text-muted-foreground">
-            {((stats.approved / stats.total) * 100).toFixed(1)}% tingkat
-            persetujuan
+            {stats.approval_rate} tingkat persetujuan
           </p>
         </CardContent>
       </Card>
@@ -45,10 +45,9 @@ export function StatsCard({ stats }: StatsCardProps) {
           <XCircle className="h-4 w-4 text-rose-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.rejected}</div>
+          <div className="text-2xl font-bold">{stats.total_rejected}</div>
           <p className="text-xs text-muted-foreground">
-            {((stats.rejected / stats.total) * 100).toFixed(1)}% tingkat
-            penolakan
+            {stats.rejected_rate} tingkat penolakan
           </p>
         </CardContent>
       </Card>
@@ -58,7 +57,7 @@ export function StatsCard({ stats }: StatsCardProps) {
           <Clock className="h-4 w-4 text-orange-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.waiting}</div>
+          <div className="text-2xl font-bold">{stats.current_waiting}</div>
           <p className="text-xs text-muted-foreground">Menunggu tinjauan</p>
         </CardContent>
       </Card>
@@ -68,7 +67,9 @@ export function StatsCard({ stats }: StatsCardProps) {
           <Timer className="h-4 w-4 text-sky-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.avgLeadTime}</div>
+          <div className="text-2xl font-bold">
+            {stats.avg_lead_time_minutes}m
+          </div>
           <p className="text-xs text-muted-foreground">Per proses selesai</p>
         </CardContent>
       </Card>
