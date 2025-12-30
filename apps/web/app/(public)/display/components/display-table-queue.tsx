@@ -1,6 +1,6 @@
 'use client';
 
-import { QueueItem } from './display-current-queue';
+import { QueueItem } from './display-current-queue.js';
 import { Clock, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -9,7 +9,10 @@ interface DisplayTableQueueProps {
   title?: string;
 }
 
-export function DisplayTableQueue({ queues, title = "Antrean Berikutnya" }: DisplayTableQueueProps) {
+export function DisplayTableQueue({
+  queues,
+  title = 'Antrean Berikutnya',
+}: DisplayTableQueueProps) {
   return (
     <div className="h-full rounded-3xl bg-card/60 backdrop-blur-xl border border-border flex flex-col overflow-hidden">
       {/* Header */}
@@ -24,17 +27,27 @@ export function DisplayTableQueue({ queues, title = "Antrean Berikutnya" }: Disp
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-full border border-border">
           <Users className="w-4 h-4 text-muted-foreground" />
-          <span className="text-lg font-bold text-foreground">{queues.length}</span>
+          <span className="text-lg font-bold text-foreground">
+            {queues.length}
+          </span>
           <span className="text-muted-foreground text-sm">menunggu</span>
         </div>
       </div>
 
       {/* Table Header */}
       <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-muted/50 border-b border-border shrink-0">
-        <div className="col-span-1 text-xs font-bold text-muted-foreground uppercase tracking-wider">#</div>
-        <div className="col-span-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">No. Antrean</div>
-        <div className="col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-wider">Perusahaan</div>
-        <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">Status</div>
+        <div className="col-span-1 text-xs font-bold text-muted-foreground uppercase tracking-wider">
+          #
+        </div>
+        <div className="col-span-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">
+          No. Antrean
+        </div>
+        <div className="col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-wider">
+          Perusahaan
+        </div>
+        <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">
+          Status
+        </div>
       </div>
 
       {/* Queue List */}
@@ -55,11 +68,13 @@ export function DisplayTableQueue({ queues, title = "Antrean Berikutnya" }: Disp
               >
                 {/* Order Number */}
                 <div className="col-span-1">
-                  <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                    index === 0 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted text-muted-foreground'
-                  }`}>
+                  <span
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                      index === 0
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
                     {index + 1}
                   </span>
                 </div>
@@ -73,7 +88,10 @@ export function DisplayTableQueue({ queues, title = "Antrean Berikutnya" }: Disp
 
                 {/* Company Name */}
                 <div className="col-span-5">
-                  <p className="font-medium text-lg text-foreground truncate" title={queue.companyName}>
+                  <p
+                    className="font-medium text-lg text-foreground truncate"
+                    title={queue.companyName}
+                  >
                     {queue.companyName}
                   </p>
                   <p className="text-sm text-muted-foreground truncate">
@@ -84,10 +102,14 @@ export function DisplayTableQueue({ queues, title = "Antrean Berikutnya" }: Disp
                 {/* Status */}
                 <div className="col-span-2 text-right">
                   <Badge
-                    variant={queue.status === 'MENUNGGU' ? 'outline' : 'secondary'}
-                    className={queue.status === 'MENUNGGU' 
-                      ? 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30' 
-                      : ''}
+                    variant={
+                      queue.status === 'MENUNGGU' ? 'outline' : 'secondary'
+                    }
+                    className={
+                      queue.status === 'MENUNGGU'
+                        ? 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30'
+                        : ''
+                    }
                   >
                     <span className="w-2 h-2 rounded-full bg-current" />
                     {queue.status === 'MENUNGGU' ? 'Menunggu' : queue.status}

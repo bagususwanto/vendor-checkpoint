@@ -9,15 +9,11 @@ import {
 } from './components/display-current-queue';
 import { DisplayTableQueue } from './components/display-table-queue';
 import { DisplayFooterQueue } from './components/display-footer-queue';
-import { useState } from 'react';
 
-// Mock Data Generation Removed
-
-
-export default function TvDisplayPage() {
+export default function DisplayPage() {
   const { data: activeQueuesData } = useActiveQueues(1, 10);
   const allQueues = activeQueuesData?.data || [];
-  
+
   const currentQueueData = allQueues.length > 0 ? allQueues[0] : null;
   const waitingQueuesData = allQueues.length > 0 ? allQueues.slice(1) : [];
 
@@ -36,8 +32,6 @@ export default function TvDisplayPage() {
     driverName: q.driver_name,
     companyName: q.snapshot_company_name || '-',
   }));
-
-
 
   return (
     <>
