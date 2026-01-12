@@ -48,8 +48,8 @@ export const navData: NavData = {
       icon: SquareChartGantt,
       items: [
         {
-          title: 'Semua Antrean',
-          url: '/staff/queue',
+          title: 'Verification',
+          url: '/staff/verification',
         },
         {
           title: 'Check-Out',
