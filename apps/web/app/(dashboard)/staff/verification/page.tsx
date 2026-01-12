@@ -36,7 +36,7 @@ export default function VerificationPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
-  const [date, setDate] = useState<DateRange | undefined>();
+  const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [categoryId, setCategoryId] = useState('');
   const [status, setStatus] = useState('');
 
