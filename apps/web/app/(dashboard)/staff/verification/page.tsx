@@ -23,7 +23,7 @@ import { VerificationSheet } from '../dashboard/components/verification-sheet';
 import { useVerificationList } from '@/hooks/api/use-check-in';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 import { useDebounce } from '../../../../hooks/use-debounce';
 import { Separator } from '@/components/ui/separator';
 
@@ -75,6 +75,14 @@ export default function VerificationPage() {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setPage(1); // Reset to page 1 on search
+  };
+
+  const handleReset = () => {
+    setSearchTerm('');
+    setDate(undefined);
+    setCategoryId('');
+    setStatus('');
+    setPage(1);
   };
 
   const totalPages = meta?.last_page || meta?.lastPage || meta?.pageCount || 1; // Robust fallback
@@ -137,6 +145,16 @@ export default function VerificationPage() {
                 </option>
               ))}
           </select>
+          {(searchTerm || date || status || categoryId) && (
+            <Button
+              variant="ghost"
+              onClick={handleReset}
+              className="h-8 px-2 lg:px-3"
+            >
+              Reset
+              <X className="ml-2 h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 
