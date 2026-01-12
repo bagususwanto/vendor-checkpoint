@@ -48,3 +48,21 @@ export function useVerificationList(
     refetchInterval: 10000, // Refresh every 10 seconds
   });
 }
+
+export function useVerifyCheckIn() {
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: { status: 'APPROVED' | 'REJECTED'; note?: string };
+    }) => checkInService.verifyCheckIn(id, payload),
+  });
+}
+
+export function useCheckoutCheckIn() {
+  return useMutation({
+    mutationFn: (id: string) => checkInService.checkoutCheckIn(id),
+  });
+}

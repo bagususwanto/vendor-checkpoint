@@ -33,6 +33,8 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { Separator } from '@/components/ui/separator';
+import { useVerifyCheckIn } from '@/hooks/api/use-check-in';
+import { toast } from 'sonner';
 
 interface CheckinData {
   id: string;
@@ -51,12 +53,45 @@ interface VerificationSheetProps {
 export function VerificationSheet({
   checkin,
   trigger,
-}: VerificationSheetProps) {
+  onSuccess,
+}: VerificationSheetProps & { onSuccess?: () => void }) {
   const [decision, setDecision] = useState<'approve' | 'reject' | null>(null);
   const [reason, setReason] = useState('');
+  const [open, setOpen] = useState(false);
+
+  const verifyMutation = useVerifyCheckIn();
+
+  const handleSave = () => {
+    if (!decision) return;
+
+    verifyMutation.mutate(
+      {
+        id: checkin.id,
+        payload: {
+          status: decision === 'approve' ? 'APPROVED' : 'REJECTED',
+          note: reason,
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.success('Verifikasi Berhasil', {
+            description: `Check-in telah berhasil di-${decision === 'approve' ? 'setujui' : 'tolak'}.`,
+          });
+          setOpen(false);
+          onSuccess?.();
+        },
+        onError: (error) => {
+          toast.error('Gagal Verifikasi', {
+            description:
+              error.message || 'Terjadi kesalahan saat menyimpan verifikasi.',
+          });
+        },
+      },
+    );
+  };
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
       <SheetContent className="sm:max-w-2xl w-full flex flex-col h-full ring-offset-0 focus-visible:outline-none [&>button]:hidden">
         <SheetHeader>
@@ -303,10 +338,14 @@ export function VerificationSheet({
 
         <SheetFooter className="mt-auto">
           <Button
-            disabled={decision === 'reject' && !reason}
-            onClick={() => console.log({ decision, reason })}
+            disabled={
+              !decision ||
+              (decision === 'reject' && !reason) ||
+              verifyMutation.isPending
+            }
+            onClick={handleSave}
           >
-            Simpan
+            {verifyMutation.isPending ? 'Menyimpan...' : 'Simpan'}
           </Button>
           <SheetClose asChild>
             <Button variant="outline">Batal</Button>

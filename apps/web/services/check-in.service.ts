@@ -58,4 +58,30 @@ export const checkInService = {
       throw error;
     }
   },
+
+  verifyCheckIn: async (
+    id: string,
+    payload: { status: 'APPROVED' | 'REJECTED'; note?: string },
+  ) => {
+    try {
+      const response = await axiosInstance.post<{ data: any }>(
+        `/check-in/${id}/verify`,
+        payload,
+      );
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  checkoutCheckIn: async (id: string) => {
+    try {
+      const response = await axiosInstance.post<{ data: any }>(
+        `/check-in/${id}/checkout`,
+      );
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };

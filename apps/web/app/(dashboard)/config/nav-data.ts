@@ -51,14 +51,6 @@ export const navData: NavData = {
           title: 'Semua Antrean',
           url: '/staff/queue',
         },
-        {
-          title: 'Verifikasi',
-          url: '/staff/verification',
-        },
-        {
-          title: 'Check-Out',
-          url: '/staff/checkout',
-        },
       ],
     },
   ],

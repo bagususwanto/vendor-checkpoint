@@ -22,6 +22,8 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { QueueStatus } from '@repo/types';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CheckoutSheet } from './checkout-sheet';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface QueueTableProps {
   checkins: any[]; // Replace any with proper type
@@ -38,6 +40,12 @@ export function QueueTable({
   totalPages,
   setPage,
 }: QueueTableProps) {
+  const queryClient = useQueryClient();
+
+  const handleSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['verification-list'] });
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -115,17 +123,41 @@ export function QueueTable({
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <VerificationSheet
-                      checkin={{
-                        id: checkin.queue_number,
-                        company: checkin.snapshot_company_name,
-                        driver: checkin.driver_name,
-                        category: checkin.snapshot_category_name,
-                        time: checkin.submission_time,
-                        status: checkin.current_status.toLowerCase(),
-                      }}
-                      trigger={<Button size="sm">Verifikasi</Button>}
-                    />
+                    {(checkin.current_status === QueueStatus.MENUNGGU ||
+                      checkin.current_status === 'WAITING') && (
+                      <VerificationSheet
+                        checkin={{
+                          id: checkin.queue_number,
+                          company: checkin.snapshot_company_name,
+                          driver: checkin.driver_name,
+                          category: checkin.snapshot_category_name,
+                          time: checkin.submission_time,
+                          status: checkin.current_status.toLowerCase(),
+                        }}
+                        trigger={<Button size="sm">Verifikasi</Button>}
+                        onSuccess={handleSuccess}
+                      />
+                    )}
+
+                    {(checkin.current_status === QueueStatus.DISETUJUI ||
+                      checkin.current_status === 'APPROVED') && (
+                      <CheckoutSheet
+                        checkin={{
+                          id: checkin.queue_number,
+                          company: checkin.snapshot_company_name,
+                          driver: checkin.driver_name,
+                          category: checkin.snapshot_category_name,
+                          time: checkin.submission_time,
+                          status: checkin.current_status.toLowerCase(),
+                        }}
+                        trigger={
+                          <Button size="sm" variant="secondary">
+                            Check-Out
+                          </Button>
+                        }
+                        onSuccess={handleSuccess}
+                      />
+                    )}
                   </TableCell>
                 </TableRow>
               ))
