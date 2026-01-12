@@ -45,6 +45,7 @@ export const checkInService = {
       start_date?: string;
       end_date?: string;
       material_category_id?: string;
+      status?: string;
     };
   }) => {
     try {

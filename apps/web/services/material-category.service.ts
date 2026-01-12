@@ -11,17 +11,17 @@ export type FindMaterialParams = {
   page?: number;
   limit?: number;
   search?: string;
+  is_active?: boolean;
 };
 
 export const materialCategoryService = {
   getMaterialCategories: async (params: FindMaterialParams) => {
     try {
-      const response = await axiosInstance.get<PaginatedResponse<MaterialCategory>>(
-        '/material-category',
-        {
-          params,
-        }
-      );
+      const response = await axiosInstance.get<
+        PaginatedResponse<MaterialCategory>
+      >('/material-category', {
+        params,
+      });
       return response.data;
     } catch (error) {
       throw error;

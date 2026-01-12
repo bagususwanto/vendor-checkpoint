@@ -27,11 +27,36 @@ import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useDebounce } from '../../../../hooks/use-debounce';
 import { Separator } from '@/components/ui/separator';
 
+import { useMaterialCategories } from '@/hooks/api/use-material-categories';
+import { QueueStatus } from '@repo/types';
+
 export default function VerificationPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [status, setStatus] = useState('');
+
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const { data: categories } = useMaterialCategories({
+    search: '',
+    is_active: true,
+  });
+
+  const { data, isLoading } = useVerificationList(
+    page,
+    limit,
+    debouncedSearchTerm,
+    {
+      start_date: startDate || undefined,
+      end_date: endDate || undefined,
+      material_category_id: categoryId || undefined,
+      status: status || undefined, // Passing status to filter
+    },
+  );
 
   // Basic debounce implementation since I'm not sure if useDebounce exists
   // If useDebounce doesn't exist, I'll need to remove the import or implement it.
@@ -42,12 +67,6 @@ export default function VerificationPage() {
 
   // Actually, let's use a safe approach: direct state for now, optimize later or check file tree.
   // BETTER: Check if useDebounce exists. I saw `hooks` dir.
-
-  const { data, isLoading } = useVerificationList(
-    page,
-    limit,
-    debouncedSearchTerm,
-  );
 
   const checkins = data?.data || [];
   const meta: any = data?.meta; // Type assertion to bypass potential type mismatch for now
@@ -66,7 +85,7 @@ export default function VerificationPage() {
       </div>
       <Separator />
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-1 items-center space-x-2">
           <Input
             placeholder="Cari driver, perusahaan..."
@@ -74,6 +93,61 @@ export default function VerificationPage() {
             onChange={handleSearch}
             className="h-8 w-[150px] lg:w-[250px]"
           />
+        </div>
+        <div className="flex flex-col md:flex-row gap-2">
+          <Input
+            type="date"
+            value={startDate}
+            onChange={(e) => {
+              setStartDate(e.target.value);
+              setPage(1);
+            }}
+            className="h-8 w-full md:w-auto"
+            title="Tanggal Mulai"
+          />
+          <Input
+            type="date"
+            value={endDate}
+            onChange={(e) => {
+              setEndDate(e.target.value);
+              setPage(1);
+            }}
+            className="h-8 w-full md:w-auto"
+            title="Tanggal Selesai"
+          />
+          <select
+            className="h-8 w-full md:w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            value={status}
+            onChange={(e) => {
+              setStatus(e.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="">Semua Status</option>
+            <option value={QueueStatus.DISETUJUI}>Disetujui</option>
+            <option value={QueueStatus.DITOLAK}>Ditolak</option>
+            <option value={QueueStatus.MENUNGGU}>Menunggu</option>
+          </select>
+          <select
+            className="h-8 w-full md:w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            value={categoryId}
+            onChange={(e) => {
+              setCategoryId(e.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="">Semua Kategori</option>
+            {categories?.pages
+              .flatMap((page) => page.data)
+              .map((category) => (
+                <option
+                  key={category.material_category_id}
+                  value={category.material_category_id}
+                >
+                  {category.category_name}
+                </option>
+              ))}
+          </select>
         </div>
       </div>
 
@@ -131,16 +205,20 @@ export default function VerificationPage() {
                     <TableCell>
                       <Badge
                         variant={
+                          checkin.current_status === QueueStatus.DISETUJUI ||
                           checkin.current_status === 'APPROVED'
                             ? 'default'
-                            : checkin.current_status === 'REJECTED'
+                            : checkin.current_status === QueueStatus.DITOLAK ||
+                                checkin.current_status === 'REJECTED'
                               ? 'destructive'
                               : 'secondary'
                         }
                         className={
+                          checkin.current_status === QueueStatus.DISETUJUI ||
                           checkin.current_status === 'APPROVED'
                             ? 'bg-emerald-500 hover:bg-emerald-600'
-                            : checkin.current_status === 'REJECTED'
+                            : checkin.current_status === QueueStatus.DITOLAK ||
+                                checkin.current_status === 'REJECTED'
                               ? 'bg-rose-500 hover:bg-rose-600'
                               : 'bg-orange-500 hover:bg-orange-600 text-white'
                         }
