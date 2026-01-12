@@ -29,13 +29,14 @@ import { Separator } from '@/components/ui/separator';
 
 import { useMaterialCategories } from '@/hooks/api/use-material-categories';
 import { QueueStatus } from '@repo/types';
+import { DatePickerWithRange } from '@/components/ui/date-range-picker';
+import { DateRange } from 'react-day-picker';
 
 export default function VerificationPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [date, setDate] = useState<DateRange | undefined>();
   const [categoryId, setCategoryId] = useState('');
   const [status, setStatus] = useState('');
 
@@ -51,8 +52,8 @@ export default function VerificationPage() {
     limit,
     debouncedSearchTerm,
     {
-      start_date: startDate || undefined,
-      end_date: endDate || undefined,
+      start_date: date?.from ? format(date.from, 'yyyy-MM-dd') : undefined,
+      end_date: date?.to ? format(date.to, 'yyyy-MM-dd') : undefined,
       material_category_id: categoryId || undefined,
       status: status || undefined, // Passing status to filter
     },
@@ -95,25 +96,13 @@ export default function VerificationPage() {
           />
         </div>
         <div className="flex flex-col md:flex-row gap-2">
-          <Input
-            type="date"
-            value={startDate}
-            onChange={(e) => {
-              setStartDate(e.target.value);
+          <DatePickerWithRange
+            date={date}
+            setDate={(d) => {
+              setDate(d);
               setPage(1);
             }}
-            className="h-8 w-full md:w-auto"
-            title="Tanggal Mulai"
-          />
-          <Input
-            type="date"
-            value={endDate}
-            onChange={(e) => {
-              setEndDate(e.target.value);
-              setPage(1);
-            }}
-            className="h-8 w-full md:w-auto"
-            title="Tanggal Selesai"
+            className="w-full md:w-auto"
           />
           <select
             className="h-8 w-full md:w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
