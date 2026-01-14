@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import {
   Card,
   CardContent,
@@ -10,13 +11,25 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useChecklistStore } from '@/stores/use-checklist.store';
+import { useSubmitCheckIn } from '@/hooks/api/use-check-in';
+import { formatDate } from '@/lib/utils';
 import { ReviewIdentity } from './components/review-identity';
 import { ReviewChecklist } from './components/review-checklist';
 import { ReviewActions } from './components/review-actions';
+import { ProcessingCheckIn } from './components/processing-check-in';
 
 export default function CheckInStep3() {
-  const { step1Data, step2Data, successData, checklistCategories } = useChecklistStore();
+  const {
+    step1Data,
+    step2Data,
+    successData,
+    checklistCategories,
+    setSuccessData,
+    resetFormData,
+  } = useChecklistStore();
   const router = useRouter();
+  const { mutateAsync: submitCheckIn } = useSubmitCheckIn();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     // If successData exists, it means we just submitted successfully.
@@ -34,7 +47,63 @@ export default function CheckInStep3() {
     if (!step2Data) {
       router.replace('/check-in/step-2');
     }
-  }, [step1Data, step2Data, successData, router]);
+  }, [step1Data, step2Data, successData, router, checklistCategories]);
+
+  const handleSubmit = async () => {
+    if (!step1Data || !step2Data) {
+      toast.error('Data tidak lengkap', {
+        description: 'Silakan kembali ke langkah sebelumnya.',
+      });
+      return;
+    }
+
+    const payload = {
+      vendor_id: Number(step1Data.company.value),
+      driver_name: step1Data.fullName,
+      material_category_id: Number(step1Data.materialCategory.value),
+      checklist_responses: Object.entries(step2Data.checklistItems).map(
+        ([itemId, value]) => ({
+          checklist_item_id: Number(itemId),
+          response_value: value === 'true',
+        }),
+      ),
+    };
+
+    setIsProcessing(true);
+
+    try {
+      // Artificial minimum delay for better UX (optional, but good for "processing" feel)
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      const result = await submitCheckIn(payload);
+
+      const successData = {
+        queueNumber: result.queue_number,
+        companyName: result.company_name,
+        driverName: result.driver_name,
+        status_display_text: result.status_display_text,
+        estimatedWaitMinutes: result.estimated_wait_minutes,
+        submitTime: formatDate(result.submission_time),
+      };
+
+      setSuccessData(successData);
+      toast.success('Check-in Berhasil', {
+        description: 'Data Anda telah berhasil dikirim.',
+      });
+      resetFormData();
+      router.replace('/check-in/success');
+    } catch (error) {
+      console.error('Error submitting check-in:', error);
+      toast.error('Gagal mengirim data', {
+        description: 'Terjadi kesalahan saat mengirim data. Silakan coba lagi.',
+      });
+      setIsProcessing(false);
+    }
+  };
+
+  if (isProcessing) {
+    return <ProcessingCheckIn />;
+  }
 
   return (
     <div>
@@ -47,11 +116,9 @@ export default function CheckInStep3() {
         </CardHeader>
         <CardContent className="space-y-6">
           <ReviewIdentity step1Data={step1Data} />
-          <ReviewChecklist
-            step2Data={step2Data}
-          />
+          <ReviewChecklist step2Data={step2Data} />
         </CardContent>
-        <ReviewActions />
+        <ReviewActions onConfirm={handleSubmit} isSubmitting={isProcessing} />
       </Card>
     </div>
   );
