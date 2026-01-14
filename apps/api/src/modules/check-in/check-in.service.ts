@@ -282,6 +282,52 @@ export class CheckInService {
     };
   }
 
+  async findVerificationListById(id: number) {
+    const entry = await this.prisma.ops_checkin_entry.findUnique({
+      where: {
+        entry_id: id,
+      },
+      select: {
+        queue_number: true,
+        driver_name: true,
+        submission_time: true,
+        snapshot_company_name: true,
+        snapshot_category_name: true,
+        ops_checkin_response: {
+          select: {
+            item_text_snapshot: true,
+            response_value: true,
+            is_compliant: true,
+            display_order: true,
+            checklist_category: {
+              select: {
+                category_name: true,
+                display_order: true,
+                icon_name: true,
+                color_code: true,
+              },
+            },
+          },
+          orderBy: {
+            display_order: 'asc',
+          },
+        },
+      },
+    });
+
+    if (!entry) return null;
+
+    const checklist_responses = this.formatCheckinResponses(
+      entry.ops_checkin_response,
+    );
+
+    const { ops_checkin_response, ...rest } = entry;
+    return {
+      ...rest,
+      checklist_responses,
+    };
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} checkIn`;
   }
@@ -300,6 +346,32 @@ export class CheckInService {
       throw new BadRequestException('Vendor tidak ditemukan');
     }
     return vendor;
+  }
+
+  private formatCheckinResponses(responses: any[]) {
+    const grouped = responses.reduce((acc, response) => {
+      const categoryName = response.checklist_category.category_name;
+      if (!acc[categoryName]) {
+        acc[categoryName] = {
+          category_name: categoryName,
+          display_order: response.checklist_category.display_order,
+          icon_name: response.checklist_category.icon_name,
+          color_code: response.checklist_category.color_code,
+          items: [],
+        };
+      }
+      acc[categoryName].items.push({
+        item_text_snapshot: response.item_text_snapshot,
+        response_value: response.response_value,
+        is_compliant: response.is_compliant,
+        display_order: response.display_order,
+      });
+      return acc;
+    }, {});
+
+    return Object.values(grouped).sort(
+      (a: any, b: any) => a.display_order - b.display_order,
+    );
   }
 
   private async validateMaterialCategory(material_category_id: number) {
