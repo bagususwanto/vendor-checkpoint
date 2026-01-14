@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CheckinList } from './checkin-list';
+import { QueueStatus } from '@repo/types';
 
 export function RecentCheckinsTable() {
   return (
@@ -26,10 +27,10 @@ export function RecentCheckinsTable() {
             <TabsTrigger value="approved">Siap Check-Out</TabsTrigger>
           </TabsList>
           <TabsContent value="waiting" className="space-y-4">
-            <CheckinList status="WAITING" />
+            <CheckinList status={QueueStatus.MENUNGGU} />
           </TabsContent>
           <TabsContent value="approved" className="space-y-4">
-            <CheckinList status="APPROVED" />
+            <CheckinList status={QueueStatus.DISETUJUI} />
           </TabsContent>
         </Tabs>
       </CardContent>

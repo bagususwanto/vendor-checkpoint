@@ -19,7 +19,7 @@ import { QueueStatus } from '@repo/types';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface CheckinListProps {
-  status: 'WAITING' | 'APPROVED';
+  status: QueueStatus.MENUNGGU | QueueStatus.DISETUJUI;
 }
 
 export function CheckinList({ status }: CheckinListProps) {
@@ -81,20 +81,16 @@ export function CheckinList({ status }: CheckinListProps) {
               <TableCell>
                 <Badge
                   variant={
-                    checkin.current_status === QueueStatus.DISETUJUI ||
-                    checkin.current_status === 'APPROVED'
+                    checkin.current_status === QueueStatus.DISETUJUI
                       ? 'default'
-                      : checkin.current_status === QueueStatus.DITOLAK ||
-                          checkin.current_status === 'REJECTED'
+                      : checkin.current_status === QueueStatus.DITOLAK
                         ? 'destructive'
                         : 'secondary'
                   }
                   className={
-                    checkin.current_status === QueueStatus.DISETUJUI ||
-                    checkin.current_status === 'APPROVED'
+                    checkin.current_status === QueueStatus.DISETUJUI
                       ? 'bg-emerald-500 hover:bg-emerald-600'
-                      : checkin.current_status === QueueStatus.DITOLAK ||
-                          checkin.current_status === 'REJECTED'
+                      : checkin.current_status === QueueStatus.DITOLAK
                         ? 'bg-rose-500 hover:bg-rose-600'
                         : 'bg-orange-500 hover:bg-orange-600 text-white'
                   }
@@ -103,7 +99,7 @@ export function CheckinList({ status }: CheckinListProps) {
                 </Badge>
               </TableCell>
               <TableCell className="text-right">
-                {status === 'WAITING' ? (
+                {status === QueueStatus.MENUNGGU ? (
                   <VerificationSheet
                     checkin={{
                       id: checkin.queue_number,

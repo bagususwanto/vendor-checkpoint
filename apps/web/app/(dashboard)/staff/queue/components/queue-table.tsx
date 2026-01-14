@@ -112,20 +112,16 @@ export function QueueTable({
                   <TableCell>
                     <Badge
                       variant={
-                        checkin.current_status === QueueStatus.DISETUJUI ||
-                        checkin.current_status === 'APPROVED'
+                        checkin.current_status === QueueStatus.DISETUJUI
                           ? 'default'
-                          : checkin.current_status === QueueStatus.DITOLAK ||
-                              checkin.current_status === 'REJECTED'
+                          : checkin.current_status === QueueStatus.DITOLAK
                             ? 'destructive'
                             : 'secondary'
                       }
                       className={
-                        checkin.current_status === QueueStatus.DISETUJUI ||
-                        checkin.current_status === 'APPROVED'
+                        checkin.current_status === QueueStatus.DISETUJUI
                           ? 'bg-emerald-500 hover:bg-emerald-600'
-                          : checkin.current_status === QueueStatus.DITOLAK ||
-                              checkin.current_status === 'REJECTED'
+                          : checkin.current_status === QueueStatus.DITOLAK
                             ? 'bg-rose-500 hover:bg-rose-600'
                             : 'bg-orange-500 hover:bg-orange-600 text-white'
                       }
@@ -134,8 +130,7 @@ export function QueueTable({
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    {(checkin.current_status === QueueStatus.MENUNGGU ||
-                      checkin.current_status === 'WAITING') && (
+                    {checkin.current_status === QueueStatus.MENUNGGU && (
                       <VerificationSheet
                         checkin={{
                           id: checkin.queue_number,
@@ -150,8 +145,7 @@ export function QueueTable({
                       />
                     )}
 
-                    {(checkin.current_status === QueueStatus.DISETUJUI ||
-                      checkin.current_status === 'APPROVED') && (
+                    {checkin.current_status === QueueStatus.DISETUJUI && (
                       <CheckoutSheet
                         checkin={{
                           id: checkin.queue_number,
