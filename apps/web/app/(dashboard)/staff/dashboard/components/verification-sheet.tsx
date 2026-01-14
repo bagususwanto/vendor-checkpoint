@@ -56,12 +56,14 @@ interface CheckinData {
 interface VerificationSheetProps {
   checkin: CheckinData;
   trigger?: React.ReactNode;
+  readonly?: boolean;
 }
 
 export function VerificationSheet({
   checkin,
   trigger,
   onSuccess,
+  readonly = false,
 }: VerificationSheetProps & { onSuccess?: () => void }) {
   const [decision, setDecision] = useState<'approve' | 'reject' | null>(null);
   const [reason, setReason] = useState('');
@@ -351,83 +353,85 @@ export function VerificationSheet({
                   </Accordion>
                 </div>
 
-                <Separator />
+                {!readonly && <Separator />}
 
                 {/* Keputusan */}
-                <div>
-                  <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
-                    Keputusan Akhir
-                  </h4>
-                  <RadioGroup
-                    value={decision || ''}
-                    onValueChange={(v) =>
-                      setDecision(v as 'approve' | 'reject')
-                    }
-                    className="grid gap-3"
-                  >
-                    <div>
-                      <RadioGroupItem
-                        value="approve"
-                        id="approve"
-                        className="peer sr-only"
-                      />
-                      <Label
-                        htmlFor="approve"
-                        className="flex items-center justify-between rounded-lg border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer transition-all"
-                      >
-                        <div className="flex w-full items-center gap-3">
-                          <div className="rounded-full bg-green-100 p-1 text-green-600">
-                            <CheckCircle className="h-5 w-5" />
+                {!readonly && (
+                  <div>
+                    <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
+                      Keputusan Akhir
+                    </h4>
+                    <RadioGroup
+                      value={decision || ''}
+                      onValueChange={(v) =>
+                        setDecision(v as 'approve' | 'reject')
+                      }
+                      className="grid gap-3"
+                    >
+                      <div>
+                        <RadioGroupItem
+                          value="approve"
+                          id="approve"
+                          className="peer sr-only"
+                        />
+                        <Label
+                          htmlFor="approve"
+                          className="flex items-center justify-between rounded-lg border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer transition-all"
+                        >
+                          <div className="flex w-full items-center gap-3">
+                            <div className="rounded-full bg-green-100 p-1 text-green-600">
+                              <CheckCircle className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-sm">Setujui</p>
+                              <p className="text-xs text-muted-foreground">
+                                Lanjutkan proses
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-semibold text-sm">Setujui</p>
-                            <p className="text-xs text-muted-foreground">
-                              Lanjutkan proses
-                            </p>
+                        </Label>
+                      </div>
+                      <div>
+                        <RadioGroupItem
+                          value="reject"
+                          id="reject"
+                          className="peer sr-only"
+                        />
+                        <Label
+                          htmlFor="reject"
+                          className="flex items-center justify-between rounded-lg border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-destructive peer-data-[state=checked]:bg-destructive/5 cursor-pointer transition-all"
+                        >
+                          <div className="flex w-full items-center gap-3">
+                            <div className="rounded-full bg-red-100 p-1 text-red-600">
+                              <XCircle className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-sm">Tolak</p>
+                              <p className="text-xs text-muted-foreground">
+                                Hentikan proses
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </Label>
-                    </div>
-                    <div>
-                      <RadioGroupItem
-                        value="reject"
-                        id="reject"
-                        className="peer sr-only"
-                      />
-                      <Label
-                        htmlFor="reject"
-                        className="flex items-center justify-between rounded-lg border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-destructive peer-data-[state=checked]:bg-destructive/5 cursor-pointer transition-all"
-                      >
-                        <div className="flex w-full items-center gap-3">
-                          <div className="rounded-full bg-red-100 p-1 text-red-600">
-                            <XCircle className="h-5 w-5" />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-sm">Tolak</p>
-                            <p className="text-xs text-muted-foreground">
-                              Hentikan proses
-                            </p>
-                          </div>
-                        </div>
-                      </Label>
-                    </div>
-                  </RadioGroup>
+                        </Label>
+                      </div>
+                    </RadioGroup>
 
-                  {decision === 'reject' && (
-                    <div className="mt-3 animate-in fade-in slide-in-from-top-2">
-                      <Label htmlFor="reason" className="sr-only">
-                        Alasan Penolakan
-                      </Label>
-                      <textarea
-                        id="reason"
-                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        placeholder="Tuliskan alasan penolakan di sini..."
-                        value={reason}
-                        onChange={(e) => setReason(e.target.value)}
-                      />
-                    </div>
-                  )}
-                </div>
+                    {decision === 'reject' && (
+                      <div className="mt-3 animate-in fade-in slide-in-from-top-2">
+                        <Label htmlFor="reason" className="sr-only">
+                          Alasan Penolakan
+                        </Label>
+                        <textarea
+                          id="reason"
+                          className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          placeholder="Tuliskan alasan penolakan di sini..."
+                          value={reason}
+                          onChange={(e) => setReason(e.target.value)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ) : (
@@ -438,18 +442,22 @@ export function VerificationSheet({
         </div>
 
         <SheetFooter className="mt-auto">
-          <Button
-            disabled={
-              !decision ||
-              (decision === 'reject' && !reason) ||
-              verifyMutation.isPending
-            }
-            onClick={handleSave}
-          >
-            {verifyMutation.isPending ? 'Menyimpan...' : 'Simpan'}
-          </Button>
+          {!readonly && (
+            <Button
+              disabled={
+                !decision ||
+                (decision === 'reject' && !reason) ||
+                verifyMutation.isPending
+              }
+              onClick={handleSave}
+            >
+              {verifyMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+            </Button>
+          )}
           <SheetClose asChild>
-            <Button variant="outline">Batal</Button>
+            <Button variant={readonly ? 'default' : 'outline'}>
+              {readonly ? 'Tutup' : 'Batal'}
+            </Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

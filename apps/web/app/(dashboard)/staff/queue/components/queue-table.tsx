@@ -147,6 +147,25 @@ export function QueueTable({
                         onSuccess={handleSuccess}
                       />
                     )}
+
+                    {checkin.current_status === QueueStatus.SELESAI && (
+                      <VerificationSheet
+                        checkin={{
+                          id: checkin.queue_number,
+                          company: checkin.snapshot_company_name,
+                          driver: checkin.driver_name,
+                          category: checkin.snapshot_category_name,
+                          time: checkin.submission_time,
+                          status: checkin.current_status.toLowerCase(),
+                        }}
+                        trigger={
+                          <Button size="sm" variant="outline">
+                            Detail
+                          </Button>
+                        }
+                        readonly={true}
+                      />
+                    )}
                   </TableCell>
                 </TableRow>
               ))

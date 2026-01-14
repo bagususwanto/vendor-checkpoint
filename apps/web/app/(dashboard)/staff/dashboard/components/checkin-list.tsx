@@ -96,7 +96,7 @@ export function CheckinList({ status }: CheckinListProps) {
                     trigger={<Button size="sm">Verifikasi</Button>}
                     onSuccess={handleSuccess}
                   />
-                ) : (
+                ) : status === QueueStatus.DISETUJUI ? (
                   <CheckoutSheet
                     checkin={{
                       id: checkin.queue_number,
@@ -112,6 +112,23 @@ export function CheckinList({ status }: CheckinListProps) {
                       </Button>
                     }
                     onSuccess={handleSuccess}
+                  />
+                ) : (
+                  <VerificationSheet
+                    checkin={{
+                      id: checkin.queue_number,
+                      company: checkin.snapshot_company_name,
+                      driver: checkin.driver_name,
+                      category: checkin.snapshot_category_name,
+                      time: checkin.submission_time,
+                      status: checkin.current_status.toLowerCase(),
+                    }}
+                    trigger={
+                      <Button size="sm" variant="outline">
+                        Detail
+                      </Button>
+                    }
+                    readonly={true}
                   />
                 )}
               </TableCell>
