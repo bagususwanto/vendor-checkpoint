@@ -59,3 +59,10 @@ export const verifyCheckInSchema = z.object({
 });
 
 export type VerifyCheckIn = z.infer<typeof verifyCheckInSchema>;
+
+export const checkoutSchema = z.object({
+  queue_number: z.string().min(1, 'Nomor antrean harus diisi'),
+  checkout_by_user_id: z.number(),
+});
+
+export type Checkout = z.infer<typeof checkoutSchema>;

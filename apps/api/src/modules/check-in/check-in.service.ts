@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCheckInDto } from './dto/create-check-in.dto';
 import { UpdateCheckInDto } from './dto/update-check-in.dto';
 import { VerifyCheckInDto } from './dto/verify-check-in.dto';
+import { CheckoutCheckInDto } from './dto/checkout-check-in.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { VendorService } from '../vendor/vendor.service';
 import { generateQueueNumber } from 'src/common/utils/queue-number.util.';
@@ -448,6 +449,121 @@ export class CheckInService {
         driver_name: entry.driver_name,
         company_name: entry.snapshot_company_name,
         verified_at: new Date(),
+      };
+    });
+  }
+
+  async checkoutEntry(checkoutDto: CheckoutCheckInDto, requestInfo: any) {
+    const { queue_number, checkout_by_user_id } = checkoutDto;
+
+    return await this.prisma.$transaction(async (tx) => {
+      // 1. Find and validate entry
+      const entry = await tx.ops_checkin_entry.findUnique({
+        where: { queue_number },
+        select: {
+          entry_id: true,
+          current_status: true,
+          driver_name: true,
+          snapshot_company_name: true,
+          ops_timelog: {
+            select: {
+              timelog_id: true,
+              checkin_time: true,
+              is_checked_out: true,
+            },
+          },
+        },
+      });
+
+      if (!entry) {
+        throw new BadRequestException('Nomor antrean tidak ditemukan');
+      }
+
+      if (entry.current_status !== QueueStatus.DISETUJUI) {
+        throw new BadRequestException(
+          `Checkout hanya dapat dilakukan untuk status DISETUJUI. Status saat ini: ${entry.current_status}`,
+        );
+      }
+
+      if (!entry.ops_timelog) {
+        throw new BadRequestException('Data timelog tidak ditemukan');
+      }
+
+      if (entry.ops_timelog.is_checked_out) {
+        throw new BadRequestException('Antrean sudah melakukan checkout');
+      }
+
+      // 2. Calculate duration
+      const checkoutTime = new Date();
+      const checkinTime = entry.ops_timelog.checkin_time;
+      let durationMinutes: number | null = null;
+
+      if (checkinTime) {
+        const diffMs = checkoutTime.getTime() - checkinTime.getTime();
+        durationMinutes = Math.round(diffMs / 60000);
+      }
+
+      // 3. Get display text from config
+      const statusDisplayText = await this.systemConfigService.findByConfigKey(
+        'DEFAULT_STATUS_SELESAI_DISPLAY_TEXT',
+      );
+
+      // 4. Update ops_timelog
+      await tx.ops_timelog.update({
+        where: { timelog_id: entry.ops_timelog.timelog_id },
+        data: {
+          checkout_time: checkoutTime,
+          checkout_by_user_id,
+          is_checked_out: true,
+          duration_minutes: durationMinutes,
+          updated_at: checkoutTime,
+        },
+      });
+
+      // 5. Update ops_checkin_entry
+      await tx.ops_checkin_entry.update({
+        where: { queue_number },
+        data: {
+          current_status: QueueStatus.SELESAI,
+          updated_at: checkoutTime,
+        },
+      });
+
+      // 6. Update ops_queue_status
+      await tx.ops_queue_status.update({
+        where: { entry_id: entry.entry_id },
+        data: {
+          current_status: QueueStatus.SELESAI,
+          status_display_text: statusDisplayText.config_value,
+          last_updated: checkoutTime,
+        },
+      });
+
+      // 7. Create audit log
+      await this.auditService.create(tx, {
+        entry_id: entry.entry_id,
+        user_id: checkout_by_user_id,
+        action_type: 'CHECKIN_CHECKOUT',
+        action_description: 'Check-in checkout berhasil',
+        ip_address: requestInfo.ipAddress,
+        user_agent: requestInfo.userAgent,
+        old_value: JSON.stringify({ status: QueueStatus.DISETUJUI }),
+        new_value: JSON.stringify({
+          status: QueueStatus.SELESAI,
+          checkout_time: checkoutTime,
+          duration_minutes: durationMinutes,
+        }),
+      });
+
+      // 8. Return result
+      return {
+        queue_number,
+        status: QueueStatus.SELESAI,
+        status_display_text: statusDisplayText.config_value,
+        driver_name: entry.driver_name,
+        company_name: entry.snapshot_company_name,
+        checkout_time: checkoutTime,
+        duration_minutes: durationMinutes,
       };
     });
   }

@@ -13,6 +13,7 @@ import { CheckInService } from './check-in.service';
 import { CreateCheckInDto } from './dto/create-check-in.dto';
 import { UpdateCheckInDto } from './dto/update-check-in.dto';
 import { VerifyCheckInDto } from './dto/verify-check-in.dto';
+import { CheckoutCheckInDto } from './dto/checkout-check-in.dto';
 import { getRequestInfo } from 'src/common/utils/request-info.util';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 
@@ -56,6 +57,12 @@ export class CheckInController {
   verify(@Body() verifyCheckInDto: VerifyCheckInDto, @Req() req: Request) {
     const requestInfo = getRequestInfo(req);
     return this.checkInService.verifyCheckIn(verifyCheckInDto, requestInfo);
+  }
+
+  @Patch('/checkout')
+  checkout(@Body() checkoutDto: CheckoutCheckInDto, @Req() req: Request) {
+    const requestInfo = getRequestInfo(req);
+    return this.checkInService.checkoutEntry(checkoutDto, requestInfo);
   }
 
   @Get(':id')
