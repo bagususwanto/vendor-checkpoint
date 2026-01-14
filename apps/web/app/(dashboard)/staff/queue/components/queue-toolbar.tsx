@@ -42,8 +42,8 @@ export function QueueToolbar({
   onReset,
 }: QueueToolbarProps) {
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div className="flex flex-1 items-center space-x-2">
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-1 items-center space-x-2 min-w-[300px]">
         <Input
           placeholder="Cari driver, perusahaan..."
           value={searchTerm}
@@ -51,12 +51,8 @@ export function QueueToolbar({
           className="w-full"
         />
       </div>
-      <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto flex-wrap">
-        <DatePickerWithRange
-          date={date}
-          setDate={setDate}
-          className="w-full sm:w-[250px]"
-        />
+      <div className="flex items-center gap-4 flex-wrap">
+        <DatePickerWithRange date={date} setDate={setDate} className="w-auto" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
