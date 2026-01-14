@@ -290,6 +290,24 @@ export const SYSTEM_CONFIGS = [
     config_type: 'STRING',
     description: 'Status menunggu verifikasi di Display',
   },
+  {
+    config_key: 'DEFAULT_STATUS_DISETUJUI_DISPLAY_TEXT',
+    config_value: 'Sedang Diproses',
+    config_type: 'STRING',
+    description: 'Status disetujui di Display',
+  },
+  {
+    config_key: 'DEFAULT_STATUS_DITOLAK_DISPLAY_TEXT',
+    config_value: 'Ditolak',
+    config_type: 'STRING',
+    description: 'Status ditolak di Display',
+  },
+  {
+    config_key: 'DEFAULT_STATUS_SELESAI_DISPLAY_TEXT',
+    config_value: 'Selesai',
+    config_type: 'STRING',
+    description: 'Status selesai di Display',
+  },
 ];
 
 export const ADMIN_USER = {

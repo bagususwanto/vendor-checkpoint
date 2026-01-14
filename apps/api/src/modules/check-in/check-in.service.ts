@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCheckInDto } from './dto/create-check-in.dto';
 import { UpdateCheckInDto } from './dto/update-check-in.dto';
+import { VerifyCheckInDto } from './dto/verify-check-in.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { VendorService } from '../vendor/vendor.service';
 import { generateQueueNumber } from 'src/common/utils/queue-number.util.';
@@ -15,7 +16,12 @@ import { AuditService } from '../audit/audit.service';
 import { toInt } from 'src/common/utils/string-to-int.util';
 import { MaterialCategoryService } from '../material_category/material_category.service';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
-import { DisplayQueue, PaginatedResponse, VerificationList } from '@repo/types';
+import {
+  DisplayQueue,
+  PaginatedResponse,
+  VerificationList,
+  QueueStatus,
+} from '@repo/types';
 
 @Injectable()
 export class CheckInService {
@@ -338,6 +344,112 @@ export class CheckInService {
 
   remove(id: number) {
     return `This action removes a #${id} checkIn`;
+  }
+
+  async verifyCheckIn(verifyCheckInDto: VerifyCheckInDto, requestInfo: any) {
+    const { queue_number, action, rejection_reason, verified_by_user_id } =
+      verifyCheckInDto;
+
+    // Validate rejection_reason is required for REJECT action
+    if (action === 'REJECT' && !rejection_reason?.trim()) {
+      throw new BadRequestException(
+        'Alasan penolakan harus diisi untuk aksi REJECT',
+      );
+    }
+
+    return await this.prisma.$transaction(async (tx) => {
+      // 1. Find and validate entry
+      const entry = await tx.ops_checkin_entry.findUnique({
+        where: { queue_number },
+        select: {
+          entry_id: true,
+          current_status: true,
+          driver_name: true,
+          snapshot_company_name: true,
+        },
+      });
+
+      if (!entry) {
+        throw new BadRequestException('Nomor antrean tidak ditemukan');
+      }
+
+      if (entry.current_status !== QueueStatus.MENUNGGU) {
+        throw new BadRequestException(
+          `Check-in sudah diverifikasi dengan status: ${entry.current_status}`,
+        );
+      }
+
+      // 2. Determine new status
+      const newStatus =
+        action === 'APPROVE' ? QueueStatus.DISETUJUI : QueueStatus.DITOLAK;
+
+      // 3. Get display text from config
+      const statusConfigKey =
+        action === 'APPROVE'
+          ? 'DEFAULT_STATUS_DISETUJUI_DISPLAY_TEXT'
+          : 'DEFAULT_STATUS_DITOLAK_DISPLAY_TEXT';
+
+      const statusDisplayText =
+        await this.systemConfigService.findByConfigKey(statusConfigKey);
+
+      // 4. Update ops_checkin_entry
+      await tx.ops_checkin_entry.update({
+        where: { queue_number },
+        data: {
+          current_status: newStatus,
+          updated_at: new Date(),
+        },
+      });
+
+      // 5. Update ops_queue_status
+      await tx.ops_queue_status.update({
+        where: { entry_id: entry.entry_id },
+        data: {
+          current_status: newStatus,
+          status_display_text: statusDisplayText.config_value,
+          last_updated: new Date(),
+        },
+      });
+
+      // 6. Create ops_verification record
+      await tx.ops_verification.create({
+        data: {
+          entry_id: entry.entry_id,
+          verified_by_user_id,
+          verification_status: newStatus,
+          rejection_reason: action === 'REJECT' ? rejection_reason : null,
+        },
+      });
+
+      // 7. Create audit log
+      await this.auditService.create(tx, {
+        entry_id: entry.entry_id,
+        user_id: verified_by_user_id,
+        action_type:
+          action === 'APPROVE' ? 'CHECKIN_APPROVE' : 'CHECKIN_REJECT',
+        action_description:
+          action === 'APPROVE'
+            ? 'Check-in disetujui'
+            : `Check-in ditolak: ${rejection_reason}`,
+        ip_address: requestInfo.ipAddress,
+        user_agent: requestInfo.userAgent,
+        old_value: JSON.stringify({ status: QueueStatus.MENUNGGU }),
+        new_value: JSON.stringify({
+          status: newStatus,
+          rejection_reason: action === 'REJECT' ? rejection_reason : null,
+        }),
+      });
+
+      // 8. Return result
+      return {
+        queue_number,
+        status: newStatus,
+        status_display_text: statusDisplayText.config_value,
+        driver_name: entry.driver_name,
+        company_name: entry.snapshot_company_name,
+        verified_at: new Date(),
+      };
+    });
   }
 
   private async validateVendor(vendor_id: number) {

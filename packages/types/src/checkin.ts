@@ -50,3 +50,12 @@ export const checkInSchema = z.object({
 });
 
 export type CheckIn = z.infer<typeof checkInSchema>;
+
+export const verifyCheckInSchema = z.object({
+  queue_number: z.string().min(1, 'Nomor antrean harus diisi'),
+  action: z.enum(['APPROVE', 'REJECT']),
+  rejection_reason: z.string().optional(),
+  verified_by_user_id: z.number(),
+});
+
+export type VerifyCheckIn = z.infer<typeof verifyCheckInSchema>;
