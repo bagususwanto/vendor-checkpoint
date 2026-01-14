@@ -174,7 +174,6 @@ export function CheckoutSheet({
         <SheetFooter className="mt-auto pt-4 border-t">
           <Button
             size="lg"
-            className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700"
             onClick={handleCheckout}
             disabled={checkoutMutation.isPending}
           >

@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { VerificationSheet } from './verification-sheet';
 import { CheckoutSheet } from '../../queue/components/checkout-sheet';
+import { StatusBadge } from '../../../components/status-badge';
 import { useVerificationList } from '@/hooks/api/use-check-in';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -79,24 +80,7 @@ export function CheckinList({ status }: CheckinListProps) {
                   : '-'}
               </TableCell>
               <TableCell>
-                <Badge
-                  variant={
-                    checkin.current_status === QueueStatus.DISETUJUI
-                      ? 'default'
-                      : checkin.current_status === QueueStatus.DITOLAK
-                        ? 'destructive'
-                        : 'secondary'
-                  }
-                  className={
-                    checkin.current_status === QueueStatus.DISETUJUI
-                      ? 'bg-emerald-500 hover:bg-emerald-600'
-                      : checkin.current_status === QueueStatus.DITOLAK
-                        ? 'bg-rose-500 hover:bg-rose-600'
-                        : 'bg-orange-500 hover:bg-orange-600 text-white'
-                  }
-                >
-                  {checkin.current_status}
-                </Badge>
+                <StatusBadge status={checkin.current_status} />
               </TableCell>
               <TableCell className="text-right">
                 {status === QueueStatus.MENUNGGU ? (

@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { StatusBadge } from '../../../components/status-badge';
 
 interface QueueTableProps {
   checkins: any[]; // Replace any with proper type
@@ -110,24 +111,7 @@ export function QueueTable({
                       : '-'}
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        checkin.current_status === QueueStatus.DISETUJUI
-                          ? 'default'
-                          : checkin.current_status === QueueStatus.DITOLAK
-                            ? 'destructive'
-                            : 'secondary'
-                      }
-                      className={
-                        checkin.current_status === QueueStatus.DISETUJUI
-                          ? 'bg-emerald-500 hover:bg-emerald-600'
-                          : checkin.current_status === QueueStatus.DITOLAK
-                            ? 'bg-rose-500 hover:bg-rose-600'
-                            : 'bg-orange-500 hover:bg-orange-600 text-white'
-                      }
-                    >
-                      {checkin.current_status}
-                    </Badge>
+                    <StatusBadge status={checkin.current_status} />
                   </TableCell>
                   <TableCell className="text-right">
                     {checkin.current_status === QueueStatus.MENUNGGU && (
