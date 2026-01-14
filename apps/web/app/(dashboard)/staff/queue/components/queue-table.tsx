@@ -24,6 +24,13 @@ import { QueueStatus } from '@repo/types';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { CheckoutSheet } from './checkout-sheet';
 import { useQueryClient } from '@tanstack/react-query';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface QueueTableProps {
   checkins: any[]; // Replace any with proper type
@@ -31,6 +38,8 @@ interface QueueTableProps {
   page: number;
   totalPages: number;
   setPage: (page: number) => void;
+  limit: number;
+  setLimit: (limit: number) => void;
 }
 
 export function QueueTable({
@@ -39,6 +48,8 @@ export function QueueTable({
   page,
   totalPages,
   setPage,
+  limit,
+  setLimit,
 }: QueueTableProps) {
   const queryClient = useQueryClient();
 
@@ -165,28 +176,50 @@ export function QueueTable({
           </TableBody>
         </Table>
 
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage(page - 1)}
-            disabled={page <= 1 || isLoading}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Previous
-          </Button>
-          <div className="text-sm text-muted-foreground">
-            Page {page} of {totalPages}
+        <div className="flex items-center justify-between py-4">
+          <div className="flex items-center space-x-2">
+            <p className="text-sm text-muted-foreground">Rows per page</p>
+            <Select
+              value={`${limit}`}
+              onValueChange={(value: string) => {
+                setLimit(Number(value));
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue placeholder={limit} />
+              </SelectTrigger>
+              <SelectContent side="top">
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage(page + 1)}
-            disabled={page >= totalPages || isLoading}
-          >
-            Next
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(page - 1)}
+              disabled={page <= 1 || isLoading}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            <div className="text-sm text-muted-foreground">
+              Page {page} of {totalPages}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(page + 1)}
+              disabled={page >= totalPages || isLoading}
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

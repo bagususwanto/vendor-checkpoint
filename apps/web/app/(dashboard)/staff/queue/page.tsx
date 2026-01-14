@@ -12,7 +12,7 @@ import { QueueTable } from './components/queue-table';
 
 export default function QueuePage() {
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit, setLimit] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [categoryId, setCategoryId] = useState('');
@@ -54,7 +54,12 @@ export default function QueuePage() {
   };
 
   // Robust fallback for total pages
-  const totalPages = meta?.last_page || meta?.lastPage || meta?.pageCount || 1;
+  const totalPages =
+    meta?.total_pages ||
+    meta?.last_page ||
+    meta?.lastPage ||
+    meta?.pageCount ||
+    1;
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -88,6 +93,8 @@ export default function QueuePage() {
         page={page}
         totalPages={totalPages}
         setPage={setPage}
+        limit={limit}
+        setLimit={setLimit}
       />
     </div>
   );
