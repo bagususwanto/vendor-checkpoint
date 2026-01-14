@@ -282,10 +282,10 @@ export class CheckInService {
     };
   }
 
-  async findVerificationListById(id: number) {
+  async findVerificationListById(queueNumber: string) {
     const entry = await this.prisma.ops_checkin_entry.findUnique({
       where: {
-        entry_id: id,
+        queue_number: queueNumber,
       },
       select: {
         queue_number: true,

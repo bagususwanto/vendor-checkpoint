@@ -46,9 +46,9 @@ export class CheckInController {
     return this.checkInService.findVerificationList(query);
   }
 
-  @Get('/verification-list/:id')
-  findVerificationListById(@Param('id') id: string) {
-    return this.checkInService.findVerificationListById(+id);
+  @Get('/verification-list/:queueNumber')
+  findVerificationListById(@Param('queueNumber') queueNumber: string) {
+    return this.checkInService.findVerificationListById(queueNumber);
   }
 
   @Get(':id')

@@ -59,6 +59,17 @@ export const checkInService = {
     }
   },
 
+  getVerificationDetail: async (queueNumber: string) => {
+    try {
+      const response = await axiosInstance.get<{ data: any }>(
+        `/check-in/verification-list/${queueNumber}`,
+      );
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   verifyCheckIn: async (
     id: string,
     payload: { status: 'APPROVED' | 'REJECTED'; note?: string },

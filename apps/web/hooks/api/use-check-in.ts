@@ -49,6 +49,14 @@ export function useVerificationList(
   });
 }
 
+export function useVerificationDetail(queueNumber: string) {
+  return useQuery({
+    queryKey: ['verification-detail', queueNumber],
+    queryFn: () => checkInService.getVerificationDetail(queueNumber),
+    enabled: !!queueNumber,
+  });
+}
+
 export function useVerifyCheckIn() {
   return useMutation({
     mutationFn: ({
