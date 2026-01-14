@@ -30,10 +30,6 @@ import {
   Package,
   User,
   Clock,
-  ShieldAlert,
-  BadgeCheck,
-  Activity,
-  TreeDeciduous,
   Loader2,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -45,6 +41,8 @@ import {
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
+
+import { icons } from 'lucide-react';
 
 interface CheckinData {
   id: string;
@@ -59,13 +57,6 @@ interface VerificationSheetProps {
   checkin: CheckinData;
   trigger?: React.ReactNode;
 }
-
-const IconMap: Record<string, any> = {
-  ShieldAlert,
-  BadgeCheck,
-  Activity,
-  TreeDeciduous,
-};
 
 export function VerificationSheet({
   checkin,
@@ -243,7 +234,8 @@ export function VerificationSheet({
                     {detailData.checklist_responses?.map(
                       (category: any, index: number) => {
                         const CategoryIcon =
-                          IconMap[category.icon_name] || Activity;
+                          icons[category.icon_name as keyof typeof icons] ||
+                          icons.Activity;
                         const categoryNonCompliantCount = category.items.filter(
                           (item: any) => !item.is_compliant,
                         ).length;
