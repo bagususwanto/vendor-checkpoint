@@ -279,32 +279,78 @@ export function VerificationSheet({
                                 )}
                               </div>
                             </AccordionTrigger>
-                            <AccordionContent className="px-4 pb-4 pt-2">
-                              <ul className="space-y-3 pt-2">
+                            <AccordionContent className="px-0 pb-0">
+                              <div className="divide-y">
                                 {category.items.map(
                                   (item: any, idx: number) => (
-                                    <li
+                                    <div
                                       key={idx}
-                                      className="flex items-center gap-3 text-sm"
+                                      className="flex items-start justify-between gap-4 p-4 hover:bg-muted/30 transition-colors"
                                     >
-                                      {item.is_compliant ? (
-                                        <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
-                                      ) : (
-                                        <XCircle className="h-4 w-4 text-red-500 shrink-0" />
-                                      )}
-                                      <span
-                                        className={
-                                          item.is_compliant
-                                            ? 'text-muted-foreground'
-                                            : 'font-medium text-red-600'
-                                        }
-                                      >
-                                        {item.item_text_snapshot}
-                                      </span>
-                                    </li>
+                                      <div className="space-y-1">
+                                        <p
+                                          className={`text-sm ${
+                                            !item.is_compliant
+                                              ? 'font-medium text-destructive'
+                                              : 'text-foreground'
+                                          }`}
+                                        >
+                                          {item.item_text_snapshot}
+                                        </p>
+                                        {!item.is_compliant && (
+                                          <p className="text-xs text-muted-foreground">
+                                            Item ini memerlukan perhatian
+                                            khusus.
+                                          </p>
+                                        )}
+                                      </div>
+                                      <div className="shrink-0">
+                                        {item.response_value ? (
+                                          <Badge
+                                            variant={
+                                              item.is_compliant
+                                                ? 'outline'
+                                                : 'destructive'
+                                            }
+                                            className={`${
+                                              item.is_compliant
+                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300'
+                                                : ''
+                                            }`}
+                                          >
+                                            {item.is_compliant ? (
+                                              <CheckCircle className="mr-1 h-3 w-3" />
+                                            ) : (
+                                              <XCircle className="mr-1 h-3 w-3" />
+                                            )}
+                                            Ya
+                                          </Badge>
+                                        ) : (
+                                          <Badge
+                                            variant={
+                                              item.is_compliant
+                                                ? 'outline'
+                                                : 'destructive'
+                                            }
+                                            className={`${
+                                              item.is_compliant
+                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300'
+                                                : ''
+                                            }`}
+                                          >
+                                            {item.is_compliant ? (
+                                              <CheckCircle className="mr-1 h-3 w-3" />
+                                            ) : (
+                                              <XCircle className="mr-1 h-3 w-3" />
+                                            )}
+                                            Tidak
+                                          </Badge>
+                                        )}
+                                      </div>
+                                    </div>
                                   ),
                                 )}
-                              </ul>
+                              </div>
                             </AccordionContent>
                           </AccordionItem>
                         );
