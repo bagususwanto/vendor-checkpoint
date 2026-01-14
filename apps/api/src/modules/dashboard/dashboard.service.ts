@@ -3,6 +3,8 @@ import { PrismaService } from 'src/common/prisma/prisma.service';
 import { getStartOfToday } from 'src/common/utils/today-date.util';
 import { formatDate } from 'src/common/utils/format-date.util';
 
+import { QueueStatus } from '@repo/types';
+
 @Injectable()
 export class DashboardService {
   constructor(private readonly prisma: PrismaService) {}
@@ -25,13 +27,13 @@ export class DashboardService {
           },
         },
       }),
-      // Total approved today
+      // Total approved today (includes approved and completed)
       this.prisma.ops_checkin_entry.count({
         where: {
           submission_time: {
             gte: today,
           },
-          current_status: 'DISETUJUI',
+          current_status: { in: [QueueStatus.DISETUJUI, QueueStatus.SELESAI] },
         },
       }),
       // Total rejected today
@@ -40,7 +42,7 @@ export class DashboardService {
           submission_time: {
             gte: today,
           },
-          current_status: 'DITOLAK',
+          current_status: QueueStatus.DITOLAK,
         },
       }),
       // Current waiting (active queue today)
@@ -49,7 +51,7 @@ export class DashboardService {
           submission_time: {
             gte: today,
           },
-          current_status: 'MENUNGGU',
+          current_status: QueueStatus.MENUNGGU,
         },
       }),
       // Avg lead time for today's completed entries
