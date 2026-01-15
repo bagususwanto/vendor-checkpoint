@@ -1,5 +1,6 @@
 'use client';
 
+import { StatusBadge } from '../../../components/status-badge';
 import {
   Sheet,
   SheetClose,
@@ -118,13 +119,17 @@ export function VerificationSheet({
       <SheetContent className="sm:max-w-2xl w-full flex flex-col h-full ring-offset-0 focus-visible:outline-none [&>button]:hidden">
         <SheetHeader>
           <div className="flex items-center justify-between">
-            <SheetTitle>Verifikasi Check-in</SheetTitle>
+            <SheetTitle>
+              {readonly ? 'Detail Check-in' : 'Verifikasi Check-in'}
+            </SheetTitle>
             <Badge variant="outline" className="text-base px-3 py-1">
               {checkin.id}
             </Badge>
           </div>
           <SheetDescription>
-            Tinjau detail dan berikan keputusan verifikasi.
+            {readonly
+              ? 'Informasi detail check-in dan riwayat verifikasi.'
+              : 'Tinjau detail dan berikan keputusan verifikasi.'}
           </SheetDescription>
         </SheetHeader>
 
@@ -210,6 +215,134 @@ export function VerificationSheet({
                   </div>
                 </div>
               </div>
+
+              {/* Log Waktu */}
+              {detailData.ops_timelog && (
+                <div>
+                  <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
+                    Log Waktu
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="p-4 shadow-sm">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Waktu Check-in
+                        </p>
+                        <p className="font-semibold text-sm">
+                          {detailData.ops_timelog.checkin_time
+                            ? format(
+                                new Date(detailData.ops_timelog.checkin_time),
+                                'dd MMM yyyy, HH:mm',
+                                { locale: localeId },
+                              )
+                            : '-'}
+                        </p>
+                      </div>
+                    </Card>
+                    <Card className="p-4 shadow-sm">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Waktu Check-out
+                        </p>
+                        <p className="font-semibold text-sm">
+                          {detailData.ops_timelog.checkout_time
+                            ? format(
+                                new Date(detailData.ops_timelog.checkout_time),
+                                'dd MMM yyyy, HH:mm',
+                                { locale: localeId },
+                              )
+                            : '-'}
+                        </p>
+                      </div>
+                    </Card>
+                    <Card className="p-4 shadow-sm">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Durasi
+                        </p>
+                        <p className="font-semibold text-sm">
+                          {detailData.ops_timelog.duration_minutes
+                            ? `${detailData.ops_timelog.duration_minutes} Menit`
+                            : '-'}
+                        </p>
+                      </div>
+                    </Card>
+                    <Card className="p-4 shadow-sm">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Checkout Oleh
+                        </p>
+                        <p className="font-semibold text-sm">
+                          {detailData.ops_timelog.user?.full_name || '-'}
+                        </p>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+              )}
+
+              {/* Informasi Verifikasi */}
+              {detailData.ops_verification && (
+                <div>
+                  <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
+                    Informasi Verifikasi
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="p-4 shadow-sm">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Status Verifikasi
+                        </p>
+                        <StatusBadge
+                          status={
+                            detailData.ops_verification.verification_status
+                          }
+                        />
+                      </div>
+                    </Card>
+                    <Card className="p-4 shadow-sm">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Diverifikasi Oleh
+                        </p>
+                        <p className="font-semibold text-sm">
+                          {detailData.ops_verification.user?.full_name || '-'}
+                        </p>
+                      </div>
+                    </Card>
+                    <Card className="p-4 shadow-sm col-span-2">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Waktu Verifikasi
+                        </p>
+                        <p className="font-semibold text-sm">
+                          {detailData.ops_verification.verification_time
+                            ? format(
+                                new Date(
+                                  detailData.ops_verification.verification_time,
+                                ),
+                                'dd MMM yyyy, HH:mm',
+                                { locale: localeId },
+                              )
+                            : '-'}
+                        </p>
+                      </div>
+                    </Card>
+                    {detailData.ops_verification.rejection_reason && (
+                      <Card className="p-4 shadow-sm col-span-2 bg-red-50 border-red-100">
+                        <div className="space-y-1">
+                          <p className="text-xs font-medium text-destructive">
+                            Alasan Penolakan
+                          </p>
+                          <p className="text-sm text-destructive font-medium">
+                            {detailData.ops_verification.rejection_reason}
+                          </p>
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-6">
                 {/* Checklist */}
