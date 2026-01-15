@@ -23,7 +23,7 @@ export function ChecklistItem({ item, form }: ChecklistItemProps) {
         return (
           <Field
             data-invalid={isInvalid}
-            className={`space-y-2 bg-background p-4 border rounded-lg transition-colors duration-300 ${
+            className={`space-y-2 bg-transparent p-4 border rounded-lg transition-colors duration-300 ${
               field.state.value === 'false'
                 ? 'border-destructive bg-red-50/50'
                 : ''
@@ -61,9 +61,7 @@ export function ChecklistItem({ item, form }: ChecklistItemProps) {
                 <span className="font-semibold text-base">TIDAK</span>
               </ToggleGroupItem>
             </ToggleGroup>
-            {isInvalid && (
-              <FieldError errors={field.state.meta.errors} />
-            )}
+            {isInvalid && <FieldError errors={field.state.meta.errors} />}
           </Field>
         );
       }}
