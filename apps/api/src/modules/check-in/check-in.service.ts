@@ -300,6 +300,31 @@ export class CheckInService {
         submission_time: true,
         snapshot_company_name: true,
         snapshot_category_name: true,
+        ops_timelog: {
+          select: {
+            checkin_time: true,
+            checkout_time: true,
+            duration_minutes: true,
+            is_checked_out: true,
+            user: {
+              select: {
+                full_name: true,
+              },
+            },
+          },
+        },
+        ops_verification: {
+          select: {
+            verification_status: true,
+            rejection_reason: true,
+            verification_time: true,
+            user: {
+              select: {
+                full_name: true,
+              },
+            },
+          },
+        },
         ops_checkin_response: {
           select: {
             item_text_snapshot: true,
