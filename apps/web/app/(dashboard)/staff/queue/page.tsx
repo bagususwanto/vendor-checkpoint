@@ -9,6 +9,13 @@ import { DateRange } from 'react-day-picker';
 import { QueueHeader } from './components/queue-header';
 import { QueueToolbar } from './components/queue-toolbar';
 import { QueueTable } from './components/queue-table';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export default function QueuePage() {
   const [page, setPage] = useState(1);
@@ -65,37 +72,48 @@ export default function QueuePage() {
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <QueueHeader />
 
-      <QueueToolbar
-        searchTerm={searchTerm}
-        onSearchChange={handleSearch}
-        date={date}
-        setDate={(d) => {
-          setDate(d);
-          setPage(1);
-        }}
-        status={status}
-        setStatus={(s) => {
-          setStatus(s);
-          setPage(1);
-        }}
-        categoryId={categoryId}
-        setCategoryId={(c) => {
-          setCategoryId(c);
-          setPage(1);
-        }}
-        categories={categories}
-        onReset={handleReset}
-      />
+      <Card>
+        <CardHeader>
+          <CardTitle>Daftar Antrean</CardTitle>
+          <CardDescription>
+            Kelola dan pantau antrean vendor, verifikasi dokumen, dan proses
+            check-out.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <QueueToolbar
+            searchTerm={searchTerm}
+            onSearchChange={handleSearch}
+            date={date}
+            setDate={(d) => {
+              setDate(d);
+              setPage(1);
+            }}
+            status={status}
+            setStatus={(s) => {
+              setStatus(s);
+              setPage(1);
+            }}
+            categoryId={categoryId}
+            setCategoryId={(c) => {
+              setCategoryId(c);
+              setPage(1);
+            }}
+            categories={categories}
+            onReset={handleReset}
+          />
 
-      <QueueTable
-        checkins={checkins}
-        isLoading={isLoading}
-        page={page}
-        totalPages={totalPages}
-        setPage={setPage}
-        limit={limit}
-        setLimit={setLimit}
-      />
+          <QueueTable
+            checkins={checkins}
+            isLoading={isLoading}
+            page={page}
+            totalPages={totalPages}
+            setPage={setPage}
+            limit={limit}
+            setLimit={setLimit}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

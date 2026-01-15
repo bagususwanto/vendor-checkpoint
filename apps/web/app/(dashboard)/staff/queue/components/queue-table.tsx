@@ -10,13 +10,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+
 import { VerificationSheet } from '../../dashboard/components/verification-sheet';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -59,166 +53,160 @@ export function QueueTable({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Daftar Verifikasi</CardTitle>
-        <CardDescription>Kelola verifikasi check-in driver.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
+    <div className="space-y-4">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>No. Antrean</TableHead>
+            <TableHead>Perusahaan</TableHead>
+            <TableHead>Driver</TableHead>
+            <TableHead>Kategori</TableHead>
+            <TableHead>Waktu</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Aksi</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {isLoading ? (
             <TableRow>
-              <TableHead>No. Antrean</TableHead>
-              <TableHead>Perusahaan</TableHead>
-              <TableHead>Driver</TableHead>
-              <TableHead>Kategori</TableHead>
-              <TableHead>Waktu</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Aksi</TableHead>
+              <TableCell colSpan={7} className="text-center py-4">
+                Loading...
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
-                  Loading...
+          ) : checkins.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-4">
+                Tidak ada data ditemukan
+              </TableCell>
+            </TableRow>
+          ) : (
+            checkins.map((checkin: any) => (
+              <TableRow key={checkin.queue_number}>
+                <TableCell className="font-medium">
+                  {checkin.queue_number}
+                </TableCell>
+                <TableCell>{checkin.snapshot_company_name}</TableCell>
+                <TableCell>{checkin.driver_name}</TableCell>
+                <TableCell>{checkin.snapshot_category_name}</TableCell>
+                <TableCell>
+                  {checkin.submission_time
+                    ? format(
+                        new Date(checkin.submission_time),
+                        'dd MMM HH:mm',
+                        {
+                          locale: id,
+                        },
+                      )
+                    : '-'}
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={checkin.current_status} />
+                </TableCell>
+                <TableCell className="text-right">
+                  {checkin.current_status === QueueStatus.MENUNGGU && (
+                    <VerificationSheet
+                      checkin={{
+                        id: checkin.queue_number,
+                        company: checkin.snapshot_company_name,
+                        driver: checkin.driver_name,
+                        category: checkin.snapshot_category_name,
+                        time: checkin.submission_time,
+                        status: checkin.current_status.toLowerCase(),
+                      }}
+                      trigger={<Button size="sm">Verifikasi</Button>}
+                      onSuccess={handleSuccess}
+                    />
+                  )}
+
+                  {checkin.current_status === QueueStatus.DISETUJUI && (
+                    <CheckoutSheet
+                      checkin={{
+                        id: checkin.queue_number,
+                        company: checkin.snapshot_company_name,
+                        driver: checkin.driver_name,
+                        category: checkin.snapshot_category_name,
+                        time: checkin.submission_time,
+                        status: checkin.current_status.toLowerCase(),
+                      }}
+                      trigger={
+                        <Button size="sm" variant="secondary">
+                          Check-Out
+                        </Button>
+                      }
+                      onSuccess={handleSuccess}
+                    />
+                  )}
+
+                  {checkin.current_status === QueueStatus.SELESAI && (
+                    <VerificationSheet
+                      checkin={{
+                        id: checkin.queue_number,
+                        company: checkin.snapshot_company_name,
+                        driver: checkin.driver_name,
+                        category: checkin.snapshot_category_name,
+                        time: checkin.submission_time,
+                        status: checkin.current_status.toLowerCase(),
+                      }}
+                      trigger={
+                        <Button size="sm" variant="outline">
+                          Detail
+                        </Button>
+                      }
+                      readonly={true}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
-            ) : checkins.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
-                  Tidak ada data ditemukan
-                </TableCell>
-              </TableRow>
-            ) : (
-              checkins.map((checkin: any) => (
-                <TableRow key={checkin.queue_number}>
-                  <TableCell className="font-medium">
-                    {checkin.queue_number}
-                  </TableCell>
-                  <TableCell>{checkin.snapshot_company_name}</TableCell>
-                  <TableCell>{checkin.driver_name}</TableCell>
-                  <TableCell>{checkin.snapshot_category_name}</TableCell>
-                  <TableCell>
-                    {checkin.submission_time
-                      ? format(
-                          new Date(checkin.submission_time),
-                          'dd MMM HH:mm',
-                          {
-                            locale: id,
-                          },
-                        )
-                      : '-'}
-                  </TableCell>
-                  <TableCell>
-                    <StatusBadge status={checkin.current_status} />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {checkin.current_status === QueueStatus.MENUNGGU && (
-                      <VerificationSheet
-                        checkin={{
-                          id: checkin.queue_number,
-                          company: checkin.snapshot_company_name,
-                          driver: checkin.driver_name,
-                          category: checkin.snapshot_category_name,
-                          time: checkin.submission_time,
-                          status: checkin.current_status.toLowerCase(),
-                        }}
-                        trigger={<Button size="sm">Verifikasi</Button>}
-                        onSuccess={handleSuccess}
-                      />
-                    )}
+            ))
+          )}
+        </TableBody>
+      </Table>
 
-                    {checkin.current_status === QueueStatus.DISETUJUI && (
-                      <CheckoutSheet
-                        checkin={{
-                          id: checkin.queue_number,
-                          company: checkin.snapshot_company_name,
-                          driver: checkin.driver_name,
-                          category: checkin.snapshot_category_name,
-                          time: checkin.submission_time,
-                          status: checkin.current_status.toLowerCase(),
-                        }}
-                        trigger={
-                          <Button size="sm" variant="secondary">
-                            Check-Out
-                          </Button>
-                        }
-                        onSuccess={handleSuccess}
-                      />
-                    )}
-
-                    {checkin.current_status === QueueStatus.SELESAI && (
-                      <VerificationSheet
-                        checkin={{
-                          id: checkin.queue_number,
-                          company: checkin.snapshot_company_name,
-                          driver: checkin.driver_name,
-                          category: checkin.snapshot_category_name,
-                          time: checkin.submission_time,
-                          status: checkin.current_status.toLowerCase(),
-                        }}
-                        trigger={
-                          <Button size="sm" variant="outline">
-                            Detail
-                          </Button>
-                        }
-                        readonly={true}
-                      />
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-
-        <div className="flex items-center justify-between py-4">
-          <div className="flex items-center space-x-2">
-            <p className="text-sm text-muted-foreground">Rows per page</p>
-            <Select
-              value={`${limit}`}
-              onValueChange={(value: string) => {
-                setLimit(Number(value));
-                setPage(1);
-              }}
-            >
-              <SelectTrigger className="h-8 w-[70px]">
-                <SelectValue placeholder={limit} />
-              </SelectTrigger>
-              <SelectContent side="top">
-                <SelectItem value="5">5</SelectItem>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(page - 1)}
-              disabled={page <= 1 || isLoading}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Previous
-            </Button>
-            <div className="text-sm text-muted-foreground">
-              Page {page} of {totalPages}
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(page + 1)}
-              disabled={page >= totalPages || isLoading}
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+      <div className="flex items-center justify-between py-4">
+        <div className="flex items-center space-x-2">
+          <p className="text-sm text-muted-foreground">Rows per page</p>
+          <Select
+            value={`${limit}`}
+            onValueChange={(value: string) => {
+              setLimit(Number(value));
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="h-8 w-[70px]">
+              <SelectValue placeholder={limit} />
+            </SelectTrigger>
+            <SelectContent side="top">
+              <SelectItem value="5">5</SelectItem>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="20">20</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(page - 1)}
+            disabled={page <= 1 || isLoading}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Previous
+          </Button>
+          <div className="text-sm text-muted-foreground">
+            Page {page} of {totalPages}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(page + 1)}
+            disabled={page >= totalPages || isLoading}
+          >
+            Next
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
