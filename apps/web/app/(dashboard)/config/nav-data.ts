@@ -24,6 +24,38 @@ export interface NavData {
   navMain: NavItem[];
 }
 
+// export const navData: NavData = {
+//   user: {
+//     name: 'shadcn',
+//     email: 'm@example.com',
+//     avatar: '',
+//   },
+//   navMain: [
+//     {
+//       title: 'Dasbor',
+//       url: '#',
+//       icon: LayoutDashboard,
+//       items: [
+//         {
+//           title: 'Petugas Warehouse',
+//           url: '/staff/dashboard',
+//         },
+//       ],
+//     },
+//     {
+//       title: 'Manajemen Antrean',
+//       url: '#',
+//       icon: SquareChartGantt,
+//       items: [
+//         {
+//           title: 'Semua Antrean',
+//           url: '/staff/queue',
+//         },
+//       ],
+//     },
+//   ],
+// };
+
 export const navData: NavData = {
   user: {
     name: 'shadcn',
@@ -33,25 +65,15 @@ export const navData: NavData = {
   navMain: [
     {
       title: 'Dasbor',
-      url: '#',
+      url: '/staff/dashboard',
       icon: LayoutDashboard,
-      items: [
-        {
-          title: 'Petugas Warehouse',
-          url: '/staff/dashboard',
-        },
-      ],
+      items: [],
     },
     {
       title: 'Manajemen Antrean',
-      url: '#',
+      url: '/staff/queue',
       icon: SquareChartGantt,
-      items: [
-        {
-          title: 'Semua Antrean',
-          url: '/staff/queue',
-        },
-      ],
+      items: [],
     },
   ],
 };

@@ -39,10 +39,30 @@ export function NavMain({
     <SidebarGroup>
       <SidebarMenu>
         {items.map((item) => {
+          // Check if item has sub-items
+          const hasSubItems = item.items && item.items.length > 0;
+
           // Check if any sub-item is active
           const hasActiveSubItem = item.items?.some(
             (subItem) => pathname === subItem.url,
           );
+
+          if (!hasSubItems) {
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={item.title}
+                  isActive={pathname === item.url}
+                >
+                  <Link href={item.url}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          }
 
           return (
             <Collapsible
