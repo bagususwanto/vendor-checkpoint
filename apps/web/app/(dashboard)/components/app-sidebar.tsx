@@ -19,7 +19,19 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 
+import { useUser } from '@/hooks/api/use-auth';
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user, isLoading } = useUser();
+
+  const userData = user
+    ? {
+        name: user.name || user.username || 'User',
+        email: user.username || 'user@example.com',
+        avatar: user.img || '',
+      }
+    : navData.user;
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -46,7 +58,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={navData.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={navData.user} />
+        {isLoading ? (
+          <div className="p-4 text-sm text-muted-foreground">Loading...</div>
+        ) : (
+          <NavUser user={userData} />
+        )}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

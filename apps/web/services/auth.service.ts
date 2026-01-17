@@ -44,4 +44,10 @@ export const authService = {
     if (typeof window === 'undefined') return null;
     return localStorage.getItem('accessToken');
   },
+
+  getProfile: async (): Promise<any> => {
+    const response = await axiosInstance.get('/auth/me');
+    console.log(response);
+    return response.data.data;
+  },
 };
