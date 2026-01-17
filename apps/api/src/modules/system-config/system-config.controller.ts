@@ -1,8 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { SystemConfigService } from './system-config.service';
 import { CreateSystemConfigDto } from './dto/create-system-config.dto';
 import { UpdateSystemConfigDto } from './dto/update-system-config.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
+// All system-config routes are protected - system settings
+@UseGuards(JwtAuthGuard)
 @Controller('system-config')
 export class SystemConfigController {
   constructor(private readonly systemConfigService: SystemConfigService) {}
@@ -23,7 +35,10 @@ export class SystemConfigController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSystemConfigDto: UpdateSystemConfigDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateSystemConfigDto: UpdateSystemConfigDto,
+  ) {
     return this.systemConfigService.update(+id, updateSystemConfigDto);
   }
 

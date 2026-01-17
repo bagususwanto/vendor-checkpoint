@@ -1,8 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { AuditService } from './audit.service';
 import { CreateAuditDto } from './dto/create-audit.dto';
 import { UpdateAuditDto } from './dto/update-audit.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
+// All audit routes are protected - sensitive data
+@UseGuards(JwtAuthGuard)
 @Controller('audit')
 export class AuditController {
   constructor(private readonly auditService: AuditService) {}
