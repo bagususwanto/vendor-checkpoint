@@ -13,14 +13,10 @@ import { RolesGuard } from '../../common/guards/roles.guard';
     PassportModule,
     JwtModule.register({
       secret: process.env.EXTERNAL_API_KEY || 'dummy',
-      signOptions: { algorithm: 'RS256' },
+      signOptions: { algorithm: 'HS256' },
     }),
   ],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    RolesGuard,
-  ],
+  providers: [AuthService, JwtStrategy, RolesGuard],
   controllers: [AuthController],
   exports: [AuthService],
 })
