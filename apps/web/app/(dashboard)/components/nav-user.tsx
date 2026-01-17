@@ -26,6 +26,8 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 
+import { authService } from '@/services/auth.service';
+
 export function NavUser({
   user,
 }: {
@@ -49,6 +51,20 @@ export function NavUser({
   };
 
   const initials = getInitials(user.name);
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Fallback: force client logout
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('accessToken');
+        window.location.href = '/login';
+      }
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -113,7 +129,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

@@ -60,7 +60,9 @@ export class AuthService {
     }
   }
 
-  async logout(cookies: string): Promise<{ success: boolean }> {
+  async logout(
+    cookies: string,
+  ): Promise<{ success: boolean; setCookieHeader?: string[] }> {
     try {
       const config: AxiosRequestConfig = {
         headers: {
@@ -73,8 +75,11 @@ export class AuthService {
         {},
         config,
       );
-      await lastValueFrom(resp$);
-      return { success: true };
+      const response = await lastValueFrom(resp$);
+
+      const setCookieHeader = response.headers['set-cookie'];
+
+      return { success: true, setCookieHeader };
     } catch (err) {
       // best-effort; don't leak remote errors
       return { success: false };

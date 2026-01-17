@@ -59,9 +59,21 @@ export class AuthController {
 
   // LOGOUT -> forward ke external API
   @Post('logout')
-  async logout(@Req() req: Request) {
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const cookies = req.headers.cookie || '';
-    return this.authService.logout(cookies);
+    const result = await this.authService.logout(cookies);
+
+    if (result.setCookieHeader && result.setCookieHeader.length > 0) {
+      result.setCookieHeader.forEach((cookie) => {
+        res.append('Set-Cookie', cookie);
+      });
+    } else {
+      // Fallback: Jika external API gagal atau tidak return header,
+      // kita paksa hapus cookie di client agar user tetap ke-logout dari sisi frontend.
+      res.clearCookie('refreshToken');
+    }
+
+    return result;
   }
 
   // PROFILE -> protected route untuk debugging
