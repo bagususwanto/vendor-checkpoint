@@ -53,7 +53,7 @@ export function QueueTable({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex-1">
       <Table>
         <TableHeader>
           <TableRow>
