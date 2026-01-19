@@ -59,18 +59,17 @@ export function useVerificationDetail(queueNumber: string) {
 
 export function useVerifyCheckIn() {
   return useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: string;
-      payload: { status: 'APPROVED' | 'REJECTED'; note?: string };
-    }) => checkInService.verifyCheckIn(id, payload),
+    mutationFn: (payload: {
+      queue_number: string;
+      action: 'APPROVE' | 'REJECT';
+      rejection_reason?: string;
+    }) => checkInService.verifyCheckIn(payload),
   });
 }
 
 export function useCheckoutCheckIn() {
   return useMutation({
-    mutationFn: (id: string) => checkInService.checkoutCheckIn(id),
+    mutationFn: (queueNumber: string) =>
+      checkInService.checkoutCheckIn(queueNumber),
   });
 }

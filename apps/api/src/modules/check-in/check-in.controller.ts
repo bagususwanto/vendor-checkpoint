@@ -67,17 +67,23 @@ export class CheckInController {
   // PROTECTED - Staff only
   @UseGuards(JwtAuthGuard)
   @Patch('/verify')
-  verify(@Body() verifyCheckInDto: VerifyCheckInDto, @Req() req: Request) {
+  verify(@Body() verifyCheckInDto: VerifyCheckInDto, @Req() req: any) {
     const requestInfo = getRequestInfo(req);
-    return this.checkInService.verifyCheckIn(verifyCheckInDto, requestInfo);
+    const userId = req.user.userId;
+    return this.checkInService.verifyCheckIn(
+      verifyCheckInDto,
+      requestInfo,
+      userId,
+    );
   }
 
   // PROTECTED - Staff only
   @UseGuards(JwtAuthGuard)
   @Patch('/checkout')
-  checkout(@Body() checkoutDto: CheckoutCheckInDto, @Req() req: Request) {
+  checkout(@Body() checkoutDto: CheckoutCheckInDto, @Req() req: any) {
     const requestInfo = getRequestInfo(req);
-    return this.checkInService.checkoutEntry(checkoutDto, requestInfo);
+    const userId = req.user.userId;
+    return this.checkInService.checkoutEntry(checkoutDto, requestInfo, userId);
   }
 
   // PROTECTED - Staff only

@@ -70,13 +70,14 @@ export const checkInService = {
     }
   },
 
-  verifyCheckIn: async (
-    id: string,
-    payload: { status: 'APPROVED' | 'REJECTED'; note?: string },
-  ) => {
+  verifyCheckIn: async (payload: {
+    queue_number: string;
+    action: 'APPROVE' | 'REJECT';
+    rejection_reason?: string;
+  }) => {
     try {
-      const response = await axiosInstance.post<{ data: any }>(
-        `/check-in/${id}/verify`,
+      const response = await axiosInstance.patch<{ data: any }>(
+        '/check-in/verify',
         payload,
       );
       return response.data.data;
@@ -85,10 +86,11 @@ export const checkInService = {
     }
   },
 
-  checkoutCheckIn: async (id: string) => {
+  checkoutCheckIn: async (queueNumber: string) => {
     try {
-      const response = await axiosInstance.post<{ data: any }>(
-        `/check-in/${id}/checkout`,
+      const response = await axiosInstance.patch<{ data: any }>(
+        '/check-in/checkout',
+        { queue_number: queueNumber },
       );
       return response.data.data;
     } catch (error) {

@@ -81,11 +81,9 @@ export function VerificationSheet({
 
     verifyMutation.mutate(
       {
-        id: checkin.id,
-        payload: {
-          status: decision === 'approve' ? 'APPROVED' : 'REJECTED',
-          note: reason,
-        },
+        queue_number: checkin.id, // Using the checkin ID as queue_number
+        action: decision === 'approve' ? 'APPROVE' : 'REJECT',
+        rejection_reason: reason,
       },
       {
         onSuccess: () => {

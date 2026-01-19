@@ -372,9 +372,13 @@ export class CheckInService {
     return `This action removes a #${id} checkIn`;
   }
 
-  async verifyCheckIn(verifyCheckInDto: VerifyCheckInDto, requestInfo: any) {
-    const { queue_number, action, rejection_reason, verified_by_user_id } =
-      verifyCheckInDto;
+  async verifyCheckIn(
+    verifyCheckInDto: VerifyCheckInDto,
+    requestInfo: any,
+    userId: number,
+  ) {
+    const { queue_number, action, rejection_reason } = verifyCheckInDto;
+    const localUserId = await this.resolveLocalUser(userId);
 
     // Validate rejection_reason is required for REJECT action
     if (action === 'REJECT' && !rejection_reason?.trim()) {
@@ -441,7 +445,7 @@ export class CheckInService {
       await tx.ops_verification.create({
         data: {
           entry_id: entry.entry_id,
-          verified_by_user_id,
+          verified_by_user_id: localUserId,
           verification_status: newStatus,
           rejection_reason: action === 'REJECT' ? rejection_reason : null,
         },
@@ -450,7 +454,7 @@ export class CheckInService {
       // 7. Create audit log
       await this.auditService.create(tx, {
         entry_id: entry.entry_id,
-        user_id: verified_by_user_id,
+        user_id: localUserId,
         action_type:
           action === 'APPROVE' ? 'CHECKIN_APPROVE' : 'CHECKIN_REJECT',
         action_description:
@@ -478,8 +482,13 @@ export class CheckInService {
     });
   }
 
-  async checkoutEntry(checkoutDto: CheckoutCheckInDto, requestInfo: any) {
-    const { queue_number, checkout_by_user_id } = checkoutDto;
+  async checkoutEntry(
+    checkoutDto: CheckoutCheckInDto,
+    requestInfo: any,
+    userId: number,
+  ) {
+    const { queue_number } = checkoutDto;
+    const localUserId = await this.resolveLocalUser(userId);
 
     return await this.prisma.$transaction(async (tx) => {
       // 1. Find and validate entry
@@ -538,7 +547,7 @@ export class CheckInService {
         where: { timelog_id: entry.ops_timelog.timelog_id },
         data: {
           checkout_time: checkoutTime,
-          checkout_by_user_id,
+          checkout_by_user_id: localUserId,
           is_checked_out: true,
           duration_minutes: durationMinutes,
           updated_at: checkoutTime,
@@ -567,7 +576,7 @@ export class CheckInService {
       // 7. Create audit log
       await this.auditService.create(tx, {
         entry_id: entry.entry_id,
-        user_id: checkout_by_user_id,
+        user_id: localUserId,
         action_type: 'CHECKIN_CHECKOUT',
         action_description: 'Check-in checkout berhasil',
         ip_address: requestInfo.ipAddress,
@@ -591,6 +600,22 @@ export class CheckInService {
         duration_minutes: durationMinutes,
       };
     });
+  }
+
+  private async resolveLocalUser(tokenUserId: number): Promise<number> {
+    // 1. Try to find by user_id (if token ID matches local ID)
+    const userById = await this.prisma.mst_user.findUnique({
+      where: { user_id: tokenUserId },
+    });
+    if (userById) return userById.user_id;
+
+    // 2. Try to find by external_user_id (if token ID is external ID)
+    const userByExternal = await this.prisma.mst_user.findUnique({
+      where: { external_user_id: String(tokenUserId) },
+    });
+    if (userByExternal) return userByExternal.user_id;
+
+    throw new BadRequestException('User tidak ditemukan dalam database lokal');
   }
 
   private async validateVendor(vendor_id: number) {
