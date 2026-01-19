@@ -44,7 +44,7 @@ export class CheckInController {
   }
 
   // PROTECTED - Staff only
-  @UseGuards(JwtAuthGuard)
+  // PUBLIC - Display screen (no auth required)
   @Get('/active')
   findActiveQueue(@Query() query: PaginatedParamsDto) {
     return this.checkInService.findActiveQueue(query);

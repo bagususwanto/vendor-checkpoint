@@ -3,11 +3,13 @@ import type { NextRequest } from 'next/server';
 
 // Public paths that don't require authentication
 const publicPaths = [
+  '/',
   '/login',
   '/check-in',
   '/queue-status',
   '/forgot-password',
   '/reset-password',
+  '/display',
 ];
 
 // Check if pathname starts with any public path
