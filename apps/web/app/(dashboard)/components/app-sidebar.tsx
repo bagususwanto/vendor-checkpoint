@@ -5,7 +5,7 @@ import { ShieldCheck } from 'lucide-react';
 
 import { NavMain } from '@/app/(dashboard)/components/nav-main';
 import { NavUser } from '@/app/(dashboard)/components/nav-user';
-import { navData } from '@/app/(dashboard)/config/nav-data';
+import { navData, type NavItem } from '@/app/(dashboard)/config/nav-data';
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -20,9 +20,29 @@ import {
 } from '@/components/ui/sidebar';
 
 import { useUser } from '@/hooks/api/use-auth';
+import { UserRole } from '@repo/types';
+
+function filterNavItems(items: NavItem[], role?: string): NavItem[] {
+  return items
+    .filter((item) => {
+      // If no roles defined on item, it's visible to everyone
+      if (!item.roles || item.roles.length === 0) return true;
+      // If roles defined, user must have matching role
+      return role && item.roles.includes(role as UserRole);
+    })
+    .map((item) => ({
+      ...item,
+      items: item.items ? filterNavItems(item.items, role) : [],
+    }));
+}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user, isLoading } = useUser();
+
+  const filteredNavMain = React.useMemo(() => {
+    if (isLoading) return [];
+    return filterNavItems(navData.navMain, user?.role);
+  }, [user, isLoading]);
 
   const userData = user
     ? {
@@ -55,7 +75,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navData.navMain} />
+        <NavMain items={filteredNavMain} />
       </SidebarContent>
       <SidebarFooter>
         {isLoading ? (
