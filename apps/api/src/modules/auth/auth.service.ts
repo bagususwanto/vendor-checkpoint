@@ -41,11 +41,11 @@ export class AuthService {
         },
       };
 
-      const resp$ = this.httpService.post(
-        `${process.env.EXTERNAL_API_URL}/refresh`,
-        {},
+      const resp$ = this.httpService.get(
+        `${process.env.EXTERNAL_API_URL}/token`,
         config,
       );
+
       const response = await lastValueFrom(resp$);
 
       // Extract Set-Cookie header from external API response
@@ -55,7 +55,12 @@ export class AuthService {
         accessToken: response.data.accessToken,
         setCookieHeader,
       };
-    } catch (err) {
+    } catch (err: any) {
+      console.error('Refresh error:', {
+        status: err?.response?.status,
+        data: err?.response?.data,
+        message: err?.message,
+      });
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
@@ -70,9 +75,8 @@ export class AuthService {
         },
       };
 
-      const resp$ = this.httpService.post(
+      const resp$ = this.httpService.delete(
         `${process.env.EXTERNAL_API_URL}/logout`,
-        {},
         config,
       );
       const response = await lastValueFrom(resp$);
