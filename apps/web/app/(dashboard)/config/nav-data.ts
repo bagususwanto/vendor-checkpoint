@@ -7,6 +7,7 @@ import {
   Settings,
   History,
   FileText,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
 import { UserRole } from '@repo/types';
@@ -95,6 +96,12 @@ export const navData: NavData = {
           icon: ClipboardCheck,
           roles: [UserRole.SUPER_ADMIN],
         },
+        {
+          title: 'Daftar User',
+          url: '/portal/master-data/users',
+          icon: Users,
+          roles: [UserRole.SUPER_ADMIN],
+        },
       ],
     },
     {
@@ -104,8 +111,14 @@ export const navData: NavData = {
       items: [
         {
           title: 'Export Laporan',
-          url: '/portal/reports',
+          url: '/portal/reports/export',
           icon: FileText,
+          roles: [UserRole.SUPER_ADMIN],
+        },
+        {
+          title: 'Export Log',
+          url: '/portal/reports/log-export',
+          icon: FileText, // Using same icon for now
           roles: [UserRole.SUPER_ADMIN],
         },
       ],
