@@ -4,6 +4,7 @@ import { axiosInstance } from '@/lib/axios';
 export type MaterialCategory = {
   material_category_id: number;
   category_name: string;
+  category_code: string;
   description?: string;
 };
 
