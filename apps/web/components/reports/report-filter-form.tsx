@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/select';
 import { useMaterialCategories } from '@/hooks/api/use-material-categories';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 interface ReportFilterFormProps {
   date: DateRange | undefined;
@@ -20,6 +21,7 @@ interface ReportFilterFormProps {
   setStatus: (status: string) => void;
   materialCategoryId: string | undefined;
   setMaterialCategoryId: (id: string | undefined) => void;
+  onReset: () => void;
 }
 
 export function ReportFilterForm({
@@ -29,6 +31,7 @@ export function ReportFilterForm({
   setStatus,
   materialCategoryId,
   setMaterialCategoryId,
+  onReset,
 }: ReportFilterFormProps) {
   const { data: materialCategoriesData } = useMaterialCategories({});
 
@@ -85,6 +88,12 @@ export function ReportFilterForm({
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="flex items-end">
+        <Button variant="outline" onClick={onReset} className="h-10 px-4">
+          Reset
+        </Button>
       </div>
     </div>
   );
