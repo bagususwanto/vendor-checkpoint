@@ -4,15 +4,17 @@ import * as React from 'react';
 import { DateRange } from 'react-day-picker';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useMaterialCategories } from '@/hooks/api/use-material-categories';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Filter, X } from 'lucide-react';
 
 interface ReportFilterFormProps {
   date: DateRange | undefined;
@@ -45,70 +47,110 @@ export function ReportFilterForm({
     );
   }, [materialCategoriesData]);
 
+  const hasFilters = !!date || status !== '' || !!materialCategoryId;
+
   return (
-    <div className="rounded-xl border bg-card p-6 shadow-sm">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="space-y-2">
-          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Periode Tanggal
-          </Label>
+    <div className="rounded-xl border bg-card p-4 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3 flex-wrap">
           <DatePickerWithRange
             date={date}
             setDate={setDate}
-            className="w-full"
+            className="w-auto"
           />
-        </div>
 
-        <div className="space-y-2">
-          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Status Check-in
-          </Label>
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="bg-background">
-              <SelectValue placeholder="Pilih Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">Semua Status</SelectItem>
-              <SelectItem value="MENUNGGU">Menunggu</SelectItem>
-              <SelectItem value="VERIFIKASI">Verifikasi</SelectItem>
-              <SelectItem value="SELESAI">Selesai</SelectItem>
-              <SelectItem value="DITOLAK">Ditolak</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-[160px] justify-start text-left font-normal"
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                {status
+                  ? status === 'MENUNGGU'
+                    ? 'Menunggu'
+                    : status === 'VERIFIKASI'
+                      ? 'Verifikasi'
+                      : status === 'SELESAI'
+                        ? 'Selesai'
+                        : status === 'DITOLAK'
+                          ? 'Ditolak'
+                          : 'Status'
+                  : 'Status'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px]">
+              <DropdownMenuLabel>Filter Status</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={status}
+                onValueChange={(val) => setStatus(val === 'ALL' ? '' : val)}
+              >
+                <DropdownMenuRadioItem value="">
+                  Semua Status
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="MENUNGGU">
+                  Menunggu
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="VERIFIKASI">
+                  Verifikasi
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="SELESAI">
+                  Selesai
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="DITOLAK">
+                  Ditolak
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        <div className="space-y-2">
-          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Kategori Material
-          </Label>
-          <Select
-            value={materialCategoryId || 'ALL'}
-            onValueChange={(val) =>
-              setMaterialCategoryId(val === 'ALL' ? undefined : val)
-            }
-          >
-            <SelectTrigger className="bg-background">
-              <SelectValue placeholder="Pilih Kategori" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">Semua Kategori</SelectItem>
-              {materialOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-[180px] justify-start text-left font-normal"
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                {materialCategoryId
+                  ? materialOptions.find(
+                      (opt) => opt.value === materialCategoryId,
+                    )?.label || 'Kategori'
+                  : 'Kategori'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px]">
+              <DropdownMenuLabel>Filter Kategori</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={materialCategoryId || ''}
+                onValueChange={(val) => setMaterialCategoryId(val || undefined)}
+              >
+                <DropdownMenuRadioItem value="">
+                  Semua Kategori
+                </DropdownMenuRadioItem>
+                {materialOptions.map((option) => (
+                  <DropdownMenuRadioItem
+                    key={option.value}
+                    value={option.value}
+                  >
+                    {option.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        <div className="flex items-end">
-          <Button
-            variant="outline"
-            onClick={onReset}
-            className="h-10 px-6 font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-          >
-            Reset
-          </Button>
+          {hasFilters && (
+            <Button
+              variant="ghost"
+              onClick={onReset}
+              className="h-8 px-2 lg:px-3 text-muted-foreground hover:text-foreground"
+            >
+              Reset
+              <X className="ml-2 h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
     </div>
