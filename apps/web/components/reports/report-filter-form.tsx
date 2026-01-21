@@ -46,54 +46,70 @@ export function ReportFilterForm({
   }, [materialCategoriesData]);
 
   return (
-    <div className="grid gap-4 md:grid-cols-3">
-      <div className="space-y-2">
-        <Label>Periode Tanggal</Label>
-        <DatePickerWithRange date={date} setDate={setDate} className="w-full" />
-      </div>
+    <div className="rounded-xl border bg-card p-6 shadow-sm">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="space-y-2">
+          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Periode Tanggal
+          </Label>
+          <DatePickerWithRange
+            date={date}
+            setDate={setDate}
+            className="w-full"
+          />
+        </div>
 
-      <div className="space-y-2">
-        <Label>Status Check-in</Label>
-        <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger>
-            <SelectValue placeholder="Pilih Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">Semua Status</SelectItem>
-            <SelectItem value="MENUNGGU">Menunggu</SelectItem>
-            <SelectItem value="VERIFIKASI">Verifikasi</SelectItem>
-            <SelectItem value="SELESAI">Selesai</SelectItem>
-            <SelectItem value="DITOLAK">Ditolak</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+        <div className="space-y-2">
+          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Status Check-in
+          </Label>
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger className="bg-background">
+              <SelectValue placeholder="Pilih Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Semua Status</SelectItem>
+              <SelectItem value="MENUNGGU">Menunggu</SelectItem>
+              <SelectItem value="VERIFIKASI">Verifikasi</SelectItem>
+              <SelectItem value="SELESAI">Selesai</SelectItem>
+              <SelectItem value="DITOLAK">Ditolak</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-      <div className="space-y-2">
-        <Label>Kategori Material</Label>
-        <Select
-          value={materialCategoryId || 'ALL'}
-          onValueChange={(val) =>
-            setMaterialCategoryId(val === 'ALL' ? undefined : val)
-          }
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Pilih Kategori" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">Semua Kategori</SelectItem>
-            {materialOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+        <div className="space-y-2">
+          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Kategori Material
+          </Label>
+          <Select
+            value={materialCategoryId || 'ALL'}
+            onValueChange={(val) =>
+              setMaterialCategoryId(val === 'ALL' ? undefined : val)
+            }
+          >
+            <SelectTrigger className="bg-background">
+              <SelectValue placeholder="Pilih Kategori" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Semua Kategori</SelectItem>
+              {materialOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      <div className="flex items-end">
-        <Button variant="outline" onClick={onReset} className="h-10 px-4">
-          Reset
-        </Button>
+        <div className="flex items-end">
+          <Button
+            variant="outline"
+            onClick={onReset}
+            className="h-10 px-6 font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+          >
+            Reset
+          </Button>
+        </div>
       </div>
     </div>
   );
