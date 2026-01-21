@@ -37,6 +37,7 @@ export interface ChecklistBreakdown {
   id: number;
   name: string;
   color: string;
+  icon_name?: string | null;
   total_items: number;
   compliant_items: number;
   compliance_rate: number;

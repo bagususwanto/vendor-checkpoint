@@ -259,6 +259,7 @@ export class DashboardService {
         checklist_category_id: true,
         category_name: true,
         color_code: true,
+        icon_name: true,
       },
       orderBy: { display_order: 'asc' },
     });
@@ -293,6 +294,7 @@ export class DashboardService {
         id: category.checklist_category_id,
         name: category.category_name,
         color: category.color_code || '#cbd5e1', // default slate-300
+        icon_name: category.icon_name,
         total_items: total,
         compliant_items: compliantCount,
         compliance_rate: Math.round(rate),
