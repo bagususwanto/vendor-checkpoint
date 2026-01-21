@@ -162,7 +162,7 @@ export class DashboardService {
       },
     });
 
-    const hours = Array.from({ length: 11 }, (_, i) => i + 7); // 07:00 to 17:00
+    const hours = Array.from({ length: 14 }, (_, i) => i + 7); // 07:00 to 20:00
     const result = hours.map((hour) => {
       const entriesInHour = completedEntries.filter((record) => {
         const entryHour = new Date(record.entry.submission_time).getHours();
@@ -188,6 +188,7 @@ export class DashboardService {
 
   async findComplianceRateByHour() {
     const today = getStartOfToday();
+
     const entries = await this.prisma.ops_checkin_entry.findMany({
       where: {
         submission_time: {
@@ -196,27 +197,52 @@ export class DashboardService {
       },
       select: {
         submission_time: true,
-        has_non_compliant_items: true,
+        ops_checkin_response: {
+          select: {
+            is_compliant: true,
+          },
+        },
       },
     });
 
-    const hours = Array.from({ length: 11 }, (_, i) => i + 7); // 07:00 to 17:00
+    const hours = Array.from({ length: 14 }, (_, i) => i + 7); // 07:00 to 20:00
     const result = hours.map((hour) => {
       const entriesInHour = entries.filter((entry) => {
         const entryHour = new Date(entry.submission_time).getHours();
         return entryHour === hour;
       });
 
-      const total = entriesInHour.length;
-      const compliantCount = entriesInHour.filter(
-        (e) => !e.has_non_compliant_items,
-      ).length;
-      const rate = total > 0 ? (compliantCount / total) * 100 : 0;
+      const totalEntries = entriesInHour.length;
+
+      if (totalEntries === 0) {
+        return {
+          hour: `${hour.toString().padStart(2, '0')}:00`,
+          compliance_rate: 0,
+          total_entries: 0,
+        };
+      }
+
+      // Calculate average compliance score across all entries in this hour
+      // For each entry: score = (compliant_items / total_items) * 100
+      // Hour score = sum(entry_scores) / total_entries
+
+      const sumScores = entriesInHour.reduce((sum, entry) => {
+        const totalItems = entry.ops_checkin_response.length;
+        if (totalItems === 0) return sum + 100; // No items = 100% compliant compliant by default? Or ignored. Assuming 100.
+
+        const compliantItems = entry.ops_checkin_response.filter(
+          (r) => r.is_compliant,
+        ).length;
+        const entryScore = (compliantItems / totalItems) * 100;
+        return sum + entryScore;
+      }, 0);
+
+      const avgRate = sumScores / totalEntries;
 
       return {
         hour: `${hour.toString().padStart(2, '0')}:00`,
-        compliance_rate: Math.round(rate),
-        total_entries: total,
+        compliance_rate: Math.round(avgRate),
+        total_entries: totalEntries,
       };
     });
 
