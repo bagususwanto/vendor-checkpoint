@@ -28,10 +28,13 @@ export interface ReportPreviewData {
 export const reportService = {
   getPreview: async (params: ReportFilter) => {
     try {
-      const response = await axiosInstance.get<ReportPreviewData>('/reports', {
-        params,
-      });
-      return response.data;
+      const response = await axiosInstance.get<{ data: ReportPreviewData }>(
+        '/reports',
+        {
+          params,
+        },
+      );
+      return response.data.data;
     } catch (error) {
       throw error;
     }
