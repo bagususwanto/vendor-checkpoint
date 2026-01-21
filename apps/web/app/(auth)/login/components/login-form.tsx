@@ -30,7 +30,7 @@ export function LoginForm({
       {
         onSuccess: () => {
           toast.success('Login successful');
-          router.push('/staff/dashboard');
+          router.push('/portal/dashboard');
         },
         onError: (error) => {
           console.error(error);

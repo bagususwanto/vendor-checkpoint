@@ -11,7 +11,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
-import { VerificationSheet } from '../../dashboard/components/verification-sheet';
+import { VerificationSheet } from '@/app/(dashboard)/portal/dashboard/components/verification-sheet';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { QueueStatus } from '@repo/types';
@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { StatusBadge } from '../../../components/status-badge';
+import { StatusBadge } from '@/app/(dashboard)/components/status-badge';
 
 interface QueueTableProps {
   checkins: any[]; // Replace any with proper type

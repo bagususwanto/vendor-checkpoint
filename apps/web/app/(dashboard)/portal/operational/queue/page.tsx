@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { useVerificationList } from '@/hooks/api/use-check-in';
-import { useDebounce } from '../../../../hooks/use-debounce';
+import { useDebounce } from '@/hooks/use-debounce';
 import { useMaterialCategories } from '@/hooks/api/use-material-categories';
 import { DateRange } from 'react-day-picker';
 import { QueueHeader } from './components/queue-header';

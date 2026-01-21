@@ -37,8 +37,8 @@ export function LandingHeader() {
 
         {/* Navigation / Actions */}
         <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => router.push('/login')}>
-            Staff Portal
+          <Button variant="outline" onClick={() => router.push('/login')}>
+            Portal
           </Button>
           {mounted ? (
             <ThemeToggleButton

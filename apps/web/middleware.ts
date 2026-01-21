@@ -44,7 +44,7 @@ export function middleware(request: NextRequest) {
 
   // Redirect to dashboard if accessing login while authenticated
   if (pathname === '/login' && isAuthenticated) {
-    return NextResponse.redirect(new URL('/staff/dashboard', request.url));
+    return NextResponse.redirect(new URL('/portal/dashboard', request.url));
   }
 
   return NextResponse.next();
