@@ -10,10 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DropdownMaterialCategory } from '@/components/dropdown-material-category';
 import { useMaterialCategories } from '@/hooks/api/use-material-categories';
 import { Label } from '@/components/ui/label';
-import { useDebounce } from '@/hooks/use-debounce';
 
 interface ReportFilterFormProps {
   date: DateRange | undefined;
@@ -32,17 +30,7 @@ export function ReportFilterForm({
   materialCategoryId,
   setMaterialCategoryId,
 }: ReportFilterFormProps) {
-  const [search, setSearch] = React.useState('');
-  const debouncedSearch = useDebounce(search, 500);
-
-  const {
-    data: materialCategoriesData,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-  } = useMaterialCategories({
-    search: debouncedSearch,
-  });
+  const { data: materialCategoriesData } = useMaterialCategories({});
 
   const materialOptions = React.useMemo(() => {
     if (!materialCategoriesData) return [];
@@ -50,7 +38,6 @@ export function ReportFilterForm({
       page.data.map((item) => ({
         label: item.category_name,
         value: item.material_category_id.toString(),
-        description: item.category_code,
       })),
     );
   }, [materialCategoriesData]);
@@ -80,23 +67,24 @@ export function ReportFilterForm({
 
       <div className="space-y-2">
         <Label>Kategori Material</Label>
-        <DropdownMaterialCategory
-          options={materialOptions}
-          value={materialCategoryId}
-          onSelect={(val) => setMaterialCategoryId(val)}
-          onSearch={setSearch}
-          onLoadMore={fetchNextPage}
-          hasMore={hasNextPage}
-          isLoading={isFetching}
-        />
-        {materialCategoryId && (
-          <p
-            className="text-xs text-muted-foreground cursor-pointer hover:underline"
-            onClick={() => setMaterialCategoryId(undefined)}
-          >
-            Reset Kategori
-          </p>
-        )}
+        <Select
+          value={materialCategoryId || 'ALL'}
+          onValueChange={(val) =>
+            setMaterialCategoryId(val === 'ALL' ? undefined : val)
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Pilih Kategori" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">Semua Kategori</SelectItem>
+            {materialOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
