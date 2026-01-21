@@ -1,8 +1,59 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Clock, XCircle, ListFilter, Timer } from 'lucide-react';
+import {
+  CheckCircle,
+  Clock,
+  XCircle,
+  ListFilter,
+  Timer,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+} from 'lucide-react';
 import { useDashboardStats } from '@/hooks/api/use-dashboard';
+import { TrendData } from '@/services/dashboard.service';
+import { cn } from '@/lib/utils';
+
+interface TrendIndicatorProps {
+  trend?: TrendData;
+  inverse?: boolean; // If true, "up" is bad (red) and "down" is good (green)
+}
+
+function TrendIndicator({ trend, inverse = false }: TrendIndicatorProps) {
+  if (!trend) return null;
+
+  const { direction, percentage } = trend;
+
+  if (direction === 'neutral') {
+    return (
+      <div className="flex items-center text-xs text-muted-foreground mt-1">
+        <Minus className="h-3 w-3 mr-1" />
+        <span>0% dari kemarin</span>
+      </div>
+    );
+  }
+
+  const isPositiveGood = !inverse;
+  // If direction is up: positive good -> green, positive bad -> red
+  // If direction is down: positive good -> red, positive bad -> green
+
+  let colorClass = '';
+  if (direction === 'up') {
+    colorClass = isPositiveGood ? 'text-emerald-500' : 'text-rose-500';
+  } else {
+    colorClass = isPositiveGood ? 'text-rose-500' : 'text-emerald-500';
+  }
+
+  const Icon = direction === 'up' ? ArrowUp : ArrowDown;
+
+  return (
+    <div className={cn('flex items-center text-xs mt-1', colorClass)}>
+      <Icon className="h-3 w-3 mr-1" />
+      <span>{percentage}% dari kemarin</span>
+    </div>
+  );
+}
 
 export function StatsCard() {
   const { data: stats, isLoading } = useDashboardStats();
@@ -24,7 +75,7 @@ export function StatsCard() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.total_checkins}</div>
-          <p className="text-xs text-muted-foreground">Total keseluruhan</p>
+          <TrendIndicator trend={stats.trends?.total_checkins} />
         </CardContent>
       </Card>
       <Card>
@@ -34,9 +85,7 @@ export function StatsCard() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.total_approved}</div>
-          <p className="text-xs text-muted-foreground">
-            {stats.approval_rate} tingkat persetujuan
-          </p>
+          <TrendIndicator trend={stats.trends?.total_approved} />
         </CardContent>
       </Card>
       <Card>
@@ -46,9 +95,7 @@ export function StatsCard() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.total_rejected}</div>
-          <p className="text-xs text-muted-foreground">
-            {stats.rejected_rate} tingkat penolakan
-          </p>
+          <TrendIndicator trend={stats.trends?.total_rejected} inverse />
         </CardContent>
       </Card>
       <Card>
@@ -58,7 +105,7 @@ export function StatsCard() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.current_waiting}</div>
-          <p className="text-xs text-muted-foreground">Menunggu tinjauan</p>
+          <p className="text-xs text-muted-foreground mt-1">Antrian saat ini</p>
         </CardContent>
       </Card>
       <Card>
@@ -70,7 +117,7 @@ export function StatsCard() {
           <div className="text-2xl font-bold">
             {stats.avg_lead_time_minutes}m
           </div>
-          <p className="text-xs text-muted-foreground">Per proses selesai</p>
+          <TrendIndicator trend={stats.trends?.avg_lead_time} inverse />
         </CardContent>
       </Card>
     </div>

@@ -11,4 +11,19 @@ export class DashboardController {
   async findDailyStats() {
     return this.dashboardService.findDailyStats();
   }
+
+  @Get('/hourly-lead-time')
+  async findHourlyLeadTime() {
+    return this.dashboardService.findHourlyLeadTime();
+  }
+
+  @Get('/hourly-compliance')
+  async findHourlyCompliance() {
+    return this.dashboardService.findComplianceRateByHour();
+  }
+
+  @Get('/checklist-breakdown')
+  async findChecklistBreakdown() {
+    return this.dashboardService.findChecklistBreakdown();
+  }
 }
