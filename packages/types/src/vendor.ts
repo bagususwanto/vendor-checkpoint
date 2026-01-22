@@ -17,6 +17,7 @@ export const updateVendorSchema = z.object({
   vendor_code: z.string().optional(),
   company_name: z.string().optional(),
   is_active: z.boolean().optional(),
+  vendor_category_id: z.coerce.number().optional(),
 });
 
 export type FindVendorParams = z.infer<typeof findVendorParamsSchema>;
@@ -30,6 +31,7 @@ export type findVendorResponse = {
   created_at: Date;
   updated_at: Date;
   deleted_at: Date | null;
+  vendor_category_id?: number | null;
   vendor_category?: string | null;
 };
 
