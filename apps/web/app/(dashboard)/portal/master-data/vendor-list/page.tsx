@@ -4,8 +4,16 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { VendorTable } from './components/vendor-table';
 import { VendorToolbar } from './components/vendor-toolbar';
+import { VendorHeader } from './components/vendor-header';
 import { useVendorsPaginated } from '@/hooks/api/use-vendors';
 import { useDebounce } from '@/hooks/use-debounce';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export default function VendorListPage() {
   const router = useRouter();
@@ -63,30 +71,37 @@ export default function VendorListPage() {
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Daftar Vendor</h2>
-      </div>
+      <VendorHeader />
 
-      <div className="space-y-4">
-        <VendorToolbar
-          search={search}
-          setSearch={setSearch}
-          status={status}
-          setStatus={setStatus}
-          onReset={handleReset}
-        />
+      <Card>
+        <CardHeader>
+          <CardTitle>Daftar Vendor</CardTitle>
+          <CardDescription>
+            Kelola data master vendor, status aktif/nonaktif, dan sinkronisasi
+            dengan sistem eksternal.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <VendorToolbar
+            search={search}
+            setSearch={setSearch}
+            status={status}
+            setStatus={setStatus}
+            onReset={handleReset}
+          />
 
-        <VendorTable
-          vendors={data?.data || []}
-          isLoading={isLoading}
-          page={page}
-          totalPages={data?.meta.total_pages || 1}
-          total={data?.meta.total || 0}
-          setPage={setPage}
-          limit={limit}
-          setLimit={setLimit}
-        />
-      </div>
+          <VendorTable
+            vendors={data?.data || []}
+            isLoading={isLoading}
+            page={page}
+            totalPages={data?.meta.total_pages || 1}
+            total={data?.meta.total || 0}
+            setPage={setPage}
+            limit={limit}
+            setLimit={setLimit}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }
