@@ -15,12 +15,14 @@ export function useSyncUsers() {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
       toast.success('Sync User Berhasil', {
         description: `${data.data.created} user baru, ${data.data.updated} diperbarui dari ${data.data.total} total data.`,
+        duration: 10000,
       });
     },
     onError: (error: any) => {
       toast.error('Gagal Sync User', {
         description:
           error.response?.data?.message || 'Terjadi kesalahan saat sync user.',
+        duration: 10000,
       });
     },
   });

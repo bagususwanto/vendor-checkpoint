@@ -66,10 +66,13 @@ export function useSyncVendors() {
       queryClient.invalidateQueries({ queryKey: vendorKeys.all });
       toast.success(
         `Sync berhasil: ${data.data.created} vendor baru, ${data.data.updated} diperbarui`,
+        { duration: 10000 },
       );
     },
     onError: () => {
-      toast.error('Gagal sync vendor dari sistem eksternal');
+      toast.error('Gagal sync vendor dari sistem eksternal', {
+        duration: 10000,
+      });
     },
   });
 }
