@@ -125,10 +125,12 @@ export class UserService {
       });
 
       return {
-        created,
-        updated,
-        total: externalUsers.length,
-        syncTime,
+        data: {
+          created,
+          updated,
+          total: externalUsers.length,
+          syncTime,
+        },
       };
     } catch (err: any) {
       console.error('Sync user error:', {

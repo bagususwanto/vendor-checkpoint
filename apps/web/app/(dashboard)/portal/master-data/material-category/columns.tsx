@@ -2,7 +2,7 @@
 
 import { ColumnDef, Table, Row, Column } from '@tanstack/react-table';
 import { MaterialCategoryResponse } from '@repo/types';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '../../../../../components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,14 +26,16 @@ export const columns = (
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        onCheckedChange={(value: any) =>
+          table.toggleAllPageRowsSelected(!!value)
+        }
         aria-label="Select all"
       />
     ),
     cell: ({ row }: { row: Row<MaterialCategoryResponse> }) => (
       <Checkbox
         checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onCheckedChange={(value: any) => row.toggleSelected(!!value)}
         aria-label="Select row"
       />
     ),

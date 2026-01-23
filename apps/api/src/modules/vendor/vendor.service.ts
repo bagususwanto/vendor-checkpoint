@@ -177,10 +177,12 @@ export class VendorService {
       });
 
       return {
-        created,
-        updated,
-        total: externalVendors.length,
-        syncTime,
+        data: {
+          created,
+          updated,
+          total: externalVendors.length,
+          syncTime,
+        },
       };
     } catch (err: any) {
       console.error('Sync error:', {
