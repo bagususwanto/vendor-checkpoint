@@ -15,14 +15,16 @@ export const vendorService = {
   },
 
   getVendorById: async (id: number) => {
-    const response = await axiosInstance.get<findVendorResponse>(
+    const response = await axiosInstance.get<{ data: findVendorResponse }>(
       `/vendor/${id}`,
     );
-    return response.data;
+    return response.data.data;
   },
 
   syncVendors: async () => {
-    const response = await axiosInstance.post<SyncResult>('/vendor/sync');
-    return response.data;
+    const response = await axiosInstance.post<{ data: SyncResult }>(
+      '/vendor/sync',
+    );
+    return response.data.data;
   },
 };
