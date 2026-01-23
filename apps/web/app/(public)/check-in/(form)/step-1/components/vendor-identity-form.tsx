@@ -22,7 +22,7 @@ import { useChecklistStore } from '@/stores/use-checklist.store';
 import { fetchChecklistByCategory } from '@/hooks/api/use-checklist';
 import { DropdownMaterialCategory } from '@/components/dropdown-material-category';
 import { useVendors } from '@/hooks/api/use-vendors';
-import { useMaterialCategories } from '@/hooks/api/use-material-categories';
+import { useInfiniteMaterialCategories } from '@/hooks/api/use-material-categories';
 
 export function VendorIdentityForm() {
   const { step1Data, setStep1Data, setChecklistCategories } =
@@ -83,7 +83,7 @@ export function VendorIdentityForm() {
     fetchNextPage: fetchNextMaterialCategories,
     hasNextPage: hasNextMaterialCategories,
     isFetching: isFetchingMaterialCategories,
-  } = useMaterialCategories({
+  } = useInfiniteMaterialCategories({
     search: debouncedMaterialCategorySearch,
   });
 
@@ -93,7 +93,7 @@ export function VendorIdentityForm() {
         page.data.map((m) => ({
           label: m.category_name,
           value: String(m.material_category_id),
-          description: m.description,
+          description: m.description || undefined,
         })),
       ) || []
     );

@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useMaterialCategories } from '@/hooks/api/use-material-categories';
+import { useInfiniteMaterialCategories } from '@/hooks/api/use-material-categories';
 import { Button } from '@/components/ui/button';
 import { Filter, X } from 'lucide-react';
 
@@ -35,7 +35,7 @@ export function ReportFilterForm({
   setMaterialCategoryId,
   onReset,
 }: ReportFilterFormProps) {
-  const { data: materialCategoriesData } = useMaterialCategories({});
+  const { data: materialCategoriesData } = useInfiniteMaterialCategories({});
 
   const materialOptions = React.useMemo(() => {
     if (!materialCategoriesData) return [];

@@ -29,7 +29,7 @@ export default function QueuePage() {
 
   const { data: categories } = useMaterialCategories({
     search: '',
-    is_active: true,
+    status: 'active',
   });
 
   const { data, isLoading } = useVerificationList(
