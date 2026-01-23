@@ -42,9 +42,8 @@ export class UserService {
 
   async syncFromExternalApi(): Promise<SyncResult> {
     try {
-      // Assuming endpoint is /users or similar
       const resp$ = this.httpService.get(
-        `${process.env.EXTERNAL_API_URL}/users`,
+        `${process.env.EXTERNAL_API_URL}/user-public`,
       );
       const { data } = await lastValueFrom(resp$);
 
@@ -56,36 +55,80 @@ export class UserService {
       let updated = 0;
       const syncTime = new Date();
 
+      // Optimize: Create a map of operations
+      const operations: any[] = [];
+
       for (const user of externalUsers) {
-        const existingUser = await this.prisma.mst_user.findUnique({
-          where: { external_user_id: user.external_user_id },
-        });
+        if (!user.external_user_id) {
+          console.warn('Skipping user without ID:', user);
+          continue;
+        }
 
         const userData = {
           username: user.username,
-          full_name: user.name, // Adjust based on actual external API field
-          role: user.role, // Ensure roles match what DB expects
+          full_name: user.name,
+          role: user.role,
           is_active: user.is_active,
           updated_at: syncTime,
         };
 
-        if (existingUser) {
-          await this.prisma.mst_user.update({
-            where: { user_id: existingUser.user_id },
-            data: userData,
-          });
-          updated++;
-        } else {
-          await this.prisma.mst_user.create({
-            data: {
+        operations.push(
+          this.prisma.mst_user.upsert({
+            where: { external_user_id: user.external_user_id },
+            update: userData,
+            create: {
               external_user_id: user.external_user_id,
               ...userData,
               created_at: syncTime,
             },
-          });
-          created++;
+          }),
+        );
+      }
+
+      // Execute in batches
+      const BATCH_SIZE = 50;
+      const chunks = [];
+
+      for (let i = 0; i < operations.length; i += BATCH_SIZE) {
+        chunks.push(operations.slice(i, i + BATCH_SIZE));
+      }
+
+      console.log(
+        `Syncing ${operations.length} users in ${chunks.length} batches...`,
+      );
+
+      for (const [index, chunk] of chunks.entries()) {
+        console.log(`Processing batch ${index + 1} of ${chunks.length}...`);
+        try {
+          await Promise.all(chunk);
+        } catch (e) {
+          console.error(`Failed to sync batch ${index + 1}:`, e);
+          continue;
         }
       }
+
+      // Calculate stats
+      const existingIds = await this.prisma.mst_user.findMany({
+        select: { external_user_id: true },
+        where: {
+          external_user_id: {
+            in: externalUsers.map((u) => u.external_user_id).filter(Boolean),
+          },
+        },
+      });
+      const existingIdSet = new Set(existingIds.map((u) => u.external_user_id));
+
+      created = 0;
+      updated = 0;
+
+      externalUsers.forEach((u) => {
+        if (!u.external_user_id) return;
+        if (existingIdSet.has(u.external_user_id)) {
+          updated++;
+        } else {
+          created++;
+        }
+      });
 
       return {
         created,

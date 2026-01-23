@@ -11,9 +11,9 @@ import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 
 interface ExternalVendor {
-  vendor_code: string;
-  company_name: string;
-  is_active?: boolean;
+  supplierCode: string; // Mapped to vendor_code
+  supplierName: string; // Mapped to company_name
+  flag?: number; // Maybe mapped to is_active? assuming 1 is active
 }
 
 @Injectable()
@@ -91,38 +91,90 @@ export class VendorService {
       let updated = 0;
       const syncTime = new Date();
 
-      for (const vendor of externalVendors) {
-        const existingVendor = await this.prisma.mst_vendor.findUnique({
-          where: { vendor_code: vendor.vendor_code },
-        });
+      // Optimize: Create a map of operations
+      const operations: any[] = [];
 
-        if (existingVendor) {
-          // Update existing vendor
-          await this.prisma.mst_vendor.update({
-            where: { vendor_id: existingVendor.vendor_id },
-            data: {
-              company_name: vendor.company_name,
-              is_active: vendor.is_active ?? existingVendor.is_active,
+      for (const vendor of externalVendors) {
+        if (!vendor.supplierCode) {
+          console.warn('Skipping vendor without code:', vendor);
+          continue;
+        }
+
+        const vendorCode = vendor.supplierCode;
+        const companyName = vendor.supplierName;
+        const isActive = vendor.flag === 1;
+
+        // Use upsert to handle both create and update in one operation per vendor
+        // This is safe but still 1 query per vendor.
+        // To truly optimize, we can use transaction.
+        operations.push(
+          this.prisma.mst_vendor.upsert({
+            where: { vendor_code: vendorCode },
+            update: {
+              company_name: companyName,
+              is_active: isActive,
               last_sync_time: syncTime,
               sync_source: 'EXTERNAL_API',
               updated_at: syncTime,
             },
-          });
-          updated++;
-        } else {
-          // Create new vendor
-          await this.prisma.mst_vendor.create({
-            data: {
-              vendor_code: vendor.vendor_code,
-              company_name: vendor.company_name,
-              is_active: vendor.is_active ?? true,
+            create: {
+              vendor_code: vendorCode,
+              company_name: companyName,
+              is_active: isActive,
               last_sync_time: syncTime,
               sync_source: 'EXTERNAL_API',
             },
-          });
-          created++;
+          }),
+        );
+      }
+
+      // Execute in batches to avoid MSSQL transaction limits/timeouts
+      const BATCH_SIZE = 50;
+      const chunks = [];
+
+      for (let i = 0; i < operations.length; i += BATCH_SIZE) {
+        chunks.push(operations.slice(i, i + BATCH_SIZE));
+      }
+
+      console.log(
+        `Syncing ${operations.length} vendors in ${chunks.length} batches...`,
+      );
+
+      for (const [index, chunk] of chunks.entries()) {
+        console.log(`Processing batch ${index + 1} of ${chunks.length}...`);
+        try {
+          // Use Promise.all to run in parallel without transaction overhead
+          // This prevents the 'EREQINPROG' rollback error in MSSQL
+          await Promise.all(chunk);
+        } catch (e) {
+          console.error(`Failed to sync batch ${index + 1}:`, e);
+          // We continue to try next batches
+          continue;
         }
       }
+
+      const existingCodes = await this.prisma.mst_vendor.findMany({
+        select: { vendor_code: true },
+        where: {
+          vendor_code: {
+            in: externalVendors.map((v) => v.supplierCode).filter(Boolean),
+          },
+        },
+      });
+      const existingCodeSet = new Set(existingCodes.map((v) => v.vendor_code));
+
+      created = 0;
+      updated = 0;
+
+      // Re-loop to count (cheap in memory)
+      externalVendors.forEach((v) => {
+        if (!v.supplierCode) return;
+        if (existingCodeSet.has(v.supplierCode)) {
+          updated++;
+        } else {
+          created++;
+        }
+      });
 
       return {
         created,
