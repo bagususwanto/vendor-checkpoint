@@ -120,9 +120,9 @@ export const columns = (
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => onDelete(category)}
-              className="text-red-600 focus:text-red-600"
+              className="text-destructive focus:text-destructive"
             >
-              <Trash className="mr-2 h-4 w-4" />
+              <Trash className="mr-2 h-4 w-4 text-destructive" />
               Hapus
             </DropdownMenuItem>
           </DropdownMenuContent>
