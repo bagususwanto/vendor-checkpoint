@@ -31,6 +31,11 @@ export class MaterialCategoryController {
     return this.materialCategoryService.create(createMaterialCategoryDto);
   }
 
+  @Get('selection')
+  getSelection() {
+    return this.materialCategoryService.getSelection();
+  }
+
   // PUBLIC - Dropdown di form check-in
   @Get()
   findAll(@Query() query: PaginatedParamsDto) {

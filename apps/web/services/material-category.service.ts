@@ -16,6 +16,13 @@ export const materialCategoryService = {
     return response.data;
   },
 
+  getSelection: async () => {
+    const response = await axiosInstance.get<MaterialCategoryResponse[]>(
+      '/material-category/selection',
+    );
+    return response.data;
+  },
+
   getById: async (id: number) => {
     const response = await axiosInstance.get<MaterialCategoryResponse>(
       `/material-category/${id}`,

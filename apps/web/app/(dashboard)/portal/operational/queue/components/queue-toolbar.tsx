@@ -97,11 +97,9 @@ export function QueueToolbar({
             >
               <Filter className="mr-2 h-4 w-4" />
               {categoryId
-                ? categories?.pages
-                    .flatMap((p: any) => p.data)
-                    .find(
-                      (c: any) => String(c.material_category_id) === categoryId,
-                    )?.category_name || 'Kategori'
+                ? categories?.find(
+                    (c: any) => String(c.material_category_id) === categoryId,
+                  )?.category_name || 'Kategori'
                 : 'Kategori'}
             </Button>
           </DropdownMenuTrigger>
@@ -115,16 +113,14 @@ export function QueueToolbar({
               <DropdownMenuRadioItem value="">
                 Semua Kategori
               </DropdownMenuRadioItem>
-              {categories?.pages
-                .flatMap((page: any) => page.data)
-                .map((category: any) => (
-                  <DropdownMenuRadioItem
-                    key={category.material_category_id}
-                    value={String(category.material_category_id)}
-                  >
-                    {category.category_name}
-                  </DropdownMenuRadioItem>
-                ))}
+              {categories?.map((category: any) => (
+                <DropdownMenuRadioItem
+                  key={category.material_category_id}
+                  value={String(category.material_category_id)}
+                >
+                  {category.category_name}
+                </DropdownMenuRadioItem>
+              ))}
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>

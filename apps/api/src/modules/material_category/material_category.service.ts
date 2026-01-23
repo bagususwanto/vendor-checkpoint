@@ -180,4 +180,15 @@ export class MaterialCategoryService {
       data: { is_active: !existing.is_active },
     });
   }
+
+  async getSelection(): Promise<mst_material_category[]> {
+    return this.prisma.mst_material_category.findMany({
+      where: {
+        is_active: true,
+      },
+      orderBy: {
+        category_name: 'asc',
+      },
+    });
+  }
 }

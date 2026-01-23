@@ -15,7 +15,15 @@ export const materialCategoryKeys = {
     [...materialCategoryKeys.lists(), params] as const,
   details: () => [...materialCategoryKeys.all, 'detail'] as const,
   detail: (id: number) => [...materialCategoryKeys.details(), id] as const,
+  selection: () => [...materialCategoryKeys.all, 'selection'] as const,
 };
+
+export function useMaterialCategorySelection() {
+  return useQuery({
+    queryKey: materialCategoryKeys.selection(),
+    queryFn: () => materialCategoryService.getSelection(),
+  });
+}
 
 export function useMaterialCategories(
   params: Partial<FindMaterialCategoryParams> = {},
