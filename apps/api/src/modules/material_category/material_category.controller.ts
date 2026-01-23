@@ -8,10 +8,13 @@ import {
   Delete,
   Query,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { MaterialCategoryService } from './material_category.service';
 import { CreateMaterialCategoryDto } from './dto/create-material_category.dto';
 import { UpdateMaterialCategoryDto } from './dto/update-material_category.dto';
+import { BulkDeleteMaterialCategoryDto } from './dto/bulk-delete-material_category.dto';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
@@ -55,5 +58,20 @@ export class MaterialCategoryController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.materialCategoryService.remove(+id);
+  }
+
+  // PROTECTED - Admin only - Bulk delete
+  @UseGuards(JwtAuthGuard)
+  @Delete()
+  @HttpCode(HttpStatus.OK)
+  bulkDelete(@Body() bulkDeleteDto: BulkDeleteMaterialCategoryDto) {
+    return this.materialCategoryService.bulkDelete(bulkDeleteDto);
+  }
+
+  // PROTECTED - Admin only - Toggle status
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/toggle-status')
+  toggleStatus(@Param('id') id: string) {
+    return this.materialCategoryService.toggleStatus(+id);
   }
 }

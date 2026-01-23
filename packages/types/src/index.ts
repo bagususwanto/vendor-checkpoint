@@ -2,6 +2,7 @@ export * from './auth';
 export * from './common';
 export * from './enums';
 export * from './checkin';
+export * from './material-category';
 export * from './paginated';
 export * from './user';
 export * from './vendor';
