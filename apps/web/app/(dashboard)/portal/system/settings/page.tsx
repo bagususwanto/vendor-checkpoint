@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -12,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, Users, Building2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { axiosInstance } from '@/lib/axios';
+import { userService } from '@/services/user.service';
 
 export default function SettingsPage() {
   const [isSyncingVendors, setIsSyncingVendors] = useState(false);
@@ -44,10 +46,10 @@ export default function SettingsPage() {
   const handleSyncUsers = async () => {
     setIsSyncingUsers(true);
     try {
-      // TODO: Implement user sync endpoint when ready
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const response = await userService.syncUsers();
+
       toast.success('Sync User Berhasil', {
-        description: 'Data user berhasil disinkronisasi dari sistem eksternal.',
+        description: `${response.created} user baru, ${response.updated} diperbarui dari ${response.total} total data.`,
       });
     } catch (error: any) {
       toast.error('Gagal Sync User', {
@@ -74,7 +76,7 @@ export default function SettingsPage() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {/* Sync Vendors */}
-        <Card>
+        <Card className="flex flex-col">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-primary/10 p-2 text-primary">
@@ -88,11 +90,13 @@ export default function SettingsPage() {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
+          <CardContent className="flex-1">
+            <p className="text-sm text-muted-foreground">
               Sinkronkan data vendor terbaru dari sistem eksternal. Data vendor
               digunakan untuk proses check-in dan verifikasi.
             </p>
+          </CardContent>
+          <CardFooter>
             <Button
               onClick={handleSyncVendors}
               disabled={isSyncingVendors}
@@ -110,11 +114,11 @@ export default function SettingsPage() {
                 </>
               )}
             </Button>
-          </CardContent>
+          </CardFooter>
         </Card>
 
         {/* Sync Users */}
-        <Card>
+        <Card className="flex flex-col">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-blue-100 p-2 text-blue-600">
@@ -128,16 +132,17 @@ export default function SettingsPage() {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
+          <CardContent className="flex-1">
+            <p className="text-sm text-muted-foreground">
               Sinkronkan data user terbaru dari sistem eksternal. Data user
               digunakan untuk autentikasi dan otorisasi sistem.
             </p>
+          </CardContent>
+          <CardFooter>
             <Button
               onClick={handleSyncUsers}
               disabled={isSyncingUsers}
               className="w-full"
-              variant="outline"
             >
               {isSyncingUsers ? (
                 <>
@@ -151,10 +156,7 @@ export default function SettingsPage() {
                 </>
               )}
             </Button>
-            <p className="text-xs text-muted-foreground mt-2 italic">
-              * Endpoint user sync belum diimplementasikan
-            </p>
-          </CardContent>
+          </CardFooter>
         </Card>
       </div>
     </div>

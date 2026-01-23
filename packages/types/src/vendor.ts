@@ -26,10 +26,3 @@ export type findVendorResponse = {
   vendor_category_id?: number | null;
   vendor_category?: string | null;
 };
-
-export type SyncResult = {
-  created: number;
-  updated: number;
-  total: number;
-  syncTime: Date | string; // Date on backend, string (ISO) on frontend
-};

@@ -103,16 +103,6 @@ export const navData: NavData = {
             UserRole.WAREHOUSE_STAFF,
           ],
         },
-        {
-          title: 'Daftar Pengguna',
-          url: '/portal/master-data/users',
-          icon: Users,
-          roles: [
-            UserRole.SUPER_ADMIN,
-            UserRole.GROUP_LEADER,
-            UserRole.WAREHOUSE_STAFF,
-          ],
-        },
       ],
     },
     {

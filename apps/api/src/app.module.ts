@@ -13,6 +13,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { ReportModule } from './modules/report/report.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ReportModule } from './modules/report/report.module';
     MaterialCategoryModule,
     DashboardModule,
     ReportModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [
