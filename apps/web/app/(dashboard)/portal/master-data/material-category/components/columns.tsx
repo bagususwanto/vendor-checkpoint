@@ -2,7 +2,7 @@
 
 import { ColumnDef, Table, Row, Column } from '@tanstack/react-table';
 import { MaterialCategoryResponse } from '@repo/types';
-import { Checkbox } from '../../../../../components/ui/checkbox';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {

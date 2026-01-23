@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { columns } from './columns';
-import { MaterialCategoriesTable } from './material-categories-table';
-import { MaterialCategoryDialog } from './material-category-dialog';
+import { columns } from './components/columns';
+import { MaterialCategoriesTable } from './components/material-categories-table';
+import { MaterialCategoryDialog } from './components/material-category-dialog';
 import {
   useMaterialCategories,
   useCreateMaterialCategory,
