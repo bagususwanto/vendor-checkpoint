@@ -65,7 +65,7 @@ export function useSyncVendors() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: vendorKeys.all });
       toast.success(
-        `Sync berhasil: ${data.created} vendor baru, ${data.updated} diperbarui`,
+        `Sync berhasil: ${data.data.created} vendor baru, ${data.data.updated} diperbarui`,
       );
     },
     onError: () => {

@@ -14,7 +14,7 @@ export function useSyncUsers() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
       toast.success('Sync User Berhasil', {
-        description: `${data.created} user baru, ${data.updated} diperbarui dari ${data.total} total data.`,
+        description: `${data.data.created} user baru, ${data.data.updated} diperbarui dari ${data.data.total} total data.`,
       });
     },
     onError: (error: any) => {
