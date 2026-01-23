@@ -136,10 +136,27 @@ export class MaterialCategoryService {
       throw new NotFoundException('Kategori material tidak ditemukan');
     }
 
-    // Soft delete by setting is_active to false
-    return this.prisma.mst_material_category.update({
+    // Check usage
+    const [checkinCount, checklistItemCount] = await Promise.all([
+      this.prisma.ops_checkin_entry.count({
+        where: { material_category_id: id },
+      }),
+      this.prisma.mst_checklist_item.count({
+        where: { material_category_id: id },
+      }),
+    ]);
+
+    // If used in any transaction or configuration, soft delete
+    if (checkinCount > 0 || checklistItemCount > 0) {
+      return this.prisma.mst_material_category.update({
+        where: { material_category_id: id },
+        data: { is_active: false },
+      });
+    }
+
+    // Otherwise, hard delete
+    return this.prisma.mst_material_category.delete({
       where: { material_category_id: id },
-      data: { is_active: false },
     });
   }
 
@@ -152,19 +169,49 @@ export class MaterialCategoryService {
       throw new BadRequestException('Tidak ada ID yang dipilih');
     }
 
-    // Soft delete by setting is_active to false
-    const result = await this.prisma.mst_material_category.updateMany({
-      where: {
-        material_category_id: {
-          in: ids,
-        },
-      },
-      data: {
-        is_active: false,
-      },
-    });
+    // Check usage to determine which can be hard deleted vs soft deleted
+    const [usedInCheckin, usedInChecklist] = await Promise.all([
+      this.prisma.ops_checkin_entry.findMany({
+        where: { material_category_id: { in: ids } },
+        select: { material_category_id: true },
+        distinct: ['material_category_id'],
+      }),
+      this.prisma.mst_checklist_item.findMany({
+        where: { material_category_id: { in: ids } },
+        select: { material_category_id: true },
+        distinct: ['material_category_id'],
+      }),
+    ]);
 
-    return { count: result.count };
+    const usedIds = new Set<number>([
+      ...usedInCheckin.map((item) => item.material_category_id),
+      ...usedInChecklist
+        .filter((item) => item.material_category_id !== null)
+        .map((item) => item.material_category_id as number),
+    ]);
+
+    const idsToSoftDelete = ids.filter((id) => usedIds.has(id));
+    const idsToHardDelete = ids.filter((id) => !usedIds.has(id));
+
+    let softDeletedCount = 0;
+    let hardDeletedCount = 0;
+
+    if (idsToSoftDelete.length > 0) {
+      const res = await this.prisma.mst_material_category.updateMany({
+        where: { material_category_id: { in: idsToSoftDelete } },
+        data: { is_active: false },
+      });
+      softDeletedCount = res.count;
+    }
+
+    if (idsToHardDelete.length > 0) {
+      const res = await this.prisma.mst_material_category.deleteMany({
+        where: { material_category_id: { in: idsToHardDelete } },
+      });
+      hardDeletedCount = res.count;
+    }
+
+    return { count: softDeletedCount + hardDeletedCount };
   }
 
   async toggleStatus(id: number): Promise<mst_material_category> {
