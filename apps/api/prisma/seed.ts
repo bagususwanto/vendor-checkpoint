@@ -13,13 +13,25 @@ const prisma = new PrismaService();
 
 async function cleanDatabase() {
   console.log('Clearing existing data...');
-  // Delete in correct order to avoid foreign key constraints
+
+  // 1. Delete operational/transactional data first
+  await prisma.ops_checkin_response.deleteMany({});
+  await prisma.ops_verification.deleteMany({});
+  await prisma.ops_timelog.deleteMany({});
+  await prisma.ops_queue_status.deleteMany({});
+  await prisma.ops_checkin_entry.deleteMany({});
+
+  // 2. Delete logs and configs
+  await prisma.log_audit.deleteMany({});
+  await prisma.log_report_export.deleteMany({});
+  await prisma.cfg_system.deleteMany({});
+
+  // 3. Delete master data
   await prisma.mst_checklist_item.deleteMany({});
   await prisma.mst_checklist_category.deleteMany({});
-  await prisma.mst_vendor.deleteMany({}); // Vendors depend on vendor categories
+  await prisma.mst_vendor.deleteMany({});
   await prisma.mst_material_category.deleteMany({});
   await prisma.mst_user.deleteMany({});
-  await prisma.cfg_system.deleteMany({});
 }
 
 async function seedVendorCategories() {

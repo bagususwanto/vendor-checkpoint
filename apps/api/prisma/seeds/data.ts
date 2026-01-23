@@ -311,7 +311,7 @@ export const SYSTEM_CONFIGS = [
 ];
 
 export const ADMIN_USER = {
-  external_user_id: '7637',
+  external_user_id: 7637,
   username: 'admin',
   full_name: 'Administrator System',
   role: 'Super Admin',

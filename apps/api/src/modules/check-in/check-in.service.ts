@@ -611,7 +611,7 @@ export class CheckInService {
 
     // 2. Try to find by external_user_id (if token ID is external ID)
     const userByExternal = await this.prisma.mst_user.findUnique({
-      where: { external_user_id: String(tokenUserId) },
+      where: { external_user_id: tokenUserId },
     });
     if (userByExternal) return userByExternal.user_id;
 

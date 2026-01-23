@@ -86,7 +86,7 @@ model mst_checklist_item {
 
 model mst_user {
   user_id          Int      @id @default(autoincrement())
-  external_user_id String   @unique @db.VarChar(255)
+  external_user_id Int      @unique
   username         String   @db.VarChar(255)
   full_name        String   @db.VarChar(500)
   role             String   @db.VarChar(50)

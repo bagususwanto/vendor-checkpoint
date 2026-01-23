@@ -10,11 +10,12 @@ import { SyncResult } from '@repo/types';
 import { mst_user } from 'generated/prisma/client';
 
 export interface ExternalUser {
-  external_user_id: string; // or id
+  id: number;
   username: string;
   name: string; // or full_name
-  role: string;
-  is_active: boolean;
+  Role: {
+    roleName: string;
+  };
 }
 
 @Injectable()
@@ -59,25 +60,19 @@ export class UserService {
       const operations: any[] = [];
 
       for (const user of externalUsers) {
-        if (!user.external_user_id) {
-          console.warn('Skipping user without ID:', user);
-          continue;
-        }
-
         const userData = {
           username: user.username,
           full_name: user.name,
-          role: user.role,
-          is_active: user.is_active,
+          role: user.Role.roleName,
           updated_at: syncTime,
         };
 
         operations.push(
           this.prisma.mst_user.upsert({
-            where: { external_user_id: user.external_user_id },
+            where: { external_user_id: user.id },
             update: userData,
             create: {
-              external_user_id: user.external_user_id,
+              external_user_id: user.id,
               ...userData,
               created_at: syncTime,
             },
@@ -112,7 +107,7 @@ export class UserService {
         select: { external_user_id: true },
         where: {
           external_user_id: {
-            in: externalUsers.map((u) => u.external_user_id).filter(Boolean),
+            in: externalUsers.map((u) => u.id),
           },
         },
       });
@@ -122,8 +117,7 @@ export class UserService {
       updated = 0;
 
       externalUsers.forEach((u) => {
-        if (!u.external_user_id) return;
-        if (existingIdSet.has(u.external_user_id)) {
+        if (existingIdSet.has(u.id)) {
           updated++;
         } else {
           created++;
