@@ -13,15 +13,7 @@ export const findVendorParamsSchema = z.object({
   categoryId: z.coerce.number().optional(),
 });
 
-export const updateVendorSchema = z.object({
-  vendor_code: z.string().optional(),
-  company_name: z.string().optional(),
-  is_active: z.boolean().optional(),
-  vendor_category_id: z.coerce.number().optional(),
-});
-
 export type FindVendorParams = z.infer<typeof findVendorParamsSchema>;
-export type UpdateVendorPayload = z.infer<typeof updateVendorSchema>;
 
 export type findVendorResponse = {
   vendor_id: number;

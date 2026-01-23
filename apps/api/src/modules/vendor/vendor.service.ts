@@ -3,7 +3,6 @@ import {
   NotFoundException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { UpdateVendorDto } from './dto/update-vendor.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { PaginatedResponse, SyncResult } from '@repo/types';
 import { FindVendorParamsDto } from './dto/find-vendor-params.dto';
@@ -75,34 +74,6 @@ export class VendorService {
     }
 
     return vendor;
-  }
-
-  async update(
-    id: number,
-    updateVendorDto: UpdateVendorDto,
-  ): Promise<mst_vendor> {
-    // Check if vendor exists
-    await this.findOne(id);
-
-    return this.prisma.mst_vendor.update({
-      where: { vendor_id: id },
-      data: {
-        ...updateVendorDto,
-        updated_at: new Date(),
-      },
-    });
-  }
-
-  async toggleActive(id: number): Promise<mst_vendor> {
-    const vendor = await this.findOne(id);
-
-    return this.prisma.mst_vendor.update({
-      where: { vendor_id: id },
-      data: {
-        is_active: !vendor.is_active,
-        updated_at: new Date(),
-      },
-    });
   }
 
   async syncFromExternalApi(): Promise<SyncResult> {

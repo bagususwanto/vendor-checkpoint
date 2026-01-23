@@ -84,16 +84,6 @@ export const navData: NavData = {
       icon: Building2,
       items: [
         {
-          title: 'Daftar Vendor',
-          url: '/portal/master-data/vendor-list',
-          icon: Building2,
-          roles: [
-            UserRole.SUPER_ADMIN,
-            UserRole.GROUP_LEADER,
-            UserRole.WAREHOUSE_STAFF,
-          ],
-        },
-        {
           title: 'Kategori Vendor',
           url: '/portal/master-data/vendor-category',
           icon: Tags,

@@ -5,7 +5,7 @@ import {
   useInfiniteQuery,
 } from '@tanstack/react-query';
 import { vendorService } from '@/services/vendor.service';
-import { FindVendorParams, UpdateVendorPayload } from '@repo/types';
+import { FindVendorParams } from '@repo/types';
 import { toast } from 'sonner';
 
 // Keys for query invalidation
@@ -26,7 +26,7 @@ export function useVendorsPaginated(params: FindVendorParams) {
   });
 }
 
-// Infinite query for combobox/dropdown
+// Infinite query for combobox/dropdown (used in check-in form)
 export function useVendors(params: Omit<FindVendorParams, 'page' | 'limit'>) {
   return useInfiniteQuery({
     queryKey: ['vendors-infinite', params],
@@ -53,41 +53,6 @@ export function useVendor(id: number) {
     queryKey: vendorKeys.detail(id),
     queryFn: () => vendorService.getVendorById(id),
     enabled: !!id,
-  });
-}
-
-// Update vendor mutation
-export function useUpdateVendor() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateVendorPayload }) =>
-      vendorService.updateVendor(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: vendorKeys.all });
-      toast.success('Vendor berhasil diperbarui');
-    },
-    onError: () => {
-      toast.error('Gagal memperbarui vendor');
-    },
-  });
-}
-
-// Toggle active status mutation
-export function useToggleVendorActive() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: number) => vendorService.toggleActive(id),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: vendorKeys.all });
-      toast.success(
-        data.is_active ? 'Vendor diaktifkan' : 'Vendor dinonaktifkan',
-      );
-    },
-    onError: () => {
-      toast.error('Gagal mengubah status vendor');
-    },
   });
 }
 
