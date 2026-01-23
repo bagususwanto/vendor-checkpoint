@@ -185,7 +185,7 @@ export default function MaterialCategoryPage() {
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
-              className="bg-red-600 focus:ring-red-600"
+              className="bg-destructive focus:ring-destructive"
             >
               {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
             </AlertDialogAction>
@@ -210,7 +210,7 @@ export default function MaterialCategoryPage() {
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmBulkDelete}
-              className="bg-red-600 focus:ring-red-600"
+              className="bg-destructive focus:ring-destructive"
             >
               {bulkDeleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
             </AlertDialogAction>

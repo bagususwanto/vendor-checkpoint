@@ -77,7 +77,9 @@ export function MaterialCategoryForm({
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor="category_code">Kode Kategori</FieldLabel>
+                <FieldLabel htmlFor="category_code" required>
+                  Kode Kategori
+                </FieldLabel>
                 <Input
                   id="category_code"
                   placeholder="Contoh: MC-001"
@@ -100,7 +102,9 @@ export function MaterialCategoryForm({
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor="category_name">Nama Kategori</FieldLabel>
+                <FieldLabel htmlFor="category_name" required>
+                  Nama Kategori
+                </FieldLabel>
                 <Input
                   id="category_name"
                   placeholder="Contoh: Bahan Baku"
@@ -123,8 +127,8 @@ export function MaterialCategoryForm({
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor="description">
-                  Deskripsi (Opsional)
+                <FieldLabel htmlFor="description" optional>
+                  Deskripsi
                 </FieldLabel>
                 <Textarea
                   id="description"
@@ -145,8 +149,11 @@ export function MaterialCategoryForm({
           name="is_active"
           children={(field) => {
             return (
-              <Field className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
-                <div className="space-y-0.5">
+              <Field
+                orientation="horizontal"
+                className="justify-between space-x-2"
+              >
+                <div className="flex-1 space-y-0.5">
                   <FieldLabel htmlFor="is_active">Status Aktif</FieldLabel>
                   <p className="text-[0.8rem] text-muted-foreground">
                     Nonaktifkan jika kategori tidak ingin ditampilkan di opsi.
