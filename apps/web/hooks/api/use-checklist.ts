@@ -8,3 +8,6 @@ export function useChecklistByCategory(categoryId: number | null) {
     enabled: !!categoryId,
   });
 }
+
+export const fetchChecklistByCategory = (categoryId: number) =>
+  checklistService.getChecklistByCategory(categoryId);

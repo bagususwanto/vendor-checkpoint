@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -11,55 +10,12 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Users, Building2, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { axiosInstance } from '@/lib/axios';
-import { userService } from '@/services/user.service';
+import { useSyncVendors } from '@/hooks/api/use-vendors';
+import { useSyncUsers } from '@/hooks/api/use-users';
 
 export default function SettingsPage() {
-  const [isSyncingVendors, setIsSyncingVendors] = useState(false);
-  const [isSyncingUsers, setIsSyncingUsers] = useState(false);
-
-  const handleSyncVendors = async () => {
-    setIsSyncingVendors(true);
-    try {
-      const response = await axiosInstance.post<{
-        created: number;
-        updated: number;
-        total: number;
-        syncTime: string;
-      }>('/vendor/sync');
-
-      toast.success('Sync Vendor Berhasil', {
-        description: `${response.data.created} vendor baru, ${response.data.updated} diperbarui dari ${response.data.total} total data.`,
-      });
-    } catch (error: any) {
-      toast.error('Gagal Sync Vendor', {
-        description:
-          error.response?.data?.message ||
-          'Terjadi kesalahan saat sync vendor.',
-      });
-    } finally {
-      setIsSyncingVendors(false);
-    }
-  };
-
-  const handleSyncUsers = async () => {
-    setIsSyncingUsers(true);
-    try {
-      const response = await userService.syncUsers();
-
-      toast.success('Sync User Berhasil', {
-        description: `${response.created} user baru, ${response.updated} diperbarui dari ${response.total} total data.`,
-      });
-    } catch (error: any) {
-      toast.error('Gagal Sync User', {
-        description:
-          error.response?.data?.message || 'Terjadi kesalahan saat sync user.',
-      });
-    } finally {
-      setIsSyncingUsers(false);
-    }
-  };
+  const { mutate: syncVendors, isPending: isSyncingVendors } = useSyncVendors();
+  const { mutate: syncUsers, isPending: isSyncingUsers } = useSyncUsers();
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 md:p-8 pt-6">
@@ -98,7 +54,7 @@ export default function SettingsPage() {
           </CardContent>
           <CardFooter>
             <Button
-              onClick={handleSyncVendors}
+              onClick={() => syncVendors()}
               disabled={isSyncingVendors}
               className="w-full"
             >
@@ -140,9 +96,10 @@ export default function SettingsPage() {
           </CardContent>
           <CardFooter>
             <Button
-              onClick={handleSyncUsers}
+              onClick={() => syncUsers()}
               disabled={isSyncingUsers}
               className="w-full"
+              variant="outline"
             >
               {isSyncingUsers ? (
                 <>

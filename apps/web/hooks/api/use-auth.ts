@@ -8,6 +8,12 @@ export const useLoginMutation = () => {
   });
 };
 
+export const useLogout = () => {
+  return useMutation({
+    mutationFn: () => authService.logout(),
+  });
+};
+
 export const useUser = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['user'],

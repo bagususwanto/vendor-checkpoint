@@ -4,7 +4,13 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Building2, CircleArrowRight, User, Box } from 'lucide-react';
+import {
+  ArrowLeft,
+  Building2,
+  CircleArrowRight,
+  User,
+  Box,
+} from 'lucide-react';
 import { ComboboxVendor } from '@/components/combobox-vendor';
 import IconLabel from '@/components/icon-label';
 import { Button } from '@/components/ui/button';
@@ -13,13 +19,14 @@ import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { VendorIdentitySchema } from '@/lib/schemas/vendor-identity.schema';
 import { useChecklistStore } from '@/stores/use-checklist.store';
-import { checklistService } from '@/services/checklist.service';
+import { fetchChecklistByCategory } from '@/hooks/api/use-checklist';
 import { DropdownMaterialCategory } from '@/components/dropdown-material-category';
 import { useVendors } from '@/hooks/api/use-vendors';
 import { useMaterialCategories } from '@/hooks/api/use-material-categories';
 
 export function VendorIdentityForm() {
-  const { step1Data, setStep1Data, setChecklistCategories } = useChecklistStore();
+  const { step1Data, setStep1Data, setChecklistCategories } =
+    useChecklistStore();
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -65,7 +72,7 @@ export function VendorIdentityForm() {
         page.data.map((v) => ({
           label: `${v.company_name} (${v.vendor_code})`,
           value: String(v.vendor_id),
-        }))
+        })),
       ) || []
     );
   }, [vendorData]);
@@ -87,7 +94,7 @@ export function VendorIdentityForm() {
           label: m.category_name,
           value: String(m.material_category_id),
           description: m.description,
-        }))
+        })),
       ) || []
     );
   }, [materialData]);
@@ -139,9 +146,7 @@ export function VendorIdentityForm() {
         const checklistData = await queryClient.fetchQuery({
           queryKey: ['checklist', Number(value.materialCategory.value)],
           queryFn: () =>
-            checklistService.getChecklistByCategory(
-              Number(value.materialCategory.value)
-            ),
+            fetchChecklistByCategory(Number(value.materialCategory.value)),
           staleTime: 60 * 1000,
         });
 
@@ -230,7 +235,7 @@ export function VendorIdentityForm() {
                     value={selectedVendor?.value}
                     onSearch={setSearch}
                     onLoadMore={() => {
-                        if (hasNextVendors) fetchNextVendors();
+                      if (hasNextVendors) fetchNextVendors();
                     }}
                     isLoading={isFetchingVendors}
                   />
@@ -259,21 +264,22 @@ export function VendorIdentityForm() {
                     value={field.state.value}
                     onSelect={(val) => {
                       const mat = materialCategories.find(
-                        (m) => m.value === val
+                        (m) => m.value === val,
                       );
                       if (mat) {
                         form.setFieldValue('materialCategory.value', mat.value);
                         form.setFieldValue('materialCategory.label', mat.label);
                         form.setFieldValue(
                           'materialCategory.description',
-                          mat.description || ''
+                          mat.description || '',
                         );
                       }
                     }}
                     isLoading={isFetchingMaterialCategories}
                     onSearch={setMaterialCategorySearch}
                     onLoadMore={() => {
-                        if (hasNextMaterialCategories) fetchNextMaterialCategories();
+                      if (hasNextMaterialCategories)
+                        fetchNextMaterialCategories();
                     }}
                     hasMore={hasNextMaterialCategories}
                   />

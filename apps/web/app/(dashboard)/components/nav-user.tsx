@@ -26,7 +26,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 
-import { authService } from '@/services/auth.service';
+import { useLogout } from '@/hooks/api/use-auth';
 
 export function NavUser({
   user,
@@ -52,9 +52,11 @@ export function NavUser({
 
   const initials = getInitials(user.name);
 
+  const { mutateAsync: logout } = useLogout();
+
   const handleLogout = async () => {
     try {
-      await authService.logout();
+      await logout();
       window.location.href = '/login';
     } catch (error) {
       console.error('Logout failed:', error);
