@@ -111,7 +111,7 @@ export function MaterialCategoriesTable<TData, TValue>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup: HeaderGroup<TData>) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header: Header<TData, TValue>) => {
+                {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id} colSpan={header.colSpan}>
                       {header.isPlaceholder
@@ -133,7 +133,7 @@ export function MaterialCategoriesTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                 >
-                  {row.getVisibleCells().map((cell: Cell<TData, any>) => (
+                  {row.getVisibleCells().map((cell: Cell<TData, unknown>) => (
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
