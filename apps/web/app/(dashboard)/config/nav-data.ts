@@ -84,8 +84,8 @@ export const navData: NavData = {
       icon: Building2,
       items: [
         {
-          title: 'Kategori Vendor',
-          url: '/portal/master-data/vendor-category',
+          title: 'Kategori Material',
+          url: '/portal/master-data/material-category',
           icon: Tags,
           roles: [
             UserRole.SUPER_ADMIN,
