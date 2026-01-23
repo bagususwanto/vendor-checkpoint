@@ -176,9 +176,9 @@ export default function MaterialCategoryPage() {
               Tindakan ini akan menghapus kategori{' '}
               <span className="font-semibold">
                 {selectedCategory?.category_name}
-              </span>{' '}
-              (soft delete). Anda dapat mengaktifkannya kembali nanti jika
-              diperlukan.
+              </span>
+              . Jika kategori sudah memiliki data terkait, kategori akan
+              dinonaktifkan alih-alih dihapus permanen.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -203,7 +203,8 @@ export default function MaterialCategoryPage() {
             <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
             <AlertDialogDescription>
               Tindakan ini akan menghapus {rowsToDelete.length} kategori yang
-              dipilih (soft delete).
+              dipilih. Kategori yang sudah memiliki data terkait akan
+              dinonaktifkan alih-alih dihapus permanen.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
