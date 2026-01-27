@@ -34,17 +34,14 @@ export class ChecklistService {
 
     return categories.map((category) => {
       const sortedItems = category.mst_checklist_item.sort((a, b) => {
-        // Primary sort: General items (null material_category_id) come first
-        if (
-          a.material_category_id === null &&
-          b.material_category_id !== null
-        ) {
+        const typeA = a.item_type?.toLowerCase();
+        const typeB = b.item_type?.toLowerCase();
+
+        // Primary sort: item_type ('umum' first, 'khusus' last)
+        if (typeA === 'umum' && typeB !== 'umum') {
           return -1;
         }
-        if (
-          a.material_category_id !== null &&
-          b.material_category_id === null
-        ) {
+        if (typeA !== 'umum' && typeB === 'umum') {
           return 1;
         }
 

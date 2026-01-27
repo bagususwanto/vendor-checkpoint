@@ -70,13 +70,13 @@ describe('ChecklistService', () => {
         {
           checklist_item_id: 1,
           item_text: 'Special Item',
-          material_category_id: 1, // Special
+          item_type: 'KHUSUS', // Special
           display_order: 1,
         },
         {
           checklist_item_id: 2,
           item_text: 'General Item',
-          material_category_id: null, // General
+          item_type: 'UMUM', // General
           display_order: 2,
         },
       ];

@@ -422,12 +422,22 @@ export function VerificationSheet({
                                         >
                                           {item.item_text_snapshot}
                                         </p>
-                                        {!item.is_compliant && (
-                                          <p className="text-xs text-muted-foreground">
-                                            Item ini memerlukan perhatian
-                                            khusus.
-                                          </p>
-                                        )}
+                                        <div className="flex gap-2 mt-1">
+                                          {item.item_type && (
+                                            <Badge
+                                              variant="secondary"
+                                              className="text-[10px] px-1.5 py-0 h-5 capitalize"
+                                            >
+                                              {item.item_type.toLowerCase()}
+                                            </Badge>
+                                          )}
+                                          {!item.is_compliant && (
+                                            <p className="text-xs text-muted-foreground self-center">
+                                              Item ini memerlukan perhatian
+                                              khusus.
+                                            </p>
+                                          )}
+                                        </div>
                                       </div>
                                       <div className="shrink-0">
                                         {item.response_value ? (

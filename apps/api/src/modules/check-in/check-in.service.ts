@@ -331,6 +331,7 @@ export class CheckInService {
             response_value: true,
             is_compliant: true,
             display_order: true,
+            item_type: true,
             checklist_category: {
               select: {
                 category_name: true,
@@ -639,6 +640,7 @@ export class CheckInService {
         };
       }
       acc[categoryName].items.push({
+        item_type: response.item_type,
         item_text_snapshot: response.item_text_snapshot,
         response_value: response.response_value,
         is_compliant: response.is_compliant,
@@ -647,9 +649,26 @@ export class CheckInService {
       return acc;
     }, {});
 
-    return Object.values(grouped).sort(
-      (a: any, b: any) => a.display_order - b.display_order,
-    );
+    return Object.values(grouped)
+      .map((category: any) => {
+        category.items.sort((a: any, b: any) => {
+          const typeA = a.item_type?.toLowerCase();
+          const typeB = b.item_type?.toLowerCase();
+
+          // Primary sort: item_type ('umum' first, 'khusus' last)
+          if (typeA === 'umum' && typeB !== 'umum') {
+            return -1;
+          }
+          if (typeA !== 'umum' && typeB === 'umum') {
+            return 1;
+          }
+
+          // Secondary sort: display_order
+          return a.display_order - b.display_order;
+        });
+        return category;
+      })
+      .sort((a: any, b: any) => a.display_order - b.display_order);
   }
 
   private async validateMaterialCategory(material_category_id: number) {
