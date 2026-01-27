@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { addDays, format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
-import { ReportFilterForm } from '@/components/reports/report-filter-form';
-import { ReportPreview } from '@/components/reports/report-preview';
+import { ReportFilterForm } from './components/report-filter-form';
+import { ReportPreview } from './components/report-preview';
 import { useReportPreview, useExportReport } from '@/hooks/api/use-report';
 import { Button } from '@/components/ui/button';
 import { DownloadIcon, Loader2 } from 'lucide-react';
