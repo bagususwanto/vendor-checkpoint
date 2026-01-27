@@ -19,6 +19,7 @@ import {
   Plus,
   Trash2,
 } from 'lucide-react';
+import * as Icons from 'lucide-react';
 import { Reorder, useDragControls } from 'framer-motion';
 import { checklistService } from '@/services/checklist.service';
 import { toast } from 'sonner';
@@ -156,7 +157,7 @@ function ChecklistCategoryItem({
       value={category}
       dragListener={false}
       dragControls={dragControls}
-      className="mb-4 rounded-md border bg-background"
+      className="mb-4 rounded-md border bg-secondary"
     >
       <div className="flex items-center p-4">
         <div
@@ -178,6 +179,14 @@ function ChecklistCategoryItem({
                   )}
                 </Button>
               </CollapsibleTrigger>
+              {category.icon_name && (Icons as any)[category.icon_name] && (
+                <div className={category.color_code || ''}>
+                  {(() => {
+                    const Icon = (Icons as any)[category.icon_name!];
+                    return <Icon className="h-4 w-4" />;
+                  })()}
+                </div>
+              )}
               <span className="font-semibold">{category.category_name}</span>
               <span className="text-xs text-muted-foreground ml-2">
                 ({category.mst_checklist_item?.length || 0} item)
