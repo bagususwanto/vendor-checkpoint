@@ -1,10 +1,10 @@
 'use client';
 
 import { InteractiveBackground } from '@/components/interactive-background';
-import { LandingHeader } from '@/components/landing/landing-header';
-import { LandingHero } from '@/components/landing/landing-hero';
-import { LandingFeatures } from '@/components/landing/landing-features';
-import { LandingFooter } from '@/components/landing/landing-footer';
+import { LandingHeader } from '@/app/components/landing-header';
+import { LandingHero } from '@/app/components/landing-hero';
+import { LandingFeatures } from '@/app/components/landing-features';
+import { LandingFooter } from '@/app/components/landing-footer';
 
 export default function Home() {
   return (
