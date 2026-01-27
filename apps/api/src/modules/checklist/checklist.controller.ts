@@ -9,53 +9,83 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ChecklistService } from './checklist.service';
-import { CreateChecklistDto } from './dto/create-checklist.dto';
-import { UpdateChecklistDto } from './dto/update-checklist.dto';
+import { CreateChecklistCategoryDto } from './dto/create-category.dto';
+import { UpdateChecklistCategoryDto } from './dto/update-category.dto';
+import { CreateChecklistItemDto } from './dto/create-item.dto';
+import { UpdateChecklistItemDto } from './dto/update-item.dto';
+import { ReorderDto } from './dto/reorder.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @Controller('checklist')
 export class ChecklistController {
   constructor(private readonly checklistService: ChecklistService) {}
 
-  // PROTECTED - Admin only
+  // --- Category Endpoints ---
+
   @UseGuards(JwtAuthGuard)
-  @Post()
-  create(@Body() createChecklistDto: CreateChecklistDto) {
-    return this.checklistService.create(createChecklistDto);
+  @Post('category')
+  createCategory(@Body() dto: CreateChecklistCategoryDto) {
+    return this.checklistService.createCategory(dto);
   }
 
-  // PUBLIC - Digunakan di form check-in
-  @Get()
-  findAll() {
-    return this.checklistService.findAll();
+  // PUBLIC (Management? Or Protected?) -> Let's make it protected for management
+  @Get('categories')
+  findAllCategories() {
+    return this.checklistService.findAllCategories();
   }
 
-  // PUBLIC - Digunakan di form check-in
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.checklistService.findOne(+id);
+  @UseGuards(JwtAuthGuard)
+  @Patch('category/:id')
+  updateCategory(
+    @Param('id') id: string,
+    @Body() dto: UpdateChecklistCategoryDto,
+  ) {
+    return this.checklistService.updateCategory(+id, dto);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('category/:id')
+  deleteCategory(@Param('id') id: string) {
+    return this.checklistService.deleteCategory(+id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('category/reorder')
+  reorderCategories(@Body() dto: ReorderDto) {
+    return this.checklistService.reorderCategories(dto);
+  }
+
+  // --- Item Endpoints ---
+
+  @UseGuards(JwtAuthGuard)
+  @Post('item')
+  createItem(@Body() dto: CreateChecklistItemDto) {
+    return this.checklistService.createItem(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('item/:id')
+  updateItem(@Param('id') id: string, @Body() dto: UpdateChecklistItemDto) {
+    return this.checklistService.updateItem(+id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('item/:id')
+  deleteItem(@Param('id') id: string) {
+    return this.checklistService.deleteItem(+id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('item/reorder')
+  reorderItems(@Body() dto: ReorderDto) {
+    return this.checklistService.reorderItems(dto);
+  }
+
+  // --- Public / Existing ---
 
   // PUBLIC - Digunakan di form check-in
   @Get('by-category/:materialCategoryId')
   findByCategory(@Param('materialCategoryId') materialCategoryId: string) {
     return this.checklistService.findByCategory(+materialCategoryId);
-  }
-
-  // PROTECTED - Admin only
-  @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateChecklistDto: UpdateChecklistDto,
-  ) {
-    return this.checklistService.update(+id, updateChecklistDto);
-  }
-
-  // PROTECTED - Admin only
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.checklistService.remove(+id);
   }
 }

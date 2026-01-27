@@ -6,3 +6,4 @@ export * from './material-category';
 export * from './paginated';
 export * from './user';
 export * from './vendor';
+export * from './checklist';
