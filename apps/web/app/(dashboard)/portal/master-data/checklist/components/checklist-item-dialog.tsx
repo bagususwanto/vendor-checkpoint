@@ -156,7 +156,7 @@ export function ChecklistItemDialog({
                 }
                 defaultValue={form.watch('item_type')}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Pilih tipe input" />
                 </SelectTrigger>
                 <SelectContent>

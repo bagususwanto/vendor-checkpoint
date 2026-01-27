@@ -27,6 +27,7 @@ import {
   FieldLabel,
   FieldError,
   FieldContent,
+  FieldDescription,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -163,14 +164,37 @@ export function ChecklistCategoryDialog({
                   {...form.register('icon_name')}
                 />
               </FieldContent>
+              <FieldDescription>
+                Reference:{' '}
+                <a
+                  href="https://lucide.dev/icons"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Lucide Icons
+                </a>
+              </FieldDescription>
               <FieldError errors={[form.formState.errors.icon_name]} />
             </Field>
 
             <Field>
               <FieldLabel>Color Code</FieldLabel>
               <FieldContent>
-                <Input placeholder="#000000" {...form.register('color_code')} />
+                <Input
+                  placeholder="text-red-500"
+                  {...form.register('color_code')}
+                />
               </FieldContent>
+              <FieldDescription>
+                Reference:{' '}
+                <a
+                  href="https://tailwindcss.com/docs/customizing-colors"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Tailwind Colors
+                </a>
+              </FieldDescription>
               <FieldError errors={[form.formState.errors.color_code]} />
             </Field>
           </div>
