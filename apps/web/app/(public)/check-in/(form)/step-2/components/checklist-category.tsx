@@ -11,8 +11,8 @@ interface ChecklistCategoryProps {
   category: {
     id: string;
     category_name: string;
-    icon: string;
-    color: string;
+    icon?: string;
+    color?: string;
     items: any[];
   };
   vendorCategory: string | undefined;
@@ -20,7 +20,12 @@ interface ChecklistCategoryProps {
   form: any;
 }
 
-export function ChecklistCategory({ category, vendorCategory, checklistItems, form }: ChecklistCategoryProps) {
+export function ChecklistCategory({
+  category,
+  vendorCategory,
+  checklistItems,
+  form,
+}: ChecklistCategoryProps) {
   const Icon = Icons[category.icon as keyof typeof Icons] as React.ElementType;
 
   // Filter items
@@ -34,21 +39,14 @@ export function ChecklistCategory({ category, vendorCategory, checklistItems, fo
   // Calculate category progress
   const categoryItems = [...generalItems, ...specificItems];
   const categoryTotal = categoryItems.length;
-  const categoryAnswered = categoryItems.reduce(
-    (count, item) => {
-      if (
-        checklistItems &&
-        checklistItems[item.checklist_item_id.toString()]
-      ) {
-        return count + 1;
-      }
-      return count;
-    },
-    0,
-  );
+  const categoryAnswered = categoryItems.reduce((count, item) => {
+    if (checklistItems && checklistItems[item.checklist_item_id.toString()]) {
+      return count + 1;
+    }
+    return count;
+  }, 0);
 
-  const isComplete =
-    categoryTotal > 0 && categoryAnswered === categoryTotal;
+  const isComplete = categoryTotal > 0 && categoryAnswered === categoryTotal;
 
   return (
     <AccordionItem
@@ -62,11 +60,7 @@ export function ChecklistCategory({ category, vendorCategory, checklistItems, fo
       <AccordionTrigger className="px-4 hover:no-underline">
         <div className="flex justify-between items-center pr-4 w-full">
           <div className="flex items-center gap-3">
-            {Icon && (
-              <Icon
-                className={`w-5 h-5 ${category.color}`}
-              />
-            )}
+            {Icon && <Icon className={`w-5 h-5 ${category.color}`} />}
             <span className="font-semibold vendor-text">
               {category.category_name}
             </span>
@@ -87,14 +81,12 @@ export function ChecklistCategory({ category, vendorCategory, checklistItems, fo
       <AccordionContent className="space-y-6 px-4 pb-4">
         {/* General Checklist */}
         <div className="space-y-4">
-          <h4 className="font-medium text-base">
-            Checklist Umum
-          </h4>
+          <h4 className="font-medium text-base">Checklist Umum</h4>
           {generalItems.map((item) => (
-            <ChecklistItem 
-                key={item.checklist_item_id}
-                item={item}
-                form={form}
+            <ChecklistItem
+              key={item.checklist_item_id}
+              item={item}
+              form={form}
             />
           ))}
         </div>
@@ -106,7 +98,7 @@ export function ChecklistCategory({ category, vendorCategory, checklistItems, fo
               Checklist Khusus - {vendorCategory}
             </h4>
             {specificItems.map((item) => (
-              <ChecklistItem 
+              <ChecklistItem
                 key={item.checklist_item_id}
                 item={item}
                 form={form}

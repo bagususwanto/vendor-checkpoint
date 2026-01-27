@@ -29,7 +29,7 @@ export type SuccessData = {
 export type ChecklistItem = {
   checklist_item_id: number;
   item_text: string;
-  item_type: 'UMUM' | 'KHUSUS';
+  item_type: string;
   is_required: boolean;
   material_category_id?: number | null;
   display_order?: number;
@@ -39,9 +39,9 @@ export type ChecklistCategoryData = {
   checklist_category_id: number;
   category_name: string;
   display_order: number;
-  icon_name: string;
-  color_code: string;
-  mst_checklist_item: ChecklistItem[];
+  icon_name?: string | null;
+  color_code?: string | null;
+  mst_checklist_item?: ChecklistItem[];
 };
 
 type CheckListStore = {

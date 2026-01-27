@@ -34,7 +34,7 @@ export function ChecklistForm() {
 
   // Calculate progress based on visible items
   const visibleItems = (checklistCategories || []).flatMap(
-    (category) => category.mst_checklist_item,
+    (category) => category.mst_checklist_item || [],
   );
 
   const requiredItems = visibleItems.filter((item) => item.is_required);
@@ -43,9 +43,9 @@ export function ChecklistForm() {
   const categoriesToRender = (checklistCategories || []).map((c) => ({
     id: String(c.checklist_category_id),
     category_name: c.category_name,
-    icon: c.icon_name,
-    color: c.color_code,
-    items: c.mst_checklist_item,
+    icon: c.icon_name ?? undefined,
+    color: c.color_code ?? undefined,
+    items: c.mst_checklist_item || [],
   }));
 
   return (
@@ -73,8 +73,7 @@ export function ChecklistForm() {
                 <div className="flex justify-between items-center w-full max-w-md font-medium text-sm">
                   <span>Progress Pengisian</span>
                   <span>
-                    {Math.round(progress)}% ({answerCount}/
-                    {totalRequiredItems})
+                    {Math.round(progress)}% ({answerCount}/{totalRequiredItems})
                   </span>
                 </div>
                 <ProgressBar
