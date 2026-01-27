@@ -95,7 +95,7 @@ export const navData: NavData = {
         },
         {
           title: 'Daftar Pemeriksaan',
-          url: '/portal/master-data/inspection-list',
+          url: '/portal/master-data/checklist',
           icon: ClipboardCheck,
           roles: [
             UserRole.SUPER_ADMIN,
