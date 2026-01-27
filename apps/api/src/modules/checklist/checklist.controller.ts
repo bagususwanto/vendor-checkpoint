@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ChecklistService } from './checklist.service';
 import { CreateChecklistCategoryDto } from './dto/create-category.dto';
@@ -15,8 +16,11 @@ import { CreateChecklistItemDto } from './dto/create-item.dto';
 import { UpdateChecklistItemDto } from './dto/update-item.dto';
 import { ReorderDto } from './dto/reorder.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { AuditLog } from 'src/common/decorators/audit.decorator';
+import { AuditLogInterceptor } from 'src/common/interceptors/audit.interceptor';
 
 @Controller('checklist')
+@UseInterceptors(AuditLogInterceptor)
 export class ChecklistController {
   constructor(private readonly checklistService: ChecklistService) {}
 
@@ -24,6 +28,13 @@ export class ChecklistController {
 
   @UseGuards(JwtAuthGuard)
   @Post('category')
+  @AuditLog({
+    actionType: 'CHECKLIST_CATEGORY_CREATE',
+    actionDescription: 'Checklist Category created',
+    buildDetails: (req, res) => ({
+      new_value: res,
+    }),
+  })
   createCategory(@Body() dto: CreateChecklistCategoryDto) {
     return this.checklistService.createCategory(dto);
   }
@@ -36,6 +47,13 @@ export class ChecklistController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('category/:id')
+  @AuditLog({
+    actionType: 'CHECKLIST_CATEGORY_UPDATE',
+    actionDescription: 'Checklist Category updated',
+    buildDetails: (req, res) => ({
+      new_value: res,
+    }),
+  })
   updateCategory(
     @Param('id') id: string,
     @Body() dto: UpdateChecklistCategoryDto,
@@ -45,6 +63,13 @@ export class ChecklistController {
 
   @UseGuards(JwtAuthGuard)
   @Delete('category/:id')
+  @AuditLog({
+    actionType: 'CHECKLIST_CATEGORY_DELETE',
+    actionDescription: 'Checklist Category deleted',
+    buildDetails: (req, res) => ({
+      old_value: res,
+    }),
+  })
   deleteCategory(@Param('id') id: string) {
     return this.checklistService.deleteCategory(+id);
   }
@@ -59,18 +84,39 @@ export class ChecklistController {
 
   @UseGuards(JwtAuthGuard)
   @Post('item')
+  @AuditLog({
+    actionType: 'CHECKLIST_ITEM_CREATE',
+    actionDescription: 'Checklist Item created',
+    buildDetails: (req, res) => ({
+      new_value: res,
+    }),
+  })
   createItem(@Body() dto: CreateChecklistItemDto) {
     return this.checklistService.createItem(dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('item/:id')
+  @AuditLog({
+    actionType: 'CHECKLIST_ITEM_UPDATE',
+    actionDescription: 'Checklist Item updated',
+    buildDetails: (req, res) => ({
+      new_value: res,
+    }),
+  })
   updateItem(@Param('id') id: string, @Body() dto: UpdateChecklistItemDto) {
     return this.checklistService.updateItem(+id, dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete('item/:id')
+  @AuditLog({
+    actionType: 'CHECKLIST_ITEM_DELETE',
+    actionDescription: 'Checklist Item deleted',
+    buildDetails: (req, res) => ({
+      old_value: res,
+    }),
+  })
   deleteItem(@Param('id') id: string) {
     return this.checklistService.deleteItem(+id);
   }

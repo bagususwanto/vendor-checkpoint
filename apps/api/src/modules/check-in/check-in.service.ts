@@ -13,7 +13,6 @@ import { getStartOfToday } from 'src/common/utils/today-date.util';
 
 // Removed TimeLogService import
 
-import { AuditService } from '../audit/audit.service';
 import { toInt } from 'src/common/utils/string-to-int.util';
 import { MaterialCategoryService } from '../material_category/material_category.service';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
@@ -31,7 +30,7 @@ export class CheckInService {
     private readonly vendorService: VendorService,
     private readonly systemConfigService: SystemConfigService,
     private readonly checklistService: ChecklistService,
-    private readonly auditService: AuditService,
+
     private readonly materialCategoryService: MaterialCategoryService,
   ) {}
 
