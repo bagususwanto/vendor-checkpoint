@@ -87,19 +87,7 @@ export class CheckInService {
           // 7. Create Time Log
           await this.createTimeLog(tx, checkIn.entry_id);
 
-          // 8. Create Audit Log
-          await this.auditService.create(tx, {
-            entry_id: checkIn.entry_id,
-            action_type: 'CHECKIN_CREATE',
-            action_description: 'Check-in entry created',
-            ip_address: requestInfo.ipAddress,
-            user_agent: requestInfo.userAgent,
-            new_value: JSON.stringify({
-              queue_number: queueNumber,
-              vendor_id: createCheckInDto.vendor_id,
-              driver_name: createCheckInDto.driver_name,
-            }),
-          });
+          // Audit log moved to interceptor
 
           const estimatedWaitMinutes =
             await this.systemConfigService.findByConfigKey(
@@ -112,6 +100,7 @@ export class CheckInService {
 
           // 9. Return Result
           return {
+            entry_id: checkIn.entry_id, // For Audit Log
             queue_number: queueNumber,
             company_name: vendor.company_name,
             driver_name: createCheckInDto.driver_name,
@@ -452,27 +441,12 @@ export class CheckInService {
         },
       });
 
-      // 7. Create audit log
-      await this.auditService.create(tx, {
-        entry_id: entry.entry_id,
-        user_id: localUserId,
-        action_type:
-          action === 'APPROVE' ? 'CHECKIN_APPROVE' : 'CHECKIN_REJECT',
-        action_description:
-          action === 'APPROVE'
-            ? 'Check-in disetujui'
-            : `Check-in ditolak: ${rejection_reason}`,
-        ip_address: requestInfo.ipAddress,
-        user_agent: requestInfo.userAgent,
-        old_value: JSON.stringify({ status: QueueStatus.MENUNGGU }),
-        new_value: JSON.stringify({
-          status: newStatus,
-          rejection_reason: action === 'REJECT' ? rejection_reason : null,
-        }),
-      });
+      // Audit log moved to interceptor
 
       // 8. Return result
       return {
+        entry_id: entry.entry_id, // For Audit Log
+        user_id: localUserId, // For Audit Log
         queue_number,
         status: newStatus,
         status_display_text: statusDisplayText.config_value,
@@ -574,24 +548,12 @@ export class CheckInService {
         },
       });
 
-      // 7. Create audit log
-      await this.auditService.create(tx, {
-        entry_id: entry.entry_id,
-        user_id: localUserId,
-        action_type: 'CHECKIN_CHECKOUT',
-        action_description: 'Check-in checkout berhasil',
-        ip_address: requestInfo.ipAddress,
-        user_agent: requestInfo.userAgent,
-        old_value: JSON.stringify({ status: QueueStatus.DISETUJUI }),
-        new_value: JSON.stringify({
-          status: QueueStatus.SELESAI,
-          checkout_time: checkoutTime,
-          duration_minutes: durationMinutes,
-        }),
-      });
+      // Audit log moved to interceptor
 
       // 8. Return result
       return {
+        entry_id: entry.entry_id,
+        user_id: localUserId,
         queue_number,
         status: QueueStatus.SELESAI,
         status_display_text: statusDisplayText.config_value,

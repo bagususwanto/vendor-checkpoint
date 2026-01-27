@@ -4,7 +4,6 @@ import { CreateAuditDto } from './dto/create-audit.dto';
 import { UpdateAuditDto } from './dto/update-audit.dto';
 
 @Injectable()
-@Injectable()
 export class AuditService {
   constructor(private readonly prisma: PrismaService) {}
 
