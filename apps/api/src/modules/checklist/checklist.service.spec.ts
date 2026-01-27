@@ -64,6 +64,39 @@ describe('ChecklistService', () => {
     expect(service).toBeDefined();
   });
 
+  describe('findAllCategories', () => {
+    it('should return categories with items sorted correctly (general first)', async () => {
+      const mockItems = [
+        {
+          checklist_item_id: 1,
+          item_text: 'Special Item',
+          material_category_id: 1, // Special
+          display_order: 1,
+        },
+        {
+          checklist_item_id: 2,
+          item_text: 'General Item',
+          material_category_id: null, // General
+          display_order: 2,
+        },
+      ];
+      const mockCategory = {
+        checklist_category_id: 1,
+        category_name: 'Test Cat',
+        mst_checklist_item: mockItems,
+      };
+
+      (
+        prisma.mst_checklist_category.findMany as jest.Mock<any>
+      ).mockResolvedValue([mockCategory]);
+
+      const result = await service.findAllCategories();
+
+      expect(result[0].mst_checklist_item[0].checklist_item_id).toBe(2); // General First
+      expect(result[0].mst_checklist_item[1].checklist_item_id).toBe(1); // Special Last
+    });
+  });
+
   describe('createCategory', () => {
     it('should create a new category', async () => {
       const dto = {

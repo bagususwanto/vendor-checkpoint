@@ -23,17 +23,39 @@ export class ChecklistService {
   }
 
   async findAllCategories() {
-    return this.prisma.mst_checklist_category.findMany({
+    const categories = await this.prisma.mst_checklist_category.findMany({
       include: {
-        mst_checklist_item: {
-          orderBy: {
-            display_order: 'asc',
-          },
-        },
+        mst_checklist_item: true, // We will sort in memory
       },
       orderBy: {
         display_order: 'asc',
       },
+    });
+
+    return categories.map((category) => {
+      const sortedItems = category.mst_checklist_item.sort((a, b) => {
+        // Primary sort: General items (null material_category_id) come first
+        if (
+          a.material_category_id === null &&
+          b.material_category_id !== null
+        ) {
+          return -1;
+        }
+        if (
+          a.material_category_id !== null &&
+          b.material_category_id === null
+        ) {
+          return 1;
+        }
+
+        // Secondary sort: display_order
+        return a.display_order - b.display_order;
+      });
+
+      return {
+        ...category,
+        mst_checklist_item: sortedItems,
+      };
     });
   }
 
