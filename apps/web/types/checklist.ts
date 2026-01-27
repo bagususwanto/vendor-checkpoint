@@ -4,6 +4,7 @@ import {
   UpdateChecklistCategory,
   UpdateChecklistItem,
   Reorder,
+  ChecklistItemType,
 } from '@repo/types';
 
 export type {
@@ -12,6 +13,7 @@ export type {
   UpdateChecklistCategory,
   UpdateChecklistItem,
   Reorder,
+  ChecklistItemType,
 };
 
 export type ChecklistItemResponse = {
@@ -19,7 +21,7 @@ export type ChecklistItemResponse = {
   checklist_category_id: number;
   item_code: string;
   item_text: string;
-  item_type: string; // 'TEXT' | 'BOOLEAN' | 'NUMBER'
+  item_type: ChecklistItemType;
   material_category_id?: number | null;
   display_order: number;
   is_required: boolean;

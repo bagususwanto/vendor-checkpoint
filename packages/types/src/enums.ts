@@ -11,3 +11,8 @@ export enum QueueStatus {
   DITOLAK = 'DITOLAK',
   SELESAI = 'SELESAI',
 }
+
+export enum ChecklistItemType {
+  UMUM = 'UMUM',
+  KHUSUS = 'KHUSUS',
+}

@@ -6,8 +6,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   createChecklistItemSchema,
   updateChecklistItemSchema,
+  ChecklistItemType,
 } from '@repo/types';
 import { ChecklistItemResponse, CreateChecklistItem } from '@/types/checklist';
+// ... (keep intermediate lines if possible or replace larger chunk)
+// actually I will use multiple replace chunks to be safe
+
+// ...
 import { checklistService } from '@/services/checklist.service';
 import { toast } from 'sonner';
 
@@ -59,7 +64,7 @@ export function ChecklistItemDialog({
       checklist_category_id: categoryId || 0,
       item_text: '',
       item_code: '',
-      item_type: 'BOOLEAN',
+      item_type: ChecklistItemType.UMUM,
       display_order: 0,
       is_required: true,
       is_active: true,
@@ -85,7 +90,7 @@ export function ChecklistItemDialog({
         checklist_category_id: categoryId,
         item_text: '',
         item_code: '',
-        item_type: 'BOOLEAN',
+        item_type: ChecklistItemType.UMUM,
         display_order: 0,
         is_required: true,
         is_active: true,
@@ -155,9 +160,10 @@ export function ChecklistItemDialog({
                   <SelectValue placeholder="Pilih tipe input" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="BOOLEAN">Ya / Tidak</SelectItem>
-                  <SelectItem value="TEXT">Teks</SelectItem>
-                  <SelectItem value="NUMBER">Angka</SelectItem>
+                  <SelectItem value={ChecklistItemType.UMUM}>Umum</SelectItem>
+                  <SelectItem value={ChecklistItemType.KHUSUS}>
+                    Khusus
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </FieldContent>

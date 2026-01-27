@@ -1,6 +1,7 @@
 import { z } from 'zod';
+import { ChecklistItemType } from './enums';
 
-export const checklistItemTypeSchema = z.enum(['TEXT', 'BOOLEAN', 'NUMBER']);
+export const checklistItemTypeSchema = z.nativeEnum(ChecklistItemType);
 
 export const createChecklistCategorySchema = z.object({
   category_name: z
