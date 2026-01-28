@@ -16,3 +16,14 @@ export enum ChecklistItemType {
   UMUM = 'UMUM',
   KHUSUS = 'KHUSUS',
 }
+
+export enum AuditLogAction {
+  LOGIN = 'LOGIN',
+  LOGOUT = 'LOGOUT',
+  CREATE = 'CREATE',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+  VERIFY = 'VERIFY',
+  REJECT = 'REJECT',
+  EXPORT = 'EXPORT',
+}

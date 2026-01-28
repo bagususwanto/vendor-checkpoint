@@ -14,6 +14,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+import { AuditLogAction } from '@repo/types';
+
+// ... existing imports
+
 interface AuditLogFilterFormProps {
   date: DateRange | undefined;
   setDate: (date: DateRange | undefined) => void;
@@ -52,14 +56,11 @@ export function AuditLogFilterForm({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">Semua Action</SelectItem>
-                <SelectItem value="LOGIN">Login</SelectItem>
-                <SelectItem value="LOGOUT">Logout</SelectItem>
-                <SelectItem value="CREATE">Create</SelectItem>
-                <SelectItem value="UPDATE">Update</SelectItem>
-                <SelectItem value="DELETE">Delete</SelectItem>
-                <SelectItem value="EXPORT">Export</SelectItem>
-                <SelectItem value="VERIFY">Verify</SelectItem>
-                <SelectItem value="REJECT">Reject</SelectItem>
+                {Object.values(AuditLogAction).map((action) => (
+                  <SelectItem key={action} value={action}>
+                    {action.charAt(0) + action.slice(1).toLowerCase()}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
