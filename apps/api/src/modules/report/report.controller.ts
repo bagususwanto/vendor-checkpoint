@@ -3,6 +3,7 @@ import {
   Get,
   Query,
   Res,
+  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -27,10 +28,13 @@ export class ReportController {
   async exportExcel(
     @Query(new ValidationPipe({ transform: true })) filter: ReportFilterDto,
     @Res() res: Response,
+    @Req() req: any,
   ) {
-    const buffer = await this.reportService.generateExcel(filter);
-
-    const filename = `report_${filter.dateFrom}_${filter.dateTo}.xlsx`;
+    const userId = req.user?.userId;
+    const { buffer, filename } = await this.reportService.generateExcel(
+      filter,
+      userId,
+    );
 
     res.setHeader(
       'Content-Type',

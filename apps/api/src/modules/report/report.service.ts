@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { ReportFilterDto } from './dto/report-filter.dto';
 import * as ExcelJS from 'exceljs';
@@ -69,7 +69,11 @@ export class ReportService {
     };
   }
 
-  async generateExcel(filter: ReportFilterDto): Promise<Buffer> {
+  async generateExcel(
+    filter: ReportFilterDto,
+    userId: number,
+  ): Promise<{ buffer: Buffer; filename: string }> {
+    const localUserId = await this.resolveLocalUser(userId);
     const whereClause = this.buildWhereClause(filter);
 
     // Fetch all data needed for the report
@@ -93,6 +97,22 @@ export class ReportService {
       orderBy: { submission_time: 'desc' },
     });
 
+    // Generate filename
+    const filename = `report_${filter.dateFrom}_${filter.dateTo}.xlsx`;
+
+    // Log export
+    await this.prisma.log_report_export.create({
+      data: {
+        exported_by_user_id: localUserId,
+        report_type: 'CHECKIN_REPORT',
+        date_from: new Date(filter.dateFrom),
+        date_to: new Date(filter.dateTo),
+        filter_criteria: JSON.stringify(filter),
+        total_records: entries.length,
+        file_name: filename,
+      },
+    });
+
     // Get preview stats for summary sheet
     const preview = await this.getPreview(filter);
 
@@ -114,7 +134,26 @@ export class ReportService {
 
     // Generate buffer
     const buffer = await workbook.xlsx.writeBuffer();
-    return Buffer.from(buffer);
+    return {
+      buffer: Buffer.from(buffer),
+      filename,
+    };
+  }
+
+  private async resolveLocalUser(tokenUserId: number): Promise<number> {
+    // 1. Try to find by user_id (if token ID matches local ID)
+    const userById = await this.prisma.mst_user.findUnique({
+      where: { user_id: tokenUserId },
+    });
+    if (userById) return userById.user_id;
+
+    // 2. Try to find by external_user_id (if token ID is external ID)
+    const userByExternal = await this.prisma.mst_user.findUnique({
+      where: { external_user_id: tokenUserId },
+    });
+    if (userByExternal) return userByExternal.user_id;
+
+    throw new BadRequestException('User tidak ditemukan dalam database lokal');
   }
 
   private buildWhereClause(filter: ReportFilterDto) {
