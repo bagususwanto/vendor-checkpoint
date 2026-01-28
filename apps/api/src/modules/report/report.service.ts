@@ -98,7 +98,8 @@ export class ReportService {
     });
 
     // Generate filename
-    const filename = `report_${filter.dateFrom}_${filter.dateTo}.xlsx`;
+    const timestamp = new Date().getTime();
+    const filename = `report_${filter.dateFrom}_${filter.dateTo}_${timestamp}.xlsx`;
 
     // Log export
     await this.prisma.log_report_export.create({

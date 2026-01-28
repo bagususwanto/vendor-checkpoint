@@ -12,12 +12,12 @@ export const useReportPreview = (filter: ReportFilter) => {
 export const useExportReport = () => {
   return useMutation({
     mutationFn: (filter: ReportFilter) => reportService.exportExcel(filter),
-    onSuccess: (data: Blob) => {
+    onSuccess: ({ data, filename }: { data: Blob; filename: string }) => {
       // Create download link
       const url = window.URL.createObjectURL(new Blob([data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `report_${new Date().getTime()}.xlsx`);
+      link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
       link.remove();

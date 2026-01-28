@@ -46,7 +46,20 @@ export const reportService = {
         params,
         responseType: 'blob',
       });
-      return response.data;
+
+      let filename = `report_${new Date().getTime()}.xlsx`;
+      const contentDisposition = response.headers['content-disposition'];
+      if (contentDisposition) {
+        const matches = /filename="?([^"]*)"?/.exec(contentDisposition);
+        if (matches != null && matches[1]) {
+          filename = matches[1];
+        }
+      }
+
+      return {
+        data: response.data,
+        filename,
+      };
     } catch (error) {
       throw error;
     }
