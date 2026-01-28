@@ -1,17 +1,10 @@
-import {
-  Controller,
-  Get,
-  Query,
-  Res,
-  Req,
-  UseGuards,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Controller, Get, Query, Res, Req, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ReportService } from './report.service';
 import { ReportFilterDto } from './dto/report-filter.dto';
 import { AuditLogFilterDto } from './dto/audit-log-filter.dto';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @Controller('reports')
 @UseGuards(JwtAuthGuard)
@@ -20,14 +13,14 @@ export class ReportController {
 
   @Get()
   async getPreview(
-    @Query(new ValidationPipe({ transform: true })) filter: ReportFilterDto,
+    @Query(new ZodValidationPipe(ReportFilterDto)) filter: ReportFilterDto,
   ) {
     return this.reportService.getPreview(filter);
   }
 
   @Get('export')
   async exportExcel(
-    @Query(new ValidationPipe({ transform: true })) filter: ReportFilterDto,
+    @Query(new ZodValidationPipe(ReportFilterDto)) filter: ReportFilterDto,
     @Res() res: Response,
     @Req() req: any,
   ) {
@@ -49,14 +42,14 @@ export class ReportController {
 
   @Get('audit-logs')
   async getAuditLogs(
-    @Query(new ValidationPipe({ transform: true })) filter: AuditLogFilterDto,
+    @Query(new ZodValidationPipe(AuditLogFilterDto)) filter: AuditLogFilterDto,
   ) {
     return this.reportService.getAuditLogs(filter);
   }
 
   @Get('audit-logs/export')
   async exportAuditLogs(
-    @Query(new ValidationPipe({ transform: true })) filter: AuditLogFilterDto,
+    @Query(new ZodValidationPipe(AuditLogFilterDto)) filter: AuditLogFilterDto,
     @Res() res: Response,
     @Req() req: any,
   ) {
