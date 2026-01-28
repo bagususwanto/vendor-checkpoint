@@ -9,6 +9,7 @@ import { checklistService } from '@/services/checklist.service';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { ChecklistItemType } from '@repo/types';
+import { DeleteDialog } from '@/components/delete-dialog';
 
 interface ChecklistItemListProps {
   items: ChecklistItemResponse[];
@@ -22,6 +23,12 @@ export function ChecklistItemList({
   onRefetch,
 }: ChecklistItemListProps) {
   const [items, setItems] = useState(initialItems);
+  const [deleteDialogState, setDeleteDialogState] = useState<{
+    open: boolean;
+    id: number | null;
+    text: string;
+  }>({ open: false, id: null, text: '' });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     setItems(initialItems);
@@ -42,38 +49,69 @@ export function ChecklistItemList({
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus item ini?')) return;
+  const handleDelete = (item: ChecklistItemResponse) => {
+    setDeleteDialogState({
+      open: true,
+      id: item.checklist_item_id,
+      text: item.item_text,
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteDialogState.id) return;
+
     try {
-      await checklistService.deleteItem(id);
+      setIsDeleting(true);
+      await checklistService.deleteItem(deleteDialogState.id);
       toast.success('Item berhasil dihapus');
+      setDeleteDialogState((prev) => ({ ...prev, open: false }));
       onRefetch();
     } catch (error) {
       toast.error('Gagal menghapus item');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   return (
-    <Reorder.Group
-      axis="y"
-      values={items}
-      onReorder={handleReorder}
-      className="space-y-2"
-    >
-      {items.map((item) => (
-        <ChecklistItem
-          key={item.checklist_item_id}
-          item={item}
-          onEdit={() => onEdit(item)}
-          onDelete={() => handleDelete(item.checklist_item_id)}
-        />
-      ))}
-      {items.length === 0 && (
-        <div className="text-sm text-muted-foreground italic py-2">
-          Belum ada item checklist.
-        </div>
-      )}
-    </Reorder.Group>
+    <>
+      <Reorder.Group
+        axis="y"
+        values={items}
+        onReorder={handleReorder}
+        className="space-y-2"
+      >
+        {items.map((item) => (
+          <ChecklistItem
+            key={item.checklist_item_id}
+            item={item}
+            onEdit={() => onEdit(item)}
+            onDelete={() => handleDelete(item)}
+          />
+        ))}
+        {items.length === 0 && (
+          <div className="text-sm text-muted-foreground italic py-2">
+            Belum ada item checklist.
+          </div>
+        )}
+      </Reorder.Group>
+
+      <DeleteDialog
+        open={deleteDialogState.open}
+        onOpenChange={(open) =>
+          setDeleteDialogState((prev) => ({ ...prev, open }))
+        }
+        onConfirm={handleConfirmDelete}
+        title="Hapus Item Checklist"
+        description={
+          <span>
+            Apakah Anda yakin ingin menghapus item{' '}
+            <span className="font-semibold">"{deleteDialogState.text}"</span>?
+          </span>
+        }
+        isDeleting={isDeleting}
+      />
+    </>
   );
 }
 

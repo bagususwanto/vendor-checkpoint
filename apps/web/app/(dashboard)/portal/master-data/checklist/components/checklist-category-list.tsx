@@ -25,6 +25,7 @@ import { checklistService } from '@/services/checklist.service';
 import { toast } from 'sonner';
 import { ChecklistItemDialog } from './checklist-item-dialog';
 import { ChecklistItemList } from './checklist-item-list';
+import { DeleteDialog } from '@/components/delete-dialog';
 
 interface ChecklistCategoryListProps {
   categories: ChecklistCategoryResponse[];
@@ -46,6 +47,12 @@ export function ChecklistCategoryList({
     item: ChecklistItemResponse | null;
     categoryId: number | null;
   }>({ open: false, item: null, categoryId: null });
+  const [deleteDialogState, setDeleteDialogState] = useState<{
+    open: boolean;
+    id: number | null;
+    name: string;
+  }>({ open: false, id: null, name: '' });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     setItems(categories);
@@ -72,14 +79,27 @@ export function ChecklistCategoryList({
     setOpenItems((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus kategori ini?')) return;
+  const handleDelete = (category: ChecklistCategoryResponse) => {
+    setDeleteDialogState({
+      open: true,
+      id: category.checklist_category_id,
+      name: category.category_name,
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteDialogState.id) return;
+
     try {
-      await checklistService.deleteCategory(id);
+      setIsDeleting(true);
+      await checklistService.deleteCategory(deleteDialogState.id);
       toast.success('Kategori berhasil dihapus');
+      setDeleteDialogState((prev) => ({ ...prev, open: false }));
       onRefetch();
     } catch (error) {
       toast.error('Gagal menghapus kategori');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -110,7 +130,7 @@ export function ChecklistCategoryList({
             isOpen={openItems[category.checklist_category_id] ?? false}
             onToggle={() => toggleOpen(category.checklist_category_id)}
             onEdit={() => onEdit(category)}
-            onDelete={() => handleDelete(category.checklist_category_id)}
+            onDelete={() => handleDelete(category)}
             onAddItem={() => handleAddItem(category.checklist_category_id)}
             onEditItem={handleEditItem}
             onRefetch={onRefetch}
@@ -126,6 +146,24 @@ export function ChecklistCategoryList({
         categoryId={itemDialogState.categoryId}
         item={itemDialogState.item}
         onSuccess={handleItemSuccess}
+      />
+
+      <DeleteDialog
+        open={deleteDialogState.open}
+        onOpenChange={(open) =>
+          setDeleteDialogState((prev) => ({ ...prev, open }))
+        }
+        onConfirm={handleConfirmDelete}
+        title="Hapus Kategori Checklist"
+        description={
+          <span>
+            Apakah Anda yakin ingin menghapus kategori{' '}
+            <span className="font-semibold">"{deleteDialogState.name}"</span>?
+            Aksi ini tidak dapat dibatalkan dan akan menghapus semua item di
+            dalamnya.
+          </span>
+        }
+        isDeleting={isDeleting}
       />
     </div>
   );

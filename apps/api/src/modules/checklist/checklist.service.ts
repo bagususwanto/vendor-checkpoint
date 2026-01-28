@@ -72,8 +72,27 @@ export class ChecklistService {
   }
 
   async deleteCategory(id: number) {
-    return this.prisma.mst_checklist_category.delete({
+    // Check usage in transactions
+    const usedCount = await this.prisma.ops_checkin_response.count({
       where: { checklist_category_id: id },
+    });
+
+    if (usedCount > 0) {
+      // Soft delete if used
+      return this.prisma.mst_checklist_category.update({
+        where: { checklist_category_id: id },
+        data: { is_active: false },
+      });
+    }
+
+    // Hard delete if not used (cascade delete items first)
+    return this.prisma.$transaction(async (tx) => {
+      await tx.mst_checklist_item.deleteMany({
+        where: { checklist_category_id: id },
+      });
+      return tx.mst_checklist_category.delete({
+        where: { checklist_category_id: id },
+      });
     });
   }
 
@@ -103,6 +122,20 @@ export class ChecklistService {
   }
 
   async deleteItem(id: number) {
+    // Check usage in transactions
+    const usedCount = await this.prisma.ops_checkin_response.count({
+      where: { checklist_item_id: id },
+    });
+
+    if (usedCount > 0) {
+      // Soft delete if used
+      return this.prisma.mst_checklist_item.update({
+        where: { checklist_item_id: id },
+        data: { is_active: false },
+      });
+    }
+
+    // Hard delete if not used
     return this.prisma.mst_checklist_item.delete({
       where: { checklist_item_id: id },
     });
