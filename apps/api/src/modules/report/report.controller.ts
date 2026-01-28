@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ReportService } from './report.service';
 import { ReportFilterDto } from './dto/report-filter.dto';
-import { AuditLogFilterDto } from './dto/audit-log-filter.dto';
+import { ReportExportLogFilterDto } from './dto/report-export-log-filter.dto';
 import { ZodValidationPipe } from 'nestjs-zod';
 
 @Controller('reports')
@@ -40,32 +40,11 @@ export class ReportController {
     res.send(buffer);
   }
 
-  @Get('audit-logs')
-  async getAuditLogs(
-    @Query(new ZodValidationPipe(AuditLogFilterDto)) filter: AuditLogFilterDto,
+  @Get('export-logs')
+  async getExportLogs(
+    @Query(new ZodValidationPipe(ReportExportLogFilterDto))
+    filter: ReportExportLogFilterDto,
   ) {
-    return this.reportService.getAuditLogs(filter);
-  }
-
-  @Get('audit-logs/export')
-  async exportAuditLogs(
-    @Query(new ZodValidationPipe(AuditLogFilterDto)) filter: AuditLogFilterDto,
-    @Res() res: Response,
-    @Req() req: any,
-  ) {
-    const userId = req.user?.userId;
-    const { buffer, filename } = await this.reportService.generateAuditLogExcel(
-      filter,
-      userId,
-    );
-
-    res.setHeader(
-      'Content-Type',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    );
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.setHeader('Content-Length', buffer.length);
-
-    res.send(buffer);
+    return this.reportService.getExportLogs(filter);
   }
 }

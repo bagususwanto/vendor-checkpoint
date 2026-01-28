@@ -1,7 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { ReportFilterDto } from './dto/report-filter.dto';
-import { AuditLogFilterDto } from './dto/audit-log-filter.dto';
 import * as ExcelJS from 'exceljs';
 
 @Injectable()
@@ -434,7 +433,13 @@ export class ReportService {
     });
   }
 
-  async getAuditLogs(filter: AuditLogFilterDto) {
+  async getExportLogs(filter: {
+    dateFrom: string;
+    dateTo: string;
+    reportType?: string;
+    page: number;
+    limit: number;
+  }) {
     const dateFrom = new Date(filter.dateFrom);
     dateFrom.setHours(0, 0, 0, 0);
 
@@ -442,26 +447,22 @@ export class ReportService {
     dateTo.setHours(23, 59, 59, 999);
 
     const where: any = {
-      created_at: {
+      export_time: {
         gte: dateFrom,
         lte: dateTo,
       },
     };
 
-    if (filter.actionType) {
-      where.action_type = filter.actionType;
-    }
-
-    if (filter.userId) {
-      where.user_id = filter.userId;
+    if (filter.reportType) {
+      where.report_type = filter.reportType;
     }
 
     // Get total count
-    const total = await this.prisma.log_audit.count({ where });
+    const total = await this.prisma.log_report_export.count({ where });
 
     // Get paginated data
     const skip = (filter.page - 1) * filter.limit;
-    const data = await this.prisma.log_audit.findMany({
+    const data = await this.prisma.log_report_export.findMany({
       where,
       include: {
         user: {
@@ -471,14 +472,8 @@ export class ReportService {
             full_name: true,
           },
         },
-        entry: {
-          select: {
-            entry_id: true,
-            queue_number: true,
-          },
-        },
       },
-      orderBy: { created_at: 'desc' },
+      orderBy: { export_time: 'desc' },
       skip,
       take: filter.limit,
     });
@@ -491,143 +486,6 @@ export class ReportService {
         limit: filter.limit,
         totalPages: Math.ceil(total / filter.limit),
       },
-    };
-  }
-
-  async generateAuditLogExcel(
-    filter: AuditLogFilterDto,
-    userId: number,
-  ): Promise<{ buffer: Buffer; filename: string }> {
-    const localUserId = await this.resolveLocalUser(userId);
-
-    const dateFrom = new Date(filter.dateFrom);
-    dateFrom.setHours(0, 0, 0, 0);
-
-    const dateTo = new Date(filter.dateTo);
-    dateTo.setHours(23, 59, 59, 999);
-
-    const where: any = {
-      created_at: {
-        gte: dateFrom,
-        lte: dateTo,
-      },
-    };
-
-    if (filter.actionType) {
-      where.action_type = filter.actionType;
-    }
-
-    if (filter.userId) {
-      where.user_id = filter.userId;
-    }
-
-    // Fetch all audit logs
-    const logs = await this.prisma.log_audit.findMany({
-      where,
-      include: {
-        user: {
-          select: {
-            user_id: true,
-            username: true,
-            full_name: true,
-          },
-        },
-        entry: {
-          select: {
-            entry_id: true,
-            queue_number: true,
-          },
-        },
-      },
-      orderBy: { created_at: 'desc' },
-    });
-
-    // Generate filename
-    const filename = `audit_log_${filter.dateFrom}_${filter.dateTo}.xlsx`;
-
-    // Log export
-    await this.prisma.log_report_export.create({
-      data: {
-        exported_by_user_id: localUserId,
-        report_type: 'AUDIT_LOG',
-        date_from: new Date(filter.dateFrom),
-        date_to: new Date(filter.dateTo),
-        filter_criteria: JSON.stringify(filter),
-        total_records: logs.length,
-        file_name: filename,
-      },
-    });
-
-    const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'Vendor Checkpoint System';
-    workbook.created = new Date();
-
-    // Create audit log sheet
-    const sheet = workbook.addWorksheet('Audit Logs');
-
-    // Headers
-    const headers = [
-      'No',
-      'Timestamp',
-      'User',
-      'Action Type',
-      'Description',
-      'Queue Number',
-      'Entry ID',
-      'Old Value',
-      'New Value',
-      'IP Address',
-    ];
-
-    const headerRow = sheet.addRow(headers);
-    headerRow.font = { bold: true };
-    headerRow.eachCell((cell) => {
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFE0E0E0' },
-      };
-      cell.border = {
-        bottom: { style: 'thin' },
-      };
-    });
-
-    // Data rows
-    logs.forEach((log, index) => {
-      sheet.addRow([
-        index + 1,
-        this.formatDateTime(log.created_at),
-        log.user?.full_name || '-',
-        log.action_type,
-        log.action_description,
-        log.entry?.queue_number || '-',
-        log.entry_id || '-',
-        log.old_value || '-',
-        log.new_value || '-',
-        log.ip_address || '-',
-      ]);
-    });
-
-    // Auto-fit columns
-    sheet.columns.forEach((column, index) => {
-      if (index === 0) {
-        column.width = 5;
-      } else if (index === 1) {
-        column.width = 18;
-      } else if (index === 4) {
-        column.width = 40;
-      } else if (index === 7 || index === 8) {
-        column.width = 30;
-      } else {
-        column.width = 15;
-      }
-    });
-
-    // Generate buffer
-    const buffer = await workbook.xlsx.writeBuffer();
-    return {
-      buffer: Buffer.from(buffer),
-      filename,
     };
   }
 }

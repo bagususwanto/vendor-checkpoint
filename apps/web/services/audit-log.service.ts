@@ -36,12 +36,9 @@ export interface AuditLogResponse {
 export const auditLogService = {
   getAuditLogs: async (params: AuditLogFilter) => {
     try {
-      const response = await axiosInstance.get<AuditLogResponse>(
-        '/reports/audit-logs',
-        {
-          params,
-        },
-      );
+      const response = await axiosInstance.get<AuditLogResponse>('/audit', {
+        params,
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -50,7 +47,7 @@ export const auditLogService = {
 
   exportAuditLogs: async (params: AuditLogFilter) => {
     try {
-      const response = await axiosInstance.get('/reports/audit-logs/export', {
+      const response = await axiosInstance.get('/audit/export', {
         params,
         responseType: 'blob',
       });
