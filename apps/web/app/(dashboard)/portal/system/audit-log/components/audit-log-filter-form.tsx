@@ -32,7 +32,7 @@ export function AuditLogFilterForm({
   const hasFilters = !!date || actionType !== '';
 
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-sm">
+    <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-wrap">
           <DatePickerWithRange

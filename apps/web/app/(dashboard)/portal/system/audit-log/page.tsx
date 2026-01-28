@@ -8,8 +8,14 @@ import { AuditLogTable } from './components/audit-log-table';
 import { useAuditLogs, useExportAuditLogs } from '@/hooks/api/use-audit-log';
 import { Button } from '@/components/ui/button';
 import { DownloadIcon, Loader2 } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export default function AuditLogPage() {
   const [date, setDate] = React.useState<DateRange | undefined>({
@@ -18,6 +24,7 @@ export default function AuditLogPage() {
   });
   const [actionType, setActionType] = React.useState<string>('');
   const [page, setPage] = React.useState<number>(1);
+  const [limit, setLimit] = React.useState<number>(10);
 
   const filter = React.useMemo(() => {
     return {
@@ -25,9 +32,9 @@ export default function AuditLogPage() {
       dateTo: date?.to ? format(date.to, 'yyyy-MM-dd') : '',
       actionType: actionType === 'ALL' ? undefined : actionType,
       page,
-      limit: 10,
+      limit,
     };
-  }, [date, actionType, page]);
+  }, [date, actionType, page, limit]);
 
   const { data: auditLogsData, isLoading } = useAuditLogs(filter);
   const { mutate: exportAuditLogs, isPending: isExporting } =
@@ -56,6 +63,7 @@ export default function AuditLogPage() {
     });
     setActionType('');
     setPage(1);
+    setLimit(10);
   };
 
   return (
@@ -63,8 +71,8 @@ export default function AuditLogPage() {
       <div className="flex items-center justify-between space-y-2">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Audit Log</h2>
-          <p className="text-muted-foreground">
-            Monitor aktivitas dan perubahan sistem
+          <p className="text-muted-foreground text-sm">
+            Monitor aktivitas dan perubahan data dalam sistem.
           </p>
         </div>
         <div className="flex items-center space-x-2">
@@ -81,26 +89,38 @@ export default function AuditLogPage() {
           </Button>
         </div>
       </div>
-      <Separator />
 
-      <AuditLogFilterForm
-        date={date}
-        setDate={setDate}
-        actionType={actionType}
-        setActionType={(val) => {
-          setActionType(val);
-          setPage(1);
-        }}
-        onReset={handleReset}
-      />
+      <Card>
+        <CardHeader>
+          <CardTitle>Daftar Audit Log</CardTitle>
+          <CardDescription>
+            Tabel berikut menampilkan riwayat aktivitas pengguna dalam sistem.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <AuditLogFilterForm
+            date={date}
+            setDate={setDate}
+            actionType={actionType}
+            setActionType={(val) => {
+              setActionType(val);
+              setPage(1);
+            }}
+            onReset={handleReset}
+          />
 
-      <AuditLogTable
-        data={auditLogsData?.data || []}
-        isLoading={isLoading}
-        page={auditLogsData?.meta.page || 1}
-        totalPages={auditLogsData?.meta.totalPages || 0}
-        onPageChange={setPage}
-      />
+          <AuditLogTable
+            data={auditLogsData?.data || []}
+            isLoading={isLoading}
+            page={auditLogsData?.meta.page || 1}
+            limit={limit}
+            total={auditLogsData?.meta.total || 0}
+            totalPages={auditLogsData?.meta.totalPages || 0}
+            onPageChange={setPage}
+            onLimitChange={setLimit}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }
