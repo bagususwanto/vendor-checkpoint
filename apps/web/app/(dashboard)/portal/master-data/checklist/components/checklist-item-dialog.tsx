@@ -41,6 +41,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 interface ChecklistItemDialogProps {
   open: boolean;
@@ -151,62 +153,74 @@ export function ChecklistItemDialog({
           <Field>
             <FieldLabel required>Tipe Input</FieldLabel>
             <FieldContent>
-              <Select
+              <RadioGroup
                 onValueChange={(value) =>
                   form.setValue('item_type', value as any)
                 }
-                defaultValue={form.watch('item_type')}
+                value={form.watch('item_type')}
+                className="flex gap-4 pt-2"
               >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih tipe input" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ChecklistItemType.UMUM}>Umum</SelectItem>
-                  <SelectItem value={ChecklistItemType.KHUSUS}>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value={ChecklistItemType.UMUM} id="umum" />
+                  <Label htmlFor="umum" className="font-normal cursor-pointer">
+                    Umum
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value={ChecklistItemType.KHUSUS}
+                    id="khusus"
+                  />
+                  <Label
+                    htmlFor="khusus"
+                    className="font-normal cursor-pointer"
+                  >
                     Khusus
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+                  </Label>
+                </div>
+              </RadioGroup>
             </FieldContent>
             <FieldError errors={[form.formState.errors.item_type]} />
           </Field>
 
           {form.watch('item_type') === ChecklistItemType.KHUSUS && (
-            <Field>
-              <FieldLabel required>Kategori Material</FieldLabel>
-              <FieldContent>
-                <Select
-                  onValueChange={(value) =>
-                    form.setValue('material_category_id', Number(value))
-                  }
-                  defaultValue={
-                    form.watch('material_category_id')
-                      ? String(form.watch('material_category_id'))
-                      : undefined
-                  }
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Pilih kategori material" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {materialCategories?.map((category) => (
-                      <SelectItem
-                        key={category.material_category_id}
-                        value={String(category.material_category_id)}
-                      >
-                        {category.category_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FieldContent>
-              <FieldError
-                errors={[form.formState.errors.material_category_id]}
-              />
-            </Field>
+            <div className="py-2">
+              <Field>
+                <FieldLabel required>Kategori Material</FieldLabel>
+                <FieldContent>
+                  <Select
+                    onValueChange={(value) =>
+                      form.setValue('material_category_id', Number(value))
+                    }
+                    defaultValue={
+                      form.watch('material_category_id')
+                        ? String(form.watch('material_category_id'))
+                        : undefined
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Pilih kategori material" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {materialCategories?.map((category) => (
+                        <SelectItem
+                          key={category.material_category_id}
+                          value={String(category.material_category_id)}
+                        >
+                          {category.category_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FieldContent>
+                <FieldError
+                  errors={[form.formState.errors.material_category_id]}
+                />
+              </Field>
+            </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 py-2">
             <Field orientation="horizontal">
               <FieldContent>
                 <FieldLabel>Wajib Diisi</FieldLabel>

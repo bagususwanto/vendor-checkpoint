@@ -155,7 +155,7 @@ export function ChecklistCategoryDialog({
             <FieldError errors={[form.formState.errors.description]} />
           </Field>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 py-2">
             <Field>
               <FieldLabel>Icon Name</FieldLabel>
               <FieldContent>
@@ -199,19 +199,21 @@ export function ChecklistCategoryDialog({
             </Field>
           </div>
 
-          <Field orientation="horizontal">
-            <FieldContent>
-              <FieldLabel>Status Aktif</FieldLabel>
-            </FieldContent>
-            <FieldContent className="flex flex-1 justify-end">
-              <Switch
-                checked={form.watch('is_active')}
-                onCheckedChange={(checked) =>
-                  form.setValue('is_active', checked)
-                }
-              />
-            </FieldContent>
-          </Field>
+          <div className="py-2">
+            <Field orientation="horizontal">
+              <FieldContent>
+                <FieldLabel>Status Aktif</FieldLabel>
+              </FieldContent>
+              <FieldContent className="flex flex-1 justify-end">
+                <Switch
+                  checked={form.watch('is_active')}
+                  onCheckedChange={(checked) =>
+                    form.setValue('is_active', checked)
+                  }
+                />
+              </FieldContent>
+            </Field>
+          </div>
 
           <DialogFooter>
             <Button

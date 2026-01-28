@@ -49,9 +49,11 @@ export default function ChecklistPage() {
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Checklist</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Daftar Pemeriksaan
+          </h2>
           <p className="text-muted-foreground text-sm">
-            Kelola data master checklist (kategori dan item).
+            Kelola data master pemeriksaan (kategori dan item).
           </p>
         </div>
         <div className="flex items-center space-x-2">
@@ -63,9 +65,9 @@ export default function ChecklistPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Daftar Checklist</CardTitle>
+          <CardTitle>Daftar Pemeriksaan</CardTitle>
           <CardDescription>
-            Atur kategori dan item checklist. Geser untuk mengubah urutan.
+            Atur kategori dan item pemeriksaan. Geser untuk mengubah urutan.
           </CardDescription>
         </CardHeader>
         <CardContent>
