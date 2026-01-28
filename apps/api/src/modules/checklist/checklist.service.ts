@@ -53,7 +53,15 @@ export class ChecklistService {
           return 1;
         }
 
-        // Secondary sort: display_order
+        // Secondary sort: material_category_id
+        const matA = a.material_category_id || 0;
+        const matB = b.material_category_id || 0;
+
+        if (matA !== matB) {
+          return matA - matB;
+        }
+
+        // Tertiary sort: display_order
         return a.display_order - b.display_order;
       });
 
