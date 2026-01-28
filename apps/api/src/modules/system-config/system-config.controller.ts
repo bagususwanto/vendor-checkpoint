@@ -6,11 +6,12 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { SystemConfigService } from './system-config.service';
-import { CreateSystemConfigDto } from './dto/create-system-config.dto';
 import { UpdateSystemConfigDto } from './dto/update-system-config.dto';
+import { FindSystemConfigParamsDto } from './dto/find-system-config-params.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 // All system-config routes are protected - system settings
@@ -19,14 +20,14 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 export class SystemConfigController {
   constructor(private readonly systemConfigService: SystemConfigService) {}
 
-  @Post()
-  create(@Body() createSystemConfigDto: CreateSystemConfigDto) {
-    return this.systemConfigService.create(createSystemConfigDto);
+  @Get()
+  findAll(@Query() query: FindSystemConfigParamsDto) {
+    return this.systemConfigService.findAll(query);
   }
 
-  @Get()
-  findAll() {
-    return this.systemConfigService.findAll();
+  @Get('key/:key')
+  findByKey(@Param('key') key: string) {
+    return this.systemConfigService.findByConfigKey(key);
   }
 
   @Get(':id')
@@ -40,10 +41,5 @@ export class SystemConfigController {
     @Body() updateSystemConfigDto: UpdateSystemConfigDto,
   ) {
     return this.systemConfigService.update(+id, updateSystemConfigDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.systemConfigService.remove(+id);
   }
 }

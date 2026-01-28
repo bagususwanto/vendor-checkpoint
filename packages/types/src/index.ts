@@ -8,3 +8,4 @@ export * from './user';
 export * from './vendor';
 export * from './checklist';
 export * from './report';
+export * from './system-config';

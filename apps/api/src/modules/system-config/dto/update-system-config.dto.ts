@@ -1,4 +1,6 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateSystemConfigDto } from './create-system-config.dto';
+import { createZodDto } from 'nestjs-zod';
+import { updateSystemConfigSchema } from '@repo/types';
 
-export class UpdateSystemConfigDto extends PartialType(CreateSystemConfigDto) {}
+export class UpdateSystemConfigDto extends createZodDto(
+  updateSystemConfigSchema,
+) {}
