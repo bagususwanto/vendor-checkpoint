@@ -25,7 +25,15 @@ export class ChecklistService {
   async findAllCategories() {
     const categories = await this.prisma.mst_checklist_category.findMany({
       include: {
-        mst_checklist_item: true, // We will sort in memory
+        mst_checklist_item: {
+          include: {
+            material_category: {
+              select: {
+                category_name: true,
+              },
+            },
+          },
+        },
       },
       orderBy: {
         display_order: 'asc',

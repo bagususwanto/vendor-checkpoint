@@ -8,6 +8,7 @@ import { Reorder, useDragControls } from 'framer-motion';
 import { checklistService } from '@/services/checklist.service';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import { ChecklistItemType } from '@repo/types';
 
 interface ChecklistItemListProps {
   items: ChecklistItemResponse[];
@@ -106,6 +107,12 @@ function ChecklistItem({
         <Badge variant="outline" className="text-xs">
           {item.item_type}
         </Badge>
+        {item.item_type === ChecklistItemType.KHUSUS &&
+          item.material_category && (
+            <Badge variant="secondary" className="text-xs bg-muted">
+              {item.material_category.category_name}
+            </Badge>
+          )}
         {item.is_required && (
           <Badge variant="secondary" className="text-xs">
             Wajib

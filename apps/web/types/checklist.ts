@@ -28,6 +28,10 @@ export type ChecklistItemResponse = {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  material_category?: {
+    material_category_id: number;
+    category_name: string;
+  } | null;
 };
 
 export type ChecklistCategoryResponse = {
