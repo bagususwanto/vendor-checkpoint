@@ -30,7 +30,7 @@ export type UpdateChecklistCategory = z.infer<
   typeof updateChecklistCategorySchema
 >;
 
-export const createChecklistItemSchema = z.object({
+const checklistItemBaseSchema = z.object({
   checklist_category_id: z.number().int(),
   item_code: z
     .string()
@@ -44,9 +44,24 @@ export const createChecklistItemSchema = z.object({
   is_active: z.boolean().default(true),
 });
 
+export const createChecklistItemSchema = checklistItemBaseSchema.superRefine(
+  (data, ctx) => {
+    if (
+      data.item_type === ChecklistItemType.KHUSUS &&
+      !data.material_category_id
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Kategori material harus dipilih untuk item khusus',
+        path: ['material_category_id'],
+      });
+    }
+  },
+);
+
 export type CreateChecklistItem = z.infer<typeof createChecklistItemSchema>;
 
-export const updateChecklistItemSchema = createChecklistItemSchema.partial();
+export const updateChecklistItemSchema = checklistItemBaseSchema.partial();
 
 export type UpdateChecklistItem = z.infer<typeof updateChecklistItemSchema>;
 

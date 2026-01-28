@@ -9,6 +9,7 @@ import {
   ChecklistItemType,
 } from '@repo/types';
 import { ChecklistItemResponse, CreateChecklistItem } from '@/types/checklist';
+import { useMaterialCategorySelection } from '@/hooks/api/use-material-categories';
 // ... (keep intermediate lines if possible or replace larger chunk)
 // actually I will use multiple replace chunks to be safe
 
@@ -56,10 +57,10 @@ export function ChecklistItemDialog({
   item,
   onSuccess,
 }: ChecklistItemDialogProps) {
+  const { data: materialCategories } = useMaterialCategorySelection();
+
   const form = useForm<CreateChecklistItem>({
-    resolver: zodResolver(
-      item ? updateChecklistItemSchema : createChecklistItemSchema,
-    ) as any,
+    resolver: zodResolver(createChecklistItemSchema) as any,
     defaultValues: {
       checklist_category_id: categoryId || 0,
       item_text: '',
@@ -169,6 +170,41 @@ export function ChecklistItemDialog({
             </FieldContent>
             <FieldError errors={[form.formState.errors.item_type]} />
           </Field>
+
+          {form.watch('item_type') === ChecklistItemType.KHUSUS && (
+            <Field>
+              <FieldLabel required>Kategori Material</FieldLabel>
+              <FieldContent>
+                <Select
+                  onValueChange={(value) =>
+                    form.setValue('material_category_id', Number(value))
+                  }
+                  defaultValue={
+                    form.watch('material_category_id')
+                      ? String(form.watch('material_category_id'))
+                      : undefined
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Pilih kategori material" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {materialCategories?.map((category) => (
+                      <SelectItem
+                        key={category.material_category_id}
+                        value={String(category.material_category_id)}
+                      >
+                        {category.category_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FieldContent>
+              <FieldError
+                errors={[form.formState.errors.material_category_id]}
+              />
+            </Field>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <Field orientation="horizontal">
