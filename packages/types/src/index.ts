@@ -7,3 +7,4 @@ export * from './paginated';
 export * from './user';
 export * from './vendor';
 export * from './checklist';
+export * from './report';
