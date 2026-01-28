@@ -33,6 +33,9 @@ export type ChecklistItem = {
   is_required: boolean;
   material_category_id?: number | null;
   display_order?: number;
+  material_category?: {
+    category_name: string;
+  } | null;
 };
 
 export type ChecklistCategoryData = {

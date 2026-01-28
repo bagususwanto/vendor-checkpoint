@@ -431,6 +431,14 @@ export function VerificationSheet({
                                               {item.item_type.toLowerCase()}
                                             </Badge>
                                           )}
+                                          {item.material_category_name && (
+                                            <Badge
+                                              variant="outline"
+                                              className="text-[10px] px-1.5 py-0 h-5 text-muted-foreground"
+                                            >
+                                              {item.material_category_name}
+                                            </Badge>
+                                          )}
                                           {!item.is_compliant && (
                                             <p className="text-xs text-muted-foreground self-center">
                                               Item ini memerlukan perhatian

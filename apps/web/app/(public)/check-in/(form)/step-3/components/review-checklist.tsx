@@ -65,13 +65,21 @@ export function ReviewChecklist({ step2Data }: ReviewChecklistProps) {
                         <span className="text-muted-foreground text-sm">
                           {item.item_text}
                         </span>
-                        <div>
+                        <div className="flex gap-2">
                           <Badge
                             variant="secondary"
                             className="bg-muted text-[10px] py-0 h-4 uppercase"
                           >
                             {item.item_type}
                           </Badge>
+                          {item.material_category && (
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] py-0 h-4 text-muted-foreground"
+                            >
+                              {item.material_category.category_name}
+                            </Badge>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5 font-medium shrink-0">

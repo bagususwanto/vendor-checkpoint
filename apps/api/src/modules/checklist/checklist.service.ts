@@ -197,6 +197,11 @@ export class ChecklistService {
             material_category_id: true,
             is_required: true,
             display_order: true,
+            material_category: {
+              select: {
+                category_name: true,
+              },
+            },
           },
           where: {
             is_active: true,

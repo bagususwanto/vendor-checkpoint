@@ -320,6 +320,16 @@ export class CheckInService {
             is_compliant: true,
             display_order: true,
             item_type: true,
+            checklist_item: {
+              select: {
+                material_category_id: true,
+                material_category: {
+                  select: {
+                    category_name: true,
+                  },
+                },
+              },
+            },
             checklist_category: {
               select: {
                 category_name: true,
@@ -606,6 +616,9 @@ export class CheckInService {
         response_value: response.response_value,
         is_compliant: response.is_compliant,
         display_order: response.display_order,
+        material_category_name:
+          response.checklist_item?.material_category?.category_name,
+        material_category_id: response.checklist_item?.material_category_id,
       });
       return acc;
     }, {});
@@ -624,7 +637,15 @@ export class CheckInService {
             return 1;
           }
 
-          // Secondary sort: display_order
+          // Secondary sort: material_category_id / name
+          const matA = a.material_category_id || 0;
+          const matB = b.material_category_id || 0;
+
+          if (matA !== matB) {
+            return matA - matB;
+          }
+
+          // Tertiary sort: display_order
           return a.display_order - b.display_order;
         });
         return category;
