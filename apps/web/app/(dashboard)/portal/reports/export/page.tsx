@@ -47,8 +47,12 @@ export default function ReportsPage() {
       onSuccess: () => {
         toast.success('Report berhasil di-download');
       },
-      onError: () => {
-        toast.error('Gagal download report');
+      onError: (error: any) => {
+        const errorMessage =
+          error?.message || 'Gagal download report. Silakan coba lagi.';
+        toast.error('Gagal Export Report', {
+          description: errorMessage,
+        });
       },
     });
   };

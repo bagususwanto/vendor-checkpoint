@@ -57,3 +57,12 @@ export function useUpdateSystemConfig() {
     },
   });
 }
+
+export function useSystemConfigByKey(key: string) {
+  return useQuery({
+    queryKey: systemConfigKeys.detailByKey(key),
+    queryFn: () => systemConfigService.getByKey(key),
+    enabled: !!key,
+    staleTime: 5 * 60 * 1000, // 5 minutes - config doesn't change often
+  });
+}

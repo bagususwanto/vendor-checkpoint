@@ -17,11 +17,15 @@ export function useQueueStatus(queueNumber: string | null) {
   });
 }
 
-export function useActiveQueues(page: number, limit: number) {
+export function useActiveQueues(
+  page: number,
+  limit: number,
+  refetchInterval?: number,
+) {
   return useQuery({
     queryKey: ['active-queues', page, limit],
     queryFn: () => checkInService.getActiveQueues({ page, limit }),
-    refetchInterval: 10000,
+    refetchInterval: refetchInterval ?? 10000, // Default 10 seconds if not provided
   });
 }
 
@@ -35,6 +39,7 @@ export function useVerificationList(
     material_category_id?: string;
     status?: string;
   },
+  refetchInterval?: number,
 ) {
   return useQuery({
     queryKey: ['verification-list', page, limit, search, filter],
@@ -45,7 +50,7 @@ export function useVerificationList(
         search,
         filter,
       }),
-    refetchInterval: 10000, // Refresh every 10 seconds
+    refetchInterval: refetchInterval ?? 10000, // Default 10 seconds if not provided
   });
 }
 

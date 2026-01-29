@@ -14,6 +14,7 @@ import { VerificationSheet } from './verification-sheet';
 import { CheckoutSheet } from '@/app/(dashboard)/portal/operational/queue/components/checkout-sheet';
 import { StatusBadge } from '@/app/(dashboard)/components/status-badge';
 import { useVerificationList } from '@/hooks/api/use-check-in';
+import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { QueueStatus } from '@repo/types';
@@ -25,11 +26,24 @@ interface CheckinListProps {
 
 export function CheckinList({ status }: CheckinListProps) {
   const queryClient = useQueryClient();
-  const { data, isLoading } = useVerificationList(1, 5, undefined, {
-    start_date: format(new Date(), 'yyyy-MM-dd'),
-    end_date: format(new Date(), 'yyyy-MM-dd'),
-    status: status,
-  });
+
+  // Fetch refresh interval from system config
+  const { data: refreshConfig } = useSystemConfigByKey('REFRESH_INTERVAL_MS');
+  const refreshInterval = refreshConfig?.config_value
+    ? parseInt(refreshConfig.config_value, 10)
+    : 10000; // Default 10 seconds
+
+  const { data, isLoading } = useVerificationList(
+    1,
+    5,
+    undefined,
+    {
+      start_date: format(new Date(), 'yyyy-MM-dd'),
+      end_date: format(new Date(), 'yyyy-MM-dd'),
+      status: status,
+    },
+    refreshInterval,
+  );
 
   const checkins = data?.data || [];
 

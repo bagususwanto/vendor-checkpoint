@@ -276,7 +276,8 @@ export const SYSTEM_CONFIGS = [
     config_key: 'DISPLAY_PRIORITY_MODE',
     config_value: 'STANDARD',
     config_type: 'STRING',
-    description: 'Mode pengurutan di TV Display',
+    description:
+      'Mode pengurutan di TV Display. STANDARD: urutan berdasarkan waktu kedatangan (FIFO), PRIORITY: prioritaskan entry dengan non-compliant items',
   },
   {
     config_key: 'ESTIMATED_WAIT_MINUTES',

@@ -1,11 +1,15 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
+import { SystemConfigService } from '../system-config/system-config.service';
 import { ReportFilterDto } from './dto/report-filter.dto';
 import * as ExcelJS from 'exceljs';
 
 @Injectable()
 export class ReportService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly systemConfigService: SystemConfigService,
+  ) {}
 
   async getPreview(filter: ReportFilterDto) {
     const whereClause = this.buildWhereClause(filter);
@@ -75,6 +79,24 @@ export class ReportService {
   ): Promise<{ buffer: Buffer; filename: string }> {
     const localUserId = await this.resolveLocalUser(userId);
     const whereClause = this.buildWhereClause(filter);
+
+    // Check MAX_EXPORT_RECORD_LIMIT
+    const maxLimitConfig = await this.systemConfigService.findByConfigKey(
+      'MAX_EXPORT_RECORD_LIMIT',
+    );
+    const maxLimit = maxLimitConfig
+      ? parseInt(maxLimitConfig.config_value, 10)
+      : 50000;
+
+    const totalRecords = await this.prisma.ops_checkin_entry.count({
+      where: whereClause,
+    });
+
+    if (totalRecords > maxLimit) {
+      throw new BadRequestException(
+        `Jumlah data melebihi batas maksimal export (${totalRecords} records). Maksimal: ${maxLimit} records. Silakan persempit filter tanggal.`,
+      );
+    }
 
     // Fetch all data needed for the report
     const entries = await this.prisma.ops_checkin_entry.findMany({

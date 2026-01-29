@@ -1,6 +1,7 @@
 'use client';
 
 import { useActiveQueues } from '@/hooks/api/use-check-in';
+import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
 
 import { DisplayHeaderQueue } from './components/display-header-queue';
 import {
@@ -11,7 +12,13 @@ import { DisplayTableQueue } from './components/display-table-queue';
 import { DisplayFooterQueue } from './components/display-footer-queue';
 
 export default function DisplayPage() {
-  const { data: activeQueuesData } = useActiveQueues(1, 10);
+  // Fetch refresh interval from system config
+  const { data: refreshConfig } = useSystemConfigByKey('REFRESH_INTERVAL_MS');
+  const refreshInterval = refreshConfig?.config_value
+    ? parseInt(refreshConfig.config_value, 10)
+    : 5000; // Default 5 seconds
+
+  const { data: activeQueuesData } = useActiveQueues(1, 10, refreshInterval);
   const allQueues = activeQueuesData?.data || [];
 
   const currentQueueData = allQueues.length > 0 ? allQueues[0] : null;

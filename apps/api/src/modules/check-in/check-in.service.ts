@@ -153,6 +153,29 @@ export class CheckInService {
     const skip = (page - 1) * limit;
     const dateNow = getStartOfToday();
 
+    // Get display priority mode from config
+    const priorityModeConfig = await this.systemConfigService.findByConfigKey(
+      'DISPLAY_PRIORITY_MODE',
+    );
+    const priorityMode = priorityModeConfig?.config_value || 'STANDARD';
+
+    // Determine orderBy based on priority mode
+    let orderBy: any;
+    if (priorityMode === 'PRIORITY') {
+      // PRIORITY mode: non-compliant items first, then by priority_order
+      orderBy = [
+        { has_non_compliant_items: 'desc' as const },
+        { ops_queue_status: { priority_order: 'asc' as const } },
+      ];
+    } else {
+      // STANDARD mode: order by priority_order (FIFO)
+      orderBy = {
+        ops_queue_status: {
+          priority_order: 'asc' as const,
+        },
+      };
+    }
+
     const [data, total] = await Promise.all([
       this.prisma.ops_checkin_entry.findMany({
         skip,
@@ -170,6 +193,7 @@ export class CheckInService {
           current_status: true,
           driver_name: true,
           snapshot_company_name: true,
+          has_non_compliant_items: true,
           ops_queue_status: {
             select: {
               priority_order: true,
@@ -177,11 +201,7 @@ export class CheckInService {
             },
           },
         },
-        orderBy: {
-          ops_queue_status: {
-            priority_order: 'asc',
-          },
-        },
+        orderBy,
       }),
       this.prisma.ops_checkin_entry.count({
         where: {
@@ -244,6 +264,27 @@ export class CheckInService {
       }
     }
 
+    // Get display priority mode from config
+    const priorityModeConfig = await this.systemConfigService.findByConfigKey(
+      'DISPLAY_PRIORITY_MODE',
+    );
+    const priorityMode = priorityModeConfig?.config_value || 'STANDARD';
+
+    // Determine orderBy based on priority mode
+    let orderBy: any;
+    if (priorityMode === 'PRIORITY') {
+      // PRIORITY mode: non-compliant items first, then by submission time
+      orderBy = [
+        { has_non_compliant_items: 'desc' as const },
+        { submission_time: 'asc' as const },
+      ];
+    } else {
+      // STANDARD mode: order by submission time (FIFO)
+      orderBy = {
+        submission_time: 'asc' as const,
+      };
+    }
+
     const [data, total] = await Promise.all([
       this.prisma.ops_checkin_entry.findMany({
         skip,
@@ -255,11 +296,10 @@ export class CheckInService {
           snapshot_company_name: true,
           snapshot_category_name: true,
           current_status: true,
+          has_non_compliant_items: true,
         },
         where,
-        orderBy: {
-          submission_time: 'asc',
-        },
+        orderBy,
       }),
       this.prisma.ops_checkin_entry.count({
         where,

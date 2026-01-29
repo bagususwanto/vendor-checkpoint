@@ -1,34 +1,34 @@
 import { useQuery } from '@tanstack/react-query';
 import { dashboardService } from '@/services/dashboard.service';
 
-export function useDashboardStats() {
+export function useDashboardStats(refetchInterval?: number) {
   return useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: () => dashboardService.getStats(),
-    refetchInterval: 60000, // Refresh every 60 seconds
+    refetchInterval: refetchInterval ?? 60000, // Default 60 seconds if not provided
   });
 }
 
-export function useHourlyLeadTime() {
+export function useHourlyLeadTime(refetchInterval?: number) {
   return useQuery({
     queryKey: ['dashboard-hourly-lead-time'],
     queryFn: () => dashboardService.getHourlyLeadTime(),
-    refetchInterval: 60000, // Refresh every 60 seconds
+    refetchInterval: refetchInterval ?? 60000, // Default 60 seconds if not provided
   });
 }
 
-export function useHourlyCompliance() {
+export function useHourlyCompliance(refetchInterval?: number) {
   return useQuery({
     queryKey: ['dashboard-hourly-compliance'],
     queryFn: () => dashboardService.getHourlyCompliance(),
-    refetchInterval: 60000, // Refresh every 60 seconds
+    refetchInterval: refetchInterval ?? 60000, // Default 60 seconds if not provided
   });
 }
 
-export function useChecklistBreakdown() {
+export function useChecklistBreakdown(refetchInterval?: number) {
   return useQuery({
     queryKey: ['dashboard-checklist-breakdown'],
     queryFn: () => dashboardService.getChecklistBreakdown(),
-    refetchInterval: 60000, // Refresh every 60 seconds
+    refetchInterval: refetchInterval ?? 60000, // Default 60 seconds if not provided
   });
 }

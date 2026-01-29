@@ -12,6 +12,7 @@ import {
   Minus,
 } from 'lucide-react';
 import { useDashboardStats } from '@/hooks/api/use-dashboard';
+import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
 import { TrendData } from '@/services/dashboard.service';
 import { cn } from '@/lib/utils';
 
@@ -56,7 +57,13 @@ function TrendIndicator({ trend, inverse = false }: TrendIndicatorProps) {
 }
 
 export function StatsCard() {
-  const { data: stats, isLoading } = useDashboardStats();
+  // Fetch refresh interval from system config
+  const { data: refreshConfig } = useSystemConfigByKey('REFRESH_INTERVAL_MS');
+  const refreshInterval = refreshConfig?.config_value
+    ? parseInt(refreshConfig.config_value, 10)
+    : 60000; // Default 60 seconds
+
+  const { data: stats, isLoading } = useDashboardStats(refreshInterval);
 
   if (isLoading) {
     return <div>Loading stats...</div>;

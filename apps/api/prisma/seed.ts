@@ -115,6 +115,178 @@ async function seedVendors() {
   });
 }
 
+async function seedCheckIns() {
+  console.log('Creating dummy check-in entries...');
+
+  // Get necessary data for foreign keys
+  const vendors = await prisma.mst_vendor.findMany({ take: 10 });
+  const materialCategories = await prisma.mst_material_category.findMany();
+  const checklistItems = await prisma.mst_checklist_item.findMany({
+    include: { checklist_category: true },
+  });
+  const adminUser = await prisma.mst_user.findFirst();
+
+  if (!adminUser) {
+    console.log('No admin user found, skipping check-in seed');
+    return;
+  }
+
+  const today = new Date();
+  const statuses = ['MENUNGGU', 'DISETUJUI', 'DITOLAK', 'SELESAI'];
+  const driverNames = [
+    'Budi Santoso',
+    'Ahmad Wijaya',
+    'Siti Nurhaliza',
+    'Joko Susilo',
+    'Rina Kartika',
+    'Dedi Kurniawan',
+    'Lina Marlina',
+    'Hendra Gunawan',
+  ];
+
+  let queueCounter = 1;
+
+  // Create 15 check-in entries with various statuses
+  for (let i = 0; i < 15; i++) {
+    const vendor = vendors[i % vendors.length];
+    const materialCategory = materialCategories[i % materialCategories.length];
+    const status = statuses[i % statuses.length];
+    const driverName = driverNames[i % driverNames.length];
+
+    // Generate queue number in format YYYYMMDD-XXX
+    const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+    const queueNumber = `${dateStr}-${String(queueCounter).padStart(3, '0')}`;
+    queueCounter++;
+
+    // Determine submission time (vary between today and yesterday)
+    const submissionTime = new Date(today);
+    if (i > 10) {
+      // Some entries from yesterday
+      submissionTime.setDate(submissionTime.getDate() - 1);
+    }
+    submissionTime.setHours(8 + (i % 8), i * 5, 0, 0);
+
+    // Get relevant checklist items for this material category
+    const relevantItems = checklistItems.filter(
+      (item) =>
+        item.item_type === 'UMUM' ||
+        item.material_category_id === materialCategory.material_category_id,
+    );
+
+    // Randomly determine if entry has non-compliant items (30% chance)
+    const hasNonCompliant = Math.random() < 0.3;
+    const nonCompliantCount = hasNonCompliant
+      ? Math.floor(Math.random() * 3) + 1
+      : 0;
+
+    // Create check-in entry
+    const entry = await prisma.ops_checkin_entry.create({
+      data: {
+        queue_number: queueNumber,
+        vendor_id: vendor.vendor_id,
+        driver_name: driverName,
+        material_category_id: materialCategory.material_category_id,
+        snapshot_company_name: vendor.company_name,
+        snapshot_category_name: materialCategory.category_name,
+        submission_time: submissionTime,
+        current_status: status,
+        ip_address: `192.168.1.${100 + i}`,
+        device_identifier: `DEVICE-${i + 1}`,
+        has_non_compliant_items: hasNonCompliant,
+        non_compliant_count: nonCompliantCount,
+      },
+    });
+
+    // Create checklist responses
+    let nonCompliantCreated = 0;
+    for (const item of relevantItems.slice(0, 10)) {
+      // Take first 10 items
+      const shouldBeNonCompliant =
+        hasNonCompliant && nonCompliantCreated < nonCompliantCount;
+      const responseValue = !shouldBeNonCompliant;
+
+      await prisma.ops_checkin_response.create({
+        data: {
+          entry_id: entry.entry_id,
+          checklist_item_id: item.checklist_item_id,
+          checklist_category_id: item.checklist_category_id,
+          item_text_snapshot: item.item_text,
+          item_type: item.item_type,
+          response_value: responseValue,
+          is_compliant: responseValue,
+          display_order: item.display_order,
+        },
+      });
+
+      if (shouldBeNonCompliant) nonCompliantCreated++;
+    }
+
+    // Create queue status
+    const statusTexts = {
+      MENUNGGU: 'Menunggu Verifikasi',
+      DISETUJUI: 'Sedang Diproses',
+      DITOLAK: 'Ditolak',
+      SELESAI: 'Selesai',
+    };
+
+    await prisma.ops_queue_status.create({
+      data: {
+        entry_id: entry.entry_id,
+        queue_number: queueNumber,
+        current_status: status,
+        status_display_text: statusTexts[status as keyof typeof statusTexts],
+        priority_order: queueCounter,
+        estimated_wait_minutes: status === 'MENUNGGU' ? 30 : null,
+        last_updated: submissionTime,
+      },
+    });
+
+    // Create timelog
+    const checkinTime = new Date(submissionTime);
+    checkinTime.setMinutes(checkinTime.getMinutes() + 5);
+
+    const isCheckedOut = status === 'SELESAI';
+    const checkoutTime = isCheckedOut
+      ? new Date(checkinTime.getTime() + (20 + i * 5) * 60000)
+      : null;
+    const durationMinutes = isCheckedOut
+      ? Math.round((checkoutTime!.getTime() - checkinTime.getTime()) / 60000)
+      : null;
+
+    await prisma.ops_timelog.create({
+      data: {
+        entry_id: entry.entry_id,
+        checkin_time: checkinTime,
+        checkout_time: checkoutTime,
+        checkout_by_user_id: isCheckedOut ? adminUser.user_id : null,
+        duration_minutes: durationMinutes,
+        is_checked_out: isCheckedOut,
+      },
+    });
+
+    // Create verification for non-MENUNGGU statuses
+    if (status !== 'MENUNGGU') {
+      const verificationTime = new Date(checkinTime);
+      verificationTime.setMinutes(verificationTime.getMinutes() + 2);
+
+      await prisma.ops_verification.create({
+        data: {
+          entry_id: entry.entry_id,
+          verified_by_user_id: adminUser.user_id,
+          verification_status: status,
+          rejection_reason:
+            status === 'DITOLAK'
+              ? 'Dokumen tidak lengkap atau tidak sesuai standar'
+              : null,
+          verification_time: verificationTime,
+        },
+      });
+    }
+  }
+
+  console.log(`Created ${queueCounter - 1} dummy check-in entries`);
+}
+
 async function main(): Promise<void> {
   console.log('Starting seed...');
 
@@ -128,6 +300,9 @@ async function main(): Promise<void> {
     // These depend on the categories above
     await seedChecklistItems();
     await seedVendors();
+
+    // Seed dummy check-in data
+    await seedCheckIns();
 
     console.log('Seed completed successfully!');
   } catch (error) {

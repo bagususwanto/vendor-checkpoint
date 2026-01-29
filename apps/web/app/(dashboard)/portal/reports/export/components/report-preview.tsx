@@ -35,16 +35,21 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Check-in
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Records</CardTitle>
             <ReceiptText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data.totalCheckins}</div>
+            <div className="text-2xl font-bold">
+              {data.totalCheckins} records
+            </div>
             <p className="text-xs text-muted-foreground">
               Periode {data.period?.from} - {data.period?.to}
             </p>
+            {data.totalCheckins > 0 && (
+              <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+                ℹ️ {data.totalCheckins} records akan di-export
+              </p>
+            )}
           </CardContent>
         </Card>
         <Card>

@@ -60,7 +60,27 @@ export const reportService = {
         data: response.data,
         filename,
       };
-    } catch (error) {
+    } catch (error: any) {
+      // Handle blob error response
+      if (error.response?.data instanceof Blob) {
+        const text = await error.response.data.text();
+
+        let errorMessage = 'Gagal export report';
+
+        try {
+          const errorData = JSON.parse(text);
+
+          // NestJS error response structure: { message, error, statusCode }
+          errorMessage = errorData.message || errorMessage;
+        } catch (parseError) {
+          // Use default error message
+        }
+
+        // Throw the error message outside the try-catch
+        throw new Error(errorMessage);
+      }
+
+      // For non-blob errors, throw as is
       throw error;
     }
   },
