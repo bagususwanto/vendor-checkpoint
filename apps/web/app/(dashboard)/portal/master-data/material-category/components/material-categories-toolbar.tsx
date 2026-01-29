@@ -14,7 +14,6 @@ import {
 
 interface MaterialCategoriesToolbarProps<TData> {
   table: Table<TData>;
-  onAdd: () => void;
   onBulkDelete: (ids: number[]) => void;
   statusFilter: string;
   onStatusFilterChange: (value: string) => void;
@@ -24,7 +23,6 @@ interface MaterialCategoriesToolbarProps<TData> {
 
 export function MaterialCategoriesToolbar<TData>({
   table,
-  onAdd,
   onBulkDelete,
   statusFilter,
   onStatusFilterChange,
@@ -82,9 +80,6 @@ export function MaterialCategoriesToolbar<TData>({
             Hapus ({selectedRows.length})
           </Button>
         )}
-        <Button size="sm" onClick={onAdd}>
-          Tambah Kategori
-        </Button>
       </div>
     </div>
   );

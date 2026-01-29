@@ -40,7 +40,6 @@ interface DataTableProps<TData, TValue> {
   limit: number;
   onPageChange: (page: number) => void;
   onLimitChange: (limit: number) => void;
-  onAdd: () => void;
   onBulkDelete: (ids: number[]) => void;
   statusFilter: string;
   onStatusFilterChange: (value: string) => void;
@@ -56,7 +55,6 @@ export function MaterialCategoriesTable<TData, TValue>({
   limit,
   onPageChange,
   onLimitChange,
-  onAdd,
   onBulkDelete,
   statusFilter,
   onStatusFilterChange,
@@ -99,7 +97,6 @@ export function MaterialCategoriesTable<TData, TValue>({
     <div className="space-y-4">
       <MaterialCategoriesToolbar
         table={table}
-        onAdd={onAdd}
         onBulkDelete={onBulkDelete}
         statusFilter={statusFilter}
         onStatusFilterChange={onStatusFilterChange}

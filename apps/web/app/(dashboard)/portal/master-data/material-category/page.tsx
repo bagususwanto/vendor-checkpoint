@@ -12,6 +12,8 @@ import {
   useBulkDeleteMaterialCategories,
 } from '@/hooks/api/use-material-categories';
 import { MaterialCategoryResponse } from '@repo/types';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -126,6 +128,11 @@ export default function MaterialCategoryPage() {
             Kelola data master kategori material untuk keperluan operasional.
           </p>
         </div>
+        <div className="flex items-center space-x-2">
+          <Button onClick={handleAdd}>
+            <Plus className="mr-2 h-4 w-4" /> Tambah Kategori
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -145,7 +152,6 @@ export default function MaterialCategoryPage() {
             limit={limit}
             onPageChange={setPage}
             onLimitChange={setLimit}
-            onAdd={handleAdd}
             onBulkDelete={handleBulkDelete}
             statusFilter={status}
             onStatusFilterChange={setStatus}
