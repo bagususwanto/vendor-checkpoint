@@ -21,7 +21,7 @@ import { QueueStatus } from '@repo/types';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface CheckinListProps {
-  status: QueueStatus.MENUNGGU | QueueStatus.DISETUJUI;
+  status: QueueStatus.MENUNGGU | QueueStatus.DISETUJUI | QueueStatus.DITOLAK;
 }
 
 export function CheckinList({ status }: CheckinListProps) {
@@ -97,7 +97,7 @@ export function CheckinList({ status }: CheckinListProps) {
                 <StatusBadge status={checkin.current_status} />
               </TableCell>
               <TableCell className="text-right">
-                {status === QueueStatus.MENUNGGU ? (
+                {checkin.current_status === QueueStatus.MENUNGGU && (
                   <VerificationSheet
                     checkin={{
                       id: checkin.queue_number,
@@ -110,7 +110,9 @@ export function CheckinList({ status }: CheckinListProps) {
                     trigger={<Button size="sm">Verifikasi</Button>}
                     onSuccess={handleSuccess}
                   />
-                ) : status === QueueStatus.DISETUJUI ? (
+                )}
+
+                {checkin.current_status === QueueStatus.DISETUJUI && (
                   <CheckoutSheet
                     checkin={{
                       id: checkin.queue_number,
@@ -127,7 +129,10 @@ export function CheckinList({ status }: CheckinListProps) {
                     }
                     onSuccess={handleSuccess}
                   />
-                ) : (
+                )}
+
+                {(checkin.current_status === QueueStatus.SELESAI ||
+                  checkin.current_status === QueueStatus.DITOLAK) && (
                   <VerificationSheet
                     checkin={{
                       id: checkin.queue_number,
