@@ -12,8 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
 import { VerificationSheet } from '@/app/(dashboard)/portal/dashboard/components/verification-sheet';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+import { formatDateTime } from '@/lib/utils';
 import { QueueStatus } from '@repo/types';
 import {
   ChevronLeft,
@@ -97,13 +96,7 @@ export function QueueTable({
                 <TableCell>{checkin.snapshot_category_name}</TableCell>
                 <TableCell>
                   {checkin.submission_time
-                    ? format(
-                        new Date(checkin.submission_time),
-                        'dd MMM HH:mm',
-                        {
-                          locale: id,
-                        },
-                      )
+                    ? formatDateTime(checkin.submission_time, 'dd MMM HH:mm')
                     : '-'}
                 </TableCell>
                 <TableCell>

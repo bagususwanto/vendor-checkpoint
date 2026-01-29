@@ -22,6 +22,7 @@ export class AuditService {
         new_value: createAuditDto.new_value,
         ip_address: createAuditDto.ip_address,
         user_agent: createAuditDto.user_agent,
+        created_at: new Date(),
       },
     });
   }

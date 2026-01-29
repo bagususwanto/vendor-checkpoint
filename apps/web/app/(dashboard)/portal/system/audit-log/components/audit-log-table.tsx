@@ -19,8 +19,7 @@ import {
   Loader2,
   Eye,
 } from 'lucide-react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+
 import {
   Select,
   SelectContent,
@@ -28,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn, formatDateTime } from '@/lib/utils';
 import { AuditLogDetailSheet } from './audit-log-detail-sheet';
 
 interface AuditLogTableProps {
@@ -88,8 +88,6 @@ export function AuditLogTable({
                 <TableHead className="w-[150px]">User</TableHead>
                 <TableHead className="w-[120px]">Action</TableHead>
                 <TableHead>Deskripsi</TableHead>
-                <TableHead className="w-[150px]">Old Value</TableHead>
-                <TableHead className="w-[150px]">New Value</TableHead>
                 <TableHead className="w-[100px]">Ref ID</TableHead>
                 <TableHead className="w-[70px]"></TableHead>
               </TableRow>
@@ -102,9 +100,7 @@ export function AuditLogTable({
                   onClick={() => handleViewDetail(log)}
                 >
                   <TableCell className="font-medium">
-                    {format(new Date(log.created_at), 'dd MMM yyyy HH:mm', {
-                      locale: id,
-                    })}
+                    {formatDateTime(log.created_at)}
                   </TableCell>
                   <TableCell>{log.user?.full_name || '-'}</TableCell>
                   <TableCell>
@@ -117,18 +113,6 @@ export function AuditLogTable({
                     title={log.action_description}
                   >
                     {log.action_description}
-                  </TableCell>
-                  <TableCell
-                    className="max-w-[200px] truncate"
-                    title={log.old_value}
-                  >
-                    {log.old_value}
-                  </TableCell>
-                  <TableCell
-                    className="max-w-[200px] truncate"
-                    title={log.new_value}
-                  >
-                    {log.new_value}
                   </TableCell>
                   <TableCell>
                     {log.entry?.queue_number || log.entry_id || '-'}

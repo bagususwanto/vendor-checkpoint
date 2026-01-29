@@ -15,8 +15,14 @@ import { CheckoutSheet } from '@/app/(dashboard)/portal/operational/queue/compon
 import { StatusBadge } from '@/app/(dashboard)/components/status-badge';
 import { useVerificationList } from '@/hooks/api/use-check-in';
 import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+import { formatDateTime } from '@/lib/utils';
+import { format } from 'date-fns'; // Keeping format for line 41-42 usage which is local date only
+// import { id } from 'date-fns/locale'; // Removing locale as formatDateTime handles it, and localized format usage is replaced.
+// Wait, I am using format(new Date(), ...) below. I can keep format for that. But formatDateTime also works?
+// No, formatDateTime adds locale. 'yyyy-MM-dd' doesn't need locale.
+// I can keep format for date-formatting only.
+// But I should remove `id` locale if not used individually.
+// Let's keep `format` and remove `id`.
 import { QueueStatus } from '@repo/types';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -88,9 +94,7 @@ export function CheckinList({ status }: CheckinListProps) {
               <TableCell>{checkin.snapshot_category_name}</TableCell>
               <TableCell>
                 {checkin.submission_time
-                  ? format(new Date(checkin.submission_time), 'HH:mm', {
-                      locale: id,
-                    })
+                  ? formatDateTime(checkin.submission_time, 'HH:mm')
                   : '-'}
               </TableCell>
               <TableCell>

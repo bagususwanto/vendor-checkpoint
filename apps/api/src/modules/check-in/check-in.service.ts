@@ -81,10 +81,15 @@ export class CheckInService {
           );
 
           // 6. Create Queue Status
-          await this.createQueueStatus(tx, checkIn.entry_id, queueNumber);
+          await this.createQueueStatus(
+            tx,
+            checkIn.entry_id,
+            queueNumber,
+            dateNow,
+          );
 
           // 7. Create Time Log
-          await this.createTimeLog(tx, checkIn.entry_id);
+          await this.createTimeLog(tx, checkIn.entry_id, dateNow);
 
           // Audit log moved to interceptor
 
@@ -487,6 +492,7 @@ export class CheckInService {
           verified_by_user_id: localUserId,
           verification_status: newStatus,
           rejection_reason: action === 'REJECT' ? rejection_reason : null,
+          verification_time: new Date(),
         },
       });
 
@@ -779,11 +785,11 @@ export class CheckInService {
     });
   }
 
-  private async createTimeLog(tx: any, entryId: number) {
+  private async createTimeLog(tx: any, entryId: number, date: Date) {
     await tx.ops_timelog.create({
       data: {
         entry_id: entryId,
-        checkin_time: new Date(),
+        checkin_time: date,
         is_checked_out: false,
       },
     });
@@ -793,6 +799,7 @@ export class CheckInService {
     tx: any,
     entryId: number,
     queueNumber: string,
+    date: Date,
   ) {
     const startOfToday = getStartOfToday();
     const lastPriority = await tx.ops_queue_status.findFirst({
@@ -827,6 +834,7 @@ export class CheckInService {
         status_display_text: statusDisplayText.config_value,
         priority_order: nextPriority,
         estimated_wait_minutes: toInt(estimatedWaitMinutes.config_value),
+        last_updated: date,
       },
     });
   }

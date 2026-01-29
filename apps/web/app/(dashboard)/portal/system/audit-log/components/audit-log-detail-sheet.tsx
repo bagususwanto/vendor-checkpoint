@@ -11,8 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { AuditLog } from '@/services/audit-log.service';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+import { formatDateTime } from '@/lib/utils';
 
 import { User, Clock, Activity, FileText } from 'lucide-react';
 
@@ -28,12 +27,6 @@ export function AuditLogDetailSheet({
   onOpenChange,
 }: AuditLogDetailSheetProps) {
   if (!log) return null;
-
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'dd MMMM yyyy, HH:mm:ss', {
-      locale: id,
-    });
-  };
 
   const parseValue = (value?: string) => {
     if (!value) return null;
@@ -122,7 +115,10 @@ export function AuditLogDetailSheet({
                         Waktu
                       </p>
                       <p className="font-semibold text-base">
-                        {formatDate(log.created_at)}
+                        {formatDateTime(
+                          log.created_at,
+                          'dd MMMM yyyy, HH:mm:ss',
+                        )}
                       </p>
                     </div>
                   </div>

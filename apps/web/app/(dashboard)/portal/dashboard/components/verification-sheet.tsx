@@ -40,9 +40,7 @@ import {
   useVerificationDetail,
 } from '@/hooks/api/use-check-in';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
-import { id as localeId } from 'date-fns/locale';
-
+import { formatDateTime } from '@/lib/utils';
 import { icons } from 'lucide-react';
 
 interface CheckinData {
@@ -200,10 +198,9 @@ export function VerificationSheet({
                           </p>
                           <p className="font-semibold text-base">
                             {detailData.submission_time
-                              ? format(
-                                  new Date(detailData.submission_time),
+                              ? formatDateTime(
+                                  detailData.submission_time,
                                   'dd MMMM yyyy, HH:mm',
-                                  { locale: localeId },
                                 )
                               : '-'}
                           </p>
@@ -228,10 +225,9 @@ export function VerificationSheet({
                         </p>
                         <p className="font-semibold text-sm">
                           {detailData.ops_timelog.checkin_time
-                            ? format(
-                                new Date(detailData.ops_timelog.checkin_time),
+                            ? formatDateTime(
+                                detailData.ops_timelog.checkin_time,
                                 'dd MMM yyyy, HH:mm',
-                                { locale: localeId },
                               )
                             : '-'}
                         </p>
@@ -244,10 +240,9 @@ export function VerificationSheet({
                         </p>
                         <p className="font-semibold text-sm">
                           {detailData.ops_timelog.checkout_time
-                            ? format(
-                                new Date(detailData.ops_timelog.checkout_time),
+                            ? formatDateTime(
+                                detailData.ops_timelog.checkout_time,
                                 'dd MMM yyyy, HH:mm',
-                                { locale: localeId },
                               )
                             : '-'}
                         </p>
@@ -315,12 +310,9 @@ export function VerificationSheet({
                         </p>
                         <p className="font-semibold text-sm">
                           {detailData.ops_verification.verification_time
-                            ? format(
-                                new Date(
-                                  detailData.ops_verification.verification_time,
-                                ),
+                            ? formatDateTime(
+                                detailData.ops_verification.verification_time,
                                 'dd MMM yyyy, HH:mm',
-                                { locale: localeId },
                               )
                             : '-'}
                         </p>

@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { useChecklistStore } from '@/stores/use-checklist.store';
 import { useSubmitCheckIn } from '@/hooks/api/use-check-in';
-import { formatDate } from '@/lib/utils';
+import { formatDateTime } from '@/lib/utils';
 import { ReviewIdentity } from './components/review-identity';
 import { ReviewChecklist } from './components/review-checklist';
 import { ReviewActions } from './components/review-actions';
@@ -83,7 +83,7 @@ export default function CheckInStep3() {
         driverName: result.driver_name,
         status_display_text: result.status_display_text,
         estimatedWaitMinutes: result.estimated_wait_minutes,
-        submitTime: formatDate(result.submission_time),
+        submitTime: formatDateTime(result.submission_time),
       };
 
       setSuccessData(successData);

@@ -25,8 +25,7 @@ import { useState } from 'react';
 import { useCheckoutCheckIn } from '@/hooks/api/use-check-in';
 import { toast } from 'sonner';
 import { Separator } from '@/components/ui/separator';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+import { formatDateTime } from '@/lib/utils';
 
 interface CheckinData {
   id: string;
@@ -167,13 +166,7 @@ export function CheckoutSheet({
                     </p>
                     <p className="font-semibold text-base">
                       {checkin.time
-                        ? format(
-                            new Date(checkin.time),
-                            'dd MMMM yyyy, HH:mm',
-                            {
-                              locale: id,
-                            },
-                          )
+                        ? formatDateTime(checkin.time, 'dd MMMM yyyy, HH:mm')
                         : '-'}
                     </p>
                   </div>

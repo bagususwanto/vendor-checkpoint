@@ -194,6 +194,8 @@ async function seedCheckIns() {
         device_identifier: `DEVICE-${i + 1}`,
         has_non_compliant_items: hasNonCompliant,
         non_compliant_count: nonCompliantCount,
+        created_at: submissionTime,
+        updated_at: submissionTime,
       },
     });
 
@@ -243,7 +245,7 @@ async function seedCheckIns() {
 
     // Create timelog
     const checkinTime = new Date(submissionTime);
-    checkinTime.setMinutes(checkinTime.getMinutes() + 5);
+    // checkin_time in service is same as submission_time, so we don't add 5 minutes
 
     const isCheckedOut = status === 'SELESAI';
     const checkoutTime = isCheckedOut
@@ -261,6 +263,8 @@ async function seedCheckIns() {
         checkout_by_user_id: isCheckedOut ? adminUser.user_id : null,
         duration_minutes: durationMinutes,
         is_checked_out: isCheckedOut,
+        created_at: checkinTime,
+        updated_at: checkoutTime || checkinTime,
       },
     });
 
@@ -279,6 +283,7 @@ async function seedCheckIns() {
               ? 'Dokumen tidak lengkap atau tidak sesuai standar'
               : null,
           verification_time: verificationTime,
+          created_at: verificationTime,
         },
       });
     }
