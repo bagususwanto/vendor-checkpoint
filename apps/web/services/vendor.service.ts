@@ -22,7 +22,7 @@ export const vendorService = {
   },
 
   syncVendors: async () => {
-    const response = await axiosInstance.post<{ data: SyncResult }>(
+    const response = await axiosInstance.post<{ data: SyncResult['data'] }>(
       '/vendor/sync',
     );
     return response.data.data;

@@ -3,7 +3,7 @@ import { axiosInstance } from '@/lib/axios';
 
 export const userService = {
   syncUsers: async () => {
-    const response = await axiosInstance.post<{ data: SyncResult }>(
+    const response = await axiosInstance.post<{ data: SyncResult['data'] }>(
       '/user/sync',
     );
     return response.data.data;
