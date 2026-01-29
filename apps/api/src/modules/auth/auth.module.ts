@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { HttpModule } from '@nestjs/axios';
 import { JwtStrategy } from './jwt.strategy';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { AuditModule } from '../audit/audit.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { RolesGuard } from '../../common/guards/roles.guard';
       secret: process.env.EXTERNAL_API_KEY || 'dummy',
       signOptions: { algorithm: 'HS256' },
     }),
+    AuditModule,
   ],
   providers: [AuthService, JwtStrategy, RolesGuard],
   controllers: [AuthController],

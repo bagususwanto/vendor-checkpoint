@@ -26,5 +26,8 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "jwt-decode": "^4.0.0"
+  }
 }

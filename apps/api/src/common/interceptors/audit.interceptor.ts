@@ -62,19 +62,23 @@ export class AuditLogInterceptor implements NestInterceptor {
           }
 
           // Resolve user_id:
-          // 1. From details (if service returned resolved user_id)
-          // 2. From request.user.userId (JWT)
-          const userId = details.user_id || request.user?.userId;
+          // The userId from JWT or details is actually the external_user_id
+          // We need to find the local user_id from mst_user table
+          let localUserId: number | undefined;
 
-          // If we still don't have a user_id for some reason (public endpoint),
-          // we might want to log it as system or anonymous, but for now we follow the existing pattern
-          // which requires a user_id.
-          // However, existing code in CheckInService.create uses 'localUserId' which implies it handles looking up the user.
-          // The service refactor should ensure 'user_id' is passed back in the response if it wasn't in the request.
+          // Get external_user_id from either details or request.user
+          const externalUserId = details.user_id || request.user?.userId;
+
+          if (externalUserId) {
+            // Look up local user_id from mst_user table
+            const user =
+              await this.auditService.findUserByExternalId(externalUserId);
+            localUserId = user?.user_id;
+          }
 
           await this.auditService.create(null, {
             entry_id: details.entry_id,
-            user_id: userId,
+            user_id: localUserId,
             action_type: actionType,
             action_description: actionDescription,
             old_value: details.old_value

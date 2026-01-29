@@ -98,12 +98,9 @@ export class SystemConfigService {
   async update(
     id: number,
     updateSystemConfigDto: UpdateSystemConfigDto,
-  ): Promise<cfg_system> {
-    // Check if exists
-    const existing = await this.prisma.cfg_system.findUnique({
-      where: { config_id: id },
-    });
-
+  ): Promise<{ old_value: cfg_system; new_value: cfg_system }> {
+    // Check if exists and get old value
+    const existing = await this.findOne(id);
     if (!existing) {
       throw new NotFoundException('Konfigurasi sistem tidak ditemukan');
     }
@@ -111,25 +108,18 @@ export class SystemConfigService {
     // Check if editable
     if (!existing.is_editable) {
       throw new BadRequestException(
-        'Konfigurasi ini tidak dapat diubah (is_editable = false)',
+        'Konfigurasi sistem ini tidak dapat diubah',
       );
     }
 
-    return this.prisma.cfg_system.update({
+    const updated = await this.prisma.cfg_system.update({
       where: { config_id: id },
-      data: {
-        config_value: updateSystemConfigDto.config_value,
-        updated_at: new Date(),
-      },
-      include: {
-        user: {
-          select: {
-            user_id: true,
-            username: true,
-            full_name: true,
-          },
-        },
-      },
+      data: updateSystemConfigDto,
     });
+
+    return {
+      old_value: existing,
+      new_value: updated,
+    };
   }
 }

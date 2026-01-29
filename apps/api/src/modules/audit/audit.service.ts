@@ -255,6 +255,13 @@ export class AuditService {
     throw new BadRequestException('User tidak ditemukan dalam database lokal');
   }
 
+  async findUserByExternalId(externalUserId: number) {
+    return await this.prisma.mst_user.findUnique({
+      where: { external_user_id: externalUserId },
+      select: { user_id: true },
+    });
+  }
+
   private formatDateTime(date: Date): string {
     return new Date(date).toLocaleString('id-ID', {
       year: 'numeric',

@@ -99,18 +99,26 @@ export class MaterialCategoryService {
   async update(
     id: number,
     updateMaterialCategoryDto: UpdateMaterialCategoryDto,
-  ): Promise<mst_material_category> {
-    // Check if exists
+  ): Promise<{
+    old_value: mst_material_category;
+    new_value: mst_material_category;
+  }> {
+    // Check if exists and get old value
     const existing = await this.findOne(id);
     if (!existing) {
       throw new NotFoundException('Kategori material tidak ditemukan');
     }
 
     try {
-      return await this.prisma.mst_material_category.update({
+      const updated = await this.prisma.mst_material_category.update({
         where: { material_category_id: id },
         data: updateMaterialCategoryDto,
       });
+
+      return {
+        old_value: existing,
+        new_value: updated,
+      };
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
