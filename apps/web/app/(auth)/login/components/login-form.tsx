@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useLoginMutation } from '@/hooks/api/use-auth';
 import { cn } from '@/lib/utils';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, User, Lock, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
@@ -17,6 +17,7 @@ export function LoginForm({
 }: React.ComponentProps<'div'>) {
   const router = useRouter();
   const loginMutation = useLoginMutation();
+  const [showPassword, setShowPassword] = React.useState(false);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -63,27 +64,50 @@ export function LoginForm({
               </div>
               <Field>
                 <FieldLabel htmlFor="username">Username</FieldLabel>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  placeholder="Enter your username"
-                  required
-                  disabled={loginMutation.isPending}
-                />
+                <div className="relative">
+                  <User className="text-muted-foreground absolute left-3 top-1/2 size-4 -translate-y-1/2" />
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="Enter your username"
+                    required
+                    disabled={loginMutation.isPending}
+                    className="pl-9"
+                  />
+                </div>
               </Field>
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                 </div>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  required
-                  disabled={loginMutation.isPending}
-                />
+                <div className="relative">
+                  <Lock className="text-muted-foreground absolute left-3 top-1/2 size-4 -translate-y-1/2" />
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter your password"
+                    required
+                    disabled={loginMutation.isPending}
+                    className="px-9"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 size-4 -translate-y-1/2"
+                    disabled={loginMutation.isPending}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="size-4" />
+                    ) : (
+                      <Eye className="size-4" />
+                    )}
+                    <span className="sr-only">
+                      {showPassword ? 'Hide password' : 'Show password'}
+                    </span>
+                  </button>
+                </div>
               </Field>
               <Field>
                 <Button type="submit" disabled={loginMutation.isPending}>
