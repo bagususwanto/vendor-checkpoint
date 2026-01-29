@@ -105,6 +105,7 @@ export default function QueuePage() {
             isLoading={isLoading}
             page={page}
             totalPages={totalPages}
+            totalRecords={meta?.total || 0}
             setPage={setPage}
             limit={limit}
             setLimit={setLimit}

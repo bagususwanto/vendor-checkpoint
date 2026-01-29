@@ -15,7 +15,12 @@ import { VerificationSheet } from '@/app/(dashboard)/portal/dashboard/components
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { QueueStatus } from '@repo/types';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'lucide-react';
 import { CheckoutSheet } from './checkout-sheet';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -32,6 +37,7 @@ interface QueueTableProps {
   isLoading: boolean;
   page: number;
   totalPages: number;
+  totalRecords: number;
   setPage: (page: number) => void;
   limit: number;
   setLimit: (limit: number) => void;
@@ -42,6 +48,7 @@ export function QueueTable({
   isLoading,
   page,
   totalPages,
+  totalRecords,
   setPage,
   limit,
   setLimit,
@@ -162,49 +169,73 @@ export function QueueTable({
         </TableBody>
       </Table>
 
-      <div className="flex items-center justify-between py-4">
-        <div className="flex items-center space-x-2">
-          <p className="text-sm text-muted-foreground">Rows per page</p>
-          <Select
-            value={`${limit}`}
-            onValueChange={(value: string) => {
-              setLimit(Number(value));
-              setPage(1);
-            }}
-          >
-            <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={limit} />
-            </SelectTrigger>
-            <SelectContent side="top">
-              <SelectItem value="5">5</SelectItem>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-            </SelectContent>
-          </Select>
+      <div className="flex items-center justify-between px-2">
+        <div className="flex-1 text-sm text-muted-foreground">
+          Total {totalRecords} data
         </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage(page - 1)}
-            disabled={page <= 1 || isLoading}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Previous
-          </Button>
-          <div className="text-sm text-muted-foreground">
-            Page {page} of {totalPages}
+        <div className="flex items-center space-x-6 lg:space-x-8">
+          <div className="flex items-center space-x-2">
+            <p className="text-sm font-medium">Baris per halaman</p>
+            <Select
+              value={`${limit}`}
+              onValueChange={(value) => {
+                setLimit(Number(value));
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue placeholder={limit} />
+              </SelectTrigger>
+              <SelectContent side="top">
+                {[10, 20, 30, 40, 50].map((pageSize) => (
+                  <SelectItem key={pageSize} value={`${pageSize}`}>
+                    {pageSize}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage(page + 1)}
-            disabled={page >= totalPages || isLoading}
-          >
-            Next
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+            Halaman {page} dari {totalPages}
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              className="hidden h-8 w-8 p-0 lg:flex"
+              onClick={() => setPage(1)}
+              disabled={page <= 1 || isLoading}
+            >
+              <span className="sr-only">Go to first page</span>
+              <ChevronsLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              className="h-8 w-8 p-0"
+              onClick={() => setPage(page - 1)}
+              disabled={page <= 1 || isLoading}
+            >
+              <span className="sr-only">Go to previous page</span>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              className="h-8 w-8 p-0"
+              onClick={() => setPage(page + 1)}
+              disabled={page >= totalPages || isLoading}
+            >
+              <span className="sr-only">Go to next page</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              className="hidden h-8 w-8 p-0 lg:flex"
+              onClick={() => setPage(totalPages)}
+              disabled={page >= totalPages || isLoading}
+            >
+              <span className="sr-only">Go to last page</span>
+              <ChevronsRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>
