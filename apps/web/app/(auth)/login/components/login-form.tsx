@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useTheme } from 'next-themes';
 import { useLoginMutation } from '@/hooks/api/use-auth';
 import { cn } from '@/lib/utils';
 import { ShieldCheck, User, Lock, Eye, EyeOff } from 'lucide-react';
@@ -10,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { ThemeToggleButton } from '@/components/ui/shadcn-io/theme-toggle-button';
 
 export function LoginForm({
   className,
@@ -18,6 +20,7 @@ export function LoginForm({
   const router = useRouter();
   const loginMutation = useLoginMutation();
   const [showPassword, setShowPassword] = React.useState(false);
+  const { theme, setTheme } = useTheme();
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -45,7 +48,13 @@ export function LoginForm({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8" onSubmit={onSubmit}>
+          <form className="relative p-6 md:p-8" onSubmit={onSubmit}>
+            <div className="absolute top-4 right-4">
+              <ThemeToggleButton
+                theme={theme as 'light' | 'dark'}
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              />
+            </div>
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <a
