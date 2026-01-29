@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   PieChart,
+  Info,
 } from 'lucide-react';
 
 interface ReportPreviewProps {
@@ -47,7 +48,8 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
             </p>
             {data.totalCheckins > 0 && (
               <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
-                ℹ️ {data.totalCheckins} records akan di-export
+                <Info className="inline w-4 h-4" /> {data.totalCheckins} records
+                akan di-export
               </p>
             )}
           </CardContent>
