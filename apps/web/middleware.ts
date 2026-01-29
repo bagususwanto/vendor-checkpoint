@@ -10,6 +10,8 @@ const publicPaths = [
   '/forgot-password',
   '/reset-password',
   '/display',
+  '/icon',
+  '/apple-icon',
 ];
 
 // Check if pathname starts with any public path
