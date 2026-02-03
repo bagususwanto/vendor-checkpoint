@@ -11,7 +11,7 @@ export function LandingFooter() {
       <div className="mx-auto px-4 py-8 container">
         <div className="flex md:flex-row flex-col justify-between items-center gap-4 text-muted-foreground text-sm">
           <p className="font-medium">
-            © 2025 DX Warehouse. Vendor Checkpoint System. v1.0.0
+            © 2025 DX Warehouse. Vendor Checkpoint System. v1.0.1
           </p>
           <div className="flex items-center gap-6">
             <Button

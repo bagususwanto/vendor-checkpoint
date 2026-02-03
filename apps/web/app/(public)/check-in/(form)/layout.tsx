@@ -13,7 +13,7 @@ export default function CheckInLayout({
   const [showExitDialog, setShowExitDialog] = useState(false);
 
   return (
-    <div className="relative flex flex-col bg-linear-to-br from-background to-muted/20 min-h-screen">
+    <div className="relative flex flex-col min-h-screen">
       <InteractiveBackground color="59, 130, 246" />
       <div className="z-10 relative flex flex-col min-h-screen">
         <CheckInHeader onShowExitDialog={() => setShowExitDialog(true)} />
@@ -25,8 +25,8 @@ export default function CheckInLayout({
         </main>
       </div>
 
-      <CheckInExitDialog 
-        open={showExitDialog} 
+      <CheckInExitDialog
+        open={showExitDialog}
         onOpenChange={setShowExitDialog}
       />
     </div>
