@@ -1,4 +1,5 @@
 import { InteractiveBackground } from '@/components/interactive-background';
+import { LandingFooter } from '@/app/components/landing-footer';
 
 export default function QueueStatusLayout({
   children,
@@ -14,6 +15,7 @@ export default function QueueStatusLayout({
             {children}
           </div>
         </main>
+        <LandingFooter />
       </div>
     </div>
   );
