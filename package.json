@@ -1,9 +1,9 @@
 {
   "name": "vendor-checkpoint",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
-  "description": "",
-  "author": "",
+  "description": "Vendor Checkpoint",
+  "author": "Bagus",
   "license": "UNLICENSED",
   "scripts": {
     "dev": "turbo run dev",
