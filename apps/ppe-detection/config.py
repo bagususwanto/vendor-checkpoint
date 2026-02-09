@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     """Application configuration settings"""
     
     # CORS Configuration
-    cors_origins: List[str] = ["http://localhost:5173"]
+    cors_origins: List[str] = ["http://localhost:5173", "http://localhost:3000", "http://localhost:3001"]
     
     # Model Configuration
     model_path: str = "models/ppe.pt"

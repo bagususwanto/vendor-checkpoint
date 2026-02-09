@@ -28,7 +28,7 @@ export function ChecklistForm() {
     },
     onSubmit: async ({ value }) => {
       setStep2Data(value);
-      router.push('/check-in/step-3');
+      router.push('/check-in/step-4');
     },
   });
 
