@@ -62,6 +62,19 @@ export default function CheckInStep2() {
       setCapturedImage(imageDataUrl);
 
       const response = await detectPPE(imageBlob);
+
+      // Log the response for debugging
+      console.log('PPE Detection Response:', response);
+
+      // Validate response structure
+      if (!response || !response.detected_objects) {
+        console.error('Invalid API response:', response);
+        toast.error('Respons API Tidak Valid', {
+          description: 'Format respons dari PPE API tidak sesuai.',
+        });
+        return;
+      }
+
       const result = ppeDetectionService.validatePPECompliance(
         response.detected_objects,
       );

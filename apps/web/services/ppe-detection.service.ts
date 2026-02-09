@@ -33,10 +33,9 @@ export const ppeDetectionService = {
     try {
       const formData = new FormData();
       formData.append('file', imageBlob, 'capture.jpg');
-      formData.append('return_json', 'true');
 
       const response = await axios.post<DetectionResponse>(
-        `${PPE_API_URL}/api/detect/`,
+        `${PPE_API_URL}/api/detect/?return_json=true`,
         formData,
         {
           headers: {
@@ -58,12 +57,15 @@ export const ppeDetectionService = {
    * @returns Compliance result with status and details
    */
   validatePPECompliance: (
-    detections: DetectedObject[],
+    detections: DetectedObject[] | undefined | null,
   ): PPEComplianceResult => {
-    const hasHardhat = detections.some(
+    // Defensive check: ensure detections is an array
+    const validDetections = Array.isArray(detections) ? detections : [];
+
+    const hasHardhat = validDetections.some(
       (d) => d.class_name === 'Hardhat' && d.confidence > 0.5,
     );
-    const hasSafetyVest = detections.some(
+    const hasSafetyVest = validDetections.some(
       (d) => d.class_name === 'Safety Vest' && d.confidence > 0.5,
     );
 
@@ -76,7 +78,7 @@ export const ppeDetectionService = {
       hasHardhat,
       hasSafetyVest,
       missingItems,
-      detections,
+      detections: validDetections,
     };
   },
 };
