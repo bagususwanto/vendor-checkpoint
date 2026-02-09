@@ -6,7 +6,8 @@
   "author": "Bagus",
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "concurrently \"turbo run dev\" \"npm run dev:ppe\"",
+    "dev:ppe": "cd apps/ppe-detection && source venv/bin/activate && uvicorn main:app --reload --port 8000",
     "build": "turbo run build",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
@@ -16,6 +17,7 @@
   "devDependencies": {
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
+    "concurrently": "^9.2.1",
     "prettier": "^3.2.5",
     "turbo": "^2.6.3"
   },
