@@ -8,8 +8,9 @@ export function CheckInSteps() {
 
   const steps = [
     { path: '/check-in/step-1', label: 'Identitas & Perusahaan' },
-    { path: '/check-in/step-2', label: 'Pemeriksaan' },
-    { path: '/check-in/step-3', label: 'Konfirmasi' },
+    { path: '/check-in/step-2', label: 'Pemeriksaan APD' },
+    { path: '/check-in/step-3', label: 'Pemeriksaan SQPE' },
+    { path: '/check-in/step-4', label: 'Konfirmasi' },
   ];
 
   const currentStepIndex = steps.findIndex((step) => step.path === pathname);

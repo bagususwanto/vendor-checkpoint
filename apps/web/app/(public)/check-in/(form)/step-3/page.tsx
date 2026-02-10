@@ -32,7 +32,7 @@ export default function CheckInStep3() {
     <div>
       <Card className="w-full max-w-4xl">
         <CardHeader className="items-center text-center">
-          <CardTitle className="text-2xl">Daftar Pemeriksaan</CardTitle>
+          <CardTitle className="text-2xl">Pemeriksaan SQPE</CardTitle>
           <CardDescription className="vendor-text">
             Jawab beberapa pertanyaan berikut sebelum memasuki area warehouse.
           </CardDescription>

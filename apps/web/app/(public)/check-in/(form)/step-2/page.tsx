@@ -132,10 +132,10 @@ export default function CheckInStep2() {
     <div>
       <Card className="w-full max-w-4xl">
         <CardHeader className="items-center text-center">
-          <CardTitle className="text-2xl">Scan APD</CardTitle>
+          <CardTitle className="text-2xl">Pemeriksaan APD</CardTitle>
           <CardDescription className="vendor-text">
-            Pastikan Anda memakai helm dan rompi keselamatan, lalu lakukan scan
-            dengan kamera.
+            Pastikan Anda memakai helm dan rompi keselamatan, lalu lakukan
+            peninjauan dengan kamera.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
