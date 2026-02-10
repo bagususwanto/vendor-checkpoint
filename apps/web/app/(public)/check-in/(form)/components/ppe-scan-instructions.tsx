@@ -17,7 +17,7 @@ export function PPEScanInstructions({
         <Info className="h-5 w-5 shrink-0 text-status-info-fg" />
         <div className="space-y-2">
           <h4 className="font-semibold text-status-info-text">
-            Instruksi Scan PPE
+            Instruksi Scan APD
           </h4>
           <ul className="space-y-1 text-sm text-status-info-text">
             <li>

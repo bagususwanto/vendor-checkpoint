@@ -63,12 +63,8 @@ export default function CheckInStep2() {
 
       const response = await detectPPE(imageBlob);
 
-      // Log the response for debugging
-      console.log('PPE Detection Response:', response);
-
       // Validate response structure
       if (!response || !response.detected_objects) {
-        console.error('Invalid API response:', response);
         toast.error('Respons API Tidak Valid', {
           description: 'Format respons dari PPE API tidak sesuai.',
         });
@@ -82,19 +78,18 @@ export default function CheckInStep2() {
       setComplianceResult(result);
 
       if (result.isCompliant) {
-        toast.success('Scan PPE Berhasil', {
+        toast.success('Scan APD Berhasil', {
           description: 'Perlengkapan keselamatan Anda sudah lengkap!',
         });
       } else {
-        toast.warning('PPE Belum Lengkap', {
+        toast.warning('APD Belum Lengkap', {
           description: 'Beberapa perlengkapan keselamatan belum terdeteksi.',
         });
       }
     } catch (error) {
-      console.error('PPE Detection Error:', error);
       toast.error('Gagal Melakukan Scan', {
         description:
-          'Terjadi kesalahan saat memindai. Pastikan PPE API sudah berjalan.',
+          'Terjadi kesalahan saat memindai. Pastikan APD API sudah berjalan.',
       });
     }
   };
@@ -106,21 +101,21 @@ export default function CheckInStep2() {
 
   const handleContinue = () => {
     if (!complianceResult) {
-      toast.error('Scan PPE Diperlukan', {
-        description: 'Mohon lakukan scan PPE terlebih dahulu.',
+      toast.error('Scan APD Diperlukan', {
+        description: 'Mohon lakukan scan APD terlebih dahulu.',
       });
       return;
     }
 
     if (!complianceResult.isCompliant) {
-      toast.warning('PPE Belum Lengkap', {
+      toast.warning('APD Belum Lengkap', {
         description:
           'Mohon pastikan Anda sudah memakai helm dan rompi keselamatan.',
       });
       return;
     }
 
-    // Save PPE data to store
+    // Save APD data to store
     setPPEData({
       scanTime: new Date().toISOString(),
       detections: complianceResult.detections,
@@ -137,7 +132,7 @@ export default function CheckInStep2() {
     <div>
       <Card className="w-full max-w-4xl">
         <CardHeader className="items-center text-center">
-          <CardTitle className="text-2xl">Scan PPE</CardTitle>
+          <CardTitle className="text-2xl">Scan APD</CardTitle>
           <CardDescription className="vendor-text">
             Pastikan Anda memakai helm dan rompi keselamatan, lalu lakukan scan
             dengan kamera.

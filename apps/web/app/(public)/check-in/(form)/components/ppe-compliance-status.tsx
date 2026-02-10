@@ -32,8 +32,8 @@ export function PPEComplianceStatus({
         )}
         <AlertTitle className="text-lg font-bold mb-1 line-clamp-none">
           {isCompliant
-            ? 'Kepatuhan PPE Terpenuhi'
-            : 'Kepatuhan PPE Belum Terpenuhi'}
+            ? 'Kepatuhan APD Terpenuhi'
+            : 'Kepatuhan APD Belum Terpenuhi'}
         </AlertTitle>
         <AlertDescription className="text-base text-muted-foreground">
           {isCompliant
