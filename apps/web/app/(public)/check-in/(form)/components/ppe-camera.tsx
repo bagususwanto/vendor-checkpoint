@@ -68,6 +68,28 @@ export function PPECamera({ onCapture, isProcessing = false }: PPECameraProps) {
   }, []);
 
   const captureImage = useCallback(() => {
+    // Play scan sound
+    const AudioContext =
+      window.AudioContext || (window as any).webkitAudioContext;
+    if (AudioContext) {
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime); // A5
+      osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.1); // Drop to A4
+
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.1);
+    }
+
     if (!videoRef.current || !canvasRef.current) return;
 
     const video = videoRef.current;
@@ -134,6 +156,59 @@ export function PPECamera({ onCapture, isProcessing = false }: PPECameraProps) {
 
         {/* Hidden canvas for capturing */}
         <canvas ref={canvasRef} className="hidden" />
+
+        {/* Scanning Overlay */}
+        {isProcessing && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px]">
+            {/* Scanning Laser */}
+            <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-transparent via-primary to-transparent opacity-75 shadow-[0_0_15px_var(--color-primary)] animate-scan" />
+
+            {/* Grid Overlay */}
+            <div
+              className="absolute inset-0 opacity-20"
+              style={{
+                backgroundImage:
+                  'linear-gradient(to right, var(--color-primary) 1px, transparent 1px), linear-gradient(to bottom, var(--color-primary) 1px, transparent 1px)',
+                backgroundSize: '40px 40px',
+              }}
+            />
+
+            {/* Tech Corners */}
+            <div className="absolute inset-4 pointer-events-none">
+              <div className="absolute top-0 left-0 w-16 h-16 border-l-4 border-t-4 border-primary rounded-tl-lg" />
+              <div className="absolute top-0 right-0 w-16 h-16 border-r-4 border-t-4 border-primary rounded-tr-lg" />
+              <div className="absolute bottom-0 left-0 w-16 h-16 border-l-4 border-b-4 border-primary rounded-bl-lg" />
+              <div className="absolute bottom-0 right-0 w-16 h-16 border-r-4 border-b-4 border-primary rounded-br-lg" />
+            </div>
+
+            {/* Status Text */}
+            <div className="relative z-20 flex flex-col items-center gap-2">
+              <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <div className="bg-black/60 px-4 py-2 rounded-full border border-primary/30 backdrop-blur-md">
+                <p className="text-primary font-mono text-lg font-bold tracking-widest animate-pulse">
+                  ANALYZING PPE...
+                </p>
+              </div>
+            </div>
+
+            <style jsx>{`
+              @keyframes scan {
+                0% {
+                  top: 0%;
+                }
+                50% {
+                  top: 100%;
+                }
+                100% {
+                  top: 0%;
+                }
+              }
+              .animate-scan {
+                animation: scan 2s linear infinite;
+              }
+            `}</style>
+          </div>
+        )}
       </div>
 
       <div className="flex gap-3">

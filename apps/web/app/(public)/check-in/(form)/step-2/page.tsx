@@ -146,12 +146,12 @@ export default function CheckInStep2() {
         <CardContent className="space-y-6">
           <PPEScanInstructions hasScanned={!!capturedImage} />
 
-          {!capturedImage ? (
+          {!complianceResult ? (
             <PPECamera onCapture={handleCapture} isProcessing={isDetecting} />
           ) : (
             <div className="space-y-4">
               <PPEResultOverlay
-                imageDataUrl={capturedImage}
+                imageDataUrl={capturedImage || ''}
                 detections={complianceResult?.detections || []}
               />
 
