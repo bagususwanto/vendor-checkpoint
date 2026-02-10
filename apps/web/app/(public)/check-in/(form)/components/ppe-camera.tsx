@@ -8,9 +8,16 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 type PPECameraProps = {
   onCapture: (imageBlob: Blob, imageDataUrl: string) => void;
   isProcessing?: boolean;
+  autoCapture?: boolean;
+  countdownDuration?: number;
 };
 
-export function PPECamera({ onCapture, isProcessing = false }: PPECameraProps) {
+export function PPECamera({
+  onCapture,
+  isProcessing = false,
+  autoCapture = false,
+  countdownDuration = 5,
+}: PPECameraProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -18,6 +25,7 @@ export function PPECamera({ onCapture, isProcessing = false }: PPECameraProps) {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState<string>('');
   const [isInitializing, setIsInitializing] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
@@ -25,6 +33,7 @@ export function PPECamera({ onCapture, isProcessing = false }: PPECameraProps) {
       streamRef.current = null;
     }
     setIsCameraActive(false);
+    setCountdown(null);
   }, []);
 
   const startCamera = useCallback(async () => {
@@ -68,6 +77,8 @@ export function PPECamera({ onCapture, isProcessing = false }: PPECameraProps) {
   }, []);
 
   const captureImage = useCallback(() => {
+    setCountdown(null);
+
     // Play scan sound
     const AudioContext =
       window.AudioContext || (window as any).webkitAudioContext;
@@ -113,6 +124,39 @@ export function PPECamera({ onCapture, isProcessing = false }: PPECameraProps) {
       }
     }, 'image/jpeg');
   }, [onCapture]);
+
+  const startCountdown = useCallback(() => {
+    setCountdown(countdownDuration);
+  }, [countdownDuration]);
+
+  const cancelCountdown = useCallback(() => {
+    setCountdown(null);
+  }, []);
+
+  // Countdown timer logic
+  useEffect(() => {
+    if (countdown === null || countdown <= 0) return;
+
+    const timer = setTimeout(() => {
+      setCountdown((prev) => (prev !== null ? prev - 1 : null));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
+  // Trigger capture when countdown reaches 0
+  useEffect(() => {
+    if (countdown === 0) {
+      captureImage();
+    }
+  }, [countdown, captureImage]);
+
+  // Start countdown when camera becomes active if autocapture is enabled
+  useEffect(() => {
+    if (isCameraActive && autoCapture && !isProcessing) {
+      startCountdown();
+    }
+  }, [isCameraActive, autoCapture, startCountdown, isProcessing]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -209,6 +253,46 @@ export function PPECamera({ onCapture, isProcessing = false }: PPECameraProps) {
             `}</style>
           </div>
         )}
+
+        {/* Countdown Overlay */}
+        {countdown !== null && !isProcessing && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center">
+            <div className="relative flex h-32 w-32 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm border-4 border-white/50">
+              <span className="text-6xl font-bold text-white animate-pulse">
+                {countdown}
+              </span>
+              <svg className="absolute inset-0 h-full w-full -rotate-90">
+                <circle
+                  cx="64"
+                  cy="64"
+                  r="60"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="4"
+                  strokeDasharray="377"
+                  strokeDashoffset={
+                    377 -
+                    (377 * (countdownDuration - countdown)) / countdownDuration
+                  }
+                  className="transition-all duration-1000 ease-linear"
+                />
+              </svg>
+            </div>
+            <div className="mt-4 rounded-full bg-black/60 px-4 py-2 backdrop-blur-sm">
+              <p className="text-white font-medium">
+                Auto-scan dalam {countdown} detik...
+              </p>
+            </div>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="mt-4"
+              onClick={cancelCountdown}
+            >
+              Batalkan Auto-scan
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="flex gap-3">
@@ -245,6 +329,18 @@ export function PPECamera({ onCapture, isProcessing = false }: PPECameraProps) {
               <Camera className="mr-2 h-5 w-5" />
               {isProcessing ? 'Memproses...' : 'Ambil Gambar & Scan'}
             </Button>
+            {autoCapture && !isProcessing && countdown === null && (
+              <Button
+                type="button"
+                onClick={startCountdown}
+                variant="secondary"
+                size="icon"
+                className="aspect-square"
+                title="Mulai Auto-scan"
+              >
+                <RefreshCw className="h-5 w-5" />
+              </Button>
+            )}
           </>
         )}
       </div>
@@ -253,8 +349,10 @@ export function PPECamera({ onCapture, isProcessing = false }: PPECameraProps) {
         <div className="rounded-md bg-status-info-bg p-3 flex gap-2">
           <Lightbulb className="w-5 h-5 text-status-info-fg shrink-0 mt-0.5" />
           <p className="text-sm text-status-info-text">
-            <strong>Tips:</strong> Posisikan diri Anda agar helm dan rompi
-            keselamatan terlihat jelas di kamera.
+            <strong>Tips:</strong>{' '}
+            {autoCapture
+              ? 'Tahan posisi Anda. Scan akan dilakukan secara otomatis dalam hitungan mundur.'
+              : 'Posisikan diri Anda agar helm dan rompi keselamatan terlihat jelas di kamera.'}
           </p>
         </div>
       )}

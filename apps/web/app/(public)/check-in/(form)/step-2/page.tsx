@@ -142,7 +142,11 @@ export default function CheckInStep2() {
           <PPEScanInstructions hasScanned={!!capturedImage} />
 
           {!complianceResult ? (
-            <PPECamera onCapture={handleCapture} isProcessing={isDetecting} />
+            <PPECamera
+              onCapture={handleCapture}
+              isProcessing={isDetecting}
+              autoCapture={true}
+            />
           ) : (
             <div className="space-y-4">
               <PPEResultOverlay

@@ -29,7 +29,9 @@ export function PPEScanInstructions({
               cukup
             </li>
             <li>✓ Pastikan helm dan rompi terlihat jelas di kamera</li>
-            <li>✓ Klik tombol "Ambil Gambar & Scan" untuk memulai deteksi</li>
+            <li>
+              ✓ Tunggu hitungan mundur selesai untuk pengambilan gambar otomatis
+            </li>
           </ul>
         </div>
       </div>
