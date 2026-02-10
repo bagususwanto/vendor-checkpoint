@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useCallback, useEffect } from 'react';
-import { Camera, CameraOff, RefreshCw } from 'lucide-react';
+import { Camera, CameraOff, RefreshCw, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -175,9 +175,10 @@ export function PPECamera({ onCapture, isProcessing = false }: PPECameraProps) {
       </div>
 
       {isCameraActive && (
-        <div className="rounded-md bg-blue-50 p-3 dark:bg-blue-950/30">
+        <div className="rounded-md bg-blue-50 p-3 dark:bg-blue-950/30 flex gap-2">
+          <Lightbulb className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
           <p className="text-sm text-blue-900 dark:text-blue-100">
-            💡 <strong>Tips:</strong> Posisikan diri Anda agar helm dan rompi
+            <strong>Tips:</strong> Posisikan diri Anda agar helm dan rompi
             keselamatan terlihat jelas di kamera.
           </p>
         </div>
