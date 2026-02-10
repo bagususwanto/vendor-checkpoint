@@ -250,9 +250,9 @@ export function PPECamera({ onCapture, isProcessing = false }: PPECameraProps) {
       </div>
 
       {isCameraActive && (
-        <div className="rounded-md bg-blue-50 p-3 dark:bg-blue-950/30 flex gap-2">
-          <Lightbulb className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-          <p className="text-sm text-blue-900 dark:text-blue-100">
+        <div className="rounded-md bg-status-info-bg p-3 flex gap-2">
+          <Lightbulb className="w-5 h-5 text-status-info-fg shrink-0 mt-0.5" />
+          <p className="text-sm text-status-info-text">
             <strong>Tips:</strong> Posisikan diri Anda agar helm dan rompi
             keselamatan terlihat jelas di kamera.
           </p>

@@ -86,7 +86,7 @@ export default function SettingsPage() {
             <Card className="flex flex-col">
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-blue-100 p-2 text-blue-600">
+                  <div className="rounded-lg bg-status-info-bg p-2 text-status-info-fg">
                     <Users className="h-5 w-5" />
                   </div>
                   <div>

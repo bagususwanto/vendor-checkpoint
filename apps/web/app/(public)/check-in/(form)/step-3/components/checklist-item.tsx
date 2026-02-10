@@ -25,7 +25,7 @@ export function ChecklistItem({ item, form }: ChecklistItemProps) {
             data-invalid={isInvalid}
             className={`space-y-2 bg-transparent p-4 border rounded-lg transition-colors duration-300 ${
               field.state.value === 'false'
-                ? 'border-destructive bg-red-50/50'
+                ? 'border-status-error-border bg-status-error-bg'
                 : ''
             }`}
           >
@@ -48,14 +48,14 @@ export function ChecklistItem({ item, form }: ChecklistItemProps) {
             >
               <ToggleGroupItem
                 value="true"
-                className="flex justify-center items-center gap-2 data-[state=on]:bg-green-100 hover:bg-green-50 py-3 border data-[state=on]:border-green-600 h-auto data-[state=on]:text-green-700 hover:text-green-700 active:scale-95 transition-all duration-200"
+                className="flex justify-center items-center gap-2 data-[state=on]:bg-status-success-bg hover:bg-status-success-bg/80 py-3 border data-[state=on]:border-status-success-border h-auto data-[state=on]:text-status-success-fg hover:text-status-success-fg active:scale-95 transition-all duration-200"
               >
                 <Icons.CircleCheck className="w-5 h-5" />
                 <span className="font-semibold text-base">YA</span>
               </ToggleGroupItem>
               <ToggleGroupItem
                 value="false"
-                className="flex justify-center items-center gap-2 data-[state=on]:bg-red-100 hover:bg-red-50 py-3 border data-[state=on]:border-destructive h-auto data-[state=on]:text-red-700 hover:text-red-700 active:scale-95 transition-all duration-200"
+                className="flex justify-center items-center gap-2 data-[state=on]:bg-status-error-bg hover:bg-status-error-bg/80 py-3 border data-[state=on]:border-status-error-border h-auto data-[state=on]:text-status-error-fg hover:text-status-error-fg active:scale-95 transition-all duration-200"
               >
                 <Icons.CircleX className="w-5 h-5" />
                 <span className="font-semibold text-base">TIDAK</span>

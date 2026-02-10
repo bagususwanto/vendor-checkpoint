@@ -85,8 +85,10 @@ export function ReviewChecklist({ step2Data }: ReviewChecklistProps) {
                       <div className="flex items-center gap-1.5 font-medium shrink-0">
                         {answer === 'true' ? (
                           <>
-                            <CheckCircle2 className="w-4 h-4 text-green-600" />
-                            <span className="text-green-700 text-sm">YA</span>
+                            <CheckCircle2 className="w-4 h-4 text-status-success-fg" />
+                            <span className="text-status-success-fg text-sm">
+                              YA
+                            </span>
                           </>
                         ) : (
                           <>

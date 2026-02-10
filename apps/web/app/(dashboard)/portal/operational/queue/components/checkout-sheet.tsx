@@ -118,7 +118,7 @@ export function CheckoutSheet({
                 </Card>
                 <Card className="p-4 shadow-sm">
                   <div className="flex items-start gap-4">
-                    <div className="rounded-lg bg-blue-100 p-2 text-blue-600">
+                    <div className="rounded-lg bg-status-info-bg p-2 text-status-info-fg">
                       <User className="h-5 w-5" />
                     </div>
                     <div className="space-y-1">

@@ -92,7 +92,9 @@ export const columns = (
       return (
         <Badge
           variant={isActive ? 'default' : 'secondary'}
-          className={isActive ? 'bg-green-600 hover:bg-green-700' : ''}
+          className={
+            isActive ? 'bg-status-success-fg hover:bg-status-success-fg/90' : ''
+          }
         >
           {isActive ? 'Aktif' : 'Nonaktif'}
         </Badge>

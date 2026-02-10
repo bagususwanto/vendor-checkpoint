@@ -47,7 +47,7 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
               Periode {data.period?.from} - {data.period?.to}
             </p>
             {data.totalCheckins > 0 && (
-              <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+              <p className="text-xs text-status-info-fg mt-2">
                 <Info className="inline w-4 h-4" /> {data.totalCheckins} records
                 akan di-export
               </p>

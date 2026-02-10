@@ -31,13 +31,16 @@ export function QueueStatusCard({ data, onRefresh }: QueueStatusCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'COMPLETED':
-        return 'text-green-500 bg-green-500/10 border-green-500/20';
+        return 'text-status-success-fg bg-status-success-bg border-status-success-border';
       case 'REJECTED':
-        return 'text-red-500 bg-red-500/10 border-red-500/20';
+        return 'text-status-error-fg bg-status-error-bg border-status-error-border';
       case 'WAITING':
+        // Keeping hardcoded yellow/warning for now as defined in requirements (Red/Green/Blue refined)
+        // Ideally should be status-warning
         return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
       default:
-        return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+        // Info/Blue
+        return 'text-status-info-fg bg-status-info-bg border-status-info-border';
     }
   };
 

@@ -23,7 +23,7 @@ export function LandingFooter() {
             </Button>
             <div className="bg-border w-px h-4" />
             <span className="flex items-center gap-2">
-              <span className="bg-green-500 rounded-full w-2 h-2 animate-pulse" />
+              <span className="bg-status-success-fg rounded-full w-2 h-2 animate-pulse" />
               System Online
             </span>
           </div>

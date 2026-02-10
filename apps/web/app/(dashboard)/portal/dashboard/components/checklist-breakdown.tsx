@@ -72,7 +72,7 @@ export function ChecklistBreakdown() {
                   value={category.compliance_rate}
                   indicatorClassName={cn(
                     'bg-current',
-                    category.color || 'text-blue-500',
+                    category.color || 'text-status-info-fg',
                   )}
                   className="h-2"
                 />

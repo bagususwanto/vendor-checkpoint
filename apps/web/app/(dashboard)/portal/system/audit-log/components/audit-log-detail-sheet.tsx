@@ -88,7 +88,7 @@ export function AuditLogDetailSheet({
               <div className="space-y-4">
                 <Card className="p-4 shadow-sm">
                   <div className="flex items-start gap-4">
-                    <div className="rounded-lg bg-blue-100 p-2 text-blue-600">
+                    <div className="rounded-lg bg-status-info-bg p-2 text-status-info-fg">
                       <User className="h-5 w-5" />
                     </div>
                     <div className="space-y-1">
@@ -126,7 +126,7 @@ export function AuditLogDetailSheet({
 
                 <Card className="p-4 shadow-sm">
                   <div className="flex items-start gap-4">
-                    <div className="rounded-lg bg-green-100 p-2 text-green-600">
+                    <div className="rounded-lg bg-status-success-bg p-2 text-status-success-fg">
                       <Activity className="h-5 w-5" />
                     </div>
                     <div className="space-y-1 w-full">
@@ -170,13 +170,13 @@ export function AuditLogDetailSheet({
                     renderValue(
                       'Data Sebelum (Old Value)',
                       log.old_value,
-                      'bg-red-50/50 border-red-100 text-red-900',
+                      'bg-status-error-bg border-status-error-border text-status-error-text',
                     )}
                   {log.new_value &&
                     renderValue(
                       'Data Sesudah (New Value)',
                       log.new_value,
-                      'bg-green-50/50 border-green-100 text-green-900',
+                      'bg-status-success-bg border-status-success-border text-status-success-text',
                     )}
                 </div>
               </div>

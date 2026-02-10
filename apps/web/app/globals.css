@@ -41,10 +41,12 @@
   --success-bg: oklch(0.982 0.018 155.826);
   --success-fg: oklch(0.577 0.245 148.971);
   --success-border: oklch(0.627 0.194 149.214);
+  --success-text: oklch(0.28 0.1 149); /* Green-900 approx */
 
   --error-bg: oklch(0.976 0.013 17.585);
   --error-fg: oklch(0.577 0.245 27.325);
   --error-border: oklch(0.637 0.237 25.331);
+  --error-text: oklch(0.28 0.1 27); /* Red-900 approx */
 
   /* Info: Light Mode */
   --info-bg: oklch(0.97 0.01 247.882); /* Blue-50 approx */
@@ -117,10 +119,12 @@
   --success-bg: oklch(0.266 0.065 152.934 / 0.2);
   --success-fg: oklch(0.7 0.15 150);
   --success-border: oklch(0.4 0.1 150);
+  --success-text: oklch(0.9 0.05 150); /* Green-100 approx */
 
   --error-bg: oklch(0.279 0.077 24.363 / 0.2);
   --error-fg: oklch(0.7 0.15 25);
   --error-border: oklch(0.4 0.1 25);
+  --error-text: oklch(0.9 0.05 25); /* Red-100 approx */
 
   /* Info: Dark Mode */
   --info-bg: oklch(0.28 0.07 262.881 / 0.3); /* Blue-950/30 */
@@ -190,10 +194,12 @@
   --color-status-success-bg: var(--success-bg);
   --color-status-success-fg: var(--success-fg);
   --color-status-success-border: var(--success-border);
+  --color-status-success-text: var(--success-text);
 
   --color-status-error-bg: var(--error-bg);
   --color-status-error-fg: var(--error-fg);
   --color-status-error-border: var(--error-border);
+  --color-status-error-text: var(--error-text);
 
   /* Semantic Info Colors */
   --color-status-info-bg: var(--info-bg);

@@ -174,7 +174,7 @@ export function VerificationSheet({
                     </Card>
                     <Card className="p-4 shadow-sm">
                       <div className="flex items-start gap-4">
-                        <div className="rounded-lg bg-blue-100 p-2 text-blue-600">
+                        <div className="rounded-lg bg-status-info-bg p-2 text-status-info-fg">
                           <User className="h-5 w-5" />
                         </div>
                         <div className="space-y-1">
@@ -319,7 +319,7 @@ export function VerificationSheet({
                       </div>
                     </Card>
                     {detailData.ops_verification.rejection_reason && (
-                      <Card className="p-4 shadow-sm col-span-2 bg-red-50 border-red-100">
+                      <Card className="p-4 shadow-sm col-span-2 bg-status-error-bg border-status-error-border">
                         <div className="space-y-1">
                           <p className="text-xs font-medium text-destructive">
                             Alasan Penolakan
@@ -449,7 +449,7 @@ export function VerificationSheet({
                                             }
                                             className={`${
                                               item.is_compliant
-                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300'
+                                                ? 'bg-status-success-bg text-status-success-fg border-status-success-border hover:bg-status-success-border hover:border-status-success-fg'
                                                 : ''
                                             }`}
                                           >
@@ -469,7 +469,7 @@ export function VerificationSheet({
                                             }
                                             className={`${
                                               item.is_compliant
-                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300'
+                                                ? 'bg-status-success-bg text-status-success-fg border-status-success-border hover:bg-status-success-border hover:border-status-success-fg'
                                                 : ''
                                             }`}
                                           >
@@ -520,7 +520,7 @@ export function VerificationSheet({
                           className="flex items-center justify-between rounded-lg border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer transition-all"
                         >
                           <div className="flex w-full items-center gap-3">
-                            <div className="rounded-full bg-green-100 p-1 text-green-600">
+                            <div className="rounded-full bg-status-success-bg p-1 text-status-success-fg">
                               <CheckCircle className="h-5 w-5" />
                             </div>
                             <div>
@@ -543,7 +543,7 @@ export function VerificationSheet({
                           className="flex items-center justify-between rounded-lg border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-destructive peer-data-[state=checked]:bg-destructive/5 cursor-pointer transition-all"
                         >
                           <div className="flex w-full items-center gap-3">
-                            <div className="rounded-full bg-red-100 p-1 text-red-600">
+                            <div className="rounded-full bg-status-error-bg p-1 text-status-error-fg">
                               <XCircle className="h-5 w-5" />
                             </div>
                             <div>
