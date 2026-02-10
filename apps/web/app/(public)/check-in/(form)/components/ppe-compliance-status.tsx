@@ -21,8 +21,8 @@ export function PPEComplianceStatus({
       <Alert
         className={`${
           isCompliant
-            ? 'border-green-500 bg-green-50 dark:bg-green-950/20 [&>svg]:text-green-600'
-            : 'border-red-500 bg-red-50 dark:bg-red-950/20 [&>svg]:text-red-600'
+            ? 'border-status-success-border bg-status-success-bg [&>svg]:text-status-success-fg'
+            : 'border-status-error-border bg-status-error-bg [&>svg]:text-status-error-fg'
         } grid-cols-[auto_1fr] items-start gap-x-4`}
       >
         {isCompliant ? (
@@ -52,12 +52,12 @@ export function PPEComplianceStatus({
             <span className="font-medium">Helm (Hardhat)</span>
           </div>
           {hasHardhat ? (
-            <div className="flex items-center text-green-600 bg-green-100 dark:bg-green-950/40 px-3 py-1 rounded-full text-sm font-medium">
+            <div className="flex items-center text-status-success-fg bg-status-success-bg px-3 py-1 rounded-full text-sm font-medium">
               <CheckCircle2 className="h-4 w-4 mr-1.5" />
               Terdeteksi
             </div>
           ) : (
-            <div className="flex items-center text-red-600 bg-red-100 dark:bg-red-950/40 px-3 py-1 rounded-full text-sm font-medium">
+            <div className="flex items-center text-status-error-fg bg-status-error-bg px-3 py-1 rounded-full text-sm font-medium">
               <XCircle className="h-4 w-4 mr-1.5" />
               Missing
             </div>
@@ -73,12 +73,12 @@ export function PPEComplianceStatus({
             <span className="font-medium">Rompi (Vest)</span>
           </div>
           {hasSafetyVest ? (
-            <div className="flex items-center text-green-600 bg-green-100 dark:bg-green-950/40 px-3 py-1 rounded-full text-sm font-medium">
+            <div className="flex items-center text-status-success-fg bg-status-success-bg px-3 py-1 rounded-full text-sm font-medium">
               <CheckCircle2 className="h-4 w-4 mr-1.5" />
               Terdeteksi
             </div>
           ) : (
-            <div className="flex items-center text-red-600 bg-red-100 dark:bg-red-950/40 px-3 py-1 rounded-full text-sm font-medium">
+            <div className="flex items-center text-status-error-fg bg-status-error-bg px-3 py-1 rounded-full text-sm font-medium">
               <XCircle className="h-4 w-4 mr-1.5" />
               Missing
             </div>
@@ -87,11 +87,11 @@ export function PPEComplianceStatus({
       </div>
 
       {!isCompliant && missingItems.length > 0 && (
-        <div className="rounded-lg bg-red-50 dark:bg-red-950/20 p-4 border border-red-200 dark:border-red-900/50">
-          <p className="text-sm font-medium text-red-800 dark:text-red-200 mb-2">
+        <div className="rounded-lg bg-status-error-bg p-4 border border-status-error-border">
+          <p className="text-sm font-medium text-status-error-fg mb-2">
             Rekomendasi Tindakan:
           </p>
-          <ul className="list-disc list-inside text-sm text-red-700 dark:text-red-300 space-y-1 ml-1">
+          <ul className="list-disc list-inside text-sm text-status-error-fg space-y-1 ml-1">
             {missingItems.map((item, idx) => (
               <li key={idx}>
                 Mohon gunakan <strong>{item}</strong> dengan benar agar terlihat

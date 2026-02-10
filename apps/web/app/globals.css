@@ -36,6 +36,22 @@
   --sidebar-accent-foreground: oklch(0.3791 0.1378 265.5222);
   --sidebar-border: oklch(0.9276 0.0058 264.5313);
   --sidebar-ring: oklch(0.6397 0.172 36.4421);
+
+  /* Semantic Status Colors */
+  --success-bg: oklch(0.982 0.018 155.826);
+  --success-fg: oklch(0.577 0.245 148.971);
+  --success-border: oklch(0.627 0.194 149.214);
+
+  --error-bg: oklch(0.976 0.013 17.585);
+  --error-fg: oklch(0.577 0.245 27.325);
+  --error-border: oklch(0.637 0.237 25.331);
+
+  /* Info: Light Mode */
+  --info-bg: oklch(0.97 0.01 247.882); /* Blue-50 approx */
+  --info-fg: oklch(0.546 0.245 262.881); /* Blue-600 approx */
+  --info-border: oklch(0.81 0.05 247.882); /* Blue-200 approx */
+  --info-text: oklch(0.32 0.09 262.881); /* Blue-900 approx */
+
   --font-sans: Inter, sans-serif;
   --font-serif: Source Serif 4, serif;
   --font-mono: JetBrains Mono, monospace;
@@ -96,6 +112,21 @@
   --sidebar-accent-foreground: oklch(0.8823 0.0571 254.1284);
   --sidebar-border: oklch(0.3843 0.0301 269.7337);
   --sidebar-ring: oklch(0.6397 0.172 36.4421);
+
+  /* Semantic Status Colors (Dark Mode) - RESTORED */
+  --success-bg: oklch(0.266 0.065 152.934 / 0.2);
+  --success-fg: oklch(0.7 0.15 150);
+  --success-border: oklch(0.4 0.1 150);
+
+  --error-bg: oklch(0.279 0.077 24.363 / 0.2);
+  --error-fg: oklch(0.7 0.15 25);
+  --error-border: oklch(0.4 0.1 25);
+
+  /* Info: Dark Mode */
+  --info-bg: oklch(0.28 0.07 262.881 / 0.3); /* Blue-950/30 */
+  --info-fg: oklch(0.7 0.15 262.881); /* Blue-400 equivalent */
+  --info-border: oklch(0.4 0.1 262.881); /* Blue-800 equivalent */
+  --info-text: oklch(0.85 0.05 262.881); /* Blue-100 equivalent */
   --font-sans: Inter, sans-serif;
   --font-serif: Source Serif 4, serif;
   --font-mono: JetBrains Mono, monospace;
@@ -154,6 +185,21 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Semantic Status Colors */
+  --color-status-success-bg: var(--success-bg);
+  --color-status-success-fg: var(--success-fg);
+  --color-status-success-border: var(--success-border);
+
+  --color-status-error-bg: var(--error-bg);
+  --color-status-error-fg: var(--error-fg);
+  --color-status-error-border: var(--error-border);
+
+  /* Semantic Info Colors */
+  --color-status-info-bg: var(--info-bg);
+  --color-status-info-fg: var(--info-fg);
+  --color-status-info-border: var(--info-border);
+  --color-status-info-text: var(--info-text);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
