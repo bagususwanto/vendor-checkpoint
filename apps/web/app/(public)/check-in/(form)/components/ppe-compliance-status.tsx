@@ -18,76 +18,88 @@ export function PPEComplianceStatus({
 }: PPEComplianceStatusProps) {
   return (
     <div className="space-y-4">
-      <Alert variant={isCompliant ? 'default' : 'destructive'}>
+      <Alert
+        className={`${
+          isCompliant
+            ? 'border-green-500 bg-green-50 dark:bg-green-950/20 [&>svg]:text-green-600'
+            : 'border-red-500 bg-red-50 dark:bg-red-950/20 [&>svg]:text-red-600'
+        } grid-cols-[auto_1fr] items-start gap-x-4`}
+      >
         {isCompliant ? (
-          <CheckCircle2 className="h-5 w-5" />
+          <CheckCircle2 className="h-6 w-6 mt-1" />
         ) : (
-          <XCircle className="h-5 w-5" />
+          <XCircle className="h-6 w-6 mt-1" />
         )}
-        <AlertTitle className="vendor-text">
+        <AlertTitle className="text-lg font-bold mb-1 line-clamp-none">
           {isCompliant
-            ? 'Kepatuhan PPE Terpenuhi ✓'
+            ? 'Kepatuhan PPE Terpenuhi'
             : 'Kepatuhan PPE Belum Terpenuhi'}
         </AlertTitle>
-        <AlertDescription className="vendor-text">
+        <AlertDescription className="text-base text-muted-foreground">
           {isCompliant
             ? 'Anda sudah memakai perlengkapan keselamatan yang diperlukan.'
             : 'Mohon periksa kembali perlengkapan keselamatan Anda.'}
         </AlertDescription>
       </Alert>
 
-      <div className="space-y-2">
-        <h4 className="font-semibold vendor-text flex items-center gap-2">
-          <Shield className="h-4 w-4" />
-          Checklist PPE:
-        </h4>
-        <div className="space-y-2 pl-6">
-          <div className="flex items-center gap-2 vendor-text">
-            {hasHardhat ? (
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-            ) : (
-              <XCircle className="h-5 w-5 text-red-600" />
-            )}
-            <span
-              className={
-                hasHardhat
-                  ? 'text-green-700 dark:text-green-400'
-                  : 'text-red-700 dark:text-red-400'
-              }
-            >
-              Helm Keselamatan (Hardhat)
-            </span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Hardhat Item */}
+        <div className="flex items-center justify-between p-4 rounded-lg border bg-card shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-muted rounded-full">
+              <Shield className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <span className="font-medium">Helm (Hardhat)</span>
           </div>
-          <div className="flex items-center gap-2 vendor-text">
-            {hasSafetyVest ? (
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-            ) : (
-              <XCircle className="h-5 w-5 text-red-600" />
-            )}
-            <span
-              className={
-                hasSafetyVest
-                  ? 'text-green-700 dark:text-green-400'
-                  : 'text-red-700 dark:text-red-400'
-              }
-            >
-              Rompi Keselamatan (Safety Vest)
-            </span>
+          {hasHardhat ? (
+            <div className="flex items-center text-green-600 bg-green-100 dark:bg-green-950/40 px-3 py-1 rounded-full text-sm font-medium">
+              <CheckCircle2 className="h-4 w-4 mr-1.5" />
+              Terdeteksi
+            </div>
+          ) : (
+            <div className="flex items-center text-red-600 bg-red-100 dark:bg-red-950/40 px-3 py-1 rounded-full text-sm font-medium">
+              <XCircle className="h-4 w-4 mr-1.5" />
+              Missing
+            </div>
+          )}
+        </div>
+
+        {/* Safety Vest Item */}
+        <div className="flex items-center justify-between p-4 rounded-lg border bg-card shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-muted rounded-full">
+              <Shield className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <span className="font-medium">Rompi (Vest)</span>
           </div>
+          {hasSafetyVest ? (
+            <div className="flex items-center text-green-600 bg-green-100 dark:bg-green-950/40 px-3 py-1 rounded-full text-sm font-medium">
+              <CheckCircle2 className="h-4 w-4 mr-1.5" />
+              Terdeteksi
+            </div>
+          ) : (
+            <div className="flex items-center text-red-600 bg-red-100 dark:bg-red-950/40 px-3 py-1 rounded-full text-sm font-medium">
+              <XCircle className="h-4 w-4 mr-1.5" />
+              Missing
+            </div>
+          )}
         </div>
       </div>
 
       {!isCompliant && missingItems.length > 0 && (
-        <Alert variant="destructive">
-          <AlertDescription className="vendor-text">
-            <strong>Perlengkapan yang belum terdeteksi:</strong>
-            <ul className="mt-2 list-inside list-disc">
-              {missingItems.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-          </AlertDescription>
-        </Alert>
+        <div className="rounded-lg bg-red-50 dark:bg-red-950/20 p-4 border border-red-200 dark:border-red-900/50">
+          <p className="text-sm font-medium text-red-800 dark:text-red-200 mb-2">
+            Rekomendasi Tindakan:
+          </p>
+          <ul className="list-disc list-inside text-sm text-red-700 dark:text-red-300 space-y-1 ml-1">
+            {missingItems.map((item, idx) => (
+              <li key={idx}>
+                Mohon gunakan <strong>{item}</strong> dengan benar agar terlihat
+                kamera.
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
