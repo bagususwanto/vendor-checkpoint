@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { SystemConfigService } from '../system-config/system-config.service';
 import { ReportFilterDto } from './dto/report-filter.dto';
+import { ReportExportLogFilterDto } from './dto/report-export-log-filter.dto';
 import * as ExcelJS from 'exceljs';
 
 @Injectable()
@@ -456,13 +457,7 @@ export class ReportService {
     });
   }
 
-  async getExportLogs(filter: {
-    dateFrom: string;
-    dateTo: string;
-    reportType?: string;
-    page: number;
-    limit: number;
-  }) {
+  async getExportLogs(filter: ReportExportLogFilterDto) {
     const dateFrom = new Date(filter.dateFrom);
     dateFrom.setHours(0, 0, 0, 0);
 

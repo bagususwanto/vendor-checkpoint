@@ -10,10 +10,13 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "eslint": "^9.31.0",
     "prettier": "^3.2.5",
     "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "zod": "^3.25.76"
   }
 }

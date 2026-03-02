@@ -32,8 +32,7 @@
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@radix-ui/react-use-controllable-state": "^1.2.2",
-    "@repo/types": "*",
-    "@repo/ui": "*",
+    "@repo/types": "workspace:*",
     "@tailwindcss/postcss": "^4.1.17",
     "@tanstack/react-form": "^1.27.3",
     "@tanstack/react-query": "^5.90.12",
@@ -62,9 +61,8 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
-    "@repo/api": "*",
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.15.3",
     "@types/react": "19.1.0",
     "@types/react-dom": "19.1.1",

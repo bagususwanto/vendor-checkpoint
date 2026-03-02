@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useForm } from '@tanstack/react-form';
-import { createMaterialCategorySchema } from '@repo/types';
+import {
+  createMaterialCategorySchema,
+  CreateMaterialCategory,
+} from '@repo/types';
 import * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -18,7 +21,7 @@ import {
 import { Loader2 } from 'lucide-react';
 
 const formSchema = createMaterialCategorySchema;
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = CreateMaterialCategory;
 
 interface MaterialCategoryFormProps {
   defaultValues?: Partial<FormValues>;

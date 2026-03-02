@@ -2,11 +2,12 @@
   "name": "vendor-checkpoint",
   "version": "1.0.2",
   "private": true,
+  "packageManager": "pnpm@10.30.3",
   "description": "Vendor Checkpoint",
   "author": "Bagus",
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "concurrently \"turbo run dev\" \"npm run dev:ppe\"",
+    "dev": "concurrently \"turbo run dev\" \"pnpm run dev:ppe\"",
     "dev:ppe": "cd apps/ppe-detection && source venv/bin/activate && uvicorn main:app --reload --port 8000",
     "build": "turbo run build",
     "test": "turbo run test",
@@ -15,8 +16,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "concurrently": "^9.2.1",
     "prettier": "^3.2.5",
     "turbo": "^2.6.3"
@@ -24,7 +25,6 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "npm@11.5.2",
   "workspaces": [
     "apps/*",
     "packages/*"
