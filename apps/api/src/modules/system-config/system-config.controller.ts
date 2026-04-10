@@ -18,12 +18,12 @@ import { AuditLog } from 'src/common/decorators/audit.decorator';
 import { AuditLogInterceptor } from 'src/common/interceptors/audit.interceptor';
 
 // All system-config routes are protected - system settings
-@UseGuards(JwtAuthGuard)
 @Controller('system-config')
 @UseInterceptors(AuditLogInterceptor)
 export class SystemConfigController {
   constructor(private readonly systemConfigService: SystemConfigService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll(@Query() query: FindSystemConfigParamsDto) {
     return this.systemConfigService.findAll(query);
@@ -34,11 +34,13 @@ export class SystemConfigController {
     return this.systemConfigService.findByConfigKey(key);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.systemConfigService.findOne(+id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @AuditLog({
     actionType: 'SYSTEM_CONFIG_UPDATE',
