@@ -16,6 +16,8 @@ import { CreateCheckInDto } from './dto/create-check-in.dto';
 import { UpdateCheckInDto } from './dto/update-check-in.dto';
 import { VerifyCheckInDto } from './dto/verify-check-in.dto';
 import { CheckoutCheckInDto } from './dto/checkout-check-in.dto';
+import { HoldCheckInDto } from './dto/hold-check-in.dto';
+import { ResumeCheckInDto } from './dto/resume-check-in.dto';
 import { getRequestInfo } from 'src/common/utils/request-info.util';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -133,6 +135,51 @@ export class CheckInController {
     const requestInfo = getRequestInfo(req);
     const userId = req.user.userId;
     return this.checkInService.checkoutEntry(checkoutDto, requestInfo, userId);
+  }
+
+  // PROTECTED - Staff only
+  @UseGuards(JwtAuthGuard)
+  @Patch('/hold')
+  @AuditLog({
+    actionType: 'CHECKIN_HOLD',
+    actionDescription: 'Check-in ditahan',
+    buildDetails: (req, res) => ({
+      entry_id: res.entry_id,
+      user_id: res.user_id,
+      old_value: { status: QueueStatus.DISETUJUI },
+      new_value: {
+        status: QueueStatus.TERTAHAN,
+        hold_time: res.hold_time,
+        reason: res.reason,
+      },
+    }),
+  })
+  hold(@Body() holdDto: HoldCheckInDto, @Req() req: any) {
+    const requestInfo = getRequestInfo(req);
+    const userId = req.user.userId;
+    return this.checkInService.holdEntry(holdDto, requestInfo, userId);
+  }
+
+  // PROTECTED - Staff only
+  @UseGuards(JwtAuthGuard)
+  @Patch('/resume')
+  @AuditLog({
+    actionType: 'CHECKIN_RESUME',
+    actionDescription: 'Check-in dilanjutkan',
+    buildDetails: (req, res) => ({
+      entry_id: res.entry_id,
+      user_id: res.user_id,
+      old_value: { status: QueueStatus.TERTAHAN },
+      new_value: {
+        status: QueueStatus.DISETUJUI,
+        resume_time: res.resume_time,
+      },
+    }),
+  })
+  resume(@Body() resumeDto: ResumeCheckInDto, @Req() req: any) {
+    const requestInfo = getRequestInfo(req);
+    const userId = req.user.userId;
+    return this.checkInService.resumeEntry(resumeDto, requestInfo, userId);
   }
 
   // PROTECTED - Staff only

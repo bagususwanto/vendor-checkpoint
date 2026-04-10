@@ -25,6 +25,7 @@ export function RecentCheckinsTable() {
           <TabsList>
             <TabsTrigger value="waiting">Menunggu Verifikasi</TabsTrigger>
             <TabsTrigger value="approved">Siap Check-Out</TabsTrigger>
+            <TabsTrigger value="held">Tertahan</TabsTrigger>
             <TabsTrigger value="rejected">Ditolak</TabsTrigger>
           </TabsList>
           <TabsContent value="waiting" className="space-y-4">
@@ -32,6 +33,9 @@ export function RecentCheckinsTable() {
           </TabsContent>
           <TabsContent value="approved" className="space-y-4">
             <CheckinList status={QueueStatus.DISETUJUI} />
+          </TabsContent>
+          <TabsContent value="held" className="space-y-4">
+            <CheckinList status={QueueStatus.TERTAHAN} />
           </TabsContent>
           <TabsContent value="rejected" className="space-y-4">
             <CheckinList status={QueueStatus.DITOLAK} />

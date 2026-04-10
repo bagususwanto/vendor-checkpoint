@@ -12,6 +12,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { VerificationSheet } from './verification-sheet';
 import { CheckoutSheet } from '@/app/(dashboard)/portal/operational/queue/components/checkout-sheet';
+import { HoldDialog } from './hold-dialog';
+import { ResumeDialog } from './resume-dialog';
 import { StatusBadge } from '@/app/(dashboard)/components/status-badge';
 import { useVerificationList } from '@/hooks/api/use-check-in';
 import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
@@ -27,7 +29,7 @@ import { QueueStatus } from '@repo/types';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface CheckinListProps {
-  status: QueueStatus.MENUNGGU | QueueStatus.DISETUJUI | QueueStatus.DITOLAK;
+  status: QueueStatus.MENUNGGU | QueueStatus.DISETUJUI | QueueStatus.DITOLAK | QueueStatus.TERTAHAN;
 }
 
 export function CheckinList({ status }: CheckinListProps) {
@@ -117,22 +119,47 @@ export function CheckinList({ status }: CheckinListProps) {
                 )}
 
                 {checkin.current_status === QueueStatus.DISETUJUI && (
-                  <CheckoutSheet
-                    checkin={{
-                      id: checkin.queue_number,
-                      company: checkin.snapshot_company_name,
-                      driver: checkin.driver_name,
-                      category: checkin.snapshot_category_name,
-                      time: checkin.submission_time,
-                      status: checkin.current_status.toLowerCase(),
-                    }}
-                    trigger={
-                      <Button size="sm" variant="secondary">
-                        Check-Out
-                      </Button>
-                    }
-                    onSuccess={handleSuccess}
-                  />
+                  <div className="flex justify-end gap-2">
+                    <HoldDialog
+                      queueNumber={checkin.queue_number}
+                      trigger={
+                        <Button size="sm" variant="outline" className="border-orange-200 text-orange-600 hover:bg-orange-50 hover:text-orange-700">
+                          Tahan
+                        </Button>
+                      }
+                      onSuccess={handleSuccess}
+                    />
+                    <CheckoutSheet
+                      checkin={{
+                        id: checkin.queue_number,
+                        company: checkin.snapshot_company_name,
+                        driver: checkin.driver_name,
+                        category: checkin.snapshot_category_name,
+                        time: checkin.submission_time,
+                        status: checkin.current_status.toLowerCase(),
+                      }}
+                      trigger={
+                        <Button size="sm" variant="secondary">
+                          Check-Out
+                        </Button>
+                      }
+                      onSuccess={handleSuccess}
+                    />
+                  </div>
+                )}
+
+                {checkin.current_status === QueueStatus.TERTAHAN && (
+                  <div className="flex justify-end gap-2">
+                    <ResumeDialog
+                      queueNumber={checkin.queue_number}
+                      trigger={
+                        <Button size="sm" variant="default" className="bg-orange-500 hover:bg-orange-600">
+                          Lanjutkan
+                        </Button>
+                      }
+                      onSuccess={handleSuccess}
+                    />
+                  </div>
                 )}
 
                 {(checkin.current_status === QueueStatus.SELESAI ||

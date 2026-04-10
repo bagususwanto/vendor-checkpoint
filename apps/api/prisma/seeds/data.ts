@@ -327,6 +327,14 @@ export const SYSTEM_CONFIGS = [
     created_at: new Date(),
     updated_at: new Date(),
   },
+  {
+    config_key: 'DEFAULT_STATUS_TERTAHAN_DISPLAY_TEXT',
+    config_value: 'Tertahan',
+    config_type: 'STRING',
+    description: 'Status tertahan di Display',
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
 ];
 
 export const ADMIN_USER = {

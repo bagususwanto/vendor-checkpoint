@@ -97,4 +97,28 @@ export const checkInService = {
       throw error;
     }
   },
+
+  holdCheckIn: async (payload: { queue_number: string; reason: string }) => {
+    try {
+      const response = await axiosInstance.patch<{ data: any }>(
+        '/check-in/hold',
+        payload,
+      );
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  resumeCheckIn: async (queueNumber: string) => {
+    try {
+      const response = await axiosInstance.patch<{ data: any }>(
+        '/check-in/resume',
+        { queue_number: queueNumber },
+      );
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };

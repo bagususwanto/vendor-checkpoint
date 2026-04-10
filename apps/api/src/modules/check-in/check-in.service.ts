@@ -3,6 +3,8 @@ import { CreateCheckInDto } from './dto/create-check-in.dto';
 import { UpdateCheckInDto } from './dto/update-check-in.dto';
 import { VerifyCheckInDto } from './dto/verify-check-in.dto';
 import { CheckoutCheckInDto } from './dto/checkout-check-in.dto';
+import { HoldCheckInDto } from './dto/hold-check-in.dto';
+import { ResumeCheckInDto } from './dto/resume-check-in.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { VendorService } from '../vendor/vendor.service';
 import { generateQueueNumber } from 'src/common/utils/queue-number.util.';
@@ -187,7 +189,7 @@ export class CheckInService {
         take: limit,
         where: {
           current_status: {
-            in: ['MENUNGGU', 'DISETUJUI'],
+            in: ['MENUNGGU', 'DISETUJUI', 'TERTAHAN'],
           },
           submission_time: {
             gte: dateNow,
@@ -616,6 +618,148 @@ export class CheckInService {
         company_name: entry.snapshot_company_name,
         checkout_time: checkoutTime,
         duration_minutes: durationMinutes,
+      };
+    });
+  }
+
+  async holdEntry(
+    holdDto: HoldCheckInDto,
+    requestInfo: any,
+    userId: number,
+  ) {
+    const { queue_number, reason } = holdDto;
+    const localUserId = await this.resolveLocalUser(userId);
+
+    return await this.prisma.$transaction(async (tx) => {
+      const entry = await tx.ops_checkin_entry.findUnique({
+        where: { queue_number },
+        select: {
+          entry_id: true,
+          current_status: true,
+          driver_name: true,
+          snapshot_company_name: true,
+        },
+      });
+
+      if (!entry) {
+        throw new BadRequestException('Nomor antrean tidak ditemukan');
+      }
+
+      if (entry.current_status !== QueueStatus.DISETUJUI) {
+        throw new BadRequestException(
+          `Hanya antrean dengan status DISETUJUI yang dapat ditahan. Status saat ini: ${entry.current_status}`,
+        );
+      }
+
+      const statusDisplayText = await this.systemConfigService.findByConfigKey(
+        'DEFAULT_STATUS_TERTAHAN_DISPLAY_TEXT',
+      );
+
+      const updateTime = new Date();
+
+      await tx.ops_checkin_entry.update({
+        where: { queue_number },
+        data: {
+          current_status: QueueStatus.TERTAHAN,
+          updated_at: updateTime,
+        },
+      });
+
+      await tx.ops_queue_status.update({
+        where: { entry_id: entry.entry_id },
+        data: {
+          current_status: QueueStatus.TERTAHAN,
+          status_display_text: statusDisplayText?.config_value || 'Tertahan',
+          last_updated: updateTime,
+        },
+      });
+
+      // Insert an additional verification record for holding
+      await tx.ops_verification.create({
+        data: {
+          entry_id: entry.entry_id,
+          verified_by_user_id: localUserId,
+          verification_status: QueueStatus.TERTAHAN,
+          rejection_reason: reason,
+          verification_time: updateTime,
+        },
+      });
+
+      return {
+        entry_id: entry.entry_id,
+        user_id: localUserId,
+        queue_number,
+        status: QueueStatus.TERTAHAN,
+        status_display_text: statusDisplayText?.config_value || 'Tertahan',
+        driver_name: entry.driver_name,
+        company_name: entry.snapshot_company_name,
+        hold_time: updateTime,
+        reason,
+      };
+    });
+  }
+
+  async resumeEntry(
+    resumeDto: ResumeCheckInDto,
+    requestInfo: any,
+    userId: number,
+  ) {
+    const { queue_number } = resumeDto;
+    const localUserId = await this.resolveLocalUser(userId);
+
+    return await this.prisma.$transaction(async (tx) => {
+      const entry = await tx.ops_checkin_entry.findUnique({
+        where: { queue_number },
+        select: {
+          entry_id: true,
+          current_status: true,
+          driver_name: true,
+          snapshot_company_name: true,
+        },
+      });
+
+      if (!entry) {
+        throw new BadRequestException('Nomor antrean tidak ditemukan');
+      }
+
+      if (entry.current_status !== QueueStatus.TERTAHAN) {
+        throw new BadRequestException(
+          `Hanya antrean dengan status TERTAHAN yang dapat dilanjutkan. Status saat ini: ${entry.current_status}`,
+        );
+      }
+
+      const statusDisplayText = await this.systemConfigService.findByConfigKey(
+        'DEFAULT_STATUS_DISETUJUI_DISPLAY_TEXT',
+      );
+
+      const updateTime = new Date();
+
+      await tx.ops_checkin_entry.update({
+        where: { queue_number },
+        data: {
+          current_status: QueueStatus.DISETUJUI,
+          updated_at: updateTime,
+        },
+      });
+
+      await tx.ops_queue_status.update({
+        where: { entry_id: entry.entry_id },
+        data: {
+          current_status: QueueStatus.DISETUJUI,
+          status_display_text: statusDisplayText?.config_value || 'Sedang Diproses',
+          last_updated: updateTime,
+        },
+      });
+
+      return {
+        entry_id: entry.entry_id,
+        user_id: localUserId,
+        queue_number,
+        status: QueueStatus.DISETUJUI,
+        status_display_text: statusDisplayText?.config_value || 'Sedang Diproses',
+        driver_name: entry.driver_name,
+        company_name: entry.snapshot_company_name,
+        resume_time: updateTime,
       };
     });
   }

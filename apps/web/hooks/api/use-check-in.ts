@@ -78,3 +78,17 @@ export function useCheckoutCheckIn() {
       checkInService.checkoutCheckIn(queueNumber),
   });
 }
+
+export function useHoldCheckIn() {
+  return useMutation({
+    mutationFn: (payload: { queue_number: string; reason: string }) =>
+      checkInService.holdCheckIn(payload),
+  });
+}
+
+export function useResumeCheckIn() {
+  return useMutation({
+    mutationFn: (queueNumber: string) =>
+      checkInService.resumeCheckIn(queueNumber),
+  });
+}

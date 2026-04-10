@@ -64,3 +64,16 @@ export const checkoutSchema = z.object({
 });
 
 export type Checkout = z.infer<typeof checkoutSchema>;
+
+export const holdCheckInSchema = z.object({
+  queue_number: z.string().min(1, 'Nomor antrean harus diisi'),
+  reason: z.string().min(1, 'Alasan penahanan harus diisi'),
+});
+
+export type HoldCheckIn = z.infer<typeof holdCheckInSchema>;
+
+export const resumeCheckInSchema = z.object({
+  queue_number: z.string().min(1, 'Nomor antrean harus diisi'),
+});
+
+export type ResumeCheckIn = z.infer<typeof resumeCheckInSchema>;
