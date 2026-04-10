@@ -8,9 +8,9 @@ import { ChecklistBreakdown } from '../components/checklist-breakdown';
 export default function LeaderDashboardPage() {
   return (
     <div className="flex-1">
-      <div className="space-y-4">
+      <div className="space-y-4 p-4 md:p-8 pt-6">
         <h2 className="text-2xl font-bold tracking-tight">Dashboard Leader</h2>
-        <Separator />
+        {/* <Separator /> */}
 
         <StatsCard />
 
