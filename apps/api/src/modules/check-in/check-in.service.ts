@@ -674,10 +674,17 @@ export class CheckInService {
         },
       });
 
-      // Insert an additional verification record for holding
-      await tx.ops_verification.create({
-        data: {
+      // Update existing verification record or create if not exist
+      await tx.ops_verification.upsert({
+        where: { entry_id: entry.entry_id },
+        create: {
           entry_id: entry.entry_id,
+          verified_by_user_id: localUserId,
+          verification_status: QueueStatus.TERTAHAN,
+          rejection_reason: reason,
+          verification_time: updateTime,
+        },
+        update: {
           verified_by_user_id: localUserId,
           verification_status: QueueStatus.TERTAHAN,
           rejection_reason: reason,
@@ -748,6 +755,17 @@ export class CheckInService {
           current_status: QueueStatus.DISETUJUI,
           status_display_text: statusDisplayText?.config_value || 'Sedang Diproses',
           last_updated: updateTime,
+        },
+      });
+
+      // Update the verification record back to DISETUJUI
+      await tx.ops_verification.update({
+        where: { entry_id: entry.entry_id },
+        data: {
+          verified_by_user_id: localUserId,
+          verification_status: QueueStatus.DISETUJUI,
+          rejection_reason: null, // Clear the hold reason
+          verification_time: updateTime,
         },
       });
 
