@@ -20,6 +20,7 @@ async function cleanDatabase() {
   await prisma.ops_timelog.deleteMany({});
   await prisma.ops_queue_status.deleteMany({});
   await prisma.ops_checkin_entry.deleteMany({});
+  await prisma.ops_delivery_slot.deleteMany({});
 
   // 2. Delete logs and configs
   await prisma.log_audit.deleteMany({});
@@ -29,14 +30,16 @@ async function cleanDatabase() {
   // 3. Delete master data
   await prisma.mst_checklist_item.deleteMany({});
   await prisma.mst_checklist_category.deleteMany({});
+  await prisma.mst_vendor_schedule.deleteMany({});
   await prisma.mst_vendor.deleteMany({});
-  await prisma.mst_material_category.deleteMany({});
+  await prisma.mst_vendor_category.deleteMany({});
+  await prisma.mst_delay_reason.deleteMany({});
   await prisma.mst_user.deleteMany({});
 }
 
 async function seedVendorCategories() {
   console.log('Creating vendor categories...');
-  await prisma.mst_material_category.createMany({
+  await prisma.mst_vendor_category.createMany({
     data: VENDOR_CATEGORIES,
   });
 }
@@ -51,14 +54,14 @@ async function seedChecklistCategories() {
 async function seedChecklistItems() {
   console.log('Fetching categories for mapping...');
   const cats = await prisma.mst_checklist_category.findMany();
-  const materialCats = await prisma.mst_material_category.findMany();
+  const vendorCats = await prisma.mst_vendor_category.findMany();
 
   const catMap = Object.fromEntries(
     cats.map((c) => [c.category_code, c.checklist_category_id]),
   );
 
-  const mcMap = Object.fromEntries(
-    materialCats.map((m) => [m.category_code, m.material_category_id]),
+  const vcMap = Object.fromEntries(
+    vendorCats.map((m) => [m.category_code, m.vendor_category_id]),
   );
 
   console.log('Creating general checklist items...');
@@ -82,7 +85,7 @@ async function seedChecklistItems() {
     return {
       ...rest,
       checklist_category_id: catMap[item.category_code],
-      material_category_id: mcMap[item.material_category_code],
+      vendor_category_id: vcMap[item.material_category_code],
     };
   });
 
@@ -102,17 +105,74 @@ async function seedUsers() {
 
 async function seedSystemConfig() {
   console.log('Creating system config...');
+  const configs = [
+    ...SYSTEM_CONFIGS,
+    {
+      config_key: 'VERIFICATION_MODE_ENABLED',
+      config_value: 'false',
+      config_type: 'BOOLEAN',
+      description: 'Enable / Disable Staff Verification Mode (v2 feature)',
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
+  ];
+
   await prisma.cfg_system.createMany({
-    data: SYSTEM_CONFIGS,
+    data: configs,
   });
 }
 
 async function seedVendors() {
   console.log('Creating master vendors...');
 
+  const vendorCats = await prisma.mst_vendor_category.findMany();
+  const vCatIds = vendorCats.map((v) => v.vendor_category_id);
+
+  const vendorsToCreate = MASTER_VENDORS.map((v, index) => ({
+    ...v,
+    vendor_category_id: vCatIds[index % vCatIds.length],
+  }));
+
   await prisma.mst_vendor.createMany({
-    data: MASTER_VENDORS,
+    data: vendorsToCreate,
   });
+}
+
+async function seedDelayReasons() {
+  console.log('Creating delay reasons...');
+  await prisma.mst_delay_reason.createMany({
+    data: [
+      { category: 'Arrival', reason_text: 'Macet di Tol / Perjalanan' },
+      { category: 'Arrival', reason_text: 'Kendaraan Rusak / Mogok' },
+      { category: 'Arrival', reason_text: 'Faktor Cuaca' },
+      { category: 'Departure', reason_text: 'Proses Bongkar/Muat Lama' },
+      { category: 'Departure', reason_text: 'Menunggu Surat Jalan / Dokumen' },
+      { category: 'Departure', reason_text: 'Kendala Internal Pabrik' },
+    ],
+  });
+}
+
+async function seedVendorSchedules() {
+  console.log('Creating vendor schedules...');
+  const vendors = await prisma.mst_vendor.findMany({ take: 10 });
+  const schedules = [];
+
+  for (const vendor of vendors) {
+    for (let day = 1; day <= 5; day++) { // Monday to Friday
+      schedules.push({
+        vendor_id: vendor.vendor_id,
+        day_of_week: day,
+        arrival_time: '08:00',
+        departure_time: '12:00',
+      });
+    }
+  }
+
+  if (schedules.length > 0) {
+    await prisma.mst_vendor_schedule.createMany({
+      data: schedules,
+    });
+  }
 }
 
 async function seedCheckIns() {
@@ -120,10 +180,13 @@ async function seedCheckIns() {
 
   // Get necessary data for foreign keys
   const vendors = await prisma.mst_vendor.findMany({ take: 10 });
-  const materialCategories = await prisma.mst_material_category.findMany();
+  const vendorCategories = await prisma.mst_vendor_category.findMany();
   const checklistItems = await prisma.mst_checklist_item.findMany({
     include: { checklist_category: true },
   });
+  const delayReasons = await prisma.mst_delay_reason.findMany();
+  const arrivalReasons = delayReasons.filter(r => r.category === 'Arrival');
+  const departureReasons = delayReasons.filter(r => r.category === 'Departure');
   const adminUser = await prisma.mst_user.findFirst();
 
   if (!adminUser) {
@@ -149,9 +212,10 @@ async function seedCheckIns() {
   // Create 15 check-in entries with various statuses
   for (let i = 0; i < 15; i++) {
     const vendor = vendors[i % vendors.length];
-    const materialCategory = materialCategories[i % materialCategories.length];
+    const vendorCategory = vendorCategories[i % vendorCategories.length];
     const status = statuses[i % statuses.length];
     const driverName = driverNames[i % driverNames.length];
+    const isLate = Math.random() > 0.5;
 
     // Generate queue number in format YYYYMMDD-XXX
     const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
@@ -170,7 +234,7 @@ async function seedCheckIns() {
     const relevantItems = checklistItems.filter(
       (item) =>
         item.item_type === 'UMUM' ||
-        item.material_category_id === materialCategory.material_category_id,
+        item.vendor_category_id === vendorCategory.vendor_category_id,
     );
 
     // Randomly determine if entry has non-compliant items (30% chance)
@@ -185,9 +249,14 @@ async function seedCheckIns() {
         queue_number: queueNumber,
         vendor_id: vendor.vendor_id,
         driver_name: driverName,
-        material_category_id: materialCategory.material_category_id,
+        dn_number: `DN-100${i}`,
+        po_number: `PO-200${i}`,
+        arrival_status: isLate ? 'Late' : 'On-Time',
+        delay_arrival_reason_id: isLate ? arrivalReasons[i % arrivalReasons.length].delay_reason_id : null,
+        ai_safety_status: 'Pass',
+        snapshot_vendor_category_id: vendorCategory.vendor_category_id,
         snapshot_company_name: vendor.company_name,
-        snapshot_category_name: materialCategory.category_name,
+        snapshot_category_name: vendorCategory.category_name,
         submission_time: submissionTime,
         current_status: status,
         ip_address: `192.168.1.${100 + i}`,
@@ -236,7 +305,7 @@ async function seedCheckIns() {
         entry_id: entry.entry_id,
         queue_number: queueNumber,
         current_status: status,
-        status_display_text: statusTexts[status as keyof typeof statusTexts],
+        status_display_text: statusTexts[status as keyof typeof statusTexts] || status,
         priority_order: queueCounter,
         estimated_wait_minutes: status === 'MENUNGGU' ? 30 : null,
         last_updated: submissionTime,
@@ -254,6 +323,8 @@ async function seedCheckIns() {
     const durationMinutes = isCheckedOut
       ? Math.round((checkoutTime!.getTime() - checkinTime.getTime()) / 60000)
       : null;
+    
+    const isDepartureOverdue = isCheckedOut && Math.random() > 0.7;
 
     await prisma.ops_timelog.create({
       data: {
@@ -262,6 +333,8 @@ async function seedCheckIns() {
         checkout_time: checkoutTime,
         checkout_by_user_id: isCheckedOut ? adminUser.user_id : null,
         duration_minutes: durationMinutes,
+        departure_status: isCheckedOut ? (isDepartureOverdue ? 'Overdue' : 'On-Time') : null,
+        delay_departure_reason_id: (isCheckedOut && isDepartureOverdue) ? departureReasons[i % departureReasons.length].delay_reason_id : null,
         is_checked_out: isCheckedOut,
         created_at: checkinTime,
         updated_at: checkoutTime || checkinTime,
@@ -301,10 +374,12 @@ async function main(): Promise<void> {
     await seedChecklistCategories();
     await seedUsers();
     await seedSystemConfig();
+    await seedDelayReasons();
 
     // These depend on the categories above
     await seedChecklistItems();
     await seedVendors();
+    await seedVendorSchedules();
 
     // Seed dummy check-in data
     await seedCheckIns();

@@ -13,35 +13,87 @@ datasource db {
   provider = "sqlserver"
 }
 
-model mst_material_category {
-  material_category_id  Int      @id @default(autoincrement())
-  category_name         String   @unique @db.VarChar(255)
-  category_code         String   @unique @db.VarChar(50)
-  description           String?  @db.Text
-  is_active             Boolean  @default(true)
-  created_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
-  updated_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+model mst_vendor_category {
+  vendor_category_id Int      @id @default(autoincrement())
+  category_name      String   @unique @db.VarChar(255)
+  category_code      String   @unique @db.VarChar(50)
+  description        String?  @db.Text
+  is_active          Boolean  @default(true)
+  created_at         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
 
   mst_checklist_item mst_checklist_item[]
   ops_checkin_entry  ops_checkin_entry[]
+  mst_vendor         mst_vendor[]
 
-  @@index([category_code], name: "idx_mst_material_category_category_code")
+  @@index([category_code], name: "idx_mst_vendor_category_category_code")
 }
 
 model mst_vendor {
-  vendor_id          Int                     @id @default(autoincrement())
-  vendor_code        String                  @unique @db.VarChar(100)
-  company_name       String                  @db.VarChar(500)
-  is_active          Boolean                 @default(true)
+  vendor_id          Int       @id @default(autoincrement())
+  vendor_code        String    @unique @db.VarChar(100)
+  company_name       String    @db.VarChar(500)
+  vendor_category_id Int?
+  is_active          Boolean   @default(true)
   last_sync_time     DateTime?
-  sync_source        String?                 @db.VarChar(100)
-  created_at         DateTime                @default(dbgenerated("CURRENT_TIMESTAMP"))
-  updated_at         DateTime                @default(dbgenerated("CURRENT_TIMESTAMP"))
+  sync_source        String?   @db.VarChar(100)
+  created_at         DateTime  @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at         DateTime  @default(dbgenerated("CURRENT_TIMESTAMP"))
 
-  ops_checkin_entry ops_checkin_entry[]
+  vendor_category mst_vendor_category? @relation(fields: [vendor_category_id], references: [vendor_category_id], onDelete: NoAction, onUpdate: NoAction)
+
+  ops_checkin_entry   ops_checkin_entry[]
+  mst_vendor_schedule mst_vendor_schedule[]
 
   @@index([is_active], name: "idx_mst_vendor_active")
   @@index([vendor_code], name: "idx_mst_vendor_vendor_code")
+  @@index([vendor_category_id], name: "idx_mst_vendor_vendor_category_id")
+}
+
+model mst_delay_reason {
+  delay_reason_id Int      @id @default(autoincrement())
+  category        String   @db.VarChar(50) // 'Arrival' | 'Departure'
+  reason_text     String   @db.VarChar(255)
+  is_active       Boolean  @default(true)
+  created_at      DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at      DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  ops_checkin_entry_arrival ops_checkin_entry[] @relation("ArrivalReason")
+  ops_timelog_departure     ops_timelog[]       @relation("DepartureReason")
+
+  @@index([category, is_active], name: "idx_mst_delay_reason_category_active")
+}
+
+model mst_vendor_schedule {
+  schedule_id    Int      @id @default(autoincrement())
+  vendor_id      Int
+  day_of_week    Int // 1=Monday ... 7=Sunday
+  arrival_time   String   @db.VarChar(10) // HH:mm
+  departure_time String   @db.VarChar(10) // HH:mm
+  is_active      Boolean  @default(true)
+  created_at     DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at     DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  vendor            mst_vendor          @relation(fields: [vendor_id], references: [vendor_id], onDelete: NoAction, onUpdate: NoAction)
+  ops_delivery_slot ops_delivery_slot[]
+
+  @@index([vendor_id, is_active], name: "idx_mst_vendor_schedule_vendor_active")
+  @@index([day_of_week, is_active], name: "idx_mst_vendor_schedule_day_active")
+}
+
+model ops_delivery_slot {
+  slot_id       Int      @id @default(autoincrement())
+  schedule_id   Int
+  expected_date DateTime @db.Date
+  status        String   @default("Open") @db.VarChar(50) // Open, Filled, Missed
+  created_at    DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at    DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  schedule          mst_vendor_schedule @relation(fields: [schedule_id], references: [schedule_id], onDelete: NoAction, onUpdate: NoAction)
+  ops_checkin_entry ops_checkin_entry[]
+
+  @@index([expected_date, status], name: "idx_ops_delivery_slot_date_status")
+  @@index([schedule_id], name: "idx_ops_delivery_slot_schedule_id")
 }
 
 model mst_checklist_category {
@@ -56,7 +108,7 @@ model mst_checklist_category {
   created_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
   updated_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
 
-  mst_checklist_item mst_checklist_item[]
+  mst_checklist_item   mst_checklist_item[]
   ops_checkin_response ops_checkin_response[]
 
   @@index([is_active, display_order], name: "idx_mst_checklist_category_active_order")
@@ -68,7 +120,7 @@ model mst_checklist_item {
   item_code             String   @unique @db.VarChar(100)
   item_text             String   @db.Text
   item_type             String   @db.VarChar(50)
-  material_category_id  Int?
+  vendor_category_id    Int?
   display_order         Int
   is_required           Boolean  @default(true)
   is_active             Boolean  @default(true)
@@ -76,29 +128,29 @@ model mst_checklist_item {
   updated_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
 
   checklist_category   mst_checklist_category @relation(fields: [checklist_category_id], references: [checklist_category_id])
-  material_category    mst_material_category? @relation(fields: [material_category_id], references: [material_category_id])
+  vendor_category      mst_vendor_category?   @relation(fields: [vendor_category_id], references: [vendor_category_id], onDelete: NoAction, onUpdate: NoAction)
   ops_checkin_response ops_checkin_response[]
 
   @@index([checklist_category_id, is_active, display_order], name: "idx_mst_checklist_item_category_active_order")
   @@index([item_code], name: "idx_mst_checklist_item_item_code")
-  @@index([item_type, material_category_id, is_active], name: "idx_mst_checklist_item_type_material_category_active")
+  @@index([item_type, vendor_category_id, is_active], name: "idx_mst_checklist_item_type_vendor_category_active")
 }
 
 model mst_user {
-  user_id          Int      @id @default(autoincrement())
-  external_user_id Int      @unique
-  username         String   @db.VarChar(255)
-  full_name        String   @db.VarChar(500)
-  role             String   @db.VarChar(50)
+  user_id          Int       @id @default(autoincrement())
+  external_user_id Int       @unique
+  username         String    @db.VarChar(255)
+  full_name        String    @db.VarChar(500)
+  role             String    @db.VarChar(50)
   last_login       DateTime?
-  is_active        Boolean  @default(true)
-  created_at       DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
-  updated_at       DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  is_active        Boolean   @default(true)
+  created_at       DateTime  @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at       DateTime  @default(dbgenerated("CURRENT_TIMESTAMP"))
 
-  ops_verification ops_verification[]
-  ops_timelog      ops_timelog[]
-  cfg_system       cfg_system[]
-  log_audit        log_audit[]
+  ops_verification  ops_verification[]
+  ops_timelog       ops_timelog[]
+  cfg_system        cfg_system[]
+  log_audit         log_audit[]
   log_report_export log_report_export[]
 
   @@index([external_user_id], name: "idx_mst_user_external_user_id")
@@ -108,8 +160,14 @@ model ops_checkin_entry {
   entry_id                    Int      @id @default(autoincrement())
   queue_number                String   @unique @db.VarChar(50)
   vendor_id                   Int
+  dn_number                   String?  @db.VarChar(100)
+  po_number                   String?  @db.VarChar(100)
+  slot_id                     Int?
+  arrival_status              String?  @db.VarChar(50) // On-Time, Late, Early
+  delay_arrival_reason_id     Int?
+  ai_safety_status            String?  @db.VarChar(50) // Pass, Fail
   driver_name                 String   @db.VarChar(500)
-  material_category_id        Int
+  snapshot_vendor_category_id Int
   snapshot_company_name       String   @db.VarChar(500)
   snapshot_category_name      String   @db.VarChar(255)
   submission_time             DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
@@ -121,8 +179,10 @@ model ops_checkin_entry {
   created_at                  DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
   updated_at                  DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
 
-  mst_vendor           mst_vendor             @relation(fields: [vendor_id], references: [vendor_id])
-  material_category    mst_material_category  @relation(fields: [material_category_id], references: [material_category_id], onDelete: NoAction, onUpdate: NoAction)
+  mst_vendor               mst_vendor          @relation(fields: [vendor_id], references: [vendor_id])
+  snapshot_vendor_category mst_vendor_category @relation(fields: [snapshot_vendor_category_id], references: [vendor_category_id], onDelete: NoAction, onUpdate: NoAction)
+  delivery_slot            ops_delivery_slot?  @relation(fields: [slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction)
+  delay_arrival_reason     mst_delay_reason?   @relation("ArrivalReason", fields: [delay_arrival_reason_id], references: [delay_reason_id], onDelete: NoAction, onUpdate: NoAction)
 
   ops_checkin_response ops_checkin_response[]
   ops_verification     ops_verification?
@@ -134,22 +194,24 @@ model ops_checkin_entry {
   @@index([current_status, submission_time], name: "idx_ops_checkin_entry_status_time")
   @@index([submission_time, vendor_id], name: "idx_ops_checkin_entry_time_vendor")
   @@index([has_non_compliant_items], name: "idx_ops_checkin_entry_non_compliant")
+  @@index([slot_id], name: "idx_ops_checkin_entry_slot_id")
+  @@index([arrival_status], name: "idx_ops_checkin_entry_arrival_status")
 }
 
 model ops_checkin_response {
-  response_id         Int      @id @default(autoincrement())
-  entry_id            Int
-  checklist_item_id   Int
+  response_id           Int      @id @default(autoincrement())
+  entry_id              Int
+  checklist_item_id     Int
   checklist_category_id Int
-  item_text_snapshot  String   @db.Text
-  item_type           String   @db.VarChar(50)
-  response_value      Boolean
-  is_compliant        Boolean
-  display_order       Int
-  created_at          DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  item_text_snapshot    String   @db.Text
+  item_type             String   @db.VarChar(50)
+  response_value        Boolean
+  is_compliant          Boolean
+  display_order         Int
+  created_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
 
-  entry             ops_checkin_entry  @relation(fields: [entry_id], references: [entry_id])
-  checklist_item    mst_checklist_item @relation(fields: [checklist_item_id], references: [checklist_item_id], onDelete: NoAction, onUpdate: NoAction)
+  entry              ops_checkin_entry      @relation(fields: [entry_id], references: [entry_id])
+  checklist_item     mst_checklist_item     @relation(fields: [checklist_item_id], references: [checklist_item_id], onDelete: NoAction, onUpdate: NoAction)
   checklist_category mst_checklist_category @relation(fields: [checklist_category_id], references: [checklist_category_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([entry_id], name: "idx_ops_checkin_response_entry_id")
@@ -157,48 +219,52 @@ model ops_checkin_response {
 }
 
 model ops_verification {
-  verification_id       Int      @id @default(autoincrement())
-  entry_id              Int      @unique
-  verified_by_user_id   Int
-  verification_status   String   @db.VarChar(50)
-  rejection_reason      String?  @db.Text
-  verification_time     DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
-  created_at            DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  verification_id     Int      @id @default(autoincrement())
+  entry_id            Int      @unique
+  verified_by_user_id Int
+  verification_status String   @db.VarChar(50)
+  rejection_reason    String?  @db.Text
+  verification_time   DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  created_at          DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
 
-  entry   ops_checkin_entry @relation(fields: [entry_id], references: [entry_id])
-  user    mst_user           @relation(fields: [verified_by_user_id], references: [user_id])
+  entry ops_checkin_entry @relation(fields: [entry_id], references: [entry_id])
+  user  mst_user          @relation(fields: [verified_by_user_id], references: [user_id])
 
   @@index([entry_id], name: "idx_ops_verification_entry_id")
   @@index([verification_time, verification_status], name: "idx_ops_verification_time_status")
 }
 
 model ops_timelog {
-  timelog_id         Int      @id @default(autoincrement())
-  entry_id           Int      @unique
-  checkin_time       DateTime?
-  checkout_time      DateTime?
-  checkout_by_user_id Int?
-  duration_minutes   Int?
-  is_checked_out     Boolean  @default(false)
-  created_at         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
-  updated_at         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  timelog_id                Int       @id @default(autoincrement())
+  entry_id                  Int       @unique
+  checkin_time              DateTime?
+  checkout_time             DateTime?
+  departure_status          String?   @db.VarChar(50) // On-Time, Overdue
+  delay_departure_reason_id Int?
+  checkout_by_user_id       Int?
+  duration_minutes          Int?
+  is_checked_out            Boolean   @default(false)
+  created_at                DateTime  @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at                DateTime  @default(dbgenerated("CURRENT_TIMESTAMP"))
 
-  entry  ops_checkin_entry @relation(fields: [entry_id], references: [entry_id])
-  user   mst_user?         @relation(fields: [checkout_by_user_id], references: [user_id])
+  entry                  ops_checkin_entry @relation(fields: [entry_id], references: [entry_id])
+  user                   mst_user?         @relation(fields: [checkout_by_user_id], references: [user_id])
+  delay_departure_reason mst_delay_reason? @relation("DepartureReason", fields: [delay_departure_reason_id], references: [delay_reason_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([entry_id], name: "idx_ops_timelog_entry_id")
   @@index([is_checked_out, checkin_time], name: "idx_ops_timelog_checkout_time")
+  @@index([departure_status], name: "idx_ops_timelog_departure_status")
 }
 
 model ops_queue_status {
-  queue_status_id     Int      @id @default(autoincrement())
-  entry_id            Int      @unique
-  queue_number        String   @db.VarChar(50)
-  current_status      String   @db.VarChar(50)
-  status_display_text String   @db.VarChar(255)
-  priority_order      Int?
+  queue_status_id        Int      @id @default(autoincrement())
+  entry_id               Int      @unique
+  queue_number           String   @db.VarChar(50)
+  current_status         String   @db.VarChar(50)
+  status_display_text    String   @db.VarChar(255)
+  priority_order         Int?
   estimated_wait_minutes Int?
-  last_updated        DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  last_updated           DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
 
   entry ops_checkin_entry @relation(fields: [entry_id], references: [entry_id])
 
@@ -207,16 +273,16 @@ model ops_queue_status {
 }
 
 model log_audit {
-  audit_id        Int      @id @default(autoincrement())
-  entry_id        Int?
-  user_id         Int?
-  action_type     String   @db.VarChar(100)
-  action_description String @db.Text
-  old_value       String?  @db.Text
-  new_value       String?  @db.Text
-  ip_address      String?  @db.VarChar(50)
-  user_agent      String?  @db.VarChar(500)
-  created_at      DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  audit_id           Int      @id @default(autoincrement())
+  entry_id           Int?
+  user_id            Int?
+  action_type        String   @db.VarChar(100)
+  action_description String   @db.Text
+  old_value          String?  @db.Text
+  new_value          String?  @db.Text
+  ip_address         String?  @db.VarChar(50)
+  user_agent         String?  @db.VarChar(500)
+  created_at         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
 
   entry ops_checkin_entry? @relation(fields: [entry_id], references: [entry_id])
   user  mst_user?          @relation(fields: [user_id], references: [user_id])
@@ -226,16 +292,16 @@ model log_audit {
 }
 
 model log_report_export {
-  export_id            Int      @id @default(autoincrement())
-  exported_by_user_id  Int
-  report_type          String   @db.VarChar(100)
-  date_from            DateTime @db.Date
-  date_to              DateTime @db.Date
-  filter_criteria      String?  @db.Text
-  total_records        Int
-  file_name            String   @db.VarChar(500)
-  file_path            String?  @db.VarChar(1000)
-  export_time          DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  export_id           Int      @id @default(autoincrement())
+  exported_by_user_id Int
+  report_type         String   @db.VarChar(100)
+  date_from           DateTime @db.Date
+  date_to             DateTime @db.Date
+  filter_criteria     String?  @db.Text
+  total_records       Int
+  file_name           String   @db.VarChar(500)
+  file_path           String?  @db.VarChar(1000)
+  export_time         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
 
   user mst_user @relation(fields: [exported_by_user_id], references: [user_id])
 
@@ -243,18 +309,17 @@ model log_report_export {
 }
 
 model cfg_system {
-  config_id        Int      @id @default(autoincrement())
-  config_key       String   @unique @db.VarChar(255)
-  config_value     String   @db.Text
-  config_type      String   @db.VarChar(50)
-  description      String?  @db.Text
-  is_editable      Boolean  @default(true)
+  config_id          Int      @id @default(autoincrement())
+  config_key         String   @unique @db.VarChar(255)
+  config_value       String   @db.Text
+  config_type        String   @db.VarChar(50)
+  description        String?  @db.Text
+  is_editable        Boolean  @default(true)
   updated_by_user_id Int?
-  created_at       DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
-  updated_at       DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  created_at         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at         DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
 
   user mst_user? @relation(fields: [updated_by_user_id], references: [user_id])
 
   @@index([config_key], name: "idx_cfg_system_config_key")
 }
-
