@@ -1,30 +1,54 @@
-import { useQuery } from '@tanstack/react-query';
-import { axiosInstance } from '@/lib/axios';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { delayReasonService } from '@/services/delay-reason.service';
+import {
+  FindDelayReasonParams,
+  CreateDelayReason,
+  UpdateDelayReason,
+} from '@repo/types';
 
-export type DelayReason = {
-  delay_reason_id: number;
-  category: string;
-  reason_text: string;
-  is_active: boolean;
-};
-
-export const fetchDelayReasons = async (
-  category?: 'Arrival' | 'Departure',
-  isActive?: boolean,
-) => {
-  const params = new URLSearchParams();
-  if (category) params.append('category', category);
-  if (isActive !== undefined) params.append('isActive', isActive.toString());
-
-  const response = await axiosInstance.get<{ data: DelayReason[] }>('/delay-reasons', {
-    params,
-  });
-  return response.data;
-};
-
-export const useDelayReasons = (category?: 'Arrival' | 'Departure', isActive?: boolean) => {
+export const useDelayReasons = (params: FindDelayReasonParams) => {
   return useQuery({
-    queryKey: ['delay-reasons', category, isActive],
-    queryFn: () => fetchDelayReasons(category, isActive),
+    queryKey: ['delay-reasons', params],
+    queryFn: () => delayReasonService.getAll(params),
+  });
+};
+
+export const useDelayReason = (id: number) => {
+  return useQuery({
+    queryKey: ['delay-reason', id],
+    queryFn: () => delayReasonService.getById(id),
+    enabled: !!id,
+  });
+};
+
+export const useCreateDelayReason = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateDelayReason) => delayReasonService.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['delay-reasons'] });
+    },
+  });
+};
+
+export const useUpdateDelayReason = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateDelayReason }) =>
+      delayReasonService.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['delay-reasons'] });
+      queryClient.invalidateQueries({ queryKey: ['delay-reason'] });
+    },
+  });
+};
+
+export const useDeleteDelayReason = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => delayReasonService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['delay-reasons'] });
+    },
   });
 };

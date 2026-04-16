@@ -18,3 +18,18 @@ export const findVendorScheduleParamsSchema = z.object({
   day_of_week: z.coerce.number().optional(),
 });
 export type FindVendorScheduleParams = z.infer<typeof findVendorScheduleParamsSchema>;
+
+export type VendorScheduleResponse = {
+  schedule_id: number;
+  vendor_id: number;
+  day_of_week: number;
+  arrival_time: string;
+  departure_time: string;
+  is_active: boolean;
+  created_at: Date | string;
+  updated_at: Date | string;
+  vendor?: {
+    company_name: string;
+    vendor_code: string;
+  };
+};

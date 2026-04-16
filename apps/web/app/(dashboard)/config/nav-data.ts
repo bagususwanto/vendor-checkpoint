@@ -84,7 +84,7 @@ export const navData: NavData = {
       icon: Building2,
       items: [
         {
-          title: 'Kategori Material',
+          title: 'Kategori Vendor',
           url: '/portal/master-data/material-category',
           icon: Tags,
           roles: [
@@ -94,8 +94,28 @@ export const navData: NavData = {
           ],
         },
         {
+          title: 'Jadwal Vendor',
+          url: '/portal/master-data/vendor-schedule',
+          icon: Building2,
+          roles: [
+            UserRole.SUPER_ADMIN,
+            UserRole.GROUP_LEADER,
+            UserRole.SECTION_HEAD,
+          ],
+        },
+        {
           title: 'Daftar Pemeriksaan',
           url: '/portal/master-data/checklist',
+          icon: ClipboardCheck,
+          roles: [
+            UserRole.SUPER_ADMIN,
+            UserRole.GROUP_LEADER,
+            UserRole.WAREHOUSE_STAFF,
+          ],
+        },
+        {
+          title: 'Alasan Delay',
+          url: '/portal/master-data/delay-reason',
           icon: ClipboardCheck,
           roles: [
             UserRole.SUPER_ADMIN,

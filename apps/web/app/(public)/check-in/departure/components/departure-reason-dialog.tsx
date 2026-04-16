@@ -31,9 +31,9 @@ export function DepartureReasonDialog({
   const [selectedReasonId, setSelectedReasonId] = useState<number | undefined>();
 
   // Use the hook to fetch the departure reasons from the backend
-  const { data: delayReasonsData, isLoading } = useDelayReasons('Departure', true);
+  const { data: delayReasonsData, isLoading } = useDelayReasons({ category: 'Departure', isActive: true });
 
-  const delayReasons = delayReasonsData?.data || [];
+  const delayReasons = Array.isArray(delayReasonsData) ? delayReasonsData : delayReasonsData?.data || [];
 
   const handleConfirm = () => {
     onConfirm({
@@ -94,7 +94,7 @@ export function DepartureReasonDialog({
                     onValueChange={(val) => setSelectedReasonId(Number(val))}
                     className="flex flex-col gap-2"
                   >
-                    {delayReasons.map((reason) => (
+                    {delayReasons.map((reason: import('@repo/types').DelayReasonResponse) => (
                       <div key={reason.delay_reason_id} className="flex items-center space-x-2">
                         <RadioGroupItem
                           value={reason.delay_reason_id.toString()}
