@@ -22,7 +22,9 @@ export class VendorScheduleService {
     vendor_id?: number,
     day_of_week?: number,
   ): Promise<PaginatedResponse<any>> {
-    const { page, limit, search } = query;
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const { search } = query;
     const skip = (page - 1) * limit;
 
     const where: Prisma.mst_vendor_scheduleWhereInput = {
