@@ -130,8 +130,8 @@ export class ChecklistController {
   // --- Public / Existing ---
 
   // PUBLIC - Digunakan di form check-in
-  @Get('by-category/:materialCategoryId')
-  findByCategory(@Param('materialCategoryId') materialCategoryId: string) {
-    return this.checklistService.findByCategory(+materialCategoryId);
+  @Get('by-category/:vendorCategoryId')
+  findByCategory(@Param('vendorCategoryId') vendorCategoryId: string) {
+    return this.checklistService.findByCategory(+vendorCategoryId);
   }
 }

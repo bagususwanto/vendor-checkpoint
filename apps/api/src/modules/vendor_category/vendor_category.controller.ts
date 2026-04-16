@@ -12,60 +12,60 @@ import {
   HttpStatus,
   UseInterceptors,
 } from '@nestjs/common';
-import { MaterialCategoryService } from './material_category.service';
-import { CreateMaterialCategoryDto } from './dto/create-material_category.dto';
-import { UpdateMaterialCategoryDto } from './dto/update-material_category.dto';
-import { BulkDeleteMaterialCategoryDto } from './dto/bulk-delete-material_category.dto';
+import { VendorCategoryService } from './vendor_category.service';
+import { CreateVendorCategoryDto } from './dto/create-vendor_category.dto';
+import { UpdateVendorCategoryDto } from './dto/update-vendor_category.dto';
+import { BulkDeleteVendorCategoryDto } from './dto/bulk-delete-vendor_category.dto';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AuditLog } from 'src/common/decorators/audit.decorator';
 import { AuditLogInterceptor } from 'src/common/interceptors/audit.interceptor';
 
-@Controller('material-category')
+@Controller('vendor-categories')
 @UseInterceptors(AuditLogInterceptor)
-export class MaterialCategoryController {
+export class VendorCategoryController {
   constructor(
-    private readonly materialCategoryService: MaterialCategoryService,
+    private readonly vendorCategoryService: VendorCategoryService,
   ) {}
 
   // PROTECTED - Admin only
   @UseGuards(JwtAuthGuard)
   @Post()
   @AuditLog({
-    actionType: 'MATERIAL_CATEGORY_CREATE',
-    actionDescription: 'Material Category created',
+    actionType: 'VENDOR_CATEGORY_CREATE',
+    actionDescription: 'Vendor Category created',
     buildDetails: (req, res) => ({
       user_id: req.user?.userId,
       new_value: res,
     }),
   })
-  create(@Body() createMaterialCategoryDto: CreateMaterialCategoryDto) {
-    return this.materialCategoryService.create(createMaterialCategoryDto);
+  create(@Body() createVendorCategoryDto: CreateVendorCategoryDto) {
+    return this.vendorCategoryService.create(createVendorCategoryDto);
   }
 
   @Get('selection')
   getSelection() {
-    return this.materialCategoryService.getSelection();
+    return this.vendorCategoryService.getSelection();
   }
 
   // PUBLIC - Dropdown di form check-in
   @Get()
   findAll(@Query() query: PaginatedParamsDto) {
-    return this.materialCategoryService.findAll(query);
+    return this.vendorCategoryService.findAll(query);
   }
 
   // PUBLIC - Detail category
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.materialCategoryService.findOne(+id);
+    return this.vendorCategoryService.findOne(+id);
   }
 
   // PROTECTED - Admin only
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @AuditLog({
-    actionType: 'MATERIAL_CATEGORY_UPDATE',
-    actionDescription: 'Material Category updated',
+    actionType: 'VENDOR_CATEGORY_UPDATE',
+    actionDescription: 'Vendor Category updated',
     buildDetails: (req, res) => ({
       user_id: req.user?.userId,
       old_value: res.old_value,
@@ -74,24 +74,24 @@ export class MaterialCategoryController {
   })
   update(
     @Param('id') id: string,
-    @Body() updateMaterialCategoryDto: UpdateMaterialCategoryDto,
+    @Body() updateVendorCategoryDto: UpdateVendorCategoryDto,
   ) {
-    return this.materialCategoryService.update(+id, updateMaterialCategoryDto);
+    return this.vendorCategoryService.update(+id, updateVendorCategoryDto);
   }
 
   // PROTECTED - Admin only
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @AuditLog({
-    actionType: 'MATERIAL_CATEGORY_DELETE',
-    actionDescription: 'Material Category deleted',
+    actionType: 'VENDOR_CATEGORY_DELETE',
+    actionDescription: 'Vendor Category deleted',
     buildDetails: (req, res) => ({
       user_id: req.user?.userId,
       old_value: res,
     }),
   })
   remove(@Param('id') id: string) {
-    return this.materialCategoryService.remove(+id);
+    return this.vendorCategoryService.remove(+id);
   }
 
   // PROTECTED - Admin only - Bulk delete
@@ -99,29 +99,29 @@ export class MaterialCategoryController {
   @Delete()
   @HttpCode(HttpStatus.OK)
   @AuditLog({
-    actionType: 'MATERIAL_CATEGORY_BULK_DELETE',
-    actionDescription: 'Material Categories bulk deleted',
+    actionType: 'VENDOR_CATEGORY_BULK_DELETE',
+    actionDescription: 'Vendor Categories bulk deleted',
     buildDetails: (req, res) => ({
       user_id: req.user?.userId,
       old_value: { ids: req.body.ids },
     }),
   })
-  bulkDelete(@Body() bulkDeleteDto: BulkDeleteMaterialCategoryDto) {
-    return this.materialCategoryService.bulkDelete(bulkDeleteDto);
+  bulkDelete(@Body() bulkDeleteDto: BulkDeleteVendorCategoryDto) {
+    return this.vendorCategoryService.bulkDelete(bulkDeleteDto);
   }
 
   // PROTECTED - Admin only - Toggle status
   @UseGuards(JwtAuthGuard)
   @Patch(':id/toggle-status')
   @AuditLog({
-    actionType: 'MATERIAL_CATEGORY_TOGGLE_STATUS',
-    actionDescription: 'Material Category status toggled',
+    actionType: 'VENDOR_CATEGORY_TOGGLE_STATUS',
+    actionDescription: 'Vendor Category status toggled',
     buildDetails: (req, res) => ({
       user_id: req.user?.userId,
       new_value: res,
     }),
   })
   toggleStatus(@Param('id') id: string) {
-    return this.materialCategoryService.toggleStatus(+id);
+    return this.vendorCategoryService.toggleStatus(+id);
   }
 }

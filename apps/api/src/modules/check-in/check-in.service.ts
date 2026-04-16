@@ -16,7 +16,7 @@ import { getStartOfToday } from 'src/common/utils/today-date.util';
 // Removed TimeLogService import
 
 import { toInt } from 'src/common/utils/string-to-int.util';
-import { MaterialCategoryService } from '../material_category/material_category.service';
+import { VendorCategoryService } from '../vendor_category/vendor_category.service';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 import {
   DisplayQueue,
@@ -33,7 +33,7 @@ export class CheckInService {
     private readonly systemConfigService: SystemConfigService,
     private readonly checklistService: ChecklistService,
 
-    private readonly materialCategoryService: MaterialCategoryService,
+    private readonly vendorCategoryService: VendorCategoryService,
   ) {}
 
   async create(createCheckInDto: CreateCheckInDto, requestInfo: any) {
@@ -46,7 +46,7 @@ export class CheckInService {
         return await this.prisma.$transaction(async (tx) => {
           // 1. Validate
           const vendor = await this.validateVendor(createCheckInDto.vendor_id);
-          const vendorCategory = await this.validateMaterialCategory(
+          const vendorCategory = await this.validateVendorCategory(
             createCheckInDto.snapshot_vendor_category_id,
           );
 
@@ -888,9 +888,9 @@ export class CheckInService {
         response_value: response.response_value,
         is_compliant: response.is_compliant,
         display_order: response.display_order,
-        material_category_name:
+        vendor_category_name:
           response.checklist_item?.vendor_category?.category_name,
-        material_category_id: response.checklist_item?.vendor_category_id,
+        vendor_category_id: response.checklist_item?.vendor_category_id,
       });
       return acc;
     }, {});
@@ -909,9 +909,9 @@ export class CheckInService {
             return 1;
           }
 
-          // Secondary sort: material_category_id / name
-          const matA = a.material_category_id || 0;
-          const matB = b.material_category_id || 0;
+          // Secondary sort: vendor_category_id / name
+          const matA = a.vendor_category_id || 0;
+          const matB = b.vendor_category_id || 0;
 
           if (matA !== matB) {
             return matA - matB;
@@ -925,10 +925,10 @@ export class CheckInService {
       .sort((a: any, b: any) => a.display_order - b.display_order);
   }
 
-  private async validateMaterialCategory(vendor_category_id: number | undefined) {
+  private async validateVendorCategory(vendor_category_id: number | undefined) {
     if (!vendor_category_id) return null;
     const vendorCategory =
-      await this.materialCategoryService.findOne(vendor_category_id);
+      await this.vendorCategoryService.findOne(vendor_category_id);
     if (!vendorCategory) {
       throw new BadRequestException('Vendor Category tidak ditemukan');
     }

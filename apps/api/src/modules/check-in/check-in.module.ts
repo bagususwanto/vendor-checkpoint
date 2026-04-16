@@ -5,7 +5,7 @@ import { VendorModule } from '../vendor/vendor.module';
 import { SystemConfigModule } from '../system-config/system-config.module';
 import { ChecklistModule } from '../checklist/checklist.module';
 import { AuditModule } from '../audit/audit.module';
-import { MaterialCategoryModule } from '../material_category/material_category.module';
+import { VendorCategoryModule } from '../vendor_category/vendor_category.module';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { MaterialCategoryModule } from '../material_category/material_category.m
     SystemConfigModule,
     ChecklistModule,
     AuditModule,
-    MaterialCategoryModule,
+    VendorCategoryModule,
   ],
   controllers: [CheckInController],
   providers: [CheckInService],

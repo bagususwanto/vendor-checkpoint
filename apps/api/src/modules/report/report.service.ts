@@ -197,8 +197,8 @@ export class ReportService {
       where.current_status = filter.status;
     }
 
-    if (filter.materialCategoryId) {
-      where.material_category_id = filter.materialCategoryId;
+    if (filter.vendorCategoryId) {
+      where.snapshot_vendor_category_id = filter.vendorCategoryId;
     }
 
     return where;

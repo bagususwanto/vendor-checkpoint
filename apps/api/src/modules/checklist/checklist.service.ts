@@ -5,13 +5,13 @@ import { CreateChecklistItemDto } from './dto/create-item.dto';
 import { UpdateChecklistItemDto } from './dto/update-item.dto';
 import { ReorderDto } from './dto/reorder.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
-import { MaterialCategoryService } from '../material_category/material_category.service';
+import { VendorCategoryService } from '../vendor_category/vendor_category.service';
 
 @Injectable()
 export class ChecklistService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly materialCategoryService: MaterialCategoryService,
+    private readonly vendorCategoryService: VendorCategoryService,
   ) {}
 
   // --- Category ---
@@ -171,15 +171,15 @@ export class ChecklistService {
     });
   }
 
-  async findByCategory(materialCategoryId: number) {
-    // validate materialCategoryId
-    if (!materialCategoryId) {
-      throw new BadRequestException('Material Category is required');
+  async findByCategory(vendorCategoryId: number) {
+    // validate vendorCategoryId
+    if (!vendorCategoryId) {
+      throw new BadRequestException('Vendor Category is required');
     }
     const vendorCategory =
-      await this.materialCategoryService.findOne(materialCategoryId);
+      await this.vendorCategoryService.findOne(vendorCategoryId);
     if (!vendorCategory) {
-      throw new BadRequestException('Invalid materialCategoryId');
+      throw new BadRequestException('Invalid vendorCategoryId');
     }
 
     return this.prisma.mst_checklist_category.findMany({
@@ -206,7 +206,7 @@ export class ChecklistService {
           where: {
             is_active: true,
             OR: [
-              { vendor_category_id: materialCategoryId }, // item khusus vendor
+              { vendor_category_id: vendorCategoryId }, // item khusus vendor
               { vendor_category_id: null }, // item umum
             ],
           },

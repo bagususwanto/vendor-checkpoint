@@ -4,9 +4,9 @@ import {
   ConflictException,
   BadRequestException,
 } from '@nestjs/common';
-import { CreateMaterialCategoryDto } from './dto/create-material_category.dto';
-import { UpdateMaterialCategoryDto } from './dto/update-material_category.dto';
-import { BulkDeleteMaterialCategoryDto } from './dto/bulk-delete-material_category.dto';
+import { CreateVendorCategoryDto } from './dto/create-vendor_category.dto';
+import { UpdateVendorCategoryDto } from './dto/update-vendor_category.dto';
+import { BulkDeleteVendorCategoryDto } from './dto/bulk-delete-vendor_category.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 import { PaginatedResponse } from '@repo/types';
@@ -14,15 +14,15 @@ import { mst_vendor_category } from 'generated/prisma/client';
 import { Prisma } from 'generated/prisma/client';
 
 @Injectable()
-export class MaterialCategoryService {
+export class VendorCategoryService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(
-    createMaterialCategoryDto: CreateMaterialCategoryDto,
+    createVendorCategoryDto: CreateVendorCategoryDto,
   ): Promise<mst_vendor_category> {
     try {
       return await this.prisma.mst_vendor_category.create({
-        data: { ...createMaterialCategoryDto },
+        data: { ...createVendorCategoryDto },
       });
     } catch (error) {
       if (
@@ -98,7 +98,7 @@ export class MaterialCategoryService {
 
   async update(
     id: number,
-    updateMaterialCategoryDto: UpdateMaterialCategoryDto,
+    updateVendorCategoryDto: UpdateVendorCategoryDto,
   ): Promise<{
     old_value: mst_vendor_category;
     new_value: mst_vendor_category;
@@ -106,13 +106,13 @@ export class MaterialCategoryService {
     // Check if exists and get old value
     const existing = await this.findOne(id);
     if (!existing) {
-      throw new NotFoundException('Kategori material tidak ditemukan');
+      throw new NotFoundException('Kategori vendor tidak ditemukan');
     }
 
     try {
       const updated = await this.prisma.mst_vendor_category.update({
         where: { vendor_category_id: id },
-        data: updateMaterialCategoryDto,
+        data: updateVendorCategoryDto,
       });
 
       return {
@@ -141,7 +141,7 @@ export class MaterialCategoryService {
     // Check if exists
     const existing = await this.findOne(id);
     if (!existing) {
-      throw new NotFoundException('Kategori material tidak ditemukan');
+      throw new NotFoundException('Kategori vendor tidak ditemukan');
     }
 
     // Check usage
@@ -169,7 +169,7 @@ export class MaterialCategoryService {
   }
 
   async bulkDelete(
-    bulkDeleteDto: BulkDeleteMaterialCategoryDto,
+    bulkDeleteDto: BulkDeleteVendorCategoryDto,
   ): Promise<{ count: number }> {
     const { ids } = bulkDeleteDto;
 
@@ -226,7 +226,7 @@ export class MaterialCategoryService {
     // Check if exists
     const existing = await this.findOne(id);
     if (!existing) {
-      throw new NotFoundException('Kategori material tidak ditemukan');
+      throw new NotFoundException('Kategori vendor tidak ditemukan');
     }
 
     // Toggle is_active

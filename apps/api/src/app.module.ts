@@ -8,7 +8,7 @@ import { ChecklistModule } from './modules/checklist/checklist.module';
 import { CheckInModule } from './modules/check-in/check-in.module';
 import { SystemConfigModule } from './modules/system-config/system-config.module';
 import { AuditModule } from './modules/audit/audit.module';
-import { MaterialCategoryModule } from './modules/material_category/material_category.module';
+import { VendorCategoryModule } from './modules/vendor_category/vendor_category.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
@@ -36,7 +36,7 @@ import { SchedulerModule } from './modules/scheduler/scheduler.module';
     CheckInModule,
     SystemConfigModule,
     AuditModule,
-    MaterialCategoryModule,
+    VendorCategoryModule,
     DashboardModule,
     ReportModule,
     UserModule,

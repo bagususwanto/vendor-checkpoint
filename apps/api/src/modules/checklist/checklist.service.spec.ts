@@ -9,13 +9,13 @@ import {
 } from '@jest/globals';
 import { ChecklistService } from './checklist.service';
 import { PrismaService } from 'src/common/prisma/prisma.service';
-import { MaterialCategoryService } from '../material_category/material_category.service';
+import { VendorCategoryService } from '../vendor_category/vendor_category.service';
 import { BadRequestException } from '@nestjs/common';
 
 describe('ChecklistService', () => {
   let service: ChecklistService;
   let prisma: PrismaService;
-  let materialCategoryService: MaterialCategoryService;
+  let vendorCategoryService: VendorCategoryService;
 
   const mockPrismaService = {
     mst_checklist_category: {
@@ -33,7 +33,7 @@ describe('ChecklistService', () => {
     $transaction: jest.fn(),
   };
 
-  const mockMaterialCategoryService = {
+  const mockVendorCategoryService = {
     findOne: jest.fn(),
   };
 
@@ -43,16 +43,16 @@ describe('ChecklistService', () => {
         ChecklistService,
         { provide: PrismaService, useValue: mockPrismaService },
         {
-          provide: MaterialCategoryService,
-          useValue: mockMaterialCategoryService,
+          provide: VendorCategoryService,
+          useValue: mockVendorCategoryService,
         },
       ],
     }).compile();
 
     service = module.get<ChecklistService>(ChecklistService);
     prisma = module.get<PrismaService>(PrismaService);
-    materialCategoryService = module.get<MaterialCategoryService>(
-      MaterialCategoryService,
+    vendorCategoryService = module.get<VendorCategoryService>(
+      VendorCategoryService,
     );
   });
 
@@ -118,8 +118,8 @@ describe('ChecklistService', () => {
   });
 
   describe('findByCategory', () => {
-    it('should throw error if invalid material category', async () => {
-      (materialCategoryService.findOne as jest.Mock<any>).mockResolvedValue(
+    it('should throw error if invalid vendor category', async () => {
+      (vendorCategoryService.findOne as jest.Mock<any>).mockResolvedValue(
         null,
       );
       await expect(service.findByCategory(99)).rejects.toThrow(
@@ -128,8 +128,8 @@ describe('ChecklistService', () => {
     });
 
     it('should return categories', async () => {
-      (materialCategoryService.findOne as jest.Mock<any>).mockResolvedValue({
-        material_category_id: 1,
+      (vendorCategoryService.findOne as jest.Mock<any>).mockResolvedValue({
+        vendor_category_id: 1,
       });
       const expected = [{ category_name: 'Test' }];
       (

@@ -1,6 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { bulkDeleteVendorCategorySchema } from '@repo/types';
 
-export class BulkDeleteMaterialCategoryDto extends createZodDto(
+export class BulkDeleteVendorCategoryDto extends createZodDto(
   bulkDeleteVendorCategorySchema,
 ) {}
