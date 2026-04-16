@@ -115,6 +115,15 @@ async function seedSystemConfig() {
       created_at: new Date(),
       updated_at: new Date(),
     },
+    {
+      config_key: 'AI_APD_DETECTION_ENABLED',
+      config_value: 'true',
+      config_type: 'BOOLEAN',
+      description:
+        'Aktifkan / Nonaktifkan deteksi APD berbasis AI pada form check-in vendor. Jika nonaktif, Step 2 (Pemeriksaan APD) dilewati dan ai_safety_status akan bernilai Skipped.',
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
   ];
 
   await prisma.cfg_system.createMany({

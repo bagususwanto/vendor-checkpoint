@@ -20,6 +20,7 @@ import { PPECamera } from '../components/ppe-camera';
 import { PPEResultOverlay } from '../components/ppe-result-overlay';
 import { PPEComplianceStatus } from '../components/ppe-compliance-status';
 import { PPEScanInstructions } from '../components/ppe-scan-instructions';
+import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
 
 export default function CheckInStep2() {
   const router = useRouter();
@@ -49,13 +50,36 @@ export default function CheckInStep2() {
 
   const { mutateAsync: detectPPE, isPending: isDetecting } = usePPEDetection();
 
+  // Check if AI APD detection is enabled via system config
+  const { data: apdConfig, isLoading: isLoadingConfig } =
+    useSystemConfigByKey('AI_APD_DETECTION_ENABLED');
+  const isApdEnabled = !isLoadingConfig && apdConfig?.config_value !== 'false';
+
   useEffect(() => {
     window.scrollTo(0, 0);
 
     if (!step1Data || !checklistCategories) {
       router.replace('/check-in/step-1');
+      return;
     }
-  }, [step1Data, checklistCategories, router]);
+
+    // If config is still loading, wait before deciding to bypass
+    if (isLoadingConfig) return;
+
+    // Bypass Step 2 when AI APD detection is disabled
+    if (!isApdEnabled) {
+      setPPEData({
+        scanTime: new Date().toISOString(),
+        detections: [],
+        isCompliant: true,
+        hasHardhat: true,
+        hasSafetyVest: true,
+        capturedImage: undefined,
+      });
+      router.replace('/check-in/step-3');
+    }
+  }, [step1Data, checklistCategories, isApdEnabled, isLoadingConfig, router, setPPEData]);
+
 
   const handleCapture = async (imageBlob: Blob, imageDataUrl: string) => {
     try {

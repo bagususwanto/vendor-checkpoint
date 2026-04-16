@@ -13,6 +13,7 @@ import {
 import { useChecklistStore } from '@/stores/use-checklist.store';
 import { useSubmitCheckIn } from '@/hooks/api/use-check-in';
 import { formatDateTime } from '@/lib/utils';
+import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
 import { ReviewIdentity } from './components/review-identity';
 import { ReviewChecklist } from './components/review-checklist';
 import { ReviewActions } from './components/review-actions';
@@ -31,6 +32,9 @@ export default function CheckInStep4() {
   const router = useRouter();
   const { mutateAsync: submitCheckIn } = useSubmitCheckIn();
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const { data: apdConfig } = useSystemConfigByKey('AI_APD_DETECTION_ENABLED');
+  const isApdEnabled = apdConfig?.config_value !== 'false';
 
   useEffect(() => {
     // If successData exists, it means we just submitted successfully.
@@ -69,7 +73,11 @@ export default function CheckInStep4() {
       snapshot_vendor_category_id: Number(step1Data.vendorCategory.value),
       dn_number: step1Data.dnNumber || undefined,
       po_number: step1Data.poNumber || undefined,
-      ai_safety_status: ppeData?.isCompliant ? 'Pass' : 'Fail',
+      ai_safety_status: isApdEnabled
+        ? ppeData?.isCompliant
+          ? 'Pass'
+          : 'Fail'
+        : 'Skipped',
       // If we implement delayed arrival reason later, insert it here:
       // delay_arrival_reason_id: step1Data.delayArrivalReasonId,
       checklist_responses: Object.entries(step2Data.checklistItems).map(
