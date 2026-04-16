@@ -53,6 +53,37 @@ export class CheckInService {
           // 2. Generate Queue Number
           const queueNumber = await this.generateFormattedQueueNumber(tx);
 
+          // 2.5 Slot Matching & Config
+          const verificationModeConfig = await this.systemConfigService.findByConfigKey(
+            'VERIFICATION_MODE_ENABLED',
+          );
+          const isVerificationEnabled = verificationModeConfig?.config_value === 'true';
+          const initialStatus = isVerificationEnabled ? QueueStatus.MENUNGGU : QueueStatus.AKTIF;
+
+          let slotId = null;
+          const startOfDay = new Date(dateNow);
+          startOfDay.setHours(0, 0, 0, 0);
+
+          const slot = await tx.ops_delivery_slot.findFirst({
+            where: {
+              schedule: {
+                vendor_id: createCheckInDto.vendor_id,
+              },
+              expected_date: {
+                gte: startOfDay,
+              },
+              status: 'Open',
+            },
+          });
+
+          if (slot) {
+            slotId = slot.slot_id;
+            await tx.ops_delivery_slot.update({
+              where: { slot_id: slot.slot_id },
+              data: { status: 'Filled' },
+            });
+          }
+
           // 3. Compliance Check
           const { hasNonCompliantItems, nonCompliantCount } =
             this.calculateCompliance(createCheckInDto.checklist_responses);
@@ -63,6 +94,12 @@ export class CheckInService {
               queue_number: queueNumber,
               vendor_id: createCheckInDto.vendor_id,
               driver_name: createCheckInDto.driver_name,
+              dn_number: createCheckInDto.dn_number,
+              po_number: createCheckInDto.po_number,
+              slot_id: slotId,
+              arrival_status: createCheckInDto.arrival_status,
+              delay_arrival_reason_id: createCheckInDto.delay_arrival_reason_id,
+              ai_safety_status: createCheckInDto.ai_safety_status || 'Pending',
               snapshot_vendor_category_id:
                 createCheckInDto.snapshot_vendor_category_id ??
                 vendor.vendor_category_id ??
@@ -70,7 +107,7 @@ export class CheckInService {
               snapshot_company_name: vendor.company_name,
               snapshot_category_name: vendorCategory?.category_name ?? '',
               submission_time: dateNow,
-              current_status: 'MENUNGGU',
+              current_status: initialStatus,
               ip_address: requestInfo.ipAddress,
               device_identifier: requestInfo.deviceIdentifier,
               has_non_compliant_items: hasNonCompliantItems,
@@ -91,6 +128,7 @@ export class CheckInService {
             checkIn.entry_id,
             queueNumber,
             dateNow,
+            initialStatus,
           );
 
           // 7. Create Time Log
@@ -102,10 +140,13 @@ export class CheckInService {
             await this.systemConfigService.findByConfigKey(
               'ESTIMATED_WAIT_MINUTES',
             );
+            
+          const statusDisplayTextKey = initialStatus === QueueStatus.AKTIF 
+            ? 'DEFAULT_STATUS_DISETUJUI_DISPLAY_TEXT' 
+            : 'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT';
+
           const statusDisplayText =
-            await this.systemConfigService.findByConfigKey(
-              'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT',
-            );
+            await this.systemConfigService.findByConfigKey(statusDisplayTextKey);
 
           // 9. Return Result
           return {
@@ -585,6 +626,8 @@ export class CheckInService {
           checkout_by_user_id: localUserId,
           is_checked_out: true,
           duration_minutes: durationMinutes,
+          departure_status: checkoutDto.departure_status,
+          delay_departure_reason_id: checkoutDto.delay_departure_reason_id,
           updated_at: checkoutTime,
         },
       });
@@ -623,6 +666,24 @@ export class CheckInService {
         duration_minutes: durationMinutes,
       };
     });
+  }
+
+  async processAiSafety(queueNumber: string, aiSafetyDto: any) {
+    // Basic mock: we simulate an AI Safety verification.
+    // In real implementation, this would send `aiSafetyDto.image_base64` to vitara-ai model API.
+    const mockIsSafe = true; // Hardcoded mock
+    const newStatus = mockIsSafe ? 'Pass' : 'Fail';
+
+    const entry = await this.prisma.ops_checkin_entry.update({
+      where: { queue_number: queueNumber },
+      data: { ai_safety_status: newStatus },
+      select: {
+        queue_number: true,
+        ai_safety_status: true,
+      }
+    });
+
+    return entry;
   }
 
   async holdEntry(
@@ -966,6 +1027,7 @@ export class CheckInService {
     entryId: number,
     queueNumber: string,
     date: Date,
+    initialStatus: string,
   ) {
     const startOfToday = getStartOfToday();
     const lastPriority = await tx.ops_queue_status.findFirst({
@@ -988,15 +1050,19 @@ export class CheckInService {
     const estimatedWaitMinutes = await this.systemConfigService.findByConfigKey(
       'ESTIMATED_WAIT_MINUTES',
     );
+    const statusDisplayTextKey = initialStatus === QueueStatus.AKTIF 
+      ? 'DEFAULT_STATUS_DISETUJUI_DISPLAY_TEXT' 
+      : 'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT';
+
     const statusDisplayText = await this.systemConfigService.findByConfigKey(
-      'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT',
+      statusDisplayTextKey,
     );
 
     await tx.ops_queue_status.create({
       data: {
         entry_id: entryId,
         queue_number: queueNumber,
-        current_status: 'MENUNGGU',
+        current_status: initialStatus,
         status_display_text: statusDisplayText.config_value,
         priority_order: nextPriority,
         estimated_wait_minutes: toInt(estimatedWaitMinutes.config_value),

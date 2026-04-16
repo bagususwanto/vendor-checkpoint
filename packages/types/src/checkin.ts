@@ -66,6 +66,8 @@ export type VerifyCheckIn = z.infer<typeof verifyCheckInSchema>;
 
 export const checkoutSchema = z.object({
   queue_number: z.string().min(1, 'Nomor antrean harus diisi'),
+  departure_status: z.string().optional(),
+  delay_departure_reason_id: z.number().optional(),
 });
 
 export type Checkout = z.infer<typeof checkoutSchema>;

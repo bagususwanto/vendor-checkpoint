@@ -8,6 +8,7 @@ export enum UserRole {
 export enum QueueStatus {
   MENUNGGU = 'MENUNGGU',
   DISETUJUI = 'DISETUJUI',
+  AKTIF = 'AKTIF',
   TERTAHAN = 'TERTAHAN',
   DITOLAK = 'DITOLAK',
   SELESAI = 'SELESAI',

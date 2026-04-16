@@ -456,6 +456,101 @@ export class ReportService {
     });
   }
 
+  async generateCycleExcel(
+    filter: ReportFilterDto,
+    userId: number,
+  ): Promise<{ buffer: Buffer; filename: string }> {
+    const localUserId = await this.resolveLocalUser(userId);
+    const dateFrom = new Date(filter.dateFrom);
+    dateFrom.setHours(0, 0, 0, 0);
+
+    const dateTo = new Date(filter.dateTo);
+    dateTo.setHours(23, 59, 59, 999);
+
+    const checkins = await this.prisma.ops_checkin_entry.findMany({
+      where: {
+        submission_time: {
+          gte: dateFrom,
+          lte: dateTo,
+        },
+      },
+      include: {
+        mst_vendor: true,
+        delivery_slot: {
+          include: {
+            schedule: true,
+          },
+        },
+        ops_timelog: true,
+      },
+      orderBy: { submission_time: 'desc' },
+    });
+
+    const timestamp = new Date().getTime();
+    const filename = `cycle_monitoring_${filter.dateFrom}_${filter.dateTo}_${timestamp}.xlsx`;
+
+    await this.prisma.log_report_export.create({
+      data: {
+        exported_by_user_id: localUserId,
+        report_type: 'CYCLE_MONITORING',
+        date_from: dateFrom,
+        date_to: dateTo,
+        filter_criteria: JSON.stringify(filter),
+        total_records: checkins.length,
+        file_name: filename,
+      },
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Cycle Monitoring');
+
+    const headers = [
+      'No',
+      'Vendor',
+      'Queue Number',
+      'Expected Check-in',
+      'Actual Check-in',
+      'Arrival Status',
+      'Actual Checkout',
+      'Departure Status',
+      'Duration (min)',
+      'DN Number',
+      'PO Number',
+      'AI Safety Status',
+    ];
+
+    const headerRow = sheet.addRow(headers);
+    headerRow.font = { bold: true };
+
+    checkins.forEach((entry, index) => {
+      let expectedCheckin = '-';
+      if (entry.delivery_slot) {
+        expectedCheckin = `${this.formatDateTime(entry.delivery_slot.expected_date)} ${entry.delivery_slot.schedule.arrival_time || ''}`;
+      }
+
+      sheet.addRow([
+        index + 1,
+        entry.snapshot_company_name,
+        entry.queue_number,
+        expectedCheckin,
+        this.formatDateTime(entry.submission_time),
+        entry.arrival_status || '-',
+        entry.ops_timelog?.checkout_time ? this.formatDateTime(entry.ops_timelog.checkout_time) : '-',
+        entry.ops_timelog?.departure_status || '-',
+        entry.ops_timelog?.duration_minutes || '-',
+        entry.dn_number || '-',
+        entry.po_number || '-',
+        entry.ai_safety_status || '-',
+      ]);
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return {
+      buffer: Buffer.from(buffer),
+      filename,
+    };
+  }
+
   async getExportLogs(filter: ReportExportLogFilterDto) {
     const dateFrom = new Date(filter.dateFrom);
     dateFrom.setHours(0, 0, 0, 0);

@@ -14,9 +14,12 @@ export class DashboardService {
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    const [todayStats, yesterdayStats] = await Promise.all([
+    const [todayStats, yesterdayStats, verificationMode] = await Promise.all([
       this.getStatsForDate(today),
       this.getStatsForDate(yesterday, true), // end date is today (exclusive)
+      this.prisma.cfg_system.findUnique({
+        where: { config_key: 'VERIFICATION_MODE_ENABLED' }
+      })
     ]);
 
     const calculateTrend = (
@@ -58,6 +61,7 @@ export class DashboardService {
           yesterdayStats.avg_lead_time_minutes,
         ),
       },
+      verification_mode: verificationMode?.config_value === 'true',
     };
   }
 
@@ -72,6 +76,9 @@ export class DashboardService {
       totalRejected,
       currentWaiting,
       leadTimeAgg,
+      missedCycles,
+      onTimeArrivals,
+      onTimeDepartures,
     ] = await Promise.all([
       this.prisma.ops_checkin_entry.count({
         where: {
@@ -121,21 +128,58 @@ export class DashboardService {
           },
         },
       }),
+      this.prisma.ops_delivery_slot.count({
+        where: {
+          expected_date: {
+            gte: startDate,
+            lt: endDate,
+          },
+          status: 'Missed',
+        },
+      }),
+      this.prisma.ops_checkin_entry.count({
+        where: {
+          submission_time: {
+            gte: startDate,
+            lt: endDate,
+          },
+          arrival_status: 'On-Time',
+        },
+      }),
+      this.prisma.ops_timelog.count({
+        where: {
+          entry: {
+            submission_time: {
+              gte: startDate,
+              lt: endDate,
+            },
+          },
+          departure_status: 'On-Time',
+        },
+      }),
     ]);
 
     const approvalRate =
       totalCheckins > 0 ? (totalApproved / totalCheckins) * 100 : 0;
     const rejectedRate =
       totalCheckins > 0 ? (totalRejected / totalCheckins) * 100 : 0;
+      
+    const onTimeArrivalRate =
+      totalCheckins > 0 ? (onTimeArrivals / totalCheckins) * 100 : 0;
+    const onTimeDepartureRate =
+      totalCheckins > 0 ? (onTimeDepartures / totalCheckins) * 100 : 0;
 
     return {
       total_checkins: totalCheckins,
       total_approved: totalApproved,
       total_rejected: totalRejected,
       current_waiting: currentWaiting,
+      missed_cycle_count: missedCycles,
       avg_lead_time_minutes: Math.round(leadTimeAgg._avg.duration_minutes || 0),
       approval_rate: `${approvalRate.toFixed(1)}%`,
       rejected_rate: `${rejectedRate.toFixed(1)}%`,
+      on_time_arrival_pct: `${onTimeArrivalRate.toFixed(1)}%`,
+      on_time_departure_pct: `${onTimeDepartureRate.toFixed(1)}%`,
     };
   }
 

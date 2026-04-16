@@ -18,6 +18,7 @@ import { VerifyCheckInDto } from './dto/verify-check-in.dto';
 import { CheckoutCheckInDto } from './dto/checkout-check-in.dto';
 import { HoldCheckInDto } from './dto/hold-check-in.dto';
 import { ResumeCheckInDto } from './dto/resume-check-in.dto';
+import { AiSafetyDto } from './dto/ai-safety.dto';
 import { getRequestInfo } from 'src/common/utils/request-info.util';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -135,6 +136,24 @@ export class CheckInController {
     const requestInfo = getRequestInfo(req);
     const userId = req.user.userId;
     return this.checkInService.checkoutEntry(checkoutDto, requestInfo, userId);
+  }
+
+  // PROTECTED - Engine/Staff
+  @UseGuards(JwtAuthGuard)
+  @Post('/ai-safety/:queueNumber')
+  @AuditLog({
+    actionType: 'CHECKIN_AI_SAFETY',
+    actionDescription: 'AI Safety status verification logged',
+    buildDetails: (req, res) => ({
+      entry_id: res?.queue_number,
+      new_value: { status: res?.ai_safety_status },
+    }),
+  })
+  processAiSafety(
+    @Param('queueNumber') queueNumber: string,
+    @Body() aiSafetyDto: AiSafetyDto,
+  ) {
+    return this.checkInService.processAiSafety(queueNumber, aiSafetyDto);
   }
 
   // PROTECTED - Staff only

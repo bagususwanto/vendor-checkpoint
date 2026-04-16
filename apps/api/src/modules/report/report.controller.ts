@@ -40,6 +40,28 @@ export class ReportController {
     res.send(buffer);
   }
 
+  @Get('export-cycle')
+  async exportCycleExcel(
+    @Query(new ZodValidationPipe(ReportFilterDto)) filter: ReportFilterDto,
+    @Res() res: Response,
+    @Req() req: any,
+  ) {
+    const userId = req.user?.userId;
+    const { buffer, filename } = await this.reportService.generateCycleExcel(
+      filter,
+      userId,
+    );
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', buffer.length);
+
+    res.send(buffer);
+  }
+
   @Get('export-logs')
   async getExportLogs(
     @Query(new ZodValidationPipe(ReportExportLogFilterDto))

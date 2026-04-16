@@ -36,6 +36,10 @@ export class VendorService {
       where.is_active = isActive;
     }
 
+    if (query.categoryId) {
+      where.vendor_category_id = query.categoryId;
+    }
+
     if (search?.trim()) {
       where.OR = [
         { company_name: { contains: search } },
@@ -48,6 +52,7 @@ export class VendorService {
         skip,
         take: limit,
         where,
+        include: { vendor_category: true },
         orderBy: { created_at: 'desc' },
       }),
       this.prisma.mst_vendor.count({ where }),
