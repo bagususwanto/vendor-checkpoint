@@ -117,15 +117,15 @@ export function VerificationModeControl() {
           <AlertDialogHeader>
             <AlertDialogTitle>Ubah Mode Verifikasi?</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
-              <p>
+              <span className="block">
                 Anda akan mengubah Mode Verifikasi Staff menjadi{' '}
                 <strong className={pendingValue ? 'text-primary' : 'text-muted-foreground'}>
                   {pendingValue ? 'AKTIF' : 'NON-AKTIF'}
                 </strong>.
-              </p>
-              <p className="text-destructive font-medium mt-2">
+              </span>
+              <span className="block text-destructive font-medium mt-2">
                 Peringatan: Perubahan ini akan langsung berdampak pada alur operasional check-in vendor secara real-time.
-              </p>
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
