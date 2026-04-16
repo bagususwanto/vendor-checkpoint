@@ -46,8 +46,8 @@ export class CheckInService {
         return await this.prisma.$transaction(async (tx) => {
           // 1. Validate
           const vendor = await this.validateVendor(createCheckInDto.vendor_id);
-          const materialCategory = await this.validateMaterialCategory(
-            createCheckInDto.material_category_id,
+          const vendorCategory = await this.validateMaterialCategory(
+            createCheckInDto.snapshot_vendor_category_id,
           );
 
           // 2. Generate Queue Number
@@ -63,9 +63,12 @@ export class CheckInService {
               queue_number: queueNumber,
               vendor_id: createCheckInDto.vendor_id,
               driver_name: createCheckInDto.driver_name,
-              material_category_id: createCheckInDto.material_category_id,
+              snapshot_vendor_category_id:
+                createCheckInDto.snapshot_vendor_category_id ??
+                vendor.vendor_category_id ??
+                0,
               snapshot_company_name: vendor.company_name,
-              snapshot_category_name: materialCategory.category_name,
+              snapshot_category_name: vendorCategory?.category_name ?? '',
               submission_time: dateNow,
               current_status: 'MENUNGGU',
               ip_address: requestInfo.ipAddress,
@@ -262,8 +265,8 @@ export class CheckInService {
         }
       }
 
-      if (filter.material_category_id) {
-        where.material_category_id = Number(filter.material_category_id);
+      if (filter.snapshot_vendor_category_id) {
+        where.snapshot_vendor_category_id = Number(filter.snapshot_vendor_category_id);
       }
 
       if (filter.status) {
@@ -369,8 +372,8 @@ export class CheckInService {
             item_type: true,
             checklist_item: {
               select: {
-                material_category_id: true,
-                material_category: {
+                vendor_category_id: true,
+                vendor_category: {
                   select: {
                     category_name: true,
                   },
@@ -825,8 +828,8 @@ export class CheckInService {
         is_compliant: response.is_compliant,
         display_order: response.display_order,
         material_category_name:
-          response.checklist_item?.material_category?.category_name,
-        material_category_id: response.checklist_item?.material_category_id,
+          response.checklist_item?.vendor_category?.category_name,
+        material_category_id: response.checklist_item?.vendor_category_id,
       });
       return acc;
     }, {});
@@ -861,13 +864,14 @@ export class CheckInService {
       .sort((a: any, b: any) => a.display_order - b.display_order);
   }
 
-  private async validateMaterialCategory(material_category_id: number) {
-    const materialCategory =
-      await this.materialCategoryService.findOne(material_category_id);
-    if (!materialCategory) {
-      throw new BadRequestException('Material Category tidak ditemukan');
+  private async validateMaterialCategory(vendor_category_id: number | undefined) {
+    if (!vendor_category_id) return null;
+    const vendorCategory =
+      await this.materialCategoryService.findOne(vendor_category_id);
+    if (!vendorCategory) {
+      throw new BadRequestException('Vendor Category tidak ditemukan');
     }
-    return materialCategory;
+    return vendorCategory;
   }
 
   private async generateFormattedQueueNumber(tx: any) {

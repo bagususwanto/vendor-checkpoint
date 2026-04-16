@@ -27,7 +27,7 @@ export class ChecklistService {
       include: {
         mst_checklist_item: {
           include: {
-            material_category: {
+            vendor_category: {
               select: {
                 category_name: true,
               },
@@ -53,9 +53,9 @@ export class ChecklistService {
           return 1;
         }
 
-        // Secondary sort: material_category_id
-        const matA = a.material_category_id || 0;
-        const matB = b.material_category_id || 0;
+        // Secondary sort: vendor_category_id
+        const matA = a.vendor_category_id || 0;
+        const matB = b.vendor_category_id || 0;
 
         if (matA !== matB) {
           return matA - matB;
@@ -194,10 +194,10 @@ export class ChecklistService {
             checklist_item_id: true,
             item_type: true,
             item_text: true,
-            material_category_id: true,
+            vendor_category_id: true,
             is_required: true,
             display_order: true,
-            material_category: {
+            vendor_category: {
               select: {
                 category_name: true,
               },
@@ -206,8 +206,8 @@ export class ChecklistService {
           where: {
             is_active: true,
             OR: [
-              { material_category_id: materialCategoryId }, // item khusus vendor
-              { material_category_id: null }, // item umum
+              { vendor_category_id: materialCategoryId }, // item khusus vendor
+              { vendor_category_id: null }, // item umum
             ],
           },
           orderBy: {

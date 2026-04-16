@@ -10,7 +10,7 @@ import { BulkDeleteMaterialCategoryDto } from './dto/bulk-delete-material_catego
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 import { PaginatedResponse } from '@repo/types';
-import { mst_material_category } from 'generated/prisma/client';
+import { mst_vendor_category } from 'generated/prisma/client';
 import { Prisma } from 'generated/prisma/client';
 
 @Injectable()
@@ -19,10 +19,10 @@ export class MaterialCategoryService {
 
   async create(
     createMaterialCategoryDto: CreateMaterialCategoryDto,
-  ): Promise<mst_material_category> {
+  ): Promise<mst_vendor_category> {
     try {
-      return await this.prisma.mst_material_category.create({
-        data: createMaterialCategoryDto,
+      return await this.prisma.mst_vendor_category.create({
+        data: { ...createMaterialCategoryDto },
       });
     } catch (error) {
       if (
@@ -44,10 +44,10 @@ export class MaterialCategoryService {
 
   async findAll(
     query: PaginatedParamsDto,
-  ): Promise<PaginatedResponse<mst_material_category>> {
+  ): Promise<PaginatedResponse<mst_vendor_category>> {
     const { page, limit, search } = query;
     const skip = (page - 1) * limit;
-    const where: Prisma.mst_material_categoryWhereInput = {};
+    const where: Prisma.mst_vendor_categoryWhereInput = {};
 
     // Filter by status
     const status = (query as any).status || 'all';
@@ -68,13 +68,13 @@ export class MaterialCategoryService {
     }
 
     const [data, total] = await Promise.all([
-      this.prisma.mst_material_category.findMany({
+      this.prisma.mst_vendor_category.findMany({
         skip,
         take: limit,
         where,
         orderBy: { created_at: 'desc' },
       }),
-      this.prisma.mst_material_category.count({ where }),
+      this.prisma.mst_vendor_category.count({ where }),
     ]);
 
     return {
@@ -88,10 +88,10 @@ export class MaterialCategoryService {
     };
   }
 
-  async findOne(id: number): Promise<mst_material_category | null> {
-    return this.prisma.mst_material_category.findUnique({
+  async findOne(id: number): Promise<mst_vendor_category | null> {
+    return this.prisma.mst_vendor_category.findUnique({
       where: {
-        material_category_id: id,
+        vendor_category_id: id,
       },
     });
   }
@@ -100,8 +100,8 @@ export class MaterialCategoryService {
     id: number,
     updateMaterialCategoryDto: UpdateMaterialCategoryDto,
   ): Promise<{
-    old_value: mst_material_category;
-    new_value: mst_material_category;
+    old_value: mst_vendor_category;
+    new_value: mst_vendor_category;
   }> {
     // Check if exists and get old value
     const existing = await this.findOne(id);
@@ -110,8 +110,8 @@ export class MaterialCategoryService {
     }
 
     try {
-      const updated = await this.prisma.mst_material_category.update({
-        where: { material_category_id: id },
+      const updated = await this.prisma.mst_vendor_category.update({
+        where: { vendor_category_id: id },
         data: updateMaterialCategoryDto,
       });
 
@@ -137,7 +137,7 @@ export class MaterialCategoryService {
     }
   }
 
-  async remove(id: number): Promise<mst_material_category> {
+  async remove(id: number): Promise<mst_vendor_category> {
     // Check if exists
     const existing = await this.findOne(id);
     if (!existing) {
@@ -147,24 +147,24 @@ export class MaterialCategoryService {
     // Check usage
     const [checkinCount, checklistItemCount] = await Promise.all([
       this.prisma.ops_checkin_entry.count({
-        where: { material_category_id: id },
+        where: { snapshot_vendor_category_id: id },
       }),
       this.prisma.mst_checklist_item.count({
-        where: { material_category_id: id },
+        where: { vendor_category_id: id },
       }),
     ]);
 
     // If used in any transaction or configuration, soft delete
     if (checkinCount > 0 || checklistItemCount > 0) {
-      return this.prisma.mst_material_category.update({
-        where: { material_category_id: id },
+      return this.prisma.mst_vendor_category.update({
+        where: { vendor_category_id: id },
         data: { is_active: false },
       });
     }
 
     // Otherwise, hard delete
-    return this.prisma.mst_material_category.delete({
-      where: { material_category_id: id },
+    return this.prisma.mst_vendor_category.delete({
+      where: { vendor_category_id: id },
     });
   }
 
@@ -180,22 +180,22 @@ export class MaterialCategoryService {
     // Check usage to determine which can be hard deleted vs soft deleted
     const [usedInCheckin, usedInChecklist] = await Promise.all([
       this.prisma.ops_checkin_entry.findMany({
-        where: { material_category_id: { in: ids } },
-        select: { material_category_id: true },
-        distinct: ['material_category_id'],
+        where: { snapshot_vendor_category_id: { in: ids } },
+        select: { snapshot_vendor_category_id: true },
+        distinct: ['snapshot_vendor_category_id'],
       }),
       this.prisma.mst_checklist_item.findMany({
-        where: { material_category_id: { in: ids } },
-        select: { material_category_id: true },
-        distinct: ['material_category_id'],
+        where: { vendor_category_id: { in: ids } },
+        select: { vendor_category_id: true },
+        distinct: ['vendor_category_id'],
       }),
     ]);
 
     const usedIds = new Set<number>([
-      ...usedInCheckin.map((item) => item.material_category_id),
+      ...usedInCheckin.map((item) => item.snapshot_vendor_category_id),
       ...usedInChecklist
-        .filter((item) => item.material_category_id !== null)
-        .map((item) => item.material_category_id as number),
+        .filter((item) => item.vendor_category_id !== null)
+        .map((item) => item.vendor_category_id as number),
     ]);
 
     const idsToSoftDelete = ids.filter((id) => usedIds.has(id));
@@ -205,16 +205,16 @@ export class MaterialCategoryService {
     let hardDeletedCount = 0;
 
     if (idsToSoftDelete.length > 0) {
-      const res = await this.prisma.mst_material_category.updateMany({
-        where: { material_category_id: { in: idsToSoftDelete } },
+      const res = await this.prisma.mst_vendor_category.updateMany({
+        where: { vendor_category_id: { in: idsToSoftDelete } },
         data: { is_active: false },
       });
       softDeletedCount = res.count;
     }
 
     if (idsToHardDelete.length > 0) {
-      const res = await this.prisma.mst_material_category.deleteMany({
-        where: { material_category_id: { in: idsToHardDelete } },
+      const res = await this.prisma.mst_vendor_category.deleteMany({
+        where: { vendor_category_id: { in: idsToHardDelete } },
       });
       hardDeletedCount = res.count;
     }
@@ -222,7 +222,7 @@ export class MaterialCategoryService {
     return { count: softDeletedCount + hardDeletedCount };
   }
 
-  async toggleStatus(id: number): Promise<mst_material_category> {
+  async toggleStatus(id: number): Promise<mst_vendor_category> {
     // Check if exists
     const existing = await this.findOne(id);
     if (!existing) {
@@ -230,14 +230,14 @@ export class MaterialCategoryService {
     }
 
     // Toggle is_active
-    return this.prisma.mst_material_category.update({
-      where: { material_category_id: id },
+    return this.prisma.mst_vendor_category.update({
+      where: { vendor_category_id: id },
       data: { is_active: !existing.is_active },
     });
   }
 
-  async getSelection(): Promise<mst_material_category[]> {
-    return this.prisma.mst_material_category.findMany({
+  async getSelection(): Promise<mst_vendor_category[]> {
+    return this.prisma.mst_vendor_category.findMany({
       where: {
         is_active: true,
       },

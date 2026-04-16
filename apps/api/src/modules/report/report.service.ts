@@ -104,7 +104,6 @@ export class ReportService {
       where: whereClause,
       include: {
         mst_vendor: true,
-        material_category: true,
         ops_verification: {
           include: { user: true },
         },
