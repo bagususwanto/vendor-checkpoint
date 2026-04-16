@@ -14,6 +14,7 @@ import { useSyncVendors } from '@/hooks/api/use-vendors';
 import { useSyncUsers } from '@/hooks/api/use-users';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SystemConfigList } from './_components/system-config-list';
+import { VerificationModeControl } from './_components/verification-mode-control';
 
 export default function SettingsPage() {
   const { mutate: syncVendors, isPending: isSyncingVendors } = useSyncVendors();
@@ -128,6 +129,7 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="config" className="space-y-4">
+          <VerificationModeControl />
           <Card>
             <CardHeader>
               <CardTitle>Konfigurasi Sistem</CardTitle>
