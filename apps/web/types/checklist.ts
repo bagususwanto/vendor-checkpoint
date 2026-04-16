@@ -22,14 +22,14 @@ export type ChecklistItemResponse = {
   item_code: string;
   item_text: string;
   item_type: ChecklistItemType;
-  material_category_id?: number | null;
+  vendor_category_id?: number | null;
   display_order: number;
   is_required: boolean;
   is_active: boolean;
   created_at: string;
   updated_at: string;
   material_category?: {
-    material_category_id: number;
+    vendor_category_id: number;
     category_name: string;
   } | null;
 };

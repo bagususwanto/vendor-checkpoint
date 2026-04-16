@@ -44,7 +44,7 @@ export const checkInService = {
     filter?: {
       start_date?: string;
       end_date?: string;
-      material_category_id?: string;
+      vendor_category_id?: string;
       status?: string;
     };
   }) => {
@@ -86,11 +86,11 @@ export const checkInService = {
     }
   },
 
-  checkoutCheckIn: async (queueNumber: string) => {
+  checkoutCheckIn: async (payload: { queue_number: string; departure_status?: string; delay_departure_reason_id?: number; }) => {
     try {
       const response = await axiosInstance.patch<{ data: any }>(
         '/check-in/checkout',
-        { queue_number: queueNumber },
+        payload,
       );
       return response.data.data;
     } catch (error) {

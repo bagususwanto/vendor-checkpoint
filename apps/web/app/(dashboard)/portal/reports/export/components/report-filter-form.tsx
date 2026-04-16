@@ -21,8 +21,8 @@ interface ReportFilterFormProps {
   setDate: (date: DateRange | undefined) => void;
   status: string;
   setStatus: (status: string) => void;
-  materialCategoryId: string | undefined;
-  setMaterialCategoryId: (id: string | undefined) => void;
+  vendorCategoryId: string | undefined;
+  setVendorCategoryId: (id: string | undefined) => void;
   onReset: () => void;
 }
 
@@ -31,8 +31,8 @@ export function ReportFilterForm({
   setDate,
   status,
   setStatus,
-  materialCategoryId,
-  setMaterialCategoryId,
+  vendorCategoryId,
+  setVendorCategoryId,
   onReset,
 }: ReportFilterFormProps) {
   const { data: materialCategoriesData } = useInfiniteMaterialCategories({});
@@ -42,12 +42,12 @@ export function ReportFilterForm({
     return materialCategoriesData.pages.flatMap((page) =>
       page.data.map((item) => ({
         label: item.category_name,
-        value: item.material_category_id.toString(),
+        value: item.vendor_category_id.toString(),
       })),
     );
   }, [materialCategoriesData]);
 
-  const hasFilters = !!date || status !== '' || !!materialCategoryId;
+  const hasFilters = !!date || status !== '' || !!vendorCategoryId;
 
   return (
     <div className="rounded-xl border bg-card p-4 shadow-sm">
@@ -112,9 +112,9 @@ export function ReportFilterForm({
                 className="w-[180px] justify-start text-left font-normal"
               >
                 <Filter className="mr-2 h-4 w-4" />
-                {materialCategoryId
+                {vendorCategoryId
                   ? materialOptions.find(
-                      (opt) => opt.value === materialCategoryId,
+                      (opt) => opt.value === vendorCategoryId,
                     )?.label || 'Kategori'
                   : 'Kategori'}
               </Button>
@@ -123,8 +123,8 @@ export function ReportFilterForm({
               <DropdownMenuLabel>Filter Kategori</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuRadioGroup
-                value={materialCategoryId || ''}
-                onValueChange={(val) => setMaterialCategoryId(val || undefined)}
+                value={vendorCategoryId || ''}
+                onValueChange={(val) => setVendorCategoryId(val || undefined)}
               >
                 <DropdownMenuRadioItem value="">
                   Semua Kategori

@@ -98,7 +98,7 @@ export function QueueToolbar({
               <Filter className="mr-2 h-4 w-4" />
               {categoryId
                 ? categories?.find(
-                    (c: any) => String(c.material_category_id) === categoryId,
+                    (c: any) => String(c.vendor_category_id) === categoryId,
                   )?.category_name || 'Kategori'
                 : 'Kategori'}
             </Button>
@@ -115,8 +115,8 @@ export function QueueToolbar({
               </DropdownMenuRadioItem>
               {categories?.map((category: any) => (
                 <DropdownMenuRadioItem
-                  key={category.material_category_id}
-                  value={String(category.material_category_id)}
+                  key={category.vendor_category_id}
+                  value={String(category.vendor_category_id)}
                 >
                   {category.category_name}
                 </DropdownMenuRadioItem>

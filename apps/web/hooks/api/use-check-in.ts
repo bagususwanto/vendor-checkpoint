@@ -36,7 +36,7 @@ export function useVerificationList(
   filter?: {
     start_date?: string;
     end_date?: string;
-    material_category_id?: string;
+    vendor_category_id?: string;
     status?: string;
   },
   refetchInterval?: number,
@@ -74,8 +74,8 @@ export function useVerifyCheckIn() {
 
 export function useCheckoutCheckIn() {
   return useMutation({
-    mutationFn: (queueNumber: string) =>
-      checkInService.checkoutCheckIn(queueNumber),
+    mutationFn: (payload: { queue_number: string; departure_status?: string; delay_departure_reason_id?: number; }) =>
+      checkInService.checkoutCheckIn(payload),
   });
 }
 

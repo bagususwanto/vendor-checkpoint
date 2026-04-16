@@ -9,7 +9,7 @@ import {
   ChecklistItemType,
 } from '@repo/types';
 import { ChecklistItemResponse, CreateChecklistItem } from '@/types/checklist';
-import { useMaterialCategorySelection } from '@/hooks/api/use-material-categories';
+import { useVendorCategorySelection } from '@/hooks/api/use-material-categories';
 // ... (keep intermediate lines if possible or replace larger chunk)
 // actually I will use multiple replace chunks to be safe
 
@@ -59,7 +59,7 @@ export function ChecklistItemDialog({
   item,
   onSuccess,
 }: ChecklistItemDialogProps) {
-  const { data: materialCategories } = useMaterialCategorySelection();
+  const { data: materialCategories } = useVendorCategorySelection();
 
   const form = useForm<CreateChecklistItem>({
     resolver: zodResolver(createChecklistItemSchema) as any,
@@ -71,7 +71,7 @@ export function ChecklistItemDialog({
       display_order: 0,
       is_required: true,
       is_active: true,
-      material_category_id: undefined,
+      vendor_category_id: undefined,
     } as CreateChecklistItem,
   });
 
@@ -85,7 +85,7 @@ export function ChecklistItemDialog({
         display_order: item.display_order,
         is_required: item.is_required,
         is_active: item.is_active,
-        material_category_id: item.material_category_id ?? undefined,
+        vendor_category_id: item.vendor_category_id ?? undefined,
       });
     } else if (categoryId) {
       // Reset only if switching to create mode, keeping categoryId
@@ -97,7 +97,7 @@ export function ChecklistItemDialog({
         display_order: 0,
         is_required: true,
         is_active: true,
-        material_category_id: undefined,
+        vendor_category_id: undefined,
       });
     }
   }, [item, categoryId, form, open]);
@@ -190,11 +190,11 @@ export function ChecklistItemDialog({
                 <FieldContent>
                   <Select
                     onValueChange={(value) =>
-                      form.setValue('material_category_id', Number(value))
+                      form.setValue('vendor_category_id', Number(value))
                     }
                     defaultValue={
-                      form.watch('material_category_id')
-                        ? String(form.watch('material_category_id'))
+                      form.watch('vendor_category_id')
+                        ? String(form.watch('vendor_category_id'))
                         : undefined
                     }
                   >
@@ -204,8 +204,8 @@ export function ChecklistItemDialog({
                     <SelectContent>
                       {materialCategories?.map((category) => (
                         <SelectItem
-                          key={category.material_category_id}
-                          value={String(category.material_category_id)}
+                          key={category.vendor_category_id}
+                          value={String(category.vendor_category_id)}
                         >
                           {category.category_name}
                         </SelectItem>
@@ -214,7 +214,7 @@ export function ChecklistItemDialog({
                   </Select>
                 </FieldContent>
                 <FieldError
-                  errors={[form.formState.errors.material_category_id]}
+                  errors={[form.formState.errors.vendor_category_id]}
                 />
               </Field>
             </div>

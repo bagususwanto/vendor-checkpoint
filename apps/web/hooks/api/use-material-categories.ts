@@ -5,20 +5,20 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { materialCategoryService } from '@/services/material-category.service';
-import { FindMaterialCategoryParams } from '@repo/types';
+import { FindVendorCategoryParams } from '@repo/types';
 import { toast } from 'sonner';
 
 export const materialCategoryKeys = {
   all: ['material-categories'] as const,
   lists: () => [...materialCategoryKeys.all, 'list'] as const,
-  list: (params: FindMaterialCategoryParams) =>
+  list: (params: FindVendorCategoryParams) =>
     [...materialCategoryKeys.lists(), params] as const,
   details: () => [...materialCategoryKeys.all, 'detail'] as const,
   detail: (id: number) => [...materialCategoryKeys.details(), id] as const,
   selection: () => [...materialCategoryKeys.all, 'selection'] as const,
 };
 
-export function useMaterialCategorySelection() {
+export function useVendorCategorySelection() {
   return useQuery({
     queryKey: materialCategoryKeys.selection(),
     queryFn: () => materialCategoryService.getSelection(),
@@ -26,9 +26,9 @@ export function useMaterialCategorySelection() {
 }
 
 export function useMaterialCategories(
-  params: Partial<FindMaterialCategoryParams> = {},
+  params: Partial<FindVendorCategoryParams> = {},
 ) {
-  const finalParams: FindMaterialCategoryParams = {
+  const finalParams: FindVendorCategoryParams = {
     page: 1,
     limit: 10,
     status: 'all',
@@ -43,9 +43,9 @@ export function useMaterialCategories(
 }
 
 export function useInfiniteMaterialCategories(
-  params: Partial<FindMaterialCategoryParams> = {},
+  params: Partial<FindVendorCategoryParams> = {},
 ) {
-  const finalParams: FindMaterialCategoryParams = {
+  const finalParams: FindVendorCategoryParams = {
     page: 1,
     limit: 10,
     status: 'all',
@@ -66,7 +66,7 @@ export function useInfiniteMaterialCategories(
   });
 }
 
-export function useGetMaterialCategory(id: number) {
+export function useGetVendorCategory(id: number) {
   return useQuery({
     queryKey: materialCategoryKeys.detail(id),
     queryFn: () => materialCategoryService.getById(id),
@@ -74,7 +74,7 @@ export function useGetMaterialCategory(id: number) {
   });
 }
 
-export function useCreateMaterialCategory() {
+export function useCreateVendorCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -91,7 +91,7 @@ export function useCreateMaterialCategory() {
   });
 }
 
-export function useUpdateMaterialCategory() {
+export function useUpdateVendorCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -100,7 +100,7 @@ export function useUpdateMaterialCategory() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: materialCategoryKeys.lists() });
       queryClient.invalidateQueries({
-        queryKey: materialCategoryKeys.detail(data.material_category_id),
+        queryKey: materialCategoryKeys.detail(data.vendor_category_id),
       });
       toast.success('Berhasil memperbarui kategori material');
     },
@@ -112,7 +112,7 @@ export function useUpdateMaterialCategory() {
   });
 }
 
-export function useDeleteMaterialCategory() {
+export function useDeleteVendorCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -129,7 +129,7 @@ export function useDeleteMaterialCategory() {
   });
 }
 
-export function useBulkDeleteMaterialCategories() {
+export function useBulkDeleteVendorCategories() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -146,7 +146,7 @@ export function useBulkDeleteMaterialCategories() {
   });
 }
 
-export function useToggleMaterialCategoryStatus() {
+export function useToggleVendorCategoryStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({

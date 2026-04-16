@@ -51,7 +51,7 @@ export function CheckoutSheet({
   const checkoutMutation = useCheckoutCheckIn();
 
   const handleCheckout = () => {
-    checkoutMutation.mutate(checkin.id, {
+    checkoutMutation.mutate({ queue_number: checkin.id }, {
       onSuccess: () => {
         toast.success('Checkout Berhasil', {
           description: `Driver ${checkin.driver} telah berhasil check-out.`,

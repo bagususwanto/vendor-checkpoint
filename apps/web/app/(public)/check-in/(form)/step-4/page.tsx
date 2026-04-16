@@ -66,7 +66,12 @@ export default function CheckInStep4() {
     const payload = {
       vendor_id: Number(step1Data.company.value),
       driver_name: step1Data.fullName,
-      material_category_id: Number(step1Data.materialCategory.value),
+      snapshot_vendor_category_id: Number(step1Data.vendorCategory.value),
+      dn_number: step1Data.dnNumber || undefined,
+      po_number: step1Data.poNumber || undefined,
+      ai_safety_status: ppeData?.isCompliant ? 'Pass' : 'Fail',
+      // If we implement delayed arrival reason later, insert it here:
+      // delay_arrival_reason_id: step1Data.delayArrivalReasonId,
       checklist_responses: Object.entries(step2Data.checklistItems).map(
         ([itemId, value]) => ({
           checklist_item_id: Number(itemId),

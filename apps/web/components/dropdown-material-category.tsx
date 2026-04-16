@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-interface DropdownMaterialCategoryProps {
+interface DropdownVendorCategoryProps {
   options: {
     label: string;
     value: string;
@@ -29,7 +29,7 @@ interface DropdownMaterialCategoryProps {
   hasMore?: boolean;
 }
 
-export function DropdownMaterialCategory({
+export function DropdownVendorCategory({
   options,
   value,
   onSelect,
@@ -37,7 +37,7 @@ export function DropdownMaterialCategory({
   onSearch,
   onLoadMore,
   hasMore,
-}: DropdownMaterialCategoryProps) {
+}: DropdownVendorCategoryProps) {
   const selectedOption = options.find((opt) => opt.value === value);
 
   return (

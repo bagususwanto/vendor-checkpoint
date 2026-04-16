@@ -7,11 +7,15 @@ export type Step1Data = {
     value: string;
     label: string; // This is the company name
   };
-  materialCategory: {
+  vendorCategory: {
     value: string;
     label: string;
     description?: string;
   };
+  dnNumber?: string;
+  poNumber?: string;
+  arrivalStatus?: string; // 'On-Time' | 'Late' | 'Early'
+  delayArrivalReasonId?: number;
 };
 
 export type PPEScanData = {
@@ -41,9 +45,9 @@ export type ChecklistItem = {
   item_text: string;
   item_type: string;
   is_required: boolean;
-  material_category_id?: number | null;
+  vendor_category_id?: number | null;
   display_order?: number;
-  material_category?: {
+  vendor_category?: {
     category_name: string;
   } | null;
 };

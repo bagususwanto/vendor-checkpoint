@@ -11,4 +11,6 @@ export const VendorIdentitySchema = z.object({
     label: z.string().min(1),
     description: z.string(),
   }),
+  dnNumber: z.string().optional(),
+  poNumber: z.string().optional(),
 });

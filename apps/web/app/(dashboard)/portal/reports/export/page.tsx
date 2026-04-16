@@ -17,7 +17,7 @@ export default function ReportsPage() {
     to: new Date(),
   });
   const [status, setStatus] = React.useState<string>('');
-  const [materialCategoryId, setMaterialCategoryId] = React.useState<
+  const [vendorCategoryId, setVendorCategoryId] = React.useState<
     string | undefined
   >(undefined);
 
@@ -26,11 +26,11 @@ export default function ReportsPage() {
       dateFrom: date?.from ? format(date.from, 'yyyy-MM-dd') : '',
       dateTo: date?.to ? format(date.to, 'yyyy-MM-dd') : '',
       status: status === 'ALL' ? undefined : status,
-      materialCategoryId: materialCategoryId
-        ? parseInt(materialCategoryId)
+      vendorCategoryId: vendorCategoryId
+        ? parseInt(vendorCategoryId)
         : undefined,
     };
-  }, [date, status, materialCategoryId]);
+  }, [date, status, vendorCategoryId]);
 
   const { data: previewData, isLoading: isPreviewLoading } =
     useReportPreview(filter);
@@ -63,7 +63,7 @@ export default function ReportsPage() {
       to: new Date(),
     });
     setStatus('');
-    setMaterialCategoryId(undefined);
+    setVendorCategoryId(undefined);
   };
 
   return (
@@ -93,8 +93,8 @@ export default function ReportsPage() {
         setDate={setDate}
         status={status}
         setStatus={setStatus}
-        materialCategoryId={materialCategoryId}
-        setMaterialCategoryId={setMaterialCategoryId}
+        vendorCategoryId={vendorCategoryId}
+        setVendorCategoryId={setVendorCategoryId}
         onReset={handleReset}
       />
 

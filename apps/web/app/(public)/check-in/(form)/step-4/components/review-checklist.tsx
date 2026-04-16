@@ -72,12 +72,12 @@ export function ReviewChecklist({ step2Data }: ReviewChecklistProps) {
                           >
                             {item.item_type}
                           </Badge>
-                          {item.material_category && (
+                          {item.vendor_category && (
                             <Badge
                               variant="outline"
                               className="text-[10px] py-0 h-4 text-muted-foreground"
                             >
-                              {item.material_category.category_name}
+                              {item.vendor_category.category_name}
                             </Badge>
                           )}
                         </div>

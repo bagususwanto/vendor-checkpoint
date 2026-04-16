@@ -20,7 +20,7 @@ import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { VendorIdentitySchema } from '@/lib/schemas/vendor-identity.schema';
 import { useChecklistStore } from '@/stores/use-checklist.store';
 import { fetchChecklistByCategory } from '@/hooks/api/use-checklist';
-import { DropdownMaterialCategory } from '@/components/dropdown-material-category';
+import { DropdownVendorCategory } from '@/components/dropdown-material-category';
 import { useVendors } from '@/hooks/api/use-vendors';
 import { useInfiniteMaterialCategories } from '@/hooks/api/use-material-categories';
 
@@ -34,8 +34,8 @@ export function VendorIdentityForm() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState(search);
 
-  const [materialCategorySearch, setMaterialCategorySearch] = useState('');
-  const [debouncedMaterialCategorySearch, setDebouncedMaterialCategorySearch] =
+  const [materialCategorySearch, setVendorCategorySearch] = useState('');
+  const [debouncedVendorCategorySearch, setDebouncedVendorCategorySearch] =
     useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +50,7 @@ export function VendorIdentityForm() {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedMaterialCategorySearch(materialCategorySearch);
+      setDebouncedVendorCategorySearch(materialCategorySearch);
     }, 500);
     return () => clearTimeout(handler);
   }, [materialCategorySearch]);
@@ -84,7 +84,7 @@ export function VendorIdentityForm() {
     hasNextPage: hasNextMaterialCategories,
     isFetching: isFetchingMaterialCategories,
   } = useInfiniteMaterialCategories({
-    search: debouncedMaterialCategorySearch,
+    search: debouncedVendorCategorySearch,
   });
 
   const materialCategories = useMemo(() => {
@@ -92,7 +92,7 @@ export function VendorIdentityForm() {
       materialData?.pages.flatMap((page) =>
         page.data.map((m) => ({
           label: m.category_name,
-          value: String(m.material_category_id),
+          value: String(m.vendor_category_id),
           description: m.description || undefined,
         })),
       ) || []
@@ -131,13 +131,15 @@ export function VendorIdentityForm() {
         label: step1Data?.company.label || '',
       },
       materialCategory: {
-        value: step1Data?.materialCategory?.value || '',
-        label: step1Data?.materialCategory?.label || '',
-        description: step1Data?.materialCategory?.description || '',
+        value: step1Data?.vendorCategory?.value || '',
+        label: step1Data?.vendorCategory?.label || '',
+        description: step1Data?.vendorCategory?.description || '',
       },
+      dnNumber: (step1Data?.dnNumber || '') as string | undefined,
+      poNumber: (step1Data?.poNumber || '') as string | undefined,
     },
     validators: {
-      onSubmit: VendorIdentitySchema,
+      onSubmit: VendorIdentitySchema as any,
     },
     onSubmit: async ({ value }) => {
       try {
@@ -151,7 +153,14 @@ export function VendorIdentityForm() {
         });
 
         setChecklistCategories(checklistData);
-        setStep1Data(value);
+        setStep1Data({
+          ...value,
+          vendorCategory: value.materialCategory
+        });
+        
+        // Go to Step 1b (Arrival Reason) if late, but for now we skip to AI Safety (Step 2)
+        // Wait, where is arrival status logic? 
+        // We will fetch it from backend or just continue. 
         router.push('/check-in/step-2');
       } catch (error) {
         console.error('Failed to fetch checklist', error);
@@ -214,6 +223,70 @@ export function VendorIdentityForm() {
             }}
           />
           <form.Field
+            name="dnNumber"
+            children={(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <IconLabel
+                    classNameIcon="w-6 h-6"
+                    htmlFor="dnNumber"
+                    icon={Box}
+                  >
+                    Delivery Note (DN) / Surat Jalan
+                  </IconLabel>
+                  <Input
+                    className="h-12 vendor-text"
+                    id="dnNumber"
+                    type="text"
+                    placeholder="misal: DN-12345"
+                    autoComplete="off"
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    aria-invalid={isInvalid}
+                  />
+                  <p className="text-sm text-gray-500">Opsional, bisa di-scan jika ada barcode.</p>
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          />
+          <form.Field
+            name="poNumber"
+            children={(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <IconLabel
+                    classNameIcon="w-6 h-6"
+                    htmlFor="poNumber"
+                    icon={Box}
+                  >
+                    Purchase Order (PO)
+                  </IconLabel>
+                  <Input
+                    className="h-12 vendor-text"
+                    id="poNumber"
+                    type="text"
+                    placeholder="misal: PO-98765"
+                    autoComplete="off"
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    aria-invalid={isInvalid}
+                  />
+                  <p className="text-sm text-gray-500">Opsional.</p>
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          />
+          <form.Field
             name="company.value"
             children={(field) => {
               const isInvalid =
@@ -259,7 +332,7 @@ export function VendorIdentityForm() {
                   >
                     Kategori Material
                   </IconLabel>
-                  <DropdownMaterialCategory
+                  <DropdownVendorCategory
                     options={materialCategories}
                     value={field.state.value}
                     onSelect={(val) => {
@@ -276,7 +349,7 @@ export function VendorIdentityForm() {
                       }
                     }}
                     isLoading={isFetchingMaterialCategories}
-                    onSearch={setMaterialCategorySearch}
+                    onSearch={setVendorCategorySearch}
                     onLoadMore={() => {
                       if (hasNextMaterialCategories)
                         fetchNextMaterialCategories();

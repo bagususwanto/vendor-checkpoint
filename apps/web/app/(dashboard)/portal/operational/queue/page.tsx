@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { useVerificationList } from '@/hooks/api/use-check-in';
 import { useDebounce } from '@/hooks/use-debounce';
-import { useMaterialCategorySelection } from '@/hooks/api/use-material-categories';
+import { useVendorCategorySelection } from '@/hooks/api/use-material-categories';
 import { DateRange } from 'react-day-picker';
 import { QueueHeader } from './components/queue-header';
 import { QueueToolbar } from './components/queue-toolbar';
@@ -27,7 +27,7 @@ export default function QueuePage() {
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  const { data: categories } = useMaterialCategorySelection();
+  const { data: categories } = useVendorCategorySelection();
 
   const { data, isLoading } = useVerificationList(
     page,
@@ -36,7 +36,7 @@ export default function QueuePage() {
     {
       start_date: date?.from ? format(date.from, 'yyyy-MM-dd') : undefined,
       end_date: date?.to ? format(date.to, 'yyyy-MM-dd') : undefined,
-      material_category_id: categoryId || undefined,
+      vendor_category_id: categoryId || undefined,
       status: status || undefined,
     },
   );
