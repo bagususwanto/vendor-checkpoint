@@ -41,3 +41,20 @@ export enum AuditLogAction {
   MATERIAL_CATEGORY_TOGGLE_STATUS = 'MATERIAL_CATEGORY_TOGGLE_STATUS',
   SYSTEM_CONFIG_UPDATE = 'SYSTEM_CONFIG_UPDATE',
 }
+
+export enum ArrivalStatus {
+  ON_TIME = 'On-Time',
+  LATE = 'Late',
+  EARLY = 'Early',
+}
+
+export enum DepartureStatus {
+  ON_TIME = 'On-Time',
+  OVERDUE = 'Overdue',
+}
+
+export enum SlotStatus {
+  OPEN = 'Open',
+  FILLED = 'Filled',
+  MISSED = 'Missed',
+}
