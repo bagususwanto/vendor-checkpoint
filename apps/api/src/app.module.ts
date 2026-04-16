@@ -14,6 +14,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { ReportModule } from './modules/report/report.module';
 import { UserModule } from './modules/user/user.module';
+import { DelayReasonModule } from './modules/delay-reason/delay-reason.module';
+import { VendorScheduleModule } from './modules/vendor-schedule/vendor-schedule.module';
+import { DeliverySlotModule } from './modules/delivery-slot/delivery-slot.module';
+import { SchedulerModule } from './modules/scheduler/scheduler.module';
 
 @Module({
   imports: [
@@ -36,6 +40,10 @@ import { UserModule } from './modules/user/user.module';
     DashboardModule,
     ReportModule,
     UserModule,
+    DelayReasonModule,
+    VendorScheduleModule,
+    DeliverySlotModule,
+    SchedulerModule,
   ],
   controllers: [AppController],
   providers: [

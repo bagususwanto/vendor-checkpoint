@@ -40,7 +40,12 @@ export type QueueSearch = z.infer<typeof queueSearchSchema>;
 export const checkInSchema = z.object({
   vendor_id: z.number(),
   driver_name: z.string(),
-  material_category_id: z.number(),
+  dn_number: z.string().optional(),
+  po_number: z.string().optional(),
+  arrival_status: z.string().optional(), 
+  delay_arrival_reason_id: z.number().optional(),
+  ai_safety_status: z.string().optional(),
+  snapshot_vendor_category_id: z.number().optional(),
   checklist_responses: z.array(
     z.object({
       checklist_item_id: z.number(),
@@ -77,3 +82,16 @@ export const resumeCheckInSchema = z.object({
 });
 
 export type ResumeCheckIn = z.infer<typeof resumeCheckInSchema>;
+
+export const aiSafetySchema = z.object({
+  image_base64: z.string().optional(), // Or use multipart/form-data logic in the controller itself
+});
+
+export type AiSafety = z.infer<typeof aiSafetySchema>;
+
+export const departureScanSchema = z.object({
+  departure_status: z.string(),
+  delay_departure_reason_id: z.number().optional(),
+});
+
+export type DepartureScan = z.infer<typeof departureScanSchema>;

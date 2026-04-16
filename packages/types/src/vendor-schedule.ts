@@ -1,0 +1,20 @@
+import { z } from 'zod';
+
+export const createVendorScheduleSchema = z.object({
+  vendor_id: z.number(),
+  day_of_week: z.number().min(1).max(7),
+  arrival_time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
+  departure_time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
+  is_active: z.boolean().default(true),
+});
+
+export type CreateVendorSchedule = z.infer<typeof createVendorScheduleSchema>;
+
+export const updateVendorScheduleSchema = createVendorScheduleSchema.partial();
+export type UpdateVendorSchedule = z.infer<typeof updateVendorScheduleSchema>;
+
+export const findVendorScheduleParamsSchema = z.object({
+  vendor_id: z.coerce.number().optional(),
+  day_of_week: z.coerce.number().optional(),
+});
+export type FindVendorScheduleParams = z.infer<typeof findVendorScheduleParamsSchema>;

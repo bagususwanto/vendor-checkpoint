@@ -38,7 +38,7 @@ const checklistItemBaseSchema = z.object({
     .max(100, 'Kode item maksimal 100 karakter'),
   item_text: z.string().min(1, 'Teks item harus diisi'),
   item_type: checklistItemTypeSchema,
-  material_category_id: z.number().int().optional(),
+  vendor_category_id: z.number().int().optional(),
   display_order: z.number().int().default(0),
   is_required: z.boolean().default(true),
   is_active: z.boolean().default(true),
@@ -48,12 +48,12 @@ export const createChecklistItemSchema = checklistItemBaseSchema.superRefine(
   (data, ctx) => {
     if (
       data.item_type === ChecklistItemType.KHUSUS &&
-      !data.material_category_id
+      !data.vendor_category_id
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Kategori material harus dipilih untuk item khusus',
-        path: ['material_category_id'],
+        message: 'Kategori vendor harus dipilih untuk item khusus',
+        path: ['vendor_category_id'],
       });
     }
   },

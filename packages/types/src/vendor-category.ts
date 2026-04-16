@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const createMaterialCategorySchema = z.object({
+export const createVendorCategorySchema = z.object({
   category_code: z
     .string()
     .min(1, 'Kode kategori harus diisi')
@@ -13,38 +13,28 @@ export const createMaterialCategorySchema = z.object({
   is_active: z.boolean().default(true),
 });
 
-export type CreateMaterialCategory = z.infer<
-  typeof createMaterialCategorySchema
->;
+export type CreateVendorCategory = z.infer<typeof createVendorCategorySchema>;
 
-export const updateMaterialCategorySchema =
-  createMaterialCategorySchema.partial();
+export const updateVendorCategorySchema = createVendorCategorySchema.partial();
+export type UpdateVendorCategory = z.infer<typeof updateVendorCategorySchema>;
 
-export type UpdateMaterialCategory = z.infer<
-  typeof updateMaterialCategorySchema
->;
-
-export const bulkDeleteMaterialCategorySchema = z.object({
+export const bulkDeleteVendorCategorySchema = z.object({
   ids: z.array(z.number()).min(1, 'Minimal 1 ID harus dipilih'),
 });
 
-export type BulkDeleteMaterialCategory = z.infer<
-  typeof bulkDeleteMaterialCategorySchema
->;
+export type BulkDeleteVendorCategory = z.infer<typeof bulkDeleteVendorCategorySchema>;
 
-export const findMaterialCategoryParamsSchema = z.object({
+export const findVendorCategoryParamsSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(10),
   search: z.string().optional(),
   status: z.enum(['all', 'active', 'inactive']).optional().default('all'),
 });
 
-export type FindMaterialCategoryParams = z.infer<
-  typeof findMaterialCategoryParamsSchema
->;
+export type FindVendorCategoryParams = z.infer<typeof findVendorCategoryParamsSchema>;
 
-export type MaterialCategoryResponse = {
-  material_category_id: number;
+export type VendorCategoryResponse = {
+  vendor_category_id: number;
   category_code: string;
   category_name: string;
   description: string | null;
