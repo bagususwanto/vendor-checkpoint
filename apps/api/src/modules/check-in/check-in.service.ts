@@ -37,11 +37,10 @@ export class CheckInService {
   ) {}
 
   async create(createCheckInDto: CreateCheckInDto, requestInfo: any) {
-    const maxRetries = 3;
+    const maxRetries = 5;
     let attempt = 0;
-    const dateNow = new Date();
-
     while (attempt < maxRetries) {
+      const dateNow = new Date();
       try {
         return await this.prisma.$transaction(async (tx) => {
           // 1. Validate
@@ -54,11 +53,15 @@ export class CheckInService {
           const queueNumber = await this.generateFormattedQueueNumber(tx);
 
           // 2.5 Slot Matching & Config
-          const verificationModeConfig = await this.systemConfigService.findByConfigKey(
-            'VERIFICATION_MODE_ENABLED',
-          );
-          const isVerificationEnabled = verificationModeConfig?.config_value === 'true';
-          const initialStatus = isVerificationEnabled ? QueueStatus.MENUNGGU : QueueStatus.AKTIF;
+          const verificationModeConfig =
+            await this.systemConfigService.findByConfigKey(
+              'VERIFICATION_MODE_ENABLED',
+            );
+          const isVerificationEnabled =
+            verificationModeConfig?.config_value === 'true';
+          const initialStatus = isVerificationEnabled
+            ? QueueStatus.MENUNGGU
+            : QueueStatus.AKTIF;
 
           let slotId = null;
           const startOfDay = new Date(dateNow);
@@ -140,13 +143,16 @@ export class CheckInService {
             await this.systemConfigService.findByConfigKey(
               'ESTIMATED_WAIT_MINUTES',
             );
-            
-          const statusDisplayTextKey = initialStatus === QueueStatus.AKTIF 
-            ? 'DEFAULT_STATUS_DISETUJUI_DISPLAY_TEXT' 
-            : 'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT';
+
+          const statusDisplayTextKey =
+            initialStatus === QueueStatus.AKTIF
+              ? 'DEFAULT_STATUS_DISETUJUI_DISPLAY_TEXT'
+              : 'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT';
 
           const statusDisplayText =
-            await this.systemConfigService.findByConfigKey(statusDisplayTextKey);
+            await this.systemConfigService.findByConfigKey(
+              statusDisplayTextKey,
+            );
 
           // 9. Return Result
           return {
@@ -166,6 +172,10 @@ export class CheckInService {
         ) {
           attempt++;
           if (attempt >= maxRetries) throw error;
+          // Add a random delay (jitter) to avoid retry storms
+          await new Promise((resolve) =>
+            setTimeout(resolve, Math.random() * 300 + 100),
+          );
           continue;
         }
         throw error;
@@ -307,7 +317,9 @@ export class CheckInService {
       }
 
       if (filter.snapshot_vendor_category_id) {
-        where.snapshot_vendor_category_id = Number(filter.snapshot_vendor_category_id);
+        where.snapshot_vendor_category_id = Number(
+          filter.snapshot_vendor_category_id,
+        );
       }
 
       if (filter.status) {
@@ -695,17 +707,13 @@ export class CheckInService {
       select: {
         queue_number: true,
         ai_safety_status: true,
-      }
+      },
     });
 
     return entry;
   }
 
-  async holdEntry(
-    holdDto: HoldCheckInDto,
-    requestInfo: any,
-    userId: number,
-  ) {
+  async holdEntry(holdDto: HoldCheckInDto, requestInfo: any, userId: number) {
     const { queue_number, reason } = holdDto;
     const localUserId = await this.resolveLocalUser(userId);
 
@@ -832,7 +840,8 @@ export class CheckInService {
         where: { entry_id: entry.entry_id },
         data: {
           current_status: QueueStatus.DISETUJUI,
-          status_display_text: statusDisplayText?.config_value || 'Sedang Diproses',
+          status_display_text:
+            statusDisplayText?.config_value || 'Sedang Diproses',
           last_updated: updateTime,
         },
       });
@@ -853,7 +862,8 @@ export class CheckInService {
         user_id: localUserId,
         queue_number,
         status: QueueStatus.DISETUJUI,
-        status_display_text: statusDisplayText?.config_value || 'Sedang Diproses',
+        status_display_text:
+          statusDisplayText?.config_value || 'Sedang Diproses',
         driver_name: entry.driver_name,
         company_name: entry.snapshot_company_name,
         resume_time: updateTime,
@@ -953,16 +963,19 @@ export class CheckInService {
   private async generateFormattedQueueNumber(tx: any) {
     const format =
       await this.systemConfigService.findByConfigKey('QUEUE_FORMAT');
-    const startOfToday = getStartOfToday();
+    const now = new Date();
+    const pad = (num: number, length: number) =>
+      String(num).padStart(length, '0');
+    const todayPrefix = `${now.getFullYear()}${pad(now.getMonth() + 1, 2)}${pad(now.getDate(), 2)}`;
 
     const last = await tx.ops_checkin_entry.findFirst({
       where: {
-        submission_time: {
-          gte: startOfToday,
+        queue_number: {
+          startsWith: todayPrefix,
         },
       },
       orderBy: {
-        submission_time: 'desc',
+        queue_number: 'desc',
       },
       select: {
         queue_number: true,
@@ -1051,9 +1064,7 @@ export class CheckInService {
           gte: startOfToday,
         },
       },
-      orderBy: {
-        last_updated: 'desc',
-      },
+      orderBy: [{ last_updated: 'desc' }, { queue_status_id: 'desc' }],
       select: {
         priority_order: true,
       },
@@ -1065,13 +1076,13 @@ export class CheckInService {
     const estimatedWaitMinutes = await this.systemConfigService.findByConfigKey(
       'ESTIMATED_WAIT_MINUTES',
     );
-    const statusDisplayTextKey = initialStatus === QueueStatus.AKTIF 
-      ? 'DEFAULT_STATUS_DISETUJUI_DISPLAY_TEXT' 
-      : 'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT';
+    const statusDisplayTextKey =
+      initialStatus === QueueStatus.AKTIF
+        ? 'DEFAULT_STATUS_DISETUJUI_DISPLAY_TEXT'
+        : 'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT';
 
-    const statusDisplayText = await this.systemConfigService.findByConfigKey(
-      statusDisplayTextKey,
-    );
+    const statusDisplayText =
+      await this.systemConfigService.findByConfigKey(statusDisplayTextKey);
 
     await tx.ops_queue_status.create({
       data: {
