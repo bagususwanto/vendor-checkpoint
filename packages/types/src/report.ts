@@ -4,7 +4,7 @@ export const reportFilterSchema = z.object({
   dateFrom: z.string().date('Invalid date format (YYYY-MM-DD)'),
   dateTo: z.string().date('Invalid date format (YYYY-MM-DD)'),
   status: z.string().optional(),
-  materialCategoryId: z.coerce.number().optional(),
+  vendorCategoryId: z.coerce.number().optional(),
 });
 
 export type ReportFilter = z.infer<typeof reportFilterSchema>;

@@ -4,7 +4,7 @@ export interface ReportFilter {
   dateFrom: string;
   dateTo: string;
   status?: string;
-  materialCategoryId?: number;
+  vendorCategoryId?: number;
 }
 
 export interface ReportPreviewData {
