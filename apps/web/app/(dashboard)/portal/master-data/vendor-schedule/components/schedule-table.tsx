@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import * as React from 'react';
 import {
   Table,
   TableBody,
@@ -11,10 +11,13 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Edit2, Loader2, Search, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useVendorSchedules, useDeleteVendorSchedule } from '@/hooks/api/use-vendor-schedule';
-import { VendorScheduleResponse } from '@repo/types';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,11 +29,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Edit2,
+  Loader2,
+  Trash2,
+} from 'lucide-react';
+import { useDeleteVendorSchedule } from '@/hooks/api/use-vendor-schedule';
+import { VendorScheduleResponse } from '@repo/types';
 import { toast } from 'sonner';
-
-interface ScheduleTableProps {
-  onEdit: (schedule: VendorScheduleResponse) => void;
-}
 
 const DAYS: Record<number, string> = {
   1: 'Senin',
@@ -42,193 +52,215 @@ const DAYS: Record<number, string> = {
   7: 'Minggu',
 };
 
-const PAGE_SIZE = 10;
+interface ScheduleTableProps {
+  data: VendorScheduleResponse[];
+  isLoading: boolean;
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onLimitChange: (limit: number) => void;
+  onEdit: (schedule: VendorScheduleResponse) => void;
+}
 
-export function ScheduleTable({ onEdit }: ScheduleTableProps) {
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
-  const [searchInput, setSearchInput] = useState('');
-
-  const { data: result, isLoading } = useVendorSchedules({
-    page,
-    limit: PAGE_SIZE,
-    search: search || undefined,
-  });
+export function ScheduleTable({
+  data,
+  isLoading,
+  page,
+  limit,
+  total,
+  totalPages,
+  onPageChange,
+  onLimitChange,
+  onEdit,
+}: ScheduleTableProps) {
   const deleteMutation = useDeleteVendorSchedule();
-
-  const schedules = result?.data ?? [];
-  const meta = result?.meta;
 
   const handleDelete = (id: number) => {
     deleteMutation.mutate(id, {
-      onSuccess: () => {
-        toast.success('Jadwal berhasil dihapus');
-      },
-      onError: (error) => {
+      onSuccess: () => toast.success('Jadwal berhasil dihapus'),
+      onError: (error) =>
         toast.error('Gagal menghapus jadwal', {
           description: error.message || 'Terjadi kesalahan sistem',
-        });
-      },
+        }),
     });
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearch(searchInput);
-    setPage(1);
-  };
+  if (isLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center rounded-md border border-dashed">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="flex h-64 items-center justify-center rounded-md border border-dashed">
+        <p className="text-muted-foreground">Belum ada data jadwal vendor ditemukan</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      {/* Search bar */}
-      <form onSubmit={handleSearch} className="flex items-center gap-2 max-w-sm">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Cari vendor..."
-            className="pl-8"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-        </div>
-        <Button type="submit" variant="outline" size="sm">Cari</Button>
-        {search && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }}
-          >
-            Reset
-          </Button>
-        )}
-      </form>
-
-      {/* Table */}
-      {isLoading ? (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-      ) : schedules.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground border rounded-md">
-          {search ? `Tidak ada hasil untuk "${search}".` : 'Belum ada data jadwal vendor.'}
-        </div>
-      ) : (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px] text-center">No</TableHead>
-                <TableHead>Vendor</TableHead>
-                <TableHead>Hari</TableHead>
-                <TableHead>Waktu Tiba</TableHead>
-                <TableHead>Waktu Pulang</TableHead>
-                <TableHead className="w-[100px] text-center">Status</TableHead>
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {schedules.map((schedule: VendorScheduleResponse, index: number) => (
-                <TableRow key={schedule.schedule_id}>
-                  <TableCell className="text-center font-medium">
-                    {(page - 1) * PAGE_SIZE + index + 1}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-semibold">{schedule.vendor?.company_name || 'Tanpa Nama'}</span>
-                      <span className="text-xs text-muted-foreground">{schedule.vendor?.vendor_code}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{DAYS[schedule.day_of_week] || schedule.day_of_week}</TableCell>
-                  <TableCell>{schedule.arrival_time}</TableCell>
-                  <TableCell>{schedule.departure_time}</TableCell>
-                  <TableCell className="text-center">
-                    <Badge variant={schedule.is_active ? 'default' : 'secondary'}>
-                      {schedule.is_active ? 'Aktif' : 'Non-Aktif'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onEdit(schedule)}
-                        title="Edit Jadwal"
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                            title="Hapus Jadwal"
-                            disabled={deleteMutation.isPending}
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px] text-center">No</TableHead>
+              <TableHead>Vendor</TableHead>
+              <TableHead className="w-[100px]">Hari</TableHead>
+              <TableHead className="w-[130px]">Waktu Tiba</TableHead>
+              <TableHead className="w-[150px]">Waktu Pulang</TableHead>
+              <TableHead className="w-[100px] text-center">Status</TableHead>
+              <TableHead className="w-[80px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((schedule, index) => (
+              <TableRow key={schedule.schedule_id}>
+                <TableCell className="text-center font-medium text-muted-foreground">
+                  {(page - 1) * limit + index + 1}
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{schedule.vendor?.company_name || '-'}</span>
+                    <span className="text-xs text-muted-foreground">{schedule.vendor?.vendor_code}</span>
+                  </div>
+                </TableCell>
+                <TableCell>{DAYS[schedule.day_of_week] ?? schedule.day_of_week}</TableCell>
+                <TableCell>{schedule.arrival_time}</TableCell>
+                <TableCell>{schedule.departure_time}</TableCell>
+                <TableCell className="text-center">
+                  <Badge variant={schedule.is_active ? 'default' : 'secondary'}>
+                    {schedule.is_active ? 'Aktif' : 'Non-Aktif'}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground"
+                      onClick={() => onEdit(schedule)}
+                      title="Edit Jadwal"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                      <span className="sr-only">Edit</span>
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          title="Hapus Jadwal"
+                          disabled={deleteMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Hapus</span>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Hapus Jadwal Vendor</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Apakah Anda yakin ingin menghapus jadwal untuk vendor{' '}
+                            <span className="font-semibold text-foreground">
+                              {schedule.vendor?.company_name || schedule.vendor?.vendor_code}
+                            </span>{' '}
+                            pada hari {DAYS[schedule.day_of_week]}? Tindakan ini tidak dapat
+                            dibatalkan.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Batal</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(schedule.schedule_id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Hapus Jadwal Vendor</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Apakah Anda yakin ingin menghapus jadwal untuk vendor &quot;
-                              <span className="font-semibold text-foreground">
-                                {schedule.vendor?.company_name || schedule.vendor?.vendor_code}
-                              </span>
-                              &quot; pada hari {DAYS[schedule.day_of_week]}? Tindakan ini tidak dapat dibatalkan.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Batal</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDelete(schedule.schedule_id)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            >
-                              Hapus
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+                            Hapus
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
-      {/* Pagination footer */}
-      {meta && meta.total_pages > 1 && (
-        <div className="flex items-center justify-between px-1">
-          <p className="text-sm text-muted-foreground">
-            Menampilkan {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, meta.total)} dari {meta.total} data
-          </p>
-          <div className="flex items-center gap-2">
+      {/* Pagination controls */}
+      <div className="flex items-center justify-between px-2">
+        <div className="flex-1 text-sm text-muted-foreground">Total {total} data</div>
+        <div className="flex items-center space-x-6 lg:space-x-8">
+          <div className="flex items-center space-x-2">
+            <p className="text-sm font-medium">Baris per halaman</p>
+            <Select
+              value={`${limit}`}
+              onValueChange={(value) => {
+                onLimitChange(Number(value));
+              }}
+            >
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue placeholder={limit} />
+              </SelectTrigger>
+              <SelectContent side="top">
+                {[10, 20, 30, 50].map((pageSize) => (
+                  <SelectItem key={pageSize} value={`${pageSize}`}>
+                    {pageSize}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+            Halaman {page} dari {totalPages}
+          </div>
+          <div className="flex items-center space-x-2">
             <Button
               variant="outline"
-              size="icon"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1 || isLoading}
+              className="hidden h-8 w-8 p-0 lg:flex"
+              onClick={() => onPageChange(1)}
+              disabled={page === 1}
             >
+              <span className="sr-only">Halaman pertama</span>
+              <ChevronsLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              className="h-8 w-8 p-0"
+              onClick={() => onPageChange(page - 1)}
+              disabled={page === 1}
+            >
+              <span className="sr-only">Halaman sebelumnya</span>
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="text-sm font-medium">
-              Hal {page} / {meta.total_pages}
-            </span>
             <Button
               variant="outline"
-              size="icon"
-              onClick={() => setPage((p) => Math.min(meta.total_pages, p + 1))}
-              disabled={page >= meta.total_pages || isLoading}
+              className="h-8 w-8 p-0"
+              onClick={() => onPageChange(page + 1)}
+              disabled={page >= totalPages}
             >
+              <span className="sr-only">Halaman berikutnya</span>
               <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              className="hidden h-8 w-8 p-0 lg:flex"
+              onClick={() => onPageChange(totalPages)}
+              disabled={page === totalPages}
+            >
+              <span className="sr-only">Halaman terakhir</span>
+              <ChevronsRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
