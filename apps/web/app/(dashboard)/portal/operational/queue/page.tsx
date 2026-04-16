@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { useVerificationList } from '@/hooks/api/use-check-in';
 import { useDebounce } from '@/hooks/use-debounce';
-import { useVendorCategorySelection } from '@/hooks/api/use-material-categories';
+import { useVendorCategorySelection } from '@/hooks/api/use-vendor-categories';
 import { DateRange } from 'react-day-picker';
 import { QueueHeader } from './components/queue-header';
 import { QueueToolbar } from './components/queue-toolbar';

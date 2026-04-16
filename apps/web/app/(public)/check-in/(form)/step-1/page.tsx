@@ -16,7 +16,7 @@ export default function CheckInStep1() {
         <CardHeader className="items-center text-center">
           <CardTitle className="text-2xl">Identitas & Perusahaan</CardTitle>
           <CardDescription className="vendor-text">
-            Mohon isi data diri, pilih perusahaan, dan pilih kategori material
+            Mohon isi data diri, pilih perusahaan, dan pilih kategori vendor
           </CardDescription>
         </CardHeader>
         <CardContent>

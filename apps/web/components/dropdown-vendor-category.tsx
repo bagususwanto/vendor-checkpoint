@@ -1,19 +1,19 @@
-import { ChevronDownIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ChevronDownIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu';
 import {
   Item,
   ItemContent,
   ItemTitle,
   ItemDescription,
-} from "@/components/ui/item"
-import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
+} from '@/components/ui/item';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 interface DropdownVendorCategoryProps {
   options: {
@@ -52,36 +52,45 @@ export function DropdownVendorCategory({
             {selectedOption ? (
               <div className="flex flex-col items-start text-sm">
                 <span className="font-semibold">{selectedOption.label}</span>
-                <span className="text-xs text-muted-foreground">{selectedOption.description}</span>
+                <span className="text-xs text-muted-foreground">
+                  {selectedOption.description}
+                </span>
               </div>
             ) : (
-              <span className="text-muted-foreground">Pilih kategori material...</span>
+              <span className="text-muted-foreground">
+                Pilih kategori vendor...
+              </span>
             )}
             <ChevronDownIcon className="h-4 w-4 opacity-50" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[300px]" align="start">
+        <DropdownMenuContent
+          className="w-(--radix-dropdown-menu-trigger-width) min-w-[300px]"
+          align="start"
+        >
           {onSearch && (
             <div className="p-2 sticky top-0 bg-popover z-10">
               <Input
                 placeholder="Cari kategori..."
                 className="h-9"
                 onChange={(e) => onSearch(e.target.value)}
-                onKeyDown={(e) => e.stopPropagation()} 
+                onKeyDown={(e) => e.stopPropagation()}
               />
             </div>
           )}
           <div className="overflow-y-auto max-h-[200px]">
             {isLoading && options.length === 0 ? (
-               <div className="p-4 text-center text-sm text-muted-foreground">Memuat...</div>
+              <div className="p-4 text-center text-sm text-muted-foreground">
+                Memuat...
+              </div>
             ) : options.length > 0 ? (
               <>
                 {options.map((option) => (
                   <DropdownMenuItem
                     key={option.value}
                     className={cn(
-                      "p-0 cursor-pointer",
-                      value === option.value && "bg-accent"
+                      'p-0 cursor-pointer',
+                      value === option.value && 'bg-accent',
                     )}
                     onClick={() => onSelect(option.value)}
                   >
@@ -89,13 +98,15 @@ export function DropdownVendorCategory({
                       <ItemContent className="gap-0.5">
                         <ItemTitle>{option.label}</ItemTitle>
                         {option.description && (
-                          <ItemDescription>{option.description}</ItemDescription>
+                          <ItemDescription>
+                            {option.description}
+                          </ItemDescription>
                         )}
                       </ItemContent>
                     </Item>
                   </DropdownMenuItem>
                 ))}
-                 {hasMore && onLoadMore && (
+                {hasMore && onLoadMore && (
                   <div className="p-2 text-center">
                     <Button
                       variant="ghost"
@@ -107,7 +118,7 @@ export function DropdownVendorCategory({
                       }}
                       disabled={isLoading}
                     >
-                      {isLoading ? "Memuat..." : "Muat lebih banyak"}
+                      {isLoading ? 'Memuat...' : 'Muat lebih banyak'}
                     </Button>
                   </div>
                 )}
@@ -121,5 +132,5 @@ export function DropdownVendorCategory({
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  )
+  );
 }

@@ -8,7 +8,7 @@ import {
 } from '@repo/types';
 import { axiosInstance } from '@/lib/axios';
 
-export const materialCategoryService = {
+export const vendorCategoryService = {
   getAll: async (params: FindVendorCategoryParams) => {
     const response = await axiosInstance.get<
       PaginatedResponse<VendorCategoryResponse>

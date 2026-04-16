@@ -20,9 +20,9 @@ import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { VendorIdentitySchema } from '@/lib/schemas/vendor-identity.schema';
 import { useChecklistStore } from '@/stores/use-checklist.store';
 import { fetchChecklistByCategory } from '@/hooks/api/use-checklist';
-import { DropdownVendorCategory } from '@/components/dropdown-material-category';
+import { DropdownVendorCategory } from '@/components/dropdown-vendor-category';
 import { useVendors } from '@/hooks/api/use-vendors';
-import { useInfiniteMaterialCategories } from '@/hooks/api/use-material-categories';
+import { useInfiniteVendorCategories } from '@/hooks/api/use-vendor-categories';
 
 export function VendorIdentityForm() {
   const { step1Data, setStep1Data, setChecklistCategories } =
@@ -34,7 +34,7 @@ export function VendorIdentityForm() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState(search);
 
-  const [materialCategorySearch, setVendorCategorySearch] = useState('');
+  const [vendorCategorySearch, setVendorCategorySearch] = useState('');
   const [debouncedVendorCategorySearch, setDebouncedVendorCategorySearch] =
     useState('');
 
@@ -50,10 +50,10 @@ export function VendorIdentityForm() {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedVendorCategorySearch(materialCategorySearch);
+      setDebouncedVendorCategorySearch(vendorCategorySearch);
     }, 500);
     return () => clearTimeout(handler);
-  }, [materialCategorySearch]);
+  }, [vendorCategorySearch]);
 
   // Vendors Query
   const {
@@ -77,19 +77,19 @@ export function VendorIdentityForm() {
     );
   }, [vendorData]);
 
-  // Material Categories Query
+  // Vendor Categories Query
   const {
-    data: materialData,
-    fetchNextPage: fetchNextMaterialCategories,
-    hasNextPage: hasNextMaterialCategories,
-    isFetching: isFetchingMaterialCategories,
-  } = useInfiniteMaterialCategories({
+    data: vendorCategoryData,
+    fetchNextPage: fetchNextVendorCategories,
+    hasNextPage: hasNextVendorCategories,
+    isFetching: isFetchingVendorCategories,
+  } = useInfiniteVendorCategories({
     search: debouncedVendorCategorySearch,
   });
 
-  const materialCategories = useMemo(() => {
+  const vendorCategories = useMemo(() => {
     return (
-      materialData?.pages.flatMap((page) =>
+      vendorCategoryData?.pages.flatMap((page) =>
         page.data.map((m) => ({
           label: m.category_name,
           value: String(m.vendor_category_id),
@@ -97,7 +97,7 @@ export function VendorIdentityForm() {
         })),
       ) || []
     );
-  }, [materialData]);
+  }, [vendorCategoryData]);
 
   // Initial Selected Vendor from store
   const [selectedVendor, setSelectedVendor] = useState<{
@@ -130,7 +130,7 @@ export function VendorIdentityForm() {
         value: step1Data?.company.value || '',
         label: step1Data?.company.label || '',
       },
-      materialCategory: {
+      vendorCategory: {
         value: step1Data?.vendorCategory?.value || '',
         label: step1Data?.vendorCategory?.label || '',
         description: step1Data?.vendorCategory?.description || '',
@@ -146,16 +146,16 @@ export function VendorIdentityForm() {
         setIsSubmitting(true);
         // Using queryClient.fetchQuery to bridge the gap between imperative submit and declarative query
         const checklistData = await queryClient.fetchQuery({
-          queryKey: ['checklist', Number(value.materialCategory.value)],
+          queryKey: ['checklist', Number(value.vendorCategory.value)],
           queryFn: () =>
-            fetchChecklistByCategory(Number(value.materialCategory.value)),
+            fetchChecklistByCategory(Number(value.vendorCategory.value)),
           staleTime: 60 * 1000,
         });
 
         setChecklistCategories(checklistData);
         setStep1Data({
           ...value,
-          vendorCategory: value.materialCategory
+          vendorCategory: value.vendorCategory
         });
         
         // Go to Step 1b (Arrival Reason) if late, but for now we skip to AI Safety (Step 2)
@@ -318,7 +318,7 @@ export function VendorIdentityForm() {
             }}
           />
           <form.Field
-            name="materialCategory.value"
+            name="vendorCategory.value"
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
@@ -326,35 +326,35 @@ export function VendorIdentityForm() {
                 <Field data-invalid={isInvalid}>
                   <IconLabel
                     classNameIcon="w-6 h-6"
-                    htmlFor="materialCategory"
+                    htmlFor="vendorCategory"
                     icon={Box}
                     required
                   >
-                    Kategori Material
+                    Kategori Vendor
                   </IconLabel>
                   <DropdownVendorCategory
-                    options={materialCategories}
+                    options={vendorCategories}
                     value={field.state.value}
                     onSelect={(val) => {
-                      const mat = materialCategories.find(
+                      const mat = vendorCategories.find(
                         (m) => m.value === val,
                       );
                       if (mat) {
-                        form.setFieldValue('materialCategory.value', mat.value);
-                        form.setFieldValue('materialCategory.label', mat.label);
+                        form.setFieldValue('vendorCategory.value', mat.value);
+                        form.setFieldValue('vendorCategory.label', mat.label);
                         form.setFieldValue(
-                          'materialCategory.description',
+                          'vendorCategory.description',
                           mat.description || '',
                         );
                       }
                     }}
-                    isLoading={isFetchingMaterialCategories}
+                    isLoading={isFetchingVendorCategories}
                     onSearch={setVendorCategorySearch}
                     onLoadMore={() => {
-                      if (hasNextMaterialCategories)
-                        fetchNextMaterialCategories();
+                      if (hasNextVendorCategories)
+                        fetchNextVendorCategories();
                     }}
-                    hasMore={hasNextMaterialCategories}
+                    hasMore={hasNextVendorCategories}
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>

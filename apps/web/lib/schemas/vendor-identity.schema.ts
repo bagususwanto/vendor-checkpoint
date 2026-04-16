@@ -6,8 +6,8 @@ export const VendorIdentitySchema = z.object({
     value: z.string().min(1, 'Perusahaan wajib diisi'),
     label: z.string().min(1, 'Perusahaan wajib diisi'),
   }),
-  materialCategory: z.object({
-    value: z.string().min(1, 'Kategori Material wajib dipilih'),
+  vendorCategory: z.object({
+    value: z.string().min(1, 'Kategori Vendor wajib dipilih'),
     label: z.string().min(1),
     description: z.string(),
   }),

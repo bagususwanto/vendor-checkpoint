@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useInfiniteMaterialCategories } from '@/hooks/api/use-material-categories';
+import { useInfiniteVendorCategories } from '@/hooks/api/use-vendor-categories';
 import { Button } from '@/components/ui/button';
 import { Filter, X } from 'lucide-react';
 
@@ -35,17 +35,17 @@ export function ReportFilterForm({
   setVendorCategoryId,
   onReset,
 }: ReportFilterFormProps) {
-  const { data: materialCategoriesData } = useInfiniteMaterialCategories({});
+  const { data: vendorCategoriesData } = useInfiniteVendorCategories({});
 
-  const materialOptions = React.useMemo(() => {
-    if (!materialCategoriesData) return [];
-    return materialCategoriesData.pages.flatMap((page) =>
+  const vendorCategoryOptions = React.useMemo(() => {
+    if (!vendorCategoriesData) return [];
+    return vendorCategoriesData.pages.flatMap((page) =>
       page.data.map((item) => ({
         label: item.category_name,
         value: item.vendor_category_id.toString(),
       })),
     );
-  }, [materialCategoriesData]);
+  }, [vendorCategoriesData]);
 
   const hasFilters = !!date || status !== '' || !!vendorCategoryId;
 
@@ -113,7 +113,7 @@ export function ReportFilterForm({
               >
                 <Filter className="mr-2 h-4 w-4" />
                 {vendorCategoryId
-                  ? materialOptions.find(
+                  ? vendorCategoryOptions.find(
                       (opt) => opt.value === vendorCategoryId,
                     )?.label || 'Kategori'
                   : 'Kategori'}
@@ -129,7 +129,7 @@ export function ReportFilterForm({
                 <DropdownMenuRadioItem value="">
                   Semua Kategori
                 </DropdownMenuRadioItem>
-                {materialOptions.map((option) => (
+                {vendorCategoryOptions.map((option) => (
                   <DropdownMenuRadioItem
                     key={option.value}
                     value={option.value}

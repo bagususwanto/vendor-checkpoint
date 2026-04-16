@@ -4,28 +4,28 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { materialCategoryService } from '@/services/material-category.service';
+import { vendorCategoryService } from '@/services/vendor-category.service';
 import { FindVendorCategoryParams } from '@repo/types';
 import { toast } from 'sonner';
 
-export const materialCategoryKeys = {
-  all: ['material-categories'] as const,
-  lists: () => [...materialCategoryKeys.all, 'list'] as const,
+export const vendorCategoryKeys = {
+  all: ['vendor-categories'] as const,
+  lists: () => [...vendorCategoryKeys.all, 'list'] as const,
   list: (params: FindVendorCategoryParams) =>
-    [...materialCategoryKeys.lists(), params] as const,
-  details: () => [...materialCategoryKeys.all, 'detail'] as const,
-  detail: (id: number) => [...materialCategoryKeys.details(), id] as const,
-  selection: () => [...materialCategoryKeys.all, 'selection'] as const,
+    [...vendorCategoryKeys.lists(), params] as const,
+  details: () => [...vendorCategoryKeys.all, 'detail'] as const,
+  detail: (id: number) => [...vendorCategoryKeys.details(), id] as const,
+  selection: () => [...vendorCategoryKeys.all, 'selection'] as const,
 };
 
 export function useVendorCategorySelection() {
   return useQuery({
-    queryKey: materialCategoryKeys.selection(),
-    queryFn: () => materialCategoryService.getSelection(),
+    queryKey: vendorCategoryKeys.selection(),
+    queryFn: () => vendorCategoryService.getSelection(),
   });
 }
 
-export function useMaterialCategories(
+export function useVendorCategories(
   params: Partial<FindVendorCategoryParams> = {},
 ) {
   const finalParams: FindVendorCategoryParams = {
@@ -36,13 +36,13 @@ export function useMaterialCategories(
   };
 
   return useQuery({
-    queryKey: materialCategoryKeys.list(finalParams),
-    queryFn: () => materialCategoryService.getAll(finalParams),
+    queryKey: vendorCategoryKeys.list(finalParams),
+    queryFn: () => vendorCategoryService.getAll(finalParams),
     placeholderData: (previousData) => previousData,
   });
 }
 
-export function useInfiniteMaterialCategories(
+export function useInfiniteVendorCategories(
   params: Partial<FindVendorCategoryParams> = {},
 ) {
   const finalParams: FindVendorCategoryParams = {
@@ -53,9 +53,9 @@ export function useInfiniteMaterialCategories(
   };
 
   return useInfiniteQuery({
-    queryKey: [...materialCategoryKeys.lists(), 'infinite', finalParams],
+    queryKey: [...vendorCategoryKeys.lists(), 'infinite', finalParams],
     queryFn: ({ pageParam = 1 }) =>
-      materialCategoryService.getAll({ ...finalParams, page: pageParam }),
+      vendorCategoryService.getAll({ ...finalParams, page: pageParam }),
     getNextPageParam: (lastPage) => {
       if (lastPage.meta.page < lastPage.meta.total_pages) {
         return lastPage.meta.page + 1;
@@ -68,8 +68,8 @@ export function useInfiniteMaterialCategories(
 
 export function useGetVendorCategory(id: number) {
   return useQuery({
-    queryKey: materialCategoryKeys.detail(id),
-    queryFn: () => materialCategoryService.getById(id),
+    queryKey: vendorCategoryKeys.detail(id),
+    queryFn: () => vendorCategoryService.getById(id),
     enabled: !!id,
   });
 }
@@ -78,13 +78,13 @@ export function useCreateVendorCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: materialCategoryService.create,
+    mutationFn: vendorCategoryService.create,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: materialCategoryKeys.lists() });
-      toast.success('Berhasil membuat kategori material');
+      queryClient.invalidateQueries({ queryKey: vendorCategoryKeys.lists() });
+      toast.success('Berhasil membuat kategori vendor');
     },
     onError: (error: any) => {
-      toast.error('Gagal membuat kategori material', {
+      toast.error('Gagal membuat kategori vendor', {
         description: error.response?.data?.message || 'Terjadi kesalahan.',
       });
     },
@@ -96,16 +96,16 @@ export function useUpdateVendorCategory() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) =>
-      materialCategoryService.update(id, data),
+      vendorCategoryService.update(id, data),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: materialCategoryKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: vendorCategoryKeys.lists() });
       queryClient.invalidateQueries({
-        queryKey: materialCategoryKeys.detail(data.vendor_category_id),
+        queryKey: vendorCategoryKeys.detail(data.vendor_category_id),
       });
-      toast.success('Berhasil memperbarui kategori material');
+      toast.success('Berhasil memperbarui kategori vendor');
     },
     onError: (error: any) => {
-      toast.error('Gagal memperbarui kategori material', {
+      toast.error('Gagal memperbarui kategori vendor', {
         description: error.response?.data?.message || 'Terjadi kesalahan.',
       });
     },
@@ -116,13 +116,13 @@ export function useDeleteVendorCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: materialCategoryService.delete,
+    mutationFn: vendorCategoryService.delete,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: materialCategoryKeys.lists() });
-      toast.success('Berhasil menghapus kategori material');
+      queryClient.invalidateQueries({ queryKey: vendorCategoryKeys.lists() });
+      toast.success('Berhasil menghapus kategori vendor');
     },
     onError: (error: any) => {
-      toast.error('Gagal menghapus kategori material', {
+      toast.error('Gagal menghapus kategori vendor', {
         description: error.response?.data?.message || 'Terjadi kesalahan.',
       });
     },
@@ -133,10 +133,10 @@ export function useBulkDeleteVendorCategories() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: materialCategoryService.bulkDelete,
+    mutationFn: vendorCategoryService.bulkDelete,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: materialCategoryKeys.lists() });
-      toast.success(`Berhasil menghapus ${data.count} kategori material`);
+      queryClient.invalidateQueries({ queryKey: vendorCategoryKeys.lists() });
+      toast.success(`Berhasil menghapus ${data.count} kategori vendor`);
     },
     onError: (error: any) => {
       toast.error('Gagal menghapus data', {
@@ -150,9 +150,9 @@ export function useToggleVendorCategoryStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: materialCategoryService.toggleStatus,
+    mutationFn: vendorCategoryService.toggleStatus,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: materialCategoryKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: vendorCategoryKeys.lists() });
       toast.success('Status kategori berhasil diubah');
     },
     onError: (error: any) => {

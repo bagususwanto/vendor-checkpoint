@@ -9,7 +9,7 @@ import {
   ChecklistItemType,
 } from '@repo/types';
 import { ChecklistItemResponse, CreateChecklistItem } from '@/types/checklist';
-import { useVendorCategorySelection } from '@/hooks/api/use-material-categories';
+import { useVendorCategorySelection } from '@/hooks/api/use-vendor-categories';
 // ... (keep intermediate lines if possible or replace larger chunk)
 // actually I will use multiple replace chunks to be safe
 
