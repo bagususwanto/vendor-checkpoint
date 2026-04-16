@@ -1,12 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { delayReasonService } from '@/services/delay-reason.service';
+import { delayReasonService, DelayReasonQuery } from '@/services/delay-reason.service';
 import {
-  FindDelayReasonParams,
   CreateDelayReason,
   UpdateDelayReason,
 } from '@repo/types';
 
-export const useDelayReasons = (params: FindDelayReasonParams) => {
+export const useDelayReasons = (params: DelayReasonQuery) => {
   return useQuery({
     queryKey: ['delay-reasons', params],
     queryFn: () => delayReasonService.getAll(params),

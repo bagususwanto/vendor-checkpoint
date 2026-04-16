@@ -1,4 +1,5 @@
 import {
+  PaginatedResponse,
   DelayReasonResponse,
   FindDelayReasonParams,
   CreateDelayReason,
@@ -6,12 +7,19 @@ import {
 } from '@repo/types';
 import { axiosInstance } from '@/lib/axios';
 
+export type DelayReasonQuery = FindDelayReasonParams & {
+  page?: number;
+  limit?: number;
+  search?: string;
+};
+
 export const delayReasonService = {
-  getAll: async (params: FindDelayReasonParams) => {
-    // Note: The NestJS standard used here is returning the array directly or in a `data` property.
-    // Based on previous inspection, it might be { data: DelayReason[] } or DelayReason[]
-    const response = await axiosInstance.get('/delay-reasons', { params });
-    return Array.isArray(response.data) ? response.data : response.data.data;
+  getAll: async (params: DelayReasonQuery): Promise<PaginatedResponse<DelayReasonResponse>> => {
+    const response = await axiosInstance.get<PaginatedResponse<DelayReasonResponse>>(
+      '/delay-reasons',
+      { params },
+    );
+    return response.data;
   },
 
   getById: async (id: number) => {

@@ -38,10 +38,12 @@ export class VendorScheduleController {
 
   @Get()
   findAll(
+    @Query() query: import('src/common/dto/paginated-params.dto').PaginatedParamsDto,
     @Query('vendor_id') vendor_id?: string,
     @Query('day_of_week') day_of_week?: string,
   ) {
     return this.vendorScheduleService.findAll(
+      query,
       vendor_id ? +vendor_id : undefined,
       day_of_week ? +day_of_week : undefined,
     );

@@ -37,8 +37,11 @@ export class DelayReasonController {
   }
 
   @Get()
-  findAll(@Query('category') category?: string) {
-    return this.delayReasonService.findAll(category);
+  findAll(
+    @Query() query: import('src/common/dto/paginated-params.dto').PaginatedParamsDto,
+    @Query('category') category?: string,
+  ) {
+    return this.delayReasonService.findAll(query, category);
   }
 
   @Get(':id')

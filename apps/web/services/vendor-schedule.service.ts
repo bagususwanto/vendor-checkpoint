@@ -1,4 +1,5 @@
 import {
+  PaginatedResponse,
   VendorScheduleResponse,
   FindVendorScheduleParams,
   CreateVendorSchedule,
@@ -6,11 +7,19 @@ import {
 } from '@repo/types';
 import { axiosInstance } from '@/lib/axios';
 
+export type VendorScheduleQuery = FindVendorScheduleParams & {
+  page?: number;
+  limit?: number;
+  search?: string;
+};
+
 export const vendorScheduleService = {
-  getAll: async (params: FindVendorScheduleParams) => {
-    const response = await axiosInstance.get<{ data: VendorScheduleResponse[] }>('/vendor-schedules', { params });
-    // Note: The NestJS standard is if not explicitly wrapped, sometimes it returns array directly.
-    return Array.isArray(response.data) ? response.data : response.data.data;
+  getAll: async (params: VendorScheduleQuery): Promise<PaginatedResponse<VendorScheduleResponse>> => {
+    const response = await axiosInstance.get<PaginatedResponse<VendorScheduleResponse>>(
+      '/vendor-schedules',
+      { params },
+    );
+    return response.data;
   },
 
   getById: async (id: number) => {

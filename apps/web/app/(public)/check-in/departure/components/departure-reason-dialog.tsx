@@ -31,9 +31,9 @@ export function DepartureReasonDialog({
   const [selectedReasonId, setSelectedReasonId] = useState<number | undefined>();
 
   // Use the hook to fetch the departure reasons from the backend
-  const { data: delayReasonsData, isLoading } = useDelayReasons({ category: 'Departure', isActive: true });
+  const { data: delayReasonsData, isLoading } = useDelayReasons({ category: 'Departure', limit: 100 });
 
-  const delayReasons = Array.isArray(delayReasonsData) ? delayReasonsData : delayReasonsData?.data || [];
+  const delayReasons = delayReasonsData?.data?.filter((r) => r.is_active) ?? [];
 
   const handleConfirm = () => {
     onConfirm({
