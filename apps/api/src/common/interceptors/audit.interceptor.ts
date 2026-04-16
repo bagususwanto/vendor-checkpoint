@@ -5,7 +5,7 @@ import {
   NestInterceptor,
   Logger,
 } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { ModuleRef, Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AuditService } from '../../modules/audit/audit.service';
@@ -16,9 +16,11 @@ import { getRequestInfo } from '../utils/request-info.util';
 export class AuditLogInterceptor implements NestInterceptor {
   private readonly logger = new Logger(AuditLogInterceptor.name);
 
+  private auditService: AuditService;
+
   constructor(
     private readonly reflector: Reflector,
-    private readonly auditService: AuditService,
+    private readonly moduleRef: ModuleRef,
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -68,6 +70,10 @@ export class AuditLogInterceptor implements NestInterceptor {
 
           // Get external_user_id from either details or request.user
           const externalUserId = details.user_id || request.user?.userId;
+
+          if (!this.auditService) {
+            this.auditService = this.moduleRef.get(AuditService, { strict: false });
+          }
 
           if (externalUserId) {
             // Look up local user_id from mst_user table
