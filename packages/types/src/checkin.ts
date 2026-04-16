@@ -29,6 +29,13 @@ export type VerificationList = {
   snapshot_category_name: string;
   submission_time: Date;
   current_status: string;
+  dn_number?: string;
+  po_number?: string;
+  arrival_status?: string;
+  ai_safety_status?: string;
+  ops_timelog?: {
+    departure_status?: string;
+  };
 };
 
 export const queueSearchSchema = z.object({

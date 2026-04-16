@@ -22,7 +22,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useCheckoutCheckIn } from '@/hooks/api/use-check-in';
+import { useCheckoutCheckIn, useVerificationDetail } from '@/hooks/api/use-check-in';
 import { toast } from 'sonner';
 import { Separator } from '@/components/ui/separator';
 import { formatDateTime } from '@/lib/utils';
@@ -49,6 +49,7 @@ export function CheckoutSheet({
 }: CheckoutSheetProps) {
   const [open, setOpen] = useState(false);
   const checkoutMutation = useCheckoutCheckIn();
+  const { data: detailData } = useVerificationDetail(open ? checkin.id : '');
 
   const handleCheckout = () => {
     checkoutMutation.mutate({ queue_number: checkin.id }, {
@@ -146,6 +147,16 @@ export function CheckoutSheet({
                     </div>
                   </div>
                 </Card>
+                {detailData && (
+                  <Card className="p-4 shadow-sm col-span-2 bg-blue-50/50">
+                     <div className="flex justify-between items-center w-full">
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground">DN / PO Number</p>
+                          <p className="font-semibold text-sm mt-1">{detailData.dn_number || '-'} / {detailData.po_number || '-'}</p>
+                        </div>
+                     </div>
+                  </Card>
+                )}
               </div>
             </div>
 

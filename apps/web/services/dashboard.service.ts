@@ -20,6 +20,10 @@ export interface DashboardStats {
     total_rejected: TrendData;
     avg_lead_time: TrendData;
   };
+  verification_mode?: boolean;
+  missed_cycle_count?: number;
+  on_time_arrival_pct?: string;
+  on_time_departure_pct?: string;
 }
 
 export interface HourlyLeadTime {

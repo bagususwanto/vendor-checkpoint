@@ -10,7 +10,11 @@ import {
   ArrowUp,
   ArrowDown,
   Minus,
+  AlertTriangle,
+  TrendingUp,
+  Truck,
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { useDashboardStats } from '@/hooks/api/use-dashboard';
 import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
 import { TrendData } from '@/services/dashboard.service';
@@ -74,59 +78,105 @@ export function StatsCard() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Check-in</CardTitle>
-          <ListFilter className="h-4 w-4 text-primary" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.total_checkins}</div>
-          <TrendIndicator trend={stats.trends?.total_checkins} />
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Disetujui</CardTitle>
-          <CheckCircle className="h-4 w-4 text-emerald-500" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.total_approved}</div>
-          <TrendIndicator trend={stats.trends?.total_approved} />
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Ditolak</CardTitle>
-          <XCircle className="h-4 w-4 text-rose-500" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.total_rejected}</div>
-          <TrendIndicator trend={stats.trends?.total_rejected} inverse />
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Menunggu</CardTitle>
-          <Clock className="h-4 w-4 text-orange-500" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.current_waiting}</div>
-          <p className="text-xs text-muted-foreground mt-1">Antrian saat ini</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Rata-rata Waktu</CardTitle>
-          <Timer className="h-4 w-4 text-sky-500" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {stats.avg_lead_time_minutes}m
-          </div>
-          <TrendIndicator trend={stats.trends?.avg_lead_time} inverse />
-        </CardContent>
-      </Card>
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Badge variant={stats.verification_mode ? 'default' : 'secondary'}>
+          {stats.verification_mode ? 'Mode Verifikasi Staff' : 'Mode Self-Service'}
+        </Badge>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Check-in</CardTitle>
+            <ListFilter className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.total_checkins}</div>
+            <TrendIndicator trend={stats.trends?.total_checkins} />
+          </CardContent>
+        </Card>
+
+        {stats.verification_mode ? (
+          <>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Disetujui</CardTitle>
+                <CheckCircle className="h-4 w-4 text-emerald-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.total_approved}</div>
+                <TrendIndicator trend={stats.trends?.total_approved} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Ditolak</CardTitle>
+                <XCircle className="h-4 w-4 text-rose-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.total_rejected}</div>
+                <TrendIndicator trend={stats.trends?.total_rejected} inverse />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Menunggu</CardTitle>
+                <Clock className="h-4 w-4 text-orange-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.current_waiting}</div>
+                <p className="text-xs text-muted-foreground mt-1">Antrian saat ini</p>
+              </CardContent>
+            </Card>
+          </>
+        ) : (
+          <>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Missed Cycle</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-rose-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.missed_cycle_count}</div>
+                <p className="text-xs text-muted-foreground mt-1">Siklus terlewat hari ini</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">On-Time Arrival</CardTitle>
+                <Truck className="h-4 w-4 text-emerald-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.on_time_arrival_pct}</div>
+                <p className="text-xs text-muted-foreground mt-1">Tingkat ketepatan kedatangan</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">On-Time Departure</CardTitle>
+                <TrendingUp className="h-4 w-4 text-blue-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.on_time_departure_pct}</div>
+                <p className="text-xs text-muted-foreground mt-1">Tingkat ketepatan keberangkatan</p>
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Rata-rata Waktu</CardTitle>
+            <Timer className="h-4 w-4 text-sky-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {stats.avg_lead_time_minutes}m
+            </div>
+            <TrendIndicator trend={stats.trends?.avg_lead_time} inverse />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

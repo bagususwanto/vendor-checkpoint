@@ -348,6 +348,15 @@ export class CheckInService {
           snapshot_category_name: true,
           current_status: true,
           has_non_compliant_items: true,
+          dn_number: true,
+          po_number: true,
+          arrival_status: true,
+          ai_safety_status: true,
+          ops_timelog: {
+            select: {
+              departure_status: true,
+            },
+          },
         },
         where,
         orderBy,
@@ -379,12 +388,18 @@ export class CheckInService {
         submission_time: true,
         snapshot_company_name: true,
         snapshot_category_name: true,
+        dn_number: true,
+        po_number: true,
+        arrival_status: true,
+        ai_safety_status: true,
         ops_timelog: {
           select: {
             checkin_time: true,
             checkout_time: true,
             duration_minutes: true,
             is_checked_out: true,
+            departure_status: true,
+            delay_departure_reason_id: true,
             user: {
               select: {
                 full_name: true,

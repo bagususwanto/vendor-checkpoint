@@ -207,6 +207,47 @@ export function VerificationSheet({
                         </div>
                       </div>
                     </Card>
+
+                    {/* V2 Additions */}
+                    <Card className="p-4 shadow-sm">
+                      <div className="flex items-start gap-4">
+                        <div className="rounded-lg bg-blue-100 p-2 text-blue-600">
+                          <Package className="h-5 w-5" />
+                        </div>
+                        <div className="space-y-1 flex-1">
+                           <div className="flex justify-between items-center w-full">
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground">DN / PO Number</p>
+                                <p className="font-semibold text-base">{detailData.dn_number || '-'} / {detailData.po_number || '-'}</p>
+                              </div>
+                           </div>
+                        </div>
+                      </div>
+                    </Card>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <Card className="p-4 shadow-sm h-full">
+                        <div className="space-y-1">
+                          <p className="text-xs font-medium text-muted-foreground">Arrival Status</p>
+                          {detailData.arrival_status ? (
+                            <Badge variant={detailData.arrival_status === 'Late' ? 'destructive' : detailData.arrival_status === 'Early' ? 'secondary' : 'default'} className="mt-1">
+                              {detailData.arrival_status}
+                            </Badge>
+                          ) : '-'}
+                        </div>
+                      </Card>
+
+                      <Card className="p-4 shadow-sm h-full">
+                        <div className="space-y-1">
+                          <p className="text-xs font-medium text-muted-foreground">AI Verification</p>
+                          {detailData.ai_safety_status ? (
+                            <Badge variant={detailData.ai_safety_status === 'Fail' ? 'destructive' : detailData.ai_safety_status === 'Pass' ? 'default' : 'outline'} className="mt-1">
+                              {detailData.ai_safety_status}
+                            </Badge>
+                          ) : '-'}
+                        </div>
+                      </Card>
+                    </div>
                   </div>
                 </div>
               </div>

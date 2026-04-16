@@ -40,6 +40,7 @@ interface QueueTableProps {
   setPage: (page: number) => void;
   limit: number;
   setLimit: (limit: number) => void;
+  verificationMode: boolean;
 }
 
 export function QueueTable({
@@ -51,6 +52,7 @@ export function QueueTable({
   setPage,
   limit,
   setLimit,
+  verificationMode,
 }: QueueTableProps) {
   const queryClient = useQueryClient();
 
@@ -66,7 +68,9 @@ export function QueueTable({
             <TableHead>No. Antrean</TableHead>
             <TableHead>Perusahaan</TableHead>
             <TableHead>Driver</TableHead>
-            <TableHead>Kategori</TableHead>
+            <TableHead>DN / PO</TableHead>
+            <TableHead>Kedatangan</TableHead>
+            <TableHead>AI APD</TableHead>
             <TableHead>Waktu</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Aksi</TableHead>
@@ -75,13 +79,13 @@ export function QueueTable({
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-4">
+              <TableCell colSpan={9} className="text-center py-4">
                 Loading...
               </TableCell>
             </TableRow>
           ) : checkins.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-4">
+              <TableCell colSpan={9} className="text-center py-4">
                 Tidak ada data ditemukan
               </TableCell>
             </TableRow>
@@ -93,7 +97,26 @@ export function QueueTable({
                 </TableCell>
                 <TableCell>{checkin.snapshot_company_name}</TableCell>
                 <TableCell>{checkin.driver_name}</TableCell>
-                <TableCell>{checkin.snapshot_category_name}</TableCell>
+                <TableCell>
+                  <div className="flex flex-col text-xs space-y-1">
+                    <span className="font-semibold">{checkin.dn_number || '-'}</span>
+                    <span className="text-muted-foreground">{checkin.po_number || '-'}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {checkin.arrival_status ? (
+                    <Badge variant={checkin.arrival_status === 'Late' ? 'destructive' : checkin.arrival_status === 'Early' ? 'secondary' : 'default'}>
+                      {checkin.arrival_status}
+                    </Badge>
+                  ) : '-'}
+                </TableCell>
+                <TableCell>
+                   {checkin.ai_safety_status ? (
+                    <Badge variant={checkin.ai_safety_status === 'Fail' ? 'destructive' : checkin.ai_safety_status === 'Pass' ? 'default' : 'outline'}>
+                      {checkin.ai_safety_status}
+                    </Badge>
+                  ) : '-'}
+                </TableCell>
                 <TableCell>
                   {checkin.submission_time
                     ? formatDateTime(checkin.submission_time, 'dd MMM HH:mm')
@@ -103,41 +126,8 @@ export function QueueTable({
                   <StatusBadge status={checkin.current_status} />
                 </TableCell>
                 <TableCell className="text-right">
-                  {checkin.current_status === QueueStatus.MENUNGGU && (
-                    <VerificationSheet
-                      checkin={{
-                        id: checkin.queue_number,
-                        company: checkin.snapshot_company_name,
-                        driver: checkin.driver_name,
-                        category: checkin.snapshot_category_name,
-                        time: checkin.submission_time,
-                        status: checkin.current_status.toLowerCase(),
-                      }}
-                      trigger={<Button size="sm">Verifikasi</Button>}
-                      onSuccess={handleSuccess}
-                    />
-                  )}
-
-                  {checkin.current_status === QueueStatus.DISETUJUI && (
-                    <CheckoutSheet
-                      checkin={{
-                        id: checkin.queue_number,
-                        company: checkin.snapshot_company_name,
-                        driver: checkin.driver_name,
-                        category: checkin.snapshot_category_name,
-                        time: checkin.submission_time,
-                        status: checkin.current_status.toLowerCase(),
-                      }}
-                      trigger={
-                        <Button size="sm" variant="secondary">
-                          Check-Out
-                        </Button>
-                      }
-                      onSuccess={handleSuccess}
-                    />
-                  )}
-
-                  {checkin.current_status === QueueStatus.SELESAI && (
+                  {/* DETAIL VIEW: Applies to everything if verification is disabled OR if it's already finished */}
+                  {(!verificationMode || checkin.current_status === QueueStatus.SELESAI || checkin.current_status === QueueStatus.DITOLAK) ? (
                     <VerificationSheet
                       checkin={{
                         id: checkin.queue_number,
@@ -154,25 +144,43 @@ export function QueueTable({
                       }
                       readonly={true}
                     />
-                  )}
+                  ) : (
+                    <>
+                      {/* VERIFICATION ACTIONS (Only if mode=true) */}
+                      {checkin.current_status === QueueStatus.MENUNGGU && (
+                        <VerificationSheet
+                          checkin={{
+                            id: checkin.queue_number,
+                            company: checkin.snapshot_company_name,
+                            driver: checkin.driver_name,
+                            category: checkin.snapshot_category_name,
+                            time: checkin.submission_time,
+                            status: checkin.current_status.toLowerCase(),
+                          }}
+                          trigger={<Button size="sm">Verifikasi</Button>}
+                          onSuccess={handleSuccess}
+                        />
+                      )}
 
-                  {checkin.current_status === QueueStatus.DITOLAK && (
-                    <VerificationSheet
-                      checkin={{
-                        id: checkin.queue_number,
-                        company: checkin.snapshot_company_name,
-                        driver: checkin.driver_name,
-                        category: checkin.snapshot_category_name,
-                        time: checkin.submission_time,
-                        status: checkin.current_status.toLowerCase(),
-                      }}
-                      trigger={
-                        <Button size="sm" variant="outline">
-                          Detail
-                        </Button>
-                      }
-                      readonly={true}
-                    />
+                      {checkin.current_status === QueueStatus.DISETUJUI && (
+                        <CheckoutSheet
+                          checkin={{
+                            id: checkin.queue_number,
+                            company: checkin.snapshot_company_name,
+                            driver: checkin.driver_name,
+                            category: checkin.snapshot_category_name,
+                            time: checkin.submission_time,
+                            status: checkin.current_status.toLowerCase(),
+                          }}
+                          trigger={
+                            <Button size="sm" variant="secondary">
+                              Check-Out
+                            </Button>
+                          }
+                          onSuccess={handleSuccess}
+                        />
+                      )}
+                    </>
                   )}
                 </TableCell>
               </TableRow>

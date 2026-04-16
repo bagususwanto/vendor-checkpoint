@@ -9,6 +9,7 @@ import { DateRange } from 'react-day-picker';
 import { QueueHeader } from './components/queue-header';
 import { QueueToolbar } from './components/queue-toolbar';
 import { QueueTable } from './components/queue-table';
+import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
 import {
   Card,
   CardContent,
@@ -56,6 +57,9 @@ export default function QueuePage() {
     setStatus('');
     setPage(1);
   };
+
+  const { data: configMode } = useSystemConfigByKey('VERIFICATION_MODE_ENABLED');
+  const verificationMode = configMode?.config_value === 'true';
 
   // Robust fallback for total pages
   const totalPages =
@@ -109,6 +113,7 @@ export default function QueuePage() {
             setPage={setPage}
             limit={limit}
             setLimit={setLimit}
+            verificationMode={verificationMode}
           />
         </CardContent>
       </Card>
