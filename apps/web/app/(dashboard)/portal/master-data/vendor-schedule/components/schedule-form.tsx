@@ -36,8 +36,10 @@ import { Loader2 } from 'lucide-react';
 const formSchema = z.object({
   vendor_id: z.coerce.number().min(1, 'Pilih vendor terlebih dahulu'),
   day_of_week: z.coerce.number().min(1, 'Pilih hari valid').max(7, 'Pilih hari valid'),
+  rit: z.coerce.number().min(1, 'Nit minimal 1'),
   arrival_time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
   departure_time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
+  truck_station: z.string().optional().nullable(),
   is_active: z.boolean().default(true),
 });
 
@@ -82,8 +84,10 @@ export function ScheduleForm({
     defaultValues: {
       vendor_id: 0,
       day_of_week: 1,
+      rit: 1,
       arrival_time: '08:00',
       departure_time: '17:00',
+      truck_station: '',
       is_active: true,
     },
   });
@@ -94,16 +98,20 @@ export function ScheduleForm({
         form.reset({
           vendor_id: schedule.vendor_id,
           day_of_week: schedule.day_of_week,
+          rit: schedule.rit,
           arrival_time: schedule.arrival_time,
           departure_time: schedule.departure_time,
+          truck_station: schedule.truck_station ?? '',
           is_active: schedule.is_active,
         });
       } else {
         form.reset({
           vendor_id: 0,
           day_of_week: 1,
+          rit: 1,
           arrival_time: '08:00',
           departure_time: '17:00',
+          truck_station: '',
           is_active: true,
         });
       }
@@ -220,6 +228,14 @@ export function ScheduleForm({
             <FieldError errors={[form.formState.errors.day_of_week]} />
           </Field>
 
+          <Field>
+            <FieldLabel required>Rit (Nomor Trip)</FieldLabel>
+            <FieldContent>
+              <Input type="number" min={1} placeholder="1" {...form.register('rit')} />
+            </FieldContent>
+            <FieldError errors={[form.formState.errors.rit]} />
+          </Field>
+
           <div className="grid grid-cols-2 gap-4">
             <Field>
               <FieldLabel required>Waktu Tiba</FieldLabel>
@@ -237,6 +253,14 @@ export function ScheduleForm({
               <FieldError errors={[form.formState.errors.departure_time]} />
             </Field>
           </div>
+
+          <Field>
+            <FieldLabel>Truck Station / Pos</FieldLabel>
+            <FieldContent>
+              <Input type="text" placeholder="(Opsional) Nama Pos / Dock" {...form.register('truck_station')} />
+            </FieldContent>
+            <FieldError errors={[form.formState.errors.truck_station]} />
+          </Field>
 
           <Field>
             <FieldLabel>Status Jadwal</FieldLabel>

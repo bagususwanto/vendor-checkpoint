@@ -112,8 +112,10 @@ export function ScheduleTable({
               <TableHead className="w-[50px] text-center">No</TableHead>
               <TableHead>Vendor</TableHead>
               <TableHead className="w-[100px]">Hari</TableHead>
+              <TableHead className="w-[80px] text-center">Rit</TableHead>
               <TableHead className="w-[130px]">Waktu Tiba</TableHead>
               <TableHead className="w-[150px]">Waktu Pulang</TableHead>
+              <TableHead className="w-[150px]">Truck Station</TableHead>
               <TableHead className="w-[100px] text-center">Status</TableHead>
               <TableHead className="w-[80px]"></TableHead>
             </TableRow>
@@ -131,8 +133,10 @@ export function ScheduleTable({
                   </div>
                 </TableCell>
                 <TableCell>{DAYS[schedule.day_of_week] ?? schedule.day_of_week}</TableCell>
+                <TableCell className="text-center font-medium">{schedule.rit}</TableCell>
                 <TableCell>{schedule.arrival_time}</TableCell>
                 <TableCell>{schedule.departure_time}</TableCell>
+                <TableCell>{schedule.truck_station || '-'}</TableCell>
                 <TableCell className="text-center">
                   <Badge variant={schedule.is_active ? 'default' : 'secondary'}>
                     {schedule.is_active ? 'Aktif' : 'Non-Aktif'}

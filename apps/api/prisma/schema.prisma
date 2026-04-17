@@ -68,8 +68,10 @@ model mst_vendor_schedule {
   schedule_id    Int      @id @default(autoincrement())
   vendor_id      Int
   day_of_week    Int // 1=Monday ... 7=Sunday
+  rit            Int      @default(1)
   arrival_time   String   @db.VarChar(10) // HH:mm
   departure_time String   @db.VarChar(10) // HH:mm
+  truck_station  String?  @db.VarChar(100)
   is_active      Boolean  @default(true)
   created_at     DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
   updated_at     DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))

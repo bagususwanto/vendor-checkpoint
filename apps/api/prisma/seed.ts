@@ -172,18 +172,43 @@ async function seedDelayReasons() {
 
 async function seedVendorSchedules() {
   console.log('Creating vendor schedules...');
-  const vendors = await prisma.mst_vendor.findMany({ take: 10 });
+  const vendors = await prisma.mst_vendor.findMany({ take: 20 });
   const schedules = [];
+  const stations = ['Pos A', 'Pos B', 'Pos C', 'Dock 1', 'Dock 2'];
 
-  for (const vendor of vendors) {
+  for (let i = 0; i < vendors.length; i++) {
+    const vendor = vendors[i];
+    // Vendor 0 gets 16 rits per day
+    // Vendor 1 gets 4 rits per day
+    // Vendor 2 gets 2 rits per day
+    // Others get 1 rit per day
+    let numRits = 1;
+    if (i === 0) numRits = 16;
+    else if (i === 1) numRits = 4;
+    else if (i === 2) numRits = 2;
+
     for (let day = 1; day <= 5; day++) {
-      // Monday to Friday
-      schedules.push({
-        vendor_id: vendor.vendor_id,
-        day_of_week: day,
-        arrival_time: '08:00',
-        departure_time: '12:00',
-      });
+      for (let r = 1; r <= numRits; r++) {
+        const startHour = 8;
+        const intervalMinutes = i === 0 ? 30 : 120;
+        
+        const totalMinutes = (startHour * 60) + ((r - 1) * intervalMinutes);
+        const arrivalH = Math.floor(totalMinutes / 60);
+        const arrivalM = totalMinutes % 60;
+        const departureH = Math.floor((totalMinutes + 45) / 60);
+        const departureM = (totalMinutes + 45) % 60;
+
+        const pad = (n: number) => n.toString().padStart(2, '0');
+
+        schedules.push({
+          vendor_id: vendor.vendor_id,
+          day_of_week: day,
+          rit: r,
+          arrival_time: `${pad(arrivalH)}:${pad(arrivalM)}`,
+          departure_time: `${pad(departureH)}:${pad(departureM)}`,
+          truck_station: stations[(i + r + day) % stations.length],
+        });
+      }
     }
   }
 
