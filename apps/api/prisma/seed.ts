@@ -128,7 +128,8 @@ async function seedSystemConfig() {
       config_key: 'ARRIVAL_BUFFER_MINUTES',
       config_value: '15',
       config_type: 'NUMBER',
-      description: 'Toleransi batas waktu kedatangan vendor (dalam menit) sebelum status berubah menjadi OVERDUE pada FIDS display.',
+      description:
+        'Toleransi batas waktu kedatangan vendor (dalam menit) sebelum status berubah menjadi OVERDUE pada FIDS display.',
       created_at: new Date(),
       updated_at: new Date(),
     },
@@ -175,7 +176,8 @@ async function seedVendorSchedules() {
   const schedules = [];
 
   for (const vendor of vendors) {
-    for (let day = 1; day <= 5; day++) { // Monday to Friday
+    for (let day = 1; day <= 5; day++) {
+      // Monday to Friday
       schedules.push({
         vendor_id: vendor.vendor_id,
         day_of_week: day,
@@ -202,8 +204,10 @@ async function seedCheckIns() {
     include: { checklist_category: true },
   });
   const delayReasons = await prisma.mst_delay_reason.findMany();
-  const arrivalReasons = delayReasons.filter(r => r.category === 'Arrival');
-  const departureReasons = delayReasons.filter(r => r.category === 'Departure');
+  const arrivalReasons = delayReasons.filter((r) => r.category === 'Arrival');
+  const departureReasons = delayReasons.filter(
+    (r) => r.category === 'Departure',
+  );
   const adminUser = await prisma.mst_user.findFirst();
 
   if (!adminUser) {
@@ -269,7 +273,9 @@ async function seedCheckIns() {
         dn_number: `DN-100${i}`,
         po_number: `PO-200${i}`,
         arrival_status: isLate ? 'Late' : 'On-Time',
-        delay_arrival_reason_id: isLate ? arrivalReasons[i % arrivalReasons.length].delay_reason_id : null,
+        delay_arrival_reason_id: isLate
+          ? arrivalReasons[i % arrivalReasons.length].delay_reason_id
+          : null,
         ai_safety_status: 'Pass',
         snapshot_vendor_category_id: vendorCategory.vendor_category_id,
         snapshot_company_name: vendor.company_name,
@@ -322,7 +328,8 @@ async function seedCheckIns() {
         entry_id: entry.entry_id,
         queue_number: queueNumber,
         current_status: status,
-        status_display_text: statusTexts[status as keyof typeof statusTexts] || status,
+        status_display_text:
+          statusTexts[status as keyof typeof statusTexts] || status,
         priority_order: queueCounter,
         estimated_wait_minutes: status === 'MENUNGGU' ? 30 : null,
         last_updated: submissionTime,
@@ -340,7 +347,7 @@ async function seedCheckIns() {
     const durationMinutes = isCheckedOut
       ? Math.round((checkoutTime!.getTime() - checkinTime.getTime()) / 60000)
       : null;
-    
+
     const isDepartureOverdue = isCheckedOut && Math.random() > 0.7;
 
     await prisma.ops_timelog.create({
@@ -350,8 +357,15 @@ async function seedCheckIns() {
         checkout_time: checkoutTime,
         checkout_by_user_id: isCheckedOut ? adminUser.user_id : null,
         duration_minutes: durationMinutes,
-        departure_status: isCheckedOut ? (isDepartureOverdue ? 'Overdue' : 'On-Time') : null,
-        delay_departure_reason_id: (isCheckedOut && isDepartureOverdue) ? departureReasons[i % departureReasons.length].delay_reason_id : null,
+        departure_status: isCheckedOut
+          ? isDepartureOverdue
+            ? 'Overdue'
+            : 'On-Time'
+          : null,
+        delay_departure_reason_id:
+          isCheckedOut && isDepartureOverdue
+            ? departureReasons[i % departureReasons.length].delay_reason_id
+            : null,
         is_checked_out: isCheckedOut,
         created_at: checkinTime,
         updated_at: checkoutTime || checkinTime,
@@ -399,7 +413,7 @@ async function main(): Promise<void> {
     await seedVendorSchedules();
 
     // Seed dummy check-in data
-    await seedCheckIns();
+    // await seedCheckIns();
 
     console.log('Seed completed successfully!');
   } catch (error) {

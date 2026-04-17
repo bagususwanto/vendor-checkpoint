@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { InteractiveBackground } from '@/components/interactive-background';
@@ -10,6 +10,12 @@ import { SuccessCard } from './components/success-card';
 export default function CheckInSuccessPage() {
   const router = useRouter();
   const { successData, clearChecklistData } = useChecklistStore();
+  const [timeLeft, setTimeLeft] = useState(60);
+
+  const handleHome = useCallback(() => {
+    clearChecklistData();
+    router.push('/');
+  }, [clearChecklistData, router]);
 
   useEffect(() => {
     // If no success data (e.g. direct access), redirect home
@@ -18,10 +24,20 @@ export default function CheckInSuccessPage() {
     }
   }, [successData, router]);
 
-  const handleHome = () => {
-    clearChecklistData();
-    router.push('/');
-  };
+  useEffect(() => {
+    if (!successData) return;
+
+    if (timeLeft <= 0) {
+      handleHome();
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, handleHome, successData]);
 
   const handleStatus = () => {
     // Assuming this is the route for status check, or a placeholder
@@ -37,13 +53,22 @@ export default function CheckInSuccessPage() {
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="z-10 relative w-full max-w-md"
+        className="z-10 relative w-full max-w-md flex flex-col items-center"
       >
         <SuccessCard
           data={successData}
           onCheckStatus={handleStatus}
           onGoHome={handleHome}
         />
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="mt-8 text-muted-foreground text-sm font-medium bg-background/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50 shadow-sm"
+        >
+          Kembali ke beranda dalam <span className="text-primary font-mono font-bold">{timeLeft}</span> detik
+        </motion.p>
       </motion.div>
     </div>
   );
