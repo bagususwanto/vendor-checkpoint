@@ -48,23 +48,49 @@ export class DeliverySlotService {
   }
 
   async findTodayMonitor() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Gunakan UTC untuk konsistensi dengan SlotGeneratorJob
+    const now = new Date();
     
+    // Cari data untuk "Hari Ini" dalam format UTC YYYY-MM-DD
+    const startOfTodayUtc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0));
+    const endOfTodayUtc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999));
+
+    // Opsi B: Gunakan juga waktu lokal Jakarta jika UTC tidak menemukan hasil (mencakup pergantian hari)
+    const jakartaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+    const startOfJakarta = new Date(jakartaTime);
+    startOfJakarta.setHours(0,0,0,0);
+    const endOfJakarta = new Date(jakartaTime);
+    endOfJakarta.setHours(23,59,59,999);
+
     return this.prisma.ops_delivery_slot.findMany({
-      where: { expected_date: today },
+      where: {
+        OR: [
+          {
+            expected_date: {
+              gte: startOfTodayUtc,
+              lte: endOfTodayUtc,
+            },
+          },
+          {
+            expected_date: {
+              gte: startOfJakarta,
+              lte: endOfJakarta,
+            },
+          }
+        ]
+      },
       include: {
         schedule: {
           include: { vendor: { include: { vendor_category: true } } },
         },
         ops_checkin_entry: {
           orderBy: { submission_time: 'desc' },
-          take: 1, // ambil entry terbaru saja
+          take: 1,
           include: { ops_timelog: true },
         },
       },
       orderBy: [
-        { schedule: { arrival_time: 'asc' } }, // urutkan berdasarkan jam jadwal
+        { schedule: { arrival_time: 'asc' } },
       ],
     });
   }
