@@ -20,19 +20,19 @@ interface FidsSummaryPanelProps {
 
 export function FidsSummaryPanel({ stats }: FidsSummaryPanelProps) {
   const CardItem = ({ label, value, icon: Icon, colorClass, textClass }: any) => (
-    <div className={`relative flex items-center justify-between p-3 rounded-xl border border-border bg-muted/20 transition-all duration-300 hover:scale-[1.02] shadow-xs group overflow-hidden`}>
+    <div className={`relative flex items-center justify-between p-4 rounded-xl border border-border bg-muted/20 transition-all duration-300 hover:scale-[1.02] shadow-xs group overflow-hidden`}>
       <div className="absolute top-0 right-0 p-2 opacity-5 transform group-hover:scale-110 transition-transform">
-        <Icon size={32} />
+        <Icon size={40} />
       </div>
       <div className="flex items-center gap-3">
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${colorClass}`}>
-          <Icon className="w-4 h-4" />
+        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${colorClass}`}>
+          <Icon className="w-5 h-5" />
         </div>
         <div>
-          <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none block mb-0.5">
+          <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-none block mb-1">
             {label}
           </span>
-          <span className={`text-xl font-black tabular-nums leading-none ${textClass}`}>
+          <span className={`text-2xl font-black tabular-nums leading-none ${textClass}`}>
             {value}
           </span>
         </div>
@@ -42,18 +42,18 @@ export function FidsSummaryPanel({ stats }: FidsSummaryPanelProps) {
 
   return (
     <Card className="h-full border-border flex flex-col overflow-hidden shadow-sm py-0">
-      <CardHeader className="px-5 py-3.5 border-b border-border bg-muted/10 shrink-0">
+      <CardHeader className="px-5 py-4 border-b border-border bg-muted/10 shrink-0">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/10">
-            <BarChart3 className="w-4 h-4 text-primary" />
+          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/10">
+            <BarChart3 className="w-5 h-5 text-primary" />
           </div>
-          <CardTitle className="text-lg font-black text-foreground uppercase tracking-tight">
+          <CardTitle className="text-xl font-black text-foreground uppercase tracking-tight">
             Live <span className="text-primary">Summary</span>
           </CardTitle>
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 p-4 flex flex-col gap-3 overflow-y-auto custom-scrollbar-hidden">
+      <CardContent className="flex-1 p-5 flex flex-col gap-3.5 overflow-y-auto custom-scrollbar-hidden">
         <CardItem 
           label="Total Schedule" 
           value={stats.total} 
@@ -62,9 +62,9 @@ export function FidsSummaryPanel({ stats }: FidsSummaryPanelProps) {
           textClass="text-primary"
         />
         
-        <Separator className="my-0.5" />
+        <Separator className="my-1" />
 
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-1 gap-3">
           <CardItem 
             label="Arrived" 
             value={stats.arrived} 

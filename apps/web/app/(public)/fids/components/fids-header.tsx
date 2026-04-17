@@ -76,7 +76,9 @@ export function FidsHeader() {
         {/* Connection Status */}
         <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded-full">
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Live System</span>
+          <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">
+            Live System
+          </span>
         </div>
 
         {/* Tools */}
@@ -94,7 +96,11 @@ export function FidsHeader() {
             className="text-muted-foreground hover:bg-muted rounded-full w-8 h-8"
             title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
           >
-            {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+            {isFullscreen ? (
+              <Minimize className="w-4 h-4" />
+            ) : (
+              <Maximize className="w-4 h-4" />
+            )}
           </Button>
         </div>
 
@@ -108,13 +114,15 @@ export function FidsHeader() {
                 minute: '2-digit',
               })}
               <span className="text-xl text-primary/70 ml-1">
-                {currentTime.toLocaleTimeString('id-ID', {
-                  second: '2-digit',
-                }).slice(-2)}
+                {currentTime
+                  .toLocaleTimeString('id-ID', {
+                    second: '2-digit',
+                  })
+                  .slice(-2)}
               </span>
             </div>
           </div>
-          <div className="w-[1px] h-8 bg-border" />
+          <div className="w-px h-8 bg-border" />
           <div className="text-left min-w-[90px]">
             <div className="text-foreground font-black text-xs uppercase leading-tight">
               {currentTime.toLocaleDateString('id-ID', { weekday: 'short' })}

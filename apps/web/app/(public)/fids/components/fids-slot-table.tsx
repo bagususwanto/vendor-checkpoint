@@ -13,7 +13,13 @@ import {
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 
-export type DisplayStatus = 'PENDING' | 'OVERDUE' | 'ARRIVED' | 'MISSED' | 'IN_PROGRESS' | 'COMPLETED';
+export type DisplayStatus =
+  | 'PENDING'
+  | 'OVERDUE'
+  | 'ARRIVED'
+  | 'MISSED'
+  | 'IN_PROGRESS'
+  | 'COMPLETED';
 
 export interface ParsedFidsSlot {
   id: string;
@@ -30,43 +36,80 @@ interface FidsSlotTableProps {
 
 export function FidsSlotTable({ slots }: FidsSlotTableProps) {
   const getStatusBadge = (status: DisplayStatus) => {
-    const baseClass = "px-3 py-1 font-black text-[10px] tracking-widest transition-all duration-300 shadow-xs uppercase";
-    
+    const baseClass =
+      'px-3 py-1 font-black text-[10px] tracking-widest transition-all duration-300 shadow-xs uppercase';
+
     switch (status) {
       case 'PENDING':
         return (
-          <Badge variant="outline" className={cn(baseClass, "bg-muted text-muted-foreground border-border")}>
+          <Badge
+            variant="outline"
+            className={cn(
+              baseClass,
+              'bg-muted text-muted-foreground border-border',
+            )}
+          >
             ● PENDING
           </Badge>
         );
       case 'OVERDUE':
         return (
-          <Badge variant="outline" className={cn(baseClass, "bg-orange-500/10 text-orange-500 border-orange-500/20 animate-pulse")}>
+          <Badge
+            variant="outline"
+            className={cn(
+              baseClass,
+              'bg-orange-500/10 text-orange-500 border-orange-500/20 animate-pulse',
+            )}
+          >
             ⚠ OVERDUE
           </Badge>
         );
       case 'ARRIVED':
         return (
-          <Badge variant="outline" className={cn(baseClass, "bg-emerald-500/10 text-emerald-500 border-emerald-500/20")}>
+          <Badge
+            variant="outline"
+            className={cn(
+              baseClass,
+              'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+            )}
+          >
             ✓ ARRIVED
           </Badge>
         );
       case 'IN_PROGRESS':
         return (
-          <Badge variant="outline" className={cn(baseClass, "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20")}>
+          <Badge
+            variant="outline"
+            className={cn(
+              baseClass,
+              'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+            )}
+          >
             <span className="inline-block animate-spin mr-1.5">◌</span>
             IN PROGRESS
           </Badge>
         );
       case 'COMPLETED':
         return (
-          <Badge variant="outline" className={cn(baseClass, "bg-muted/50 text-muted-foreground border-border")}>
+          <Badge
+            variant="outline"
+            className={cn(
+              baseClass,
+              'bg-muted/50 text-muted-foreground border-border',
+            )}
+          >
             💨 COMPLETED
           </Badge>
         );
       case 'MISSED':
         return (
-          <Badge variant="outline" className={cn(baseClass, "bg-red-500/10 text-red-500 border-red-500/20")}>
+          <Badge
+            variant="outline"
+            className={cn(
+              baseClass,
+              'bg-red-500/10 text-red-500 border-red-500/20',
+            )}
+          >
             ✖ MISSED
           </Badge>
         );
@@ -93,7 +136,7 @@ export function FidsSlotTable({ slots }: FidsSlotTableProps) {
           </TableRow>
         </TableHeader>
       </Table>
-      
+
       <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar-hidden relative">
         <Table className="border-collapse table-fixed">
           <TableBody className="[&_tr:last-child]:border-b">
@@ -102,22 +145,25 @@ export function FidsSlotTable({ slots }: FidsSlotTableProps) {
                 <TableCell colSpan={4} className="h-96 text-center">
                   <div className="flex flex-col items-center justify-center text-muted-foreground/30 py-20">
                     <Users className="w-16 h-16 mb-4 opacity-20" />
-                    <p className="text-xl font-black uppercase tracking-tighter">No Active Schedules</p>
+                    <p className="text-xl font-black uppercase tracking-tighter">
+                      No Active Schedules
+                    </p>
                   </div>
                 </TableCell>
               </TableRow>
             ) : (
               slots.map((slot) => {
-                const isActive = slot.status === 'ARRIVED' || slot.status === 'IN_PROGRESS';
+                const isActive =
+                  slot.status === 'ARRIVED' || slot.status === 'IN_PROGRESS';
                 const isMissed = slot.status === 'MISSED';
-                
+
                 return (
-                  <TableRow 
-                    key={slot.id} 
+                  <TableRow
+                    key={slot.id}
                     className={cn(
-                      "transition-all duration-300 relative group h-16 border-border",
-                      isActive && "bg-emerald-500/[0.03]",
-                      isMissed && "opacity-50 grayscale-[0.2]"
+                      'transition-all duration-300 relative group h-16 border-border',
+                      isActive && 'bg-emerald',
+                      isMissed && 'opacity-50 grayscale-[0.2]',
                     )}
                   >
                     {/* Active Indicator */}
@@ -125,20 +171,28 @@ export function FidsSlotTable({ slots }: FidsSlotTableProps) {
                       {isActive && (
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 bg-emerald-500 rounded-r-full shadow-[2px_0_8px_rgba(16,185,129,0.3)]" />
                       )}
-                      <div className={cn(
-                        "text-2xl font-mono font-black tabular-nums tracking-tighter",
-                        isActive ? "text-emerald-600 dark:text-emerald-400" : "text-foreground"
-                      )}>
+                      <div
+                        className={cn(
+                          'text-2xl font-mono font-black tabular-nums tracking-tighter',
+                          isActive
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-foreground',
+                        )}
+                      >
                         {slot.expectedTime}
                       </div>
                     </TableCell>
 
                     <TableCell className="w-[45%] px-6 py-0">
                       <div className="flex flex-col">
-                        <span className={cn(
-                          "text-lg font-black tracking-tight leading-tight truncate transition-colors",
-                          isMissed ? "text-red-500" : "text-foreground group-hover:text-primary"
-                        )}>
+                        <span
+                          className={cn(
+                            'text-lg font-black tracking-tight leading-tight truncate transition-colors',
+                            isMissed
+                              ? 'text-red-500'
+                              : 'text-foreground group-hover:text-primary',
+                          )}
+                        >
                           {slot.companyName}
                         </span>
                         <span className="text-[9px] font-mono font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
@@ -154,7 +208,9 @@ export function FidsSlotTable({ slots }: FidsSlotTableProps) {
                           {slot.arrivalTime}
                         </div>
                       ) : (
-                        <span className="text-muted-foreground/30 font-mono font-black text-lg tracking-tighter">--:--</span>
+                        <span className="text-muted-foreground/30 font-mono font-black text-lg tracking-tighter">
+                          --:--
+                        </span>
                       )}
                     </TableCell>
 
