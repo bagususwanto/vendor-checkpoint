@@ -19,9 +19,9 @@ export interface DeliverySlotResponse {
 
 export const deliverySlotService = {
   findAll: async (params: FindDeliverySlotParams): Promise<DeliverySlotResponse[]> => {
-    const response = await axiosInstance.get<DeliverySlotResponse[]>('/delivery-slots', {
+    const response = await axiosInstance.get<{ data: DeliverySlotResponse[] }>('/delivery-slots', {
       params,
     });
-    return response.data;
+    return response.data.data ?? [];
   },
 };
