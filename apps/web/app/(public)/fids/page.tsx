@@ -3,7 +3,6 @@
 import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
 import { useDeliverySlotMonitor } from '@/hooks/api/use-delivery-slots';
 import { FidsHeader } from './components/fids-header';
-import { FidsFooter } from './components/fids-footer';
 import { FidsSummaryPanel, FidsStats } from './components/fids-summary-panel';
 import { FidsSlotTable, ParsedFidsSlot, DisplayStatus } from './components/fids-slot-table';
 import { DeliverySlotMonitorItem } from '@repo/types';
@@ -94,7 +93,7 @@ export default function FidsPage() {
 
   return (
     <>
-      <div className="flex flex-col h-[calc(100vh-3.5rem)] overflow-hidden">
+      <div className="flex flex-col h-screen overflow-hidden">
         {/* Header */}
         <FidsHeader />
 
@@ -110,11 +109,6 @@ export default function FidsPage() {
             <FidsSlotTable slots={parsedSlots} />
           </div>
         </main>
-      </div>
-
-      {/* Footer - Fixed at bottom */}
-      <div className="fixed bottom-0 inset-x-0 z-50">
-        <FidsFooter />
       </div>
 
       <style jsx global>{`
