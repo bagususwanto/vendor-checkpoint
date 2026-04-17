@@ -3,6 +3,8 @@
 import * as React from 'react';
 import { ShieldCheck } from 'lucide-react';
 
+import Link from 'next/link';
+
 import { NavMain } from '@/app/(dashboard)/components/nav-main';
 import { NavUser } from '@/app/(dashboard)/components/nav-user';
 import { navData, type NavItem } from '@/app/(dashboard)/config/nav-data';
@@ -60,16 +62,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              asChild
             >
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <ShieldCheck className="size-4" />
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
-                  Vendor Checkpoint
-                </span>
-                <span className="truncate text-xs">Admin Panel</span>
-              </div>
+              <Link href="/">
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <ShieldCheck className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold text-foreground">
+                    Vendor Checkpoint
+                  </span>
+                  <span className="truncate text-xs text-muted-foreground">Admin Panel</span>
+                </div>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
