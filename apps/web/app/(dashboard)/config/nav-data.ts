@@ -66,6 +66,16 @@ export const navData: NavData = {
       icon: SquareChartGantt,
       items: [
         {
+          title: 'Monitoring Pengiriman',
+          url: '/portal/operational/delivery-slot',
+          icon: SquareChartGantt,
+          roles: [
+            UserRole.SUPER_ADMIN,
+            UserRole.GROUP_LEADER,
+            UserRole.SECTION_HEAD,
+          ],
+        },
+        {
           title: 'Manajemen Antrean',
           url: '/portal/operational/queue',
           icon: SquareChartGantt,
