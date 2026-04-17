@@ -8,68 +8,49 @@ import { FidsSlotTable, ParsedFidsSlot, DisplayStatus } from './components/fids-
 import { DeliverySlotMonitorItem } from '@repo/types';
 
 export default function FidsPage() {
-  // Configs
   const { data: refreshConfig } = useSystemConfigByKey('REFRESH_INTERVAL_MS');
   const refreshInterval = refreshConfig?.config_value
     ? parseInt(refreshConfig.config_value, 10)
-    : 10000; // Default 10 seconds
+    : 10000;
 
   const { data: bufferConfig } = useSystemConfigByKey('ARRIVAL_BUFFER_MINUTES');
   const arrivalBufferMinutes = bufferConfig?.config_value
     ? parseInt(bufferConfig.config_value, 10)
-    : 15; // Default 15 minutes
+    : 15;
 
-  // Data
   const { data: slotsData } = useDeliverySlotMonitor(refreshInterval);
   const slots = slotsData || [];
-
-  // Parse logic
   const now = new Date();
 
   function deriveDisplayStatus(slot: DeliverySlotMonitorItem): DisplayStatus {
     const latestEntry = slot.ops_checkin_entry?.[0];
-
     if (slot.status === 'Missed') return 'MISSED';
-
     if (latestEntry) {
       if (latestEntry.current_status === 'SELESAI') return 'COMPLETED';
       if (latestEntry.current_status === 'AKTIF') return 'IN_PROGRESS';
-      return 'ARRIVED'; // MENUNGGU, DISETUJUI, TERTAHAN, dll
+      return 'ARRIVED';
     }
-
-    // Expected time parsing: arrival_time format is "HH:mm"
     if (slot.schedule?.arrival_time) {
       const parts = slot.schedule.arrival_time.split(':').map(Number);
       const hours = parts[0] ?? 0;
       const minutes = parts[1] ?? 0;
       const scheduleTime = new Date(now);
       scheduleTime.setHours(hours, minutes, 0, 0);
-
       const bufferMs = arrivalBufferMinutes * 60 * 1000;
-      if (now.getTime() > scheduleTime.getTime() + bufferMs) {
-        return 'OVERDUE';
-      }
+      if (now.getTime() > scheduleTime.getTime() + bufferMs) return 'OVERDUE';
     }
-
     return 'PENDING';
   }
 
-  // Parse list
   const parsedSlots: ParsedFidsSlot[] = slots.map((slot) => {
     const status = deriveDisplayStatus(slot);
-    
-    // format actual arrival time if exists
     let arrivalTime = null;
     const latestEntry = slot.ops_checkin_entry?.[0];
     if (latestEntry && latestEntry.submission_time) {
-      const submissionDate = new Date(latestEntry.submission_time);
-      arrivalTime = submissionDate.toLocaleTimeString('id-ID', {
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit',
+      arrivalTime = new Date(latestEntry.submission_time).toLocaleTimeString('id-ID', {
+        hour12: false, hour: '2-digit', minute: '2-digit',
       });
     }
-
     return {
       id: String(slot.slot_id),
       expectedTime: slot.schedule?.arrival_time || '-',
@@ -80,7 +61,6 @@ export default function FidsPage() {
     };
   });
 
-  // Calculate Stats
   const stats: FidsStats = {
     total: parsedSlots.length,
     arrived: parsedSlots.filter(s => s.status === 'ARRIVED').length,
@@ -92,31 +72,26 @@ export default function FidsPage() {
   };
 
   return (
-    <>
-      <div className="flex flex-col h-screen overflow-hidden">
-        {/* Header */}
-        <FidsHeader />
+    <div className="flex flex-col h-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground relative overflow-hidden">
+      {/* Header */}
+      <FidsHeader />
 
-        {/* Main Content */}
-        <main className="relative flex-1 grid grid-cols-12 gap-6 p-6 min-h-0 bg-dot-pattern">
-          {/* Summary - Left Side */}
-          <div className="col-span-3 h-full">
-            <FidsSummaryPanel stats={stats} />
-          </div>
+      {/* Main Content */}
+      <main className="relative flex-1 grid grid-cols-12 gap-5 p-5 min-h-0 z-10 transition-all">
+        {/* Left Column - Summary */}
+        <div className="col-span-3 h-full animate-in slide-in-from-left duration-700">
+          <FidsSummaryPanel stats={stats} />
+        </div>
 
-          {/* Schedule Table - Right Side */}
-          <div className="col-span-9 h-full min-h-0">
-            <FidsSlotTable slots={parsedSlots} />
-          </div>
-        </main>
-      </div>
+        {/* Right Column - Table */}
+        <div className="col-span-9 h-full min-h-0 animate-in slide-in-from-right duration-700">
+          <FidsSlotTable slots={parsedSlots} />
+        </div>
+      </main>
 
-      <style jsx global>{`
-        .bg-dot-pattern {
-          background-image: radial-gradient(hsl(var(--muted-foreground)/0.1) 1px, transparent 1px);
-          background-size: 24px 24px;
-        }
-      `}</style>
-    </>
+      {/* Subtle Pattern Grid */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.05] dark:opacity-[0.02]" 
+           style={{ backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+    </div>
   );
 }

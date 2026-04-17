@@ -4,7 +4,7 @@ export default function FidsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative flex flex-col bg-background min-h-screen overflow-hidden">
+    <div className="fixed inset-0 z-50 flex flex-col bg-background overflow-hidden">
       {children}
     </div>
   );

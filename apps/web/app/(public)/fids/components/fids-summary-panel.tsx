@@ -1,6 +1,8 @@
 'use client';
 
 import { CheckCircle2, Clock, AlertTriangle, XCircle, BarChart3, RotateCw } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 export interface FidsStats {
   total: number;
@@ -17,97 +19,99 @@ interface FidsSummaryPanelProps {
 }
 
 export function FidsSummaryPanel({ stats }: FidsSummaryPanelProps) {
+  const CardItem = ({ label, value, icon: Icon, colorClass, textClass }: any) => (
+    <div className={`relative flex items-center justify-between p-3 rounded-xl border border-border bg-muted/20 transition-all duration-300 hover:scale-[1.02] shadow-xs group overflow-hidden`}>
+      <div className="absolute top-0 right-0 p-2 opacity-5 transform group-hover:scale-110 transition-transform">
+        <Icon size={32} />
+      </div>
+      <div className="flex items-center gap-3">
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${colorClass}`}>
+          <Icon className="w-4 h-4" />
+        </div>
+        <div>
+          <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none block mb-0.5">
+            {label}
+          </span>
+          <span className={`text-xl font-black tabular-nums leading-none ${textClass}`}>
+            {value}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="h-full rounded-3xl bg-card/60 backdrop-blur-xl border border-border flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="px-6 py-4 border-b border-border flex items-center gap-3 shrink-0 bg-muted/30">
-        <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-          <BarChart3 className="w-5 h-5 text-primary" />
-        </div>
-        <h3 className="text-xl font-bold text-foreground uppercase tracking-wide">
-          Summary
-        </h3>
-      </div>
-
-      <div className="flex-1 p-6 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
-        {/* Total Box */}
-        <div className="bg-muted/50 rounded-2xl p-4 flex flex-col items-center justify-center border border-border shadow-sm">
-          <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Total Jadwal</span>
-          <span className="text-4xl font-black text-foreground tabular-nums">{stats.total}</span>
-        </div>
-
-        <div className="flex-1 flex flex-col gap-3">
-          {/* ARRIVED */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-            <div className="flex items-center gap-3">
-              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-              <span className="font-semibold text-emerald-700 dark:text-emerald-400">ARRIVED</span>
-            </div>
-            <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">{stats.arrived}</span>
+    <Card className="h-full border-border flex flex-col overflow-hidden shadow-sm py-0">
+      <CardHeader className="px-5 py-3.5 border-b border-border bg-muted/10 shrink-0">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/10">
+            <BarChart3 className="w-4 h-4 text-primary" />
           </div>
+          <CardTitle className="text-lg font-black text-foreground uppercase tracking-tight">
+            Live <span className="text-primary">Summary</span>
+          </CardTitle>
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex-1 p-4 flex flex-col gap-3 overflow-y-auto custom-scrollbar-hidden">
+        <CardItem 
+          label="Total Schedule" 
+          value={stats.total} 
+          icon={BarChart3} 
+          colorClass="bg-primary text-primary-foreground" 
+          textClass="text-primary"
+        />
+        
+        <Separator className="my-0.5" />
+
+        <div className="grid grid-cols-1 gap-2">
+          <CardItem 
+            label="Arrived" 
+            value={stats.arrived} 
+            icon={CheckCircle2} 
+            colorClass="bg-emerald-500 text-white" 
+            textClass="text-emerald-500"
+          />
           
-          {/* IN_PROGRESS */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-teal-500/10 border border-teal-500/20">
-            <div className="flex items-center gap-3">
-              <RotateCw className="w-5 h-5 text-teal-500" />
-              <span className="font-semibold text-teal-700 dark:text-teal-400">IN PROGRESS</span>
-            </div>
-            <span className="text-2xl font-bold text-teal-700 dark:text-teal-400 tabular-nums">{stats.inProgress}</span>
-          </div>
+          <CardItem 
+            label="In Progress" 
+            value={stats.inProgress} 
+            icon={RotateCw} 
+            colorClass="bg-teal-500 text-white" 
+            textClass="text-teal-500"
+          />
 
-          {/* COMPLETED */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-slate-500/10 border border-slate-500/20">
-            <div className="flex items-center gap-3">
-              <CheckCircle2 className="w-5 h-5 text-slate-500" />
-              <span className="font-semibold text-slate-700 dark:text-slate-400">COMPLETED</span>
-            </div>
-            <span className="text-2xl font-bold text-slate-700 dark:text-slate-400 tabular-nums">{stats.completed}</span>
-          </div>
+          <CardItem 
+            label="Pending" 
+            value={stats.pending} 
+            icon={Clock} 
+            colorClass="bg-slate-400 text-white" 
+            textClass="text-slate-500 dark:text-slate-400"
+          />
 
-          {/* PENDING */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-blue-500" />
-              <span className="font-semibold text-blue-700 dark:text-blue-400">PENDING</span>
-            </div>
-            <span className="text-2xl font-bold text-blue-700 dark:text-blue-400 tabular-nums">{stats.pending}</span>
-          </div>
+          <CardItem 
+            label="Overdue" 
+            value={stats.overdue} 
+            icon={AlertTriangle} 
+            colorClass="bg-orange-500 text-white" 
+            textClass="text-orange-500"
+          />
 
-          {/* OVERDUE */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-orange-500/10 border border-orange-500/20">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="w-5 h-5 text-orange-500" />
-              <span className="font-semibold text-orange-700 dark:text-orange-400">OVERDUE</span>
-            </div>
-            <span className="text-2xl font-bold text-orange-700 dark:text-orange-400 tabular-nums">{stats.overdue}</span>
-          </div>
-
-          {/* MISSED */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-red-500/10 border border-red-500/20">
-            <div className="flex items-center gap-3">
-              <XCircle className="w-5 h-5 text-red-500" />
-              <span className="font-semibold text-red-700 dark:text-red-400">MISSED</span>
-            </div>
-            <span className="text-2xl font-bold text-red-700 dark:text-red-400 tabular-nums">{stats.missed}</span>
-          </div>
+          <CardItem 
+            label="Missed" 
+            value={stats.missed} 
+            icon={XCircle} 
+            colorClass="bg-red-500 text-white" 
+            textClass="text-red-500"
+          />
         </div>
-      </div>
+      </CardContent>
 
       <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: hsl(var(--muted));
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: hsl(var(--border));
-          border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: hsl(var(--muted-foreground));
+        .custom-scrollbar-hidden::-webkit-scrollbar {
+          width: 0;
         }
       `}</style>
-    </div>
+    </Card>
   );
 }

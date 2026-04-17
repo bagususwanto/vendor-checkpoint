@@ -1,7 +1,17 @@
 'use client';
 
-import { Users, Clock } from 'lucide-react';
+import { Users, ArrowRight } from 'lucide-react';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 
 export type DisplayStatus = 'PENDING' | 'OVERDUE' | 'ARRIVED' | 'MISSED' | 'IN_PROGRESS' | 'COMPLETED';
 
@@ -20,158 +30,151 @@ interface FidsSlotTableProps {
 
 export function FidsSlotTable({ slots }: FidsSlotTableProps) {
   const getStatusBadge = (status: DisplayStatus) => {
+    const baseClass = "px-3 py-1 font-black text-[10px] tracking-widest transition-all duration-300 shadow-xs uppercase";
+    
     switch (status) {
       case 'PENDING':
         return (
-          <Badge variant="outline" className="bg-slate-500/10 text-slate-400 border-slate-500/20">
-            <span className="w-2 h-2 rounded-full bg-slate-400 mr-2" />
-            PENDING
+          <Badge variant="outline" className={cn(baseClass, "bg-muted text-muted-foreground border-border")}>
+            ● PENDING
           </Badge>
         );
       case 'OVERDUE':
         return (
-          <Badge variant="outline" className="bg-orange-500/20 text-orange-400 border-orange-500/30 animate-pulse">
-            <span className="w-2 h-2 rounded-full bg-orange-500 mr-2" />
-            OVERDUE
+          <Badge variant="outline" className={cn(baseClass, "bg-orange-500/10 text-orange-500 border-orange-500/20 animate-pulse")}>
+            ⚠ OVERDUE
           </Badge>
         );
       case 'ARRIVED':
         return (
-          <Badge variant="outline" className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2" />
-            ARRIVED
+          <Badge variant="outline" className={cn(baseClass, "bg-emerald-500/10 text-emerald-500 border-emerald-500/20")}>
+            ✓ ARRIVED
           </Badge>
         );
       case 'IN_PROGRESS':
         return (
-          <Badge variant="outline" className="bg-teal-500/20 text-teal-400 border-teal-500/30 font-bold">
-            <span className="w-2 h-2 rounded-full bg-teal-500 mr-2 animate-pulse" />
+          <Badge variant="outline" className={cn(baseClass, "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20")}>
+            <span className="inline-block animate-spin mr-1.5">◌</span>
             IN PROGRESS
           </Badge>
         );
       case 'COMPLETED':
         return (
-          <Badge variant="outline" className="bg-slate-500/20 text-slate-400 border-slate-500/30">
-            <span className="w-2 h-2 rounded-full bg-current mr-2" />
-            COMPLETED
+          <Badge variant="outline" className={cn(baseClass, "bg-muted/50 text-muted-foreground border-border")}>
+            💨 COMPLETED
           </Badge>
         );
       case 'MISSED':
         return (
-          <Badge variant="outline" className="bg-red-500/10 text-red-400 border-red-500/20 opacity-80">
-            <span className="w-2 h-2 rounded-full bg-red-500 mr-2" />
-            MISSED
+          <Badge variant="outline" className={cn(baseClass, "bg-red-500/10 text-red-500 border-red-500/20")}>
+            ✖ MISSED
           </Badge>
         );
     }
   };
 
   return (
-    <div className="h-full rounded-3xl bg-card/60 backdrop-blur-xl border border-border flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="px-6 py-4 border-b border-border flex items-center justify-between shrink-0 bg-muted/30">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-            <Clock className="w-5 h-5 text-primary" />
-          </div>
-          <h3 className="text-xl font-bold text-foreground uppercase tracking-wide">
-            Jadwal Kedatangan Hari Ini
-          </h3>
-        </div>
+    <Card className="h-full border-border flex flex-col overflow-hidden shadow-sm py-0">
+      <Table className="border-collapse table-fixed">
+        <TableHeader className="bg-muted/30 sticky top-0 z-20">
+          <TableRow className="hover:bg-transparent border-b border-border">
+            <TableHead className="w-[15%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+              Scheduled
+            </TableHead>
+            <TableHead className="w-[45%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+              Vendor Name
+            </TableHead>
+            <TableHead className="w-[15%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+              Check-In
+            </TableHead>
+            <TableHead className="w-[25%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] text-right">
+              Status
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+      </Table>
+      
+      <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar-hidden relative">
+        <Table className="border-collapse table-fixed">
+          <TableBody className="[&_tr:last-child]:border-b">
+            {slots.length === 0 ? (
+              <TableRow className="hover:bg-transparent border-0">
+                <TableCell colSpan={4} className="h-96 text-center">
+                  <div className="flex flex-col items-center justify-center text-muted-foreground/30 py-20">
+                    <Users className="w-16 h-16 mb-4 opacity-20" />
+                    <p className="text-xl font-black uppercase tracking-tighter">No Active Schedules</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              slots.map((slot) => {
+                const isActive = slot.status === 'ARRIVED' || slot.status === 'IN_PROGRESS';
+                const isMissed = slot.status === 'MISSED';
+                
+                return (
+                  <TableRow 
+                    key={slot.id} 
+                    className={cn(
+                      "transition-all duration-300 relative group h-16 border-border",
+                      isActive && "bg-emerald-500/[0.03]",
+                      isMissed && "opacity-50 grayscale-[0.2]"
+                    )}
+                  >
+                    {/* Active Indicator */}
+                    <TableCell className="w-[15%] px-6 py-0">
+                      {isActive && (
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 bg-emerald-500 rounded-r-full shadow-[2px_0_8px_rgba(16,185,129,0.3)]" />
+                      )}
+                      <div className={cn(
+                        "text-2xl font-mono font-black tabular-nums tracking-tighter",
+                        isActive ? "text-emerald-600 dark:text-emerald-400" : "text-foreground"
+                      )}>
+                        {slot.expectedTime}
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="w-[45%] px-6 py-0">
+                      <div className="flex flex-col">
+                        <span className={cn(
+                          "text-lg font-black tracking-tight leading-tight truncate transition-colors",
+                          isMissed ? "text-red-500" : "text-foreground group-hover:text-primary"
+                        )}>
+                          {slot.companyName}
+                        </span>
+                        <span className="text-[9px] font-mono font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
+                          ID: {slot.vendorCode}
+                        </span>
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="w-[15%] px-6 py-0">
+                      {slot.arrivalTime ? (
+                        <div className="flex items-center gap-1.5 text-primary font-mono font-black text-lg tracking-tighter tabular-nums">
+                          <ArrowRight className="w-3.5 h-3.5 opacity-40 shrink-0" />
+                          {slot.arrivalTime}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground/30 font-mono font-black text-lg tracking-tighter">--:--</span>
+                      )}
+                    </TableCell>
+
+                    <TableCell className="w-[25%] px-6 py-0 text-right">
+                      {getStatusBadge(slot.status)}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
       </div>
 
-      {/* Table Header */}
-      <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-muted/50 border-b border-border shrink-0">
-        <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-wider">
-          Waktu
-        </div>
-        <div className="col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-wider">
-          Vendor
-        </div>
-        <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-wider">
-          Tiba
-        </div>
-        <div className="col-span-3 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">
-          Status
-        </div>
-      </div>
-
-      {/* List */}
-      <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar relative">
-        {slots.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-8">
-            <Users className="w-16 h-16 mb-4 opacity-30" />
-            <p className="text-xl font-medium">Tidak ada jadwal hari ini</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-border/50">
-            {slots.map((slot) => {
-              const isActive = slot.status === 'ARRIVED' || slot.status === 'IN_PROGRESS';
-              const isMissed = slot.status === 'MISSED';
-              const isOverdue = slot.status === 'OVERDUE';
-              
-              let rowClass = "grid grid-cols-12 gap-4 px-6 py-4 items-center transition-colors hover:bg-muted/30";
-              if (isActive) {
-                rowClass += " bg-emerald-500/5 hover:bg-emerald-500/10 border-l-4 border-l-emerald-500";
-              } else if (isMissed) {
-                rowClass += " opacity-60 bg-red-500/5 blur-[0.2px]";
-              } else if (isOverdue) {
-                rowClass += " bg-orange-500/5";
-              }
-
-              return (
-                <div key={slot.id} className={rowClass}>
-                  {/* Expected Time */}
-                  <div className="col-span-2">
-                    <span className="font-mono font-bold text-xl text-foreground">
-                      {slot.expectedTime}
-                    </span>
-                  </div>
-
-                  {/* Company Name */}
-                  <div className="col-span-5">
-                    <p className={`font-bold text-lg truncate ${isMissed ? 'text-red-400' : 'text-foreground'}`} title={slot.companyName}>
-                      {slot.companyName}
-                    </p>
-                    <p className="text-sm text-muted-foreground font-mono truncate">
-                      {slot.vendorCode}
-                    </p>
-                  </div>
-
-                  {/* Arrival Time */}
-                  <div className="col-span-2">
-                    <span className="font-mono font-medium text-lg text-muted-foreground">
-                      {slot.arrivalTime || '-'}
-                    </span>
-                  </div>
-
-                  {/* Status */}
-                  <div className="col-span-3 text-right flex justify-end">
-                    {getStatusBadge(slot.status)}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Auto-scroll container can be implemented in a wrapper or with pure CSS, but for now we rely on standard scroll */}
       <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: hsl(var(--muted));
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: hsl(var(--border));
-          border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: hsl(var(--muted-foreground));
+        .custom-scrollbar-hidden::-webkit-scrollbar {
+          width: 0px;
+          background: transparent;
         }
       `}</style>
-    </div>
+    </Card>
   );
 }
