@@ -160,8 +160,12 @@ export class CheckInService {
             queue_number: queueNumber,
             company_name: vendor.company_name,
             driver_name: createCheckInDto.driver_name,
-            status_display_text: statusDisplayText.config_value,
-            estimated_wait_minutes: toInt(estimatedWaitMinutes.config_value),
+            status_display_text:
+              statusDisplayText?.config_value ||
+              (initialStatus === QueueStatus.AKTIF ? 'Diterima' : 'Menunggu'),
+            estimated_wait_minutes: estimatedWaitMinutes?.config_value
+              ? toInt(estimatedWaitMinutes.config_value)
+              : 0,
             submission_time: dateNow,
           };
         });
