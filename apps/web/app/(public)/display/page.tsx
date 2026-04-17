@@ -28,6 +28,9 @@ export default function DisplayPage() {
     ? {
         queueNumber: currentQueueData.queue_number,
         status: currentQueueData.current_status,
+        statusDisplayText:
+          currentQueueData.ops_queue_status?.status_display_text ||
+          currentQueueData.current_status,
         driverName: currentQueueData.driver_name,
         companyName: currentQueueData.snapshot_company_name || '-',
       }
@@ -36,6 +39,8 @@ export default function DisplayPage() {
   const waitingQueues: QueueItem[] = waitingQueuesData.map((q) => ({
     queueNumber: q.queue_number,
     status: q.current_status,
+    statusDisplayText:
+      q.ops_queue_status?.status_display_text || q.current_status,
     driverName: q.driver_name,
     companyName: q.snapshot_company_name || '-',
   }));

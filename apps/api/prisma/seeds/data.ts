@@ -312,6 +312,14 @@ export const SYSTEM_CONFIGS = [
     updated_at: new Date(),
   },
   {
+    config_key: 'DEFAULT_STATUS_AKTIF_DISPLAY_TEXT',
+    config_value: 'Diterima',
+    config_type: 'STRING',
+    description: 'Status aktif/diterima di Display',
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
+  {
     config_key: 'DEFAULT_STATUS_DITOLAK_DISPLAY_TEXT',
     config_value: 'Ditolak',
     config_type: 'STRING',

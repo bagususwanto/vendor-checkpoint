@@ -116,11 +116,7 @@ export function DisplayTableQueue({
                     }`}
                   >
                     <span className="w-2 h-2 rounded-full bg-current" />
-                    {queue.status === 'MENUNGGU'
-                      ? 'Menunggu'
-                      : queue.status === 'AKTIF'
-                      ? 'Aktif'
-                      : queue.status}
+                    {queue.statusDisplayText}
                   </Badge>
                 </div>
               </div>

@@ -146,7 +146,7 @@ export class CheckInService {
 
           const statusDisplayTextKey =
             initialStatus === QueueStatus.AKTIF
-              ? 'DEFAULT_STATUS_DISETUJUI_DISPLAY_TEXT'
+              ? 'DEFAULT_STATUS_AKTIF_DISPLAY_TEXT'
               : 'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT';
 
           const statusDisplayText =
@@ -194,6 +194,7 @@ export class CheckInService {
       },
       select: {
         queue_number: true,
+        current_status: true,
         snapshot_company_name: true,
         driver_name: true,
         submission_time: true,
@@ -259,6 +260,7 @@ export class CheckInService {
             select: {
               priority_order: true,
               estimated_wait_minutes: true,
+              status_display_text: true,
             },
           },
         },

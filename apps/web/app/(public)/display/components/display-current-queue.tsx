@@ -5,6 +5,7 @@ import { User, Building2, Sparkles } from 'lucide-react';
 export interface QueueItem {
   queueNumber: string;
   status: string;
+  statusDisplayText: string;
   driverName: string;
   companyName: string;
 }
@@ -42,7 +43,7 @@ export function DisplayCurrentQueue({
         <div className="inline-flex items-center gap-2 bg-linear-to-r from-emerald-500/20 to-primary/20 px-4 py-1.5 border border-emerald-500/30 rounded-full">
           <span className="bg-emerald-500 rounded-full w-2.5 h-2.5 animate-pulse" />
           <span className="font-bold text-emerald-600 dark:text-emerald-400 text-base uppercase tracking-widest">
-            Sedang Diproses
+            {currentQueue.statusDisplayText}
           </span>
         </div>
       </div>
