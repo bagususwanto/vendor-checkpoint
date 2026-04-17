@@ -25,11 +25,12 @@ export class SlotGeneratorJob {
 
     for (const schedule of schedules) {
       // Check if slot already exists for today
-      const startOfDay = new Date(today);
-      startOfDay.setHours(0, 0, 0, 0);
+      // Gunakan Date.UTC agar tanggal hari ini dibuat pada jam 00:00 UTC. 
+      // Jika pakai startOfDay.setHours(0,0,0,0), itu menjadi jam 00:00 lokal (misal: UTC+7) 
+      // yang ketika di-save oleh Prisma bisa terkonversi mundur menjadi H-1 17:00 UTC untuk kolom @db.Date.
+      const startOfDay = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0));
 
-      const endOfDay = new Date(today);
-      endOfDay.setHours(23, 59, 59, 999);
+      const endOfDay = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999));
 
       const existing = await this.prisma.ops_delivery_slot.findFirst({
         where: {
