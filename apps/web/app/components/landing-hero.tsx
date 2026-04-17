@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { CircleArrowRight, Search } from 'lucide-react';
+import { CircleArrowRight, Search, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function LandingHero() {
@@ -33,19 +33,44 @@ export function LandingHero() {
           digital.
         </p>
 
-        <div className="slide-in-from-bottom-8 flex sm:flex-row flex-col justify-center items-center gap-4 pt-4 md:pt-8 animate-in duration-1000 ease-out delay-500 fade-in">
-          <Button size="xl" onClick={() => router.push('/check-in/step-1')}>
-            Mulai Check-In
-            <CircleArrowRight className="size-6" />
-          </Button>
+        <div className="slide-in-from-bottom-8 flex flex-col justify-center items-center gap-8 pt-4 md:pt-8 animate-in duration-1000 ease-out delay-500 fade-in">
+          {/* Primary Action */}
           <Button
             size="xl"
-            variant="outline"
-            onClick={() => router.push('/queue-status')}
+            className="h-16 px-10 text-lg shadow-xl shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-105"
+            onClick={() => router.push('/check-in/step-1')}
           >
-            <Search className="size-6" />
-            Cek Status Antrean
+            Mulai Check-In
+            <CircleArrowRight className="size-6 ml-2" />
           </Button>
+
+          {/* Secondary Actions Group */}
+          <div className="flex flex-col items-center gap-4 w-full max-w-sm">
+            <div className="flex items-center gap-4 w-full">
+              <div className="flex-1 h-px bg-border/50" />
+              <span className="text-muted-foreground text-[10px] sm:text-xs font-medium uppercase tracking-[0.2em] whitespace-nowrap opacity-60">
+                Layanan Lainnya
+              </span>
+              <div className="flex-1 h-px bg-border/50" />
+            </div>
+
+            <div className="flex sm:flex-row flex-col justify-center items-center gap-3 w-full">
+              <Button
+                variant="outline"
+                onClick={() => router.push('/check-in/departure')}
+              >
+                <LogOut className="size-4 group-hover:-translate-x-1 transition-transform" />
+                Check-Out
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/queue-status')}
+              >
+                <Search className="size-4" />
+                Cek Status Antrean
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
