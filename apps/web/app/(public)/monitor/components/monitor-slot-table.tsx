@@ -21,7 +21,7 @@ export type DisplayStatus =
   | 'IN_PROGRESS'
   | 'COMPLETED';
 
-export interface ParsedFidsSlot {
+export interface ParsedMonitorSlot {
   id: string;
   expectedTime: string;
   companyName: string;
@@ -30,11 +30,11 @@ export interface ParsedFidsSlot {
   arrivalTime: string | null;
 }
 
-interface FidsSlotTableProps {
-  slots: ParsedFidsSlot[];
+interface MonitorSlotTableProps {
+  slots: ParsedMonitorSlot[];
 }
 
-export function FidsSlotTable({ slots }: FidsSlotTableProps) {
+export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
   const getStatusBadge = (status: DisplayStatus) => {
     const baseClass =
       'px-3 py-1 font-black text-[10px] tracking-widest transition-all duration-300 shadow-xs uppercase';

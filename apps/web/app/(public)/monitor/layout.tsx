@@ -1,4 +1,4 @@
-export default function FidsLayout({
+export default function MonitorLayout({
   children,
 }: {
   children: React.ReactNode;

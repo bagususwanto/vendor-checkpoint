@@ -4,7 +4,7 @@ import { CheckCircle2, Clock, AlertTriangle, XCircle, BarChart3, RotateCw } from
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
-export interface FidsStats {
+export interface MonitorStats {
   total: number;
   arrived: number;
   inProgress: number;
@@ -14,11 +14,11 @@ export interface FidsStats {
   missed: number;
 }
 
-interface FidsSummaryPanelProps {
-  stats: FidsStats;
+interface MonitorSummaryPanelProps {
+  stats: MonitorStats;
 }
 
-export function FidsSummaryPanel({ stats }: FidsSummaryPanelProps) {
+export function MonitorSummaryPanel({ stats }: MonitorSummaryPanelProps) {
   const CardItem = ({ label, value, icon: Icon, colorClass, textClass }: any) => (
     <div className={`relative flex items-center justify-between p-4 rounded-xl border border-border bg-muted/20 transition-all duration-300 hover:scale-[1.02] shadow-xs group overflow-hidden`}>
       <div className="absolute top-0 right-0 p-2 opacity-5 transform group-hover:scale-110 transition-transform">

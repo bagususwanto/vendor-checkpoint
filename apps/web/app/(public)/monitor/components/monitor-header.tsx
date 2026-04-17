@@ -6,7 +6,7 @@ import { Wifi, Maximize, Minimize, Truck, ShieldCheck } from 'lucide-react';
 import { ThemeToggleButton } from '@/components/ui/shadcn-io/theme-toggle-button';
 import { Button } from '@/components/ui/button';
 
-export function FidsHeader() {
+export function MonitorHeader() {
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [mounted, setMounted] = useState(false);

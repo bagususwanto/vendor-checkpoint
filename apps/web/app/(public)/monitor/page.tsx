@@ -2,12 +2,12 @@
 
 import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
 import { useDeliverySlotMonitor } from '@/hooks/api/use-delivery-slots';
-import { FidsHeader } from './components/fids-header';
-import { FidsSummaryPanel, FidsStats } from './components/fids-summary-panel';
-import { FidsSlotTable, ParsedFidsSlot, DisplayStatus } from './components/fids-slot-table';
+import { MonitorHeader } from './components/monitor-header';
+import { MonitorSummaryPanel, MonitorStats } from './components/monitor-summary-panel';
+import { MonitorSlotTable, ParsedMonitorSlot, DisplayStatus } from './components/monitor-slot-table';
 import { DeliverySlotMonitorItem } from '@repo/types';
 
-export default function FidsPage() {
+export default function MonitorPage() {
   const { data: refreshConfig } = useSystemConfigByKey('REFRESH_INTERVAL_MS');
   const refreshInterval = refreshConfig?.config_value
     ? parseInt(refreshConfig.config_value, 10)
@@ -42,7 +42,7 @@ export default function FidsPage() {
     return 'PENDING';
   }
 
-  const parsedSlots: ParsedFidsSlot[] = slots.map((slot) => {
+  const parsedSlots: ParsedMonitorSlot[] = slots.map((slot) => {
     const status = deriveDisplayStatus(slot);
     let arrivalTime = null;
     const latestEntry = slot.ops_checkin_entry?.[0];
@@ -61,7 +61,7 @@ export default function FidsPage() {
     };
   });
 
-  const stats: FidsStats = {
+  const stats: MonitorStats = {
     total: parsedSlots.length,
     arrived: parsedSlots.filter(s => s.status === 'ARRIVED').length,
     inProgress: parsedSlots.filter(s => s.status === 'IN_PROGRESS').length,
@@ -74,18 +74,18 @@ export default function FidsPage() {
   return (
     <div className="flex flex-col h-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground relative overflow-hidden">
       {/* Header */}
-      <FidsHeader />
+      <MonitorHeader />
 
       {/* Main Content */}
       <main className="relative flex-1 grid grid-cols-12 gap-5 p-5 min-h-0 z-10 transition-all">
         {/* Left Column - Summary */}
         <div className="col-span-3 h-full animate-in slide-in-from-left duration-700">
-          <FidsSummaryPanel stats={stats} />
+          <MonitorSummaryPanel stats={stats} />
         </div>
 
         {/* Right Column - Table */}
         <div className="col-span-9 h-full min-h-0 animate-in slide-in-from-right duration-700">
-          <FidsSlotTable slots={parsedSlots} />
+          <MonitorSlotTable slots={parsedSlots} />
         </div>
       </main>
 
