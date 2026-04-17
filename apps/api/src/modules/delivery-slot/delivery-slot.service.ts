@@ -46,4 +46,26 @@ export class DeliverySlotService {
       orderBy: { expected_date: 'desc' },
     });
   }
+
+  async findTodayMonitor() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return this.prisma.ops_delivery_slot.findMany({
+      where: { expected_date: today },
+      include: {
+        schedule: {
+          include: { vendor: { include: { vendor_category: true } } },
+        },
+        ops_checkin_entry: {
+          orderBy: { submission_time: 'desc' },
+          take: 1, // ambil entry terbaru saja
+          include: { ops_timelog: true },
+        },
+      },
+      orderBy: [
+        { schedule: { arrival_time: 'asc' } }, // urutkan berdasarkan jam jadwal
+      ],
+    });
+  }
 }

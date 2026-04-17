@@ -14,3 +14,12 @@ export const useDeliverySlots = (params: FindDeliverySlotParams, refetchInterval
     refetchIntervalInBackground: true,
   });
 };
+
+export const useDeliverySlotMonitor = (refetchInterval = 10000) => {
+  return useQuery({
+    queryKey: ['delivery-slot-monitor'],
+    queryFn: () => deliverySlotService.findMonitor(),
+    refetchInterval,
+    refetchIntervalInBackground: true,
+  });
+};

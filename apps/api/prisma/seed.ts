@@ -124,6 +124,14 @@ async function seedSystemConfig() {
       created_at: new Date(),
       updated_at: new Date(),
     },
+    {
+      config_key: 'ARRIVAL_BUFFER_MINUTES',
+      config_value: '15',
+      config_type: 'NUMBER',
+      description: 'Toleransi batas waktu kedatangan vendor (dalam menit) sebelum status berubah menjadi OVERDUE pada FIDS display.',
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
   ];
 
   await prisma.cfg_system.createMany({

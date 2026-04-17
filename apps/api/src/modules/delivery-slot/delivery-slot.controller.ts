@@ -9,6 +9,11 @@ import { AuditLogInterceptor } from 'src/common/interceptors/audit.interceptor';
 export class DeliverySlotController {
   constructor(private readonly deliverySlotService: DeliverySlotService) {}
 
+  @Get('monitor')
+  findTodayMonitor() {
+    return this.deliverySlotService.findTodayMonitor();
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get()
   findAll(@Query() query: FindDeliverySlotDto) {
