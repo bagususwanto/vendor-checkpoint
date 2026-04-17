@@ -10,11 +10,12 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, RefreshCw, Loader2 } from 'lucide-react';
 import { VendorScheduleResponse } from '@repo/types';
 import { ScheduleTable } from './components/schedule-table';
 import { ScheduleForm } from './components/schedule-form';
 import { useVendorSchedules } from '@/hooks/api/use-vendor-schedule';
+import { useTriggerSlotGenerator } from '@/hooks/api/use-scheduler';
 
 export default function VendorSchedulePage() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -25,6 +26,7 @@ export default function VendorSchedulePage() {
   const [searchInput, setSearchInput] = React.useState('');
 
   const { data: result, isLoading } = useVendorSchedules({ page, limit, search: search || undefined });
+  const { mutate: triggerGenerator, isPending: isTriggering } = useTriggerSlotGenerator();
 
   const handleAddSchedule = () => {
     setSelectedSchedule(null);
@@ -57,6 +59,18 @@ export default function VendorSchedulePage() {
           </p>
         </div>
         <div className="flex items-center space-x-2">
+          <Button
+            variant="secondary"
+            onClick={() => triggerGenerator()}
+            disabled={isTriggering}
+          >
+            {isTriggering ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Generate Slot Hari Ini
+          </Button>
           <Button onClick={handleAddSchedule}>
             <Plus className="mr-2 h-4 w-4" /> Tambah Jadwal
           </Button>
