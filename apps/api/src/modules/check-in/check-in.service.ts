@@ -243,7 +243,7 @@ export class CheckInService {
         take: limit,
         where: {
           current_status: {
-            in: ['MENUNGGU', 'DISETUJUI', 'TERTAHAN'],
+            in: ['MENUNGGU', 'DISETUJUI', 'TERTAHAN', 'AKTIF'],
           },
           submission_time: {
             gte: dateNow,

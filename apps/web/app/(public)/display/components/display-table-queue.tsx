@@ -103,16 +103,24 @@ export function DisplayTableQueue({
                 <div className="col-span-2 text-right">
                   <Badge
                     variant={
-                      queue.status === 'MENUNGGU' ? 'outline' : 'secondary'
+                      queue.status === 'MENUNGGU' || queue.status === 'AKTIF'
+                        ? 'outline'
+                        : 'secondary'
                     }
-                    className={
+                    className={`gap-1.5 ${
                       queue.status === 'MENUNGGU'
                         ? 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30'
+                        : queue.status === 'AKTIF'
+                        ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
                         : ''
-                    }
+                    }`}
                   >
                     <span className="w-2 h-2 rounded-full bg-current" />
-                    {queue.status === 'MENUNGGU' ? 'Menunggu' : queue.status}
+                    {queue.status === 'MENUNGGU'
+                      ? 'Menunggu'
+                      : queue.status === 'AKTIF'
+                      ? 'Aktif'
+                      : queue.status}
                   </Badge>
                 </div>
               </div>
