@@ -58,3 +58,33 @@ export enum SlotStatus {
   FILLED = 'Filled',
   MISSED = 'Missed',
 }
+
+export enum DayOfWeek {
+  MONDAY = 1,
+  TUESDAY = 2,
+  WEDNESDAY = 3,
+  THURSDAY = 4,
+  FRIDAY = 5,
+  SATURDAY = 6,
+  SUNDAY = 7,
+}
+
+export const DAY_NAMES: Record<number, string> = {
+  [DayOfWeek.MONDAY]: 'Senin',
+  [DayOfWeek.TUESDAY]: 'Selasa',
+  [DayOfWeek.WEDNESDAY]: 'Rabu',
+  [DayOfWeek.THURSDAY]: 'Kamis',
+  [DayOfWeek.FRIDAY]: 'Jumat',
+  [DayOfWeek.SATURDAY]: 'Sabtu',
+  [DayOfWeek.SUNDAY]: 'Minggu',
+};
+
+export const DAY_OPTIONS = [
+  { value: DayOfWeek.MONDAY, label: DAY_NAMES[DayOfWeek.MONDAY] },
+  { value: DayOfWeek.TUESDAY, label: DAY_NAMES[DayOfWeek.TUESDAY] },
+  { value: DayOfWeek.WEDNESDAY, label: DAY_NAMES[DayOfWeek.WEDNESDAY] },
+  { value: DayOfWeek.THURSDAY, label: DAY_NAMES[DayOfWeek.THURSDAY] },
+  { value: DayOfWeek.FRIDAY, label: DAY_NAMES[DayOfWeek.FRIDAY] },
+  { value: DayOfWeek.SATURDAY, label: DAY_NAMES[DayOfWeek.SATURDAY] },
+  { value: DayOfWeek.SUNDAY, label: DAY_NAMES[DayOfWeek.SUNDAY] },
+];

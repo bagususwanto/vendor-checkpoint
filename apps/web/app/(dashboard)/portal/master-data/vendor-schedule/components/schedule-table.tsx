@@ -39,18 +39,9 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useDeleteVendorSchedule } from '@/hooks/api/use-vendor-schedule';
-import { VendorScheduleResponse } from '@repo/types';
+import { VendorScheduleResponse, DAY_NAMES } from '@repo/types';
 import { toast } from 'sonner';
 
-const DAYS: Record<number, string> = {
-  1: 'Senin',
-  2: 'Selasa',
-  3: 'Rabu',
-  4: 'Kamis',
-  5: 'Jumat',
-  6: 'Sabtu',
-  7: 'Minggu',
-};
 
 interface ScheduleTableProps {
   data: VendorScheduleResponse[];
@@ -132,7 +123,7 @@ export function ScheduleTable({
                     <span className="text-xs text-muted-foreground">{schedule.vendor?.vendor_code}</span>
                   </div>
                 </TableCell>
-                <TableCell>{DAYS[schedule.day_of_week] ?? schedule.day_of_week}</TableCell>
+                <TableCell>{DAY_NAMES[schedule.day_of_week] ?? schedule.day_of_week}</TableCell>
                 <TableCell className="text-center font-medium">{schedule.rit}</TableCell>
                 <TableCell>{schedule.arrival_time}</TableCell>
                 <TableCell>{schedule.departure_time}</TableCell>
@@ -175,7 +166,7 @@ export function ScheduleTable({
                             <span className="font-semibold text-foreground">
                               {schedule.vendor?.company_name || schedule.vendor?.vendor_code}
                             </span>{' '}
-                            pada hari {DAYS[schedule.day_of_week]}? Tindakan ini tidak dapat
+                            pada hari {DAY_NAMES[schedule.day_of_week]}? Tindakan ini tidak dapat
                             dibatalkan.
                           </AlertDialogDescription>
                         </AlertDialogHeader>

@@ -1,8 +1,9 @@
 import { z } from 'zod';
+import { DayOfWeek } from './enums';
 
 export const createVendorScheduleSchema = z.object({
   vendor_id: z.number(),
-  day_of_week: z.number().min(1).max(7),
+  day_of_week: z.nativeEnum(DayOfWeek),
   rit: z.number().min(1).default(1),
   arrival_time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
   departure_time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
@@ -17,7 +18,7 @@ export type UpdateVendorSchedule = z.infer<typeof updateVendorScheduleSchema>;
 
 export const findVendorScheduleParamsSchema = z.object({
   vendor_id: z.coerce.number().optional(),
-  day_of_week: z.coerce.number().optional(),
+  day_of_week: z.nativeEnum(DayOfWeek).optional(),
 });
 export type FindVendorScheduleParams = z.infer<typeof findVendorScheduleParamsSchema>;
 

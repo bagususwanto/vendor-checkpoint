@@ -28,14 +28,14 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { VendorScheduleResponse } from '@repo/types';
+import { VendorScheduleResponse, DayOfWeek, DAY_OPTIONS } from '@repo/types';
 import { useCreateVendorSchedule, useUpdateVendorSchedule } from '@/hooks/api/use-vendor-schedule';
 import { useVendorsPaginated } from '@/hooks/api/use-vendors';
 import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   vendor_id: z.coerce.number().min(1, 'Pilih vendor terlebih dahulu'),
-  day_of_week: z.coerce.number().min(1, 'Pilih hari valid').max(7, 'Pilih hari valid'),
+  day_of_week: z.nativeEnum(DayOfWeek),
   rit: z.coerce.number().min(1, 'Nit minimal 1'),
   arrival_time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
   departure_time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
@@ -51,15 +51,6 @@ interface ScheduleFormProps {
   schedule: VendorScheduleResponse | null;
 }
 
-const DAYS = [
-  { value: 1, label: 'Senin' },
-  { value: 2, label: 'Selasa' },
-  { value: 3, label: 'Rabu' },
-  { value: 4, label: 'Kamis' },
-  { value: 5, label: 'Jumat' },
-  { value: 6, label: 'Sabtu' },
-  { value: 7, label: 'Minggu' },
-];
 
 export function ScheduleForm({
   open,
@@ -215,7 +206,7 @@ export function ScheduleForm({
                       <SelectValue placeholder="Pilih Hari" />
                     </SelectTrigger>
                     <SelectContent>
-                      {DAYS.map((day) => (
+                      {DAY_OPTIONS.map((day) => (
                         <SelectItem key={day.value} value={day.value.toString()}>
                           {day.label}
                         </SelectItem>
