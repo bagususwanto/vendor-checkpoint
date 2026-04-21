@@ -17,7 +17,6 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
     environment:
-      - NEXT_PUBLIC_API_URL=http://api:3000
       - PORT=3001
       - HOSTNAME=0.0.0.0
     ports:

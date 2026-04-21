@@ -3,6 +3,8 @@
 # temporary files
 docs/revisi/implementation_plan.md
 
+docker-compose.override.yml
+
 # Dependencies
 node_modules
 .pnp
