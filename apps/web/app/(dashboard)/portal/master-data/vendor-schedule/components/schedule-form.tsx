@@ -222,50 +222,53 @@ export function ScheduleForm({
             <FieldError errors={[form.formState.errors.vendor_id]} />
           </Field>
 
-          <Field>
-            <FieldLabel required>Hari Kedatangan</FieldLabel>
-            <FieldContent>
-              <Controller
-                control={form.control}
-                name="day_of_week"
-                render={({ field }) => (
-                  <Select
-                    disabled={isPending}
-                    onValueChange={(val) => field.onChange(Number(val))}
-                    value={field.value?.toString()}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih Hari" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DAY_OPTIONS.map((day) => (
-                        <SelectItem
-                          key={day.value}
-                          value={day.value.toString()}
-                        >
-                          {day.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </FieldContent>
-            <FieldError errors={[form.formState.errors.day_of_week]} />
-          </Field>
+          <div className="grid grid-cols-2 gap-4">
+            <Field>
+              <FieldLabel required>Hari Kedatangan</FieldLabel>
+              <FieldContent>
+                <Controller
+                  control={form.control}
+                  name="day_of_week"
+                  render={({ field }) => (
+                    <Select
+                      disabled={isPending}
+                      onValueChange={(val) => field.onChange(Number(val))}
+                      value={field.value?.toString()}
+                    >
+                      <SelectTrigger className="w-full h-10">
+                        <SelectValue placeholder="Pilih Hari" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DAY_OPTIONS.map((day) => (
+                          <SelectItem
+                            key={day.value}
+                            value={day.value.toString()}
+                          >
+                            {day.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </FieldContent>
+              <FieldError errors={[form.formState.errors.day_of_week]} />
+            </Field>
 
-          <Field>
-            <FieldLabel required>Rit (Nomor Trip)</FieldLabel>
-            <FieldContent>
-              <Input
-                type="number"
-                min={1}
-                placeholder="1"
-                {...form.register('rit')}
-              />
-            </FieldContent>
-            <FieldError errors={[form.formState.errors.rit]} />
-          </Field>
+            <Field>
+              <FieldLabel required>Rit (Nomor Trip)</FieldLabel>
+              <FieldContent>
+                <Input
+                  type="number"
+                  min={1}
+                  placeholder="1"
+                  {...form.register('rit')}
+                  className="h-10"
+                />
+              </FieldContent>
+              <FieldError errors={[form.formState.errors.rit]} />
+            </Field>
+          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <Field>
@@ -275,6 +278,7 @@ export function ScheduleForm({
                   type="time"
                   placeholder="HH:mm"
                   {...form.register('arrival_time')}
+                  className="h-10"
                 />
               </FieldContent>
               <FieldError errors={[form.formState.errors.arrival_time]} />
@@ -287,6 +291,7 @@ export function ScheduleForm({
                   type="time"
                   placeholder="HH:mm"
                   {...form.register('departure_time')}
+                  className="h-10"
                 />
               </FieldContent>
               <FieldError errors={[form.formState.errors.departure_time]} />
@@ -300,6 +305,7 @@ export function ScheduleForm({
                 type="text"
                 placeholder="(Opsional) Nama Pos / Dock"
                 {...form.register('truck_station')}
+                className="h-10"
               />
             </FieldContent>
             <FieldError errors={[form.formState.errors.truck_station]} />
