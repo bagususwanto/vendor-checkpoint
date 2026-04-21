@@ -95,7 +95,7 @@ export const navData: NavData = {
       items: [
         {
           title: 'Kategori Vendor',
-          url: '/portal/master-data/material-category',
+          url: '/portal/master-data/vendor-category',
           icon: Tags,
           roles: [
             UserRole.SUPER_ADMIN,
