@@ -21,6 +21,8 @@ export type DeliverySlotMonitorItem = {
     schedule_id: number;
     arrival_time: string;   // "HH:mm"
     departure_time: string; // "HH:mm"
+    rit: number;
+    truck_station: string | null;
     vendor: {
       vendor_id: number;
       company_name: string;

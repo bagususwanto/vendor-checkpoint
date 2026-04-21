@@ -26,6 +26,8 @@ export interface ParsedMonitorSlot {
   expectedTime: string;
   companyName: string;
   vendorCode: string;
+  rit: number;
+  truckStation: string | null;
   status: DisplayStatus;
   arrivalTime: string | null;
 }
@@ -121,16 +123,22 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
       <Table className="border-collapse table-fixed">
         <TableHeader className="bg-muted/30 sticky top-0 z-20">
           <TableRow className="hover:bg-transparent border-b border-border">
-            <TableHead className="w-[15%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+            <TableHead className="w-[12%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
               Scheduled
             </TableHead>
-            <TableHead className="w-[45%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+            <TableHead className="w-[35%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
               Vendor Name
             </TableHead>
-            <TableHead className="w-[15%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+            <TableHead className="w-[8%] px-4 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] text-center">
+              Rit
+            </TableHead>
+            <TableHead className="w-[15%] px-4 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] text-center">
+              Station
+            </TableHead>
+            <TableHead className="w-[12%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
               Check-In
             </TableHead>
-            <TableHead className="w-[25%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] text-right">
+            <TableHead className="w-[18%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] text-right">
               Status
             </TableHead>
           </TableRow>
@@ -167,7 +175,7 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
                     )}
                   >
                     {/* Active Indicator */}
-                    <TableCell className="w-[15%] px-6 py-0">
+                    <TableCell className="w-[12%] px-6 py-0">
                       {isActive && (
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 bg-emerald-500 rounded-r-full shadow-[2px_0_8px_rgba(16,185,129,0.3)]" />
                       )}
@@ -183,7 +191,7 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
                       </div>
                     </TableCell>
 
-                    <TableCell className="w-[45%] px-6 py-0">
+                    <TableCell className="w-[35%] px-6 py-0">
                       <div className="flex flex-col">
                         <span
                           className={cn(
@@ -201,7 +209,19 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
                       </div>
                     </TableCell>
 
-                    <TableCell className="w-[15%] px-6 py-0">
+                    <TableCell className="w-[8%] px-4 py-0 text-center">
+                      <div className="text-xl font-mono font-black text-foreground">
+                        {slot.rit}
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="w-[15%] px-4 py-0 text-center">
+                      <div className="text-sm font-bold uppercase text-muted-foreground bg-muted/50 px-2 py-1 rounded-sm border border-border inline-block">
+                        {slot.truckStation || '-'}
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="w-[12%] px-6 py-0">
                       {slot.arrivalTime ? (
                         <div className="flex items-center gap-1.5 text-primary font-mono font-black text-lg tracking-tighter tabular-nums">
                           <ArrowRight className="w-3.5 h-3.5 opacity-40 shrink-0" />
@@ -214,7 +234,7 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
                       )}
                     </TableCell>
 
-                    <TableCell className="w-[25%] px-6 py-0 text-right">
+                    <TableCell className="w-[18%] px-6 py-0 text-right">
                       {getStatusBadge(slot.status)}
                     </TableCell>
                   </TableRow>

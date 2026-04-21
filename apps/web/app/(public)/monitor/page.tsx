@@ -56,6 +56,8 @@ export default function MonitorPage() {
       expectedTime: slot.schedule?.arrival_time || '-',
       companyName: slot.schedule?.vendor?.company_name || '-',
       vendorCode: slot.schedule?.vendor?.vendor_code || '-',
+      rit: slot.schedule?.rit || 1,
+      truckStation: slot.schedule?.truck_station || null,
       status,
       arrivalTime,
     };
