@@ -1,0 +1,9 @@
+.venv
+__pycache__
+*.pyc
+*.pt
+.env
+.gitignore
+Dockerfile
+README.md
+!models

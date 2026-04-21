@@ -1,0 +1,15 @@
+node_modules
+.next
+dist
+.turbo
+out
+*.log
+.env*
+!.env.example
+.git
+.gitignore
+README.md
+LICENSE
+.DS_Store
+apps/ppe-detection/.venv
+apps/ppe-detection/__pycache__

@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { PrismaService } from '../src/common/prisma/prisma.service';
 import {
   ADMIN_USER,
