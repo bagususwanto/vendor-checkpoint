@@ -89,15 +89,27 @@ export function ScheduleForm({
   );
 
   const vendorOptions = useMemo(() => {
-    return (
+    const options =
       vendorsInfiniteData?.pages.flatMap((page) =>
         page.data.map((vendor) => ({
           label: `${vendor.company_name} (${vendor.vendor_code})`,
           value: vendor.vendor_id.toString(),
         })),
-      ) ?? []
-    );
-  }, [vendorsInfiniteData]);
+      ) ?? [];
+
+    // Ensure the current selected vendor is in the options list (when editing)
+    if (
+      schedule?.vendor &&
+      !options.some((opt) => opt.value === schedule.vendor_id.toString())
+    ) {
+      options.unshift({
+        label: `${schedule.vendor.company_name} (${schedule.vendor.vendor_code})`,
+        value: schedule.vendor_id.toString(),
+      });
+    }
+
+    return options;
+  }, [vendorsInfiniteData, schedule]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema as any) as any,
