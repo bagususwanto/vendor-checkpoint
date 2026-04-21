@@ -3,9 +3,10 @@ import {
   useMutation,
   useQueryClient,
   useInfiniteQuery,
+  type UseQueryOptions,
 } from '@tanstack/react-query';
 import { vendorService } from '@/services/vendor.service';
-import { FindVendorParams } from '@repo/types';
+import { FindVendorParams, PaginatedResponse, findVendorResponse } from '@repo/types';
 import { toast } from 'sonner';
 
 // Keys for query invalidation
@@ -19,10 +20,14 @@ export const vendorKeys = {
 };
 
 // Paginated query for data table
-export function useVendorsPaginated(params: FindVendorParams) {
+export function useVendorsPaginated(
+  params: FindVendorParams,
+  options?: Partial<UseQueryOptions<PaginatedResponse<findVendorResponse>>>,
+) {
   return useQuery({
     queryKey: vendorKeys.list(params),
     queryFn: () => vendorService.getVendors(params),
+    ...options,
   });
 }
 

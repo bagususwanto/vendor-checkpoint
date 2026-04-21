@@ -64,11 +64,14 @@ export function ScheduleForm({
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   // Fetch all active vendors
-  const { data: vendorsData, isLoading: isLoadingVendors } = useVendorsPaginated({
-    page: 1,
-    limit: 1000, 
-    isActive: true,
-  });
+  const { data: vendorsData, isLoading: isLoadingVendors } = useVendorsPaginated(
+    {
+      page: 1,
+      limit: 1000,
+      isActive: true,
+    },
+    { enabled: open }
+  );
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema as any) as any,
