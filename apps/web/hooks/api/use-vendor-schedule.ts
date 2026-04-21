@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { vendorScheduleService, VendorScheduleQuery } from '@/services/vendor-schedule.service';
 import {
   CreateVendorSchedule,
@@ -9,6 +9,7 @@ export const useVendorSchedules = (params: VendorScheduleQuery) => {
   return useQuery({
     queryKey: ['vendor-schedules', params],
     queryFn: () => vendorScheduleService.getAll(params),
+    placeholderData: keepPreviousData,
   });
 };
 
