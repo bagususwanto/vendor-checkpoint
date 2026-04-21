@@ -18,6 +18,10 @@ export function ComboboxVendor({
   onSearch,
   onLoadMore,
   isLoading,
+  triggerClassName,
+  inputClassName,
+  itemClassName,
+  ...props
 }: {
   dataOptions: { label: string; value: string }[];
   type: string;
@@ -26,6 +30,10 @@ export function ComboboxVendor({
   onSearch?: (value: string) => void;
   onLoadMore?: () => void;
   isLoading?: boolean;
+  triggerClassName?: string;
+  inputClassName?: string;
+  itemClassName?: string;
+  [key: string]: any;
 }) {
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
@@ -46,15 +54,16 @@ export function ComboboxVendor({
       }}
       type={type}
       value={value}
+      {...props}
     >
-      <ComboboxTrigger className="h-12 vendor-text" />
+      <ComboboxTrigger className={triggerClassName || "h-12 vendor-text"} />
       <ComboboxContent
         className="vendor-text"
         shouldFilter={!onSearch}
       >
         <ComboboxInput
           className="vendor-text"
-          classNameInput="h-12"
+          classNameInput={inputClassName || "h-12"}
           onValueChange={onSearch}
         />
         <ComboboxEmpty className="py-6 text-center vendor-text" />
@@ -62,7 +71,7 @@ export function ComboboxVendor({
           <ComboboxGroup>
             {dataOptions.map((data) => (
               <ComboboxItem
-                className="vendor-text"
+                className={itemClassName || "vendor-text"}
                 key={data.value}
                 value={data.value}
               >

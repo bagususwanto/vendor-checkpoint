@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -29,16 +29,24 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { VendorScheduleResponse, DayOfWeek, DAY_OPTIONS } from '@repo/types';
-import { useCreateVendorSchedule, useUpdateVendorSchedule } from '@/hooks/api/use-vendor-schedule';
-import { useVendorsPaginated } from '@/hooks/api/use-vendors';
-import { Loader2 } from 'lucide-react';
+import {
+  useCreateVendorSchedule,
+  useUpdateVendorSchedule,
+} from '@/hooks/api/use-vendor-schedule';
+import { useVendors } from '@/hooks/api/use-vendors';
+import { ComboboxVendor } from '@/components/combobox-vendor';
+import { useDebounce } from '@/hooks/use-debounce';
 
 const formSchema = z.object({
   vendor_id: z.coerce.number().min(1, 'Pilih vendor terlebih dahulu'),
   day_of_week: z.nativeEnum(DayOfWeek),
   rit: z.coerce.number().min(1, 'Nit minimal 1'),
-  arrival_time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
-  departure_time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
+  arrival_time: z
+    .string()
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
+  departure_time: z
+    .string()
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
   truck_station: z.string().optional().nullable(),
   is_active: z.boolean().default(true),
 });
@@ -51,7 +59,6 @@ interface ScheduleFormProps {
   schedule: VendorScheduleResponse | null;
 }
 
-
 export function ScheduleForm({
   open,
   onOpenChange,
@@ -63,15 +70,34 @@ export function ScheduleForm({
   const isEditing = !!schedule;
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  // Fetch all active vendors
-  const { data: vendorsData, isLoading: isLoadingVendors } = useVendorsPaginated(
+  const [vendorSearch, setVendorSearch] = useState('');
+  const debouncedVendorSearch = useDebounce(vendorSearch, 500);
+
+  // Fetch vendors with infinite query
+  const {
+    data: vendorsInfiniteData,
+    isLoading: isLoadingVendors,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useVendors(
     {
-      page: 1,
-      limit: 1000,
       isActive: true,
+      search: debouncedVendorSearch || undefined,
     },
-    { enabled: open }
+    { enabled: open },
   );
+
+  const vendorOptions = useMemo(() => {
+    return (
+      vendorsInfiniteData?.pages.flatMap((page) =>
+        page.data.map((vendor) => ({
+          label: `${vendor.company_name} (${vendor.vendor_code})`,
+          value: vendor.vendor_id.toString(),
+        })),
+      ) ?? []
+    );
+  }, [vendorsInfiniteData]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema as any) as any,
@@ -126,7 +152,7 @@ export function ScheduleForm({
               description: error.message || 'Terjadi kesalahan sistem',
             });
           },
-        }
+        },
       );
     } else {
       createMutation.mutate(values, {
@@ -165,28 +191,19 @@ export function ScheduleForm({
                 control={form.control}
                 name="vendor_id"
                 render={({ field }) => (
-                  <Select
-                    disabled={isPending || isLoadingVendors}
-                    onValueChange={(val) => field.onChange(Number(val))}
+                  <ComboboxVendor
+                    type="Vendor"
                     value={field.value ? field.value.toString() : ''}
-                  >
-                    <SelectTrigger>
-                      {isLoadingVendors ? (
-                        <div className="flex items-center">
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Memuat data...
-                        </div>
-                      ) : (
-                        <SelectValue placeholder="Pilih Vendor dari daftar" />
-                      )}
-                    </SelectTrigger>
-                    <SelectContent>
-                      {vendorsData?.data?.map((vendor) => (
-                        <SelectItem key={vendor.vendor_id} value={vendor.vendor_id.toString()}>
-                          {vendor.company_name} ({vendor.vendor_code})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onSelect={(val) => field.onChange(Number(val))}
+                    dataOptions={vendorOptions}
+                    onSearch={setVendorSearch}
+                    onLoadMore={() => hasNextPage && fetchNextPage()}
+                    isLoading={isLoadingVendors || isFetchingNextPage}
+                    triggerClassName="h-10 text-sm"
+                    inputClassName="h-10 text-sm"
+                    itemClassName="text-sm"
+                    modal={true}
+                  />
                 )}
               />
             </FieldContent>
@@ -210,7 +227,10 @@ export function ScheduleForm({
                     </SelectTrigger>
                     <SelectContent>
                       {DAY_OPTIONS.map((day) => (
-                        <SelectItem key={day.value} value={day.value.toString()}>
+                        <SelectItem
+                          key={day.value}
+                          value={day.value.toString()}
+                        >
                           {day.label}
                         </SelectItem>
                       ))}
@@ -225,7 +245,12 @@ export function ScheduleForm({
           <Field>
             <FieldLabel required>Rit (Nomor Trip)</FieldLabel>
             <FieldContent>
-              <Input type="number" min={1} placeholder="1" {...form.register('rit')} />
+              <Input
+                type="number"
+                min={1}
+                placeholder="1"
+                {...form.register('rit')}
+              />
             </FieldContent>
             <FieldError errors={[form.formState.errors.rit]} />
           </Field>
@@ -234,7 +259,11 @@ export function ScheduleForm({
             <Field>
               <FieldLabel required>Waktu Tiba</FieldLabel>
               <FieldContent>
-                <Input type="time" placeholder="HH:mm" {...form.register('arrival_time')} />
+                <Input
+                  type="time"
+                  placeholder="HH:mm"
+                  {...form.register('arrival_time')}
+                />
               </FieldContent>
               <FieldError errors={[form.formState.errors.arrival_time]} />
             </Field>
@@ -242,7 +271,11 @@ export function ScheduleForm({
             <Field>
               <FieldLabel required>Waktu Pulang</FieldLabel>
               <FieldContent>
-                <Input type="time" placeholder="HH:mm" {...form.register('departure_time')} />
+                <Input
+                  type="time"
+                  placeholder="HH:mm"
+                  {...form.register('departure_time')}
+                />
               </FieldContent>
               <FieldError errors={[form.formState.errors.departure_time]} />
             </Field>
@@ -251,7 +284,11 @@ export function ScheduleForm({
           <Field>
             <FieldLabel>Truck Station / Pos</FieldLabel>
             <FieldContent>
-              <Input type="text" placeholder="(Opsional) Nama Pos / Dock" {...form.register('truck_station')} />
+              <Input
+                type="text"
+                placeholder="(Opsional) Nama Pos / Dock"
+                {...form.register('truck_station')}
+              />
             </FieldContent>
             <FieldError errors={[form.formState.errors.truck_station]} />
           </Field>
@@ -261,9 +298,13 @@ export function ScheduleForm({
             <FieldContent className="flex items-center gap-2 mt-2">
               <Switch
                 checked={form.watch('is_active')}
-                onCheckedChange={(checked) => form.setValue('is_active', checked)}
+                onCheckedChange={(checked) =>
+                  form.setValue('is_active', checked)
+                }
               />
-              <span className="text-sm text-muted-foreground">Aktifkan untuk menghasilkan slot harian</span>
+              <span className="text-sm text-muted-foreground">
+                Aktifkan untuk menghasilkan slot harian
+              </span>
             </FieldContent>
           </Field>
 

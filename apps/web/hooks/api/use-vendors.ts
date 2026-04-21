@@ -4,6 +4,7 @@ import {
   useQueryClient,
   useInfiniteQuery,
   type UseQueryOptions,
+  type UseInfiniteQueryOptions,
 } from '@tanstack/react-query';
 import { vendorService } from '@/services/vendor.service';
 import { FindVendorParams, PaginatedResponse, findVendorResponse } from '@repo/types';
@@ -32,13 +33,16 @@ export function useVendorsPaginated(
 }
 
 // Infinite query for combobox/dropdown (used in check-in form)
-export function useVendors(params: Omit<FindVendorParams, 'page' | 'limit'>) {
+export function useVendors(
+  params: Omit<FindVendorParams, 'page' | 'limit'>,
+  options?: Partial<UseInfiniteQueryOptions<PaginatedResponse<findVendorResponse>>>,
+) {
   return useInfiniteQuery({
     queryKey: ['vendors-infinite', params],
     queryFn: async ({ pageParam = 1 }) => {
       const response = await vendorService.getVendors({
         ...params,
-        page: pageParam,
+        page: pageParam as number,
         limit: 10,
       });
       return response;
@@ -46,9 +50,10 @@ export function useVendors(params: Omit<FindVendorParams, 'page' | 'limit'>) {
     getNextPageParam: (lastPage) => {
       const { page, total, limit } = lastPage.meta;
       const totalPages = Math.ceil(total / limit);
-      return page < totalPages ? page + 1 : undefined;
+      return page < totalPages ? (page + 1) : undefined;
     },
     initialPageParam: 1,
+    ...options as any,
   });
 }
 
