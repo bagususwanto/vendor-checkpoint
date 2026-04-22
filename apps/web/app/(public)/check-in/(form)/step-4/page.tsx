@@ -78,8 +78,8 @@ export default function CheckInStep4() {
           ? 'Pass'
           : 'Fail'
         : 'Skipped',
-      // If we implement delayed arrival reason later, insert it here:
-      // delay_arrival_reason_id: step1Data.delayArrivalReasonId,
+      arrival_status: step1Data.arrivalStatus,
+      delay_arrival_reason_id: step1Data.delayArrivalReasonId,
       checklist_responses: Object.entries(step2Data.checklistItems).map(
         ([itemId, value]) => ({
           checklist_item_id: Number(itemId),

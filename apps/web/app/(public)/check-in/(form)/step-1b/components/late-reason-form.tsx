@@ -32,9 +32,14 @@ export function LateReasonForm() {
     },
     onSubmit: async ({ value }) => {
       if (step1Data) {
+        const selectedReason = delayReasons?.data?.find(
+          (r: any) => r.delay_reason_id.toString() === value.delayArrivalReasonId,
+        );
+
         setStep1Data({
           ...step1Data,
           delayArrivalReasonId: parseInt(value.delayArrivalReasonId),
+          delayArrivalReasonLabel: selectedReason?.reason_text,
         });
       }
       router.push('/check-in/step-2');

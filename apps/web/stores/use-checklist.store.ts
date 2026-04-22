@@ -16,6 +16,7 @@ export type Step1Data = {
   poNumber?: string;
   arrivalStatus?: string; // 'On-Time' | 'Late' | 'Early'
   delayArrivalReasonId?: number;
+  delayArrivalReasonLabel?: string;
 };
 
 export type PPEScanData = {

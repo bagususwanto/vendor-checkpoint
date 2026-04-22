@@ -9,6 +9,7 @@ import {
   User,
   Tag,
   ScanBarcode,
+  Clock,
 } from 'lucide-react';
 
 import { Step1Data } from '@/stores/use-checklist.store';
@@ -76,6 +77,22 @@ export function ReviewIdentity({ step1Data }: ReviewIdentityProps) {
               </div>
             </div>
           )}
+          <div className="flex items-center gap-3">
+            <Clock className="w-5 h-5 text-muted-foreground" />
+            <div>
+              <p className="text-muted-foreground text-sm">Status Kedatangan</p>
+              <div className="flex flex-col">
+                <span className={`font-semibold ${step1Data.arrivalStatus === 'Late' ? 'text-red-600' : 'text-green-600'}`}>
+                  {step1Data.arrivalStatus === 'Late' ? 'Terlambat' : 'Tepat Waktu'}
+                </span>
+                {step1Data.arrivalStatus === 'Late' && step1Data.delayArrivalReasonLabel && (
+                  <p className="text-sm text-muted-foreground italic">
+                    Alasan: {step1Data.delayArrivalReasonLabel}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
