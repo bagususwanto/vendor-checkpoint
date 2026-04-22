@@ -266,6 +266,67 @@ export class CheckInService {
     };
   }
 
+  async checkDepartureStatus(queueNumber: string) {
+    const dateNow = new Date();
+
+    const bufferConfig = await this.systemConfigService.findByConfigKey(
+      'ARRIVAL_BUFFER_MINUTES', // Fallback to Arrival Buffer if Departure buffer doesn't exist
+    );
+    const bufferMinutes = bufferConfig
+      ? parseInt(bufferConfig.config_value)
+      : 30;
+
+    const entry = await this.prisma.ops_checkin_entry.findUnique({
+      where: { queue_number: queueNumber },
+      include: {
+        delivery_slot: {
+          include: {
+            schedule: true,
+          },
+        },
+      },
+    });
+
+    if (!entry) {
+      throw new BadRequestException('Nomor antrean tidak ditemukan');
+    }
+
+    const actualTimeStr = dateNow.toLocaleTimeString('en-GB', {
+      timeZone: 'Asia/Jakarta',
+      hour12: false,
+    }).substring(0, 5);
+
+    if (!entry.delivery_slot) {
+      return {
+        departure_status: 'On-Time',
+        actual_time: actualTimeStr,
+        planned_departure_time: null,
+      };
+    }
+
+    const plannedDepartureStr = entry.delivery_slot.schedule.departure_time; // HH:mm
+    const [plannedHours, plannedMinutes] = plannedDepartureStr
+      .split(':')
+      .map(Number);
+
+    const plannedDate = new Date(dateNow);
+    plannedDate.setUTCHours(plannedHours - 7, plannedMinutes, 0, 0);
+
+    const diffMs = dateNow.getTime() - plannedDate.getTime();
+    const diffMinutes = Math.floor(diffMs / 60000);
+
+    let status: 'On-Time' | 'Overdue' = 'On-Time';
+    if (diffMinutes > bufferMinutes) {
+      status = 'Overdue';
+    }
+
+    return {
+      departure_status: status,
+      planned_departure_time: plannedDepartureStr,
+      actual_time: actualTimeStr,
+    };
+  }
+
   findAll() {
     return `This action returns all checkIn`;
   }

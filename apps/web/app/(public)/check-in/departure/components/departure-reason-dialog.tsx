@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,7 @@ interface DepartureReasonDialogProps {
   onClose: () => void;
   onConfirm: (payload: { departure_status: string; delay_departure_reason_id?: number }) => void;
   isSubmitting: boolean;
+  detectedStatus?: 'On-Time' | 'Overdue';
 }
 
 export function DepartureReasonDialog({
@@ -26,9 +27,17 @@ export function DepartureReasonDialog({
   onClose,
   onConfirm,
   isSubmitting,
+  detectedStatus = 'On-Time',
 }: DepartureReasonDialogProps) {
-  const [departureStatus, setDepartureStatus] = useState<string>('On-Time');
+  const [departureStatus, setDepartureStatus] = useState<string>(detectedStatus);
   const [selectedReasonId, setSelectedReasonId] = useState<number | undefined>();
+
+  useEffect(() => {
+    if (isOpen) {
+      setDepartureStatus(detectedStatus);
+      setSelectedReasonId(undefined);
+    }
+  }, [isOpen, detectedStatus]);
 
   // Use the hook to fetch the departure reasons from the backend
   const { data: delayReasonsData, isLoading } = useDelayReasons({ category: 'Departure', limit: 100 });
@@ -48,7 +57,9 @@ export function DepartureReasonDialog({
         <DialogHeader>
           <DialogTitle>Konfirmasi Check-Out</DialogTitle>
           <DialogDescription>
-            Pilih status keberangkatan Anda. Jika jadwal Anda molor/Overdue dari target, mohon sertakan alasannya.
+            {detectedStatus === 'Overdue'
+              ? 'Status keberangkatan Anda terdeteksi Overdue (Molor). Mohon sertakan alasannya.'
+              : 'Pilih status keberangkatan Anda. Jika jadwal Anda molor/Overdue dari target, mohon sertakan alasannya.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -65,13 +76,28 @@ export function DepartureReasonDialog({
               }}
               className="flex flex-col gap-3"
             >
-              <div className="flex items-center space-x-2 border p-3 rounded-lg hover:bg-slate-50 cursor-pointer">
-                <RadioGroupItem value="On-Time" id="status-ontime" />
-                <Label htmlFor="status-ontime" className="flex-1 cursor-pointer font-medium text-emerald-700">
+              <div
+                className={`flex items-center space-x-2 border p-3 rounded-lg ${
+                  detectedStatus === 'Overdue'
+                    ? 'opacity-50 bg-slate-100 cursor-not-allowed'
+                    : 'hover:bg-slate-50 cursor-pointer'
+                }`}
+              >
+                <RadioGroupItem
+                  value="On-Time"
+                  id="status-ontime"
+                  disabled={detectedStatus === 'Overdue'}
+                />
+                <Label
+                  htmlFor="status-ontime"
+                  className={`flex-1 font-medium text-emerald-700 ${
+                    detectedStatus === 'Overdue' ? 'cursor-not-allowed' : 'cursor-pointer'
+                  }`}
+                >
                   On-Time (Sesuai Target)
                 </Label>
               </div>
-              <div className="flex items-center space-x-2 border p-3 rounded-lg hover:bg-slate-50 cursor-pointer">
+              <div className="flex items-center space-x-2 border p-3 rounded-lg hover:bg-slate-50 cursor-pointer bg-slate-50">
                 <RadioGroupItem value="Overdue" id="status-overdue" />
                 <Label htmlFor="status-overdue" className="flex-1 cursor-pointer font-medium text-amber-700">
                   Overdue (Molor)

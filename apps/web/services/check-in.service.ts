@@ -13,6 +13,18 @@ export const checkInService = {
     }
   },
 
+  getDepartureCheck: async (queueNumber: string) => {
+    try {
+      // Re-use ArrivalCheckResponse for now or use any since they return similar fields
+      const response = await axiosInstance.get<{ data: any }>(
+        `/check-in/departure-check/${queueNumber}`,
+      );
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   submitCheckIn: async (payload: CheckIn) => {
     try {
       const response = await axiosInstance.post<{ data: any }>(

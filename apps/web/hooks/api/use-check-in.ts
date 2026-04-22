@@ -98,3 +98,9 @@ export function useArrivalCheck() {
     mutationFn: (vendorId: number) => checkInService.getArrivalCheck(vendorId),
   });
 }
+
+export function useDepartureCheck() {
+  return useMutation({
+    mutationFn: (queueNumber: string) => checkInService.getDepartureCheck(queueNumber),
+  });
+}

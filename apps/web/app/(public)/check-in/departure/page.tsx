@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import IconLabel from '@/components/icon-label';
 
-import { useQueueStatus, useCheckoutCheckIn } from '@/hooks/api/use-check-in';
+import { useQueueStatus, useCheckoutCheckIn, useDepartureCheck } from '@/hooks/api/use-check-in';
 import { DepartureReasonDialog } from './components/departure-reason-dialog';
 
 const SearchSchema = z.object({
@@ -40,6 +40,10 @@ export default function DeparturePage() {
   } = useQueueStatus(searchedQueue || '');
   const { mutateAsync: checkout, isPending: isCheckingOut } =
     useCheckoutCheckIn();
+  const { mutateAsync: checkDeparture, isPending: isCheckingDeparture } =
+    useDepartureCheck();
+
+  const [detectedStatus, setDetectedStatus] = useState<'On-Time' | 'Overdue'>('On-Time');
 
   const form = useForm({
     defaultValues: {
@@ -56,12 +60,20 @@ export default function DeparturePage() {
     },
   });
 
-  const handleCheckoutClick = () => {
-    // For now, always assume we might need a delay reason, or show the dialog
-    // A better approach is to ask backend if it's overdue, but since we don't have this,
-    // let's show the dialog right away, and if they are on-time, they just click "Submit" without reason?
-    // Let's always open the Departure Reason Dialog for confirmation.
-    setIsDialogOpen(true);
+  const handleCheckoutClick = async () => {
+    if (!queueData) return;
+    try {
+      const result = await checkDeparture(queueData.queue_number);
+      setDetectedStatus(result.departure_status);
+      setIsDialogOpen(true);
+    } catch (error) {
+      toast.error('Gagal memvalidasi status keberangkatan', {
+        description: 'Terjadi kesalahan saat memeriksa jadwal.',
+      });
+      // Fallback
+      setDetectedStatus('On-Time');
+      setIsDialogOpen(true);
+    }
   };
 
   const handleConfirmCheckout = async (payload: {
@@ -211,10 +223,10 @@ export default function DeparturePage() {
                     size="xl"
                     variant="default"
                     className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white"
-                    disabled={isCheckingOut}
+                    disabled={isCheckingOut || isCheckingDeparture}
                   >
                     <LogOut className="w-5 h-5 mr-2" />
-                    Konfirmasi Check-Out
+                    {isCheckingDeparture ? 'Memvalidasi...' : 'Konfirmasi Check-Out'}
                   </Button>
                 )}
               </div>
@@ -233,6 +245,7 @@ export default function DeparturePage() {
           onClose={() => setIsDialogOpen(false)}
           onConfirm={handleConfirmCheckout}
           isSubmitting={isCheckingOut}
+          detectedStatus={detectedStatus}
         />
       </main>
     </div>

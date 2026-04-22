@@ -37,6 +37,12 @@ export class CheckInController {
     return this.checkInService.checkArrivalStatus(+vendorId);
   }
 
+  // PUBLIC - Vendor cek status keberangkatan (On-Time/Overdue)
+  @Get('/departure-check/:queueNumber')
+  checkDepartureStatus(@Param('queueNumber') queueNumber: string) {
+    return this.checkInService.checkDepartureStatus(queueNumber);
+  }
+
   // PUBLIC - Vendor submit check-in tanpa login
   @Post()
   @AuditLog({
