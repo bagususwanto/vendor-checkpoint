@@ -225,7 +225,10 @@ export class CheckInService {
       },
     });
 
-    const actualTimeStr = dateNow.toTimeString().substring(0, 5); // HH:mm
+    const actualTimeStr = dateNow.toLocaleTimeString('en-GB', {
+      timeZone: 'Asia/Jakarta',
+      hour12: false,
+    }).substring(0, 5);
 
     if (!slot) {
       return {
@@ -241,7 +244,9 @@ export class CheckInService {
       .map(Number);
 
     const plannedDate = new Date(dateNow);
-    plannedDate.setHours(plannedHours, plannedMinutes, 0, 0);
+    // Menggunakan setUTCHours agar logic ini server-agnostic (tidak peduli timezone server)
+    // Karena target kita adalah WIB (UTC+7), maka jam 08:00 WIB = 01:00 UTC.
+    plannedDate.setUTCHours(plannedHours - 7, plannedMinutes, 0, 0);
 
     const diffMs = dateNow.getTime() - plannedDate.getTime();
     const diffMinutes = Math.floor(diffMs / 60000);
