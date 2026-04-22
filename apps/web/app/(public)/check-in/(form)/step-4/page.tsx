@@ -103,6 +103,8 @@ export default function CheckInStep4() {
         status_display_text: result.status_display_text,
         estimatedWaitMinutes: result.estimated_wait_minutes,
         submitTime: formatDateTime(result.submission_time),
+        dnNumber: step1Data.dnNumber,
+        poNumber: step1Data.poNumber,
       };
 
       setSuccessData(successData);

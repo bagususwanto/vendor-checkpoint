@@ -115,6 +115,16 @@ export function SuccessCard({ data, onCheckStatus, onGoHome }: SuccessCardProps)
                 label="Waktu Antrean" 
                 value={`${data.estimatedWaitMinutes} Menit`} 
               />
+              <InfoItem 
+                icon={<Search className="w-3.5 h-3.5" />} 
+                label="No. DN" 
+                value={data.dnNumber || '-'} 
+              />
+              <InfoItem 
+                icon={<Search className="w-3.5 h-3.5" />} 
+                label="No. PO" 
+                value={data.poNumber || '-'} 
+              />
             </div>
 
             {/* QR Code Section */}

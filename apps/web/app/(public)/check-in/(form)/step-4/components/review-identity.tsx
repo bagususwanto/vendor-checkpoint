@@ -55,28 +55,24 @@ export function ReviewIdentity({ step1Data }: ReviewIdentityProps) {
               </p>
             </div>
           </div>
-          {step1Data.dnNumber && (
-            <div className="flex items-center gap-3">
-              <ScanBarcode className="w-5 h-5 text-muted-foreground" />
-              <div>
-                <p className="text-muted-foreground text-sm">Delivery Note (DN)</p>
-                <p className="font-medium text-lg">
-                  {step1Data.dnNumber}
-                </p>
-              </div>
+          <div className="flex items-center gap-3">
+            <ScanBarcode className="w-5 h-5 text-muted-foreground" />
+            <div>
+              <p className="text-muted-foreground text-sm">Delivery Note (DN)</p>
+              <p className="font-medium text-lg">
+                {step1Data.dnNumber || '-'}
+              </p>
             </div>
-          )}
-          {step1Data.poNumber && (
-            <div className="flex items-center gap-3">
-              <ScanBarcode className="w-5 h-5 text-muted-foreground" />
-              <div>
-                <p className="text-muted-foreground text-sm">Purchase Order (PO)</p>
-                <p className="font-medium text-lg">
-                  {step1Data.poNumber}
-                </p>
-              </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <ScanBarcode className="w-5 h-5 text-muted-foreground" />
+            <div>
+              <p className="text-muted-foreground text-sm">Purchase Order (PO)</p>
+              <p className="font-medium text-lg">
+                {step1Data.poNumber || '-'}
+              </p>
             </div>
-          )}
+          </div>
           <div className="flex items-center gap-3">
             <Clock className="w-5 h-5 text-muted-foreground" />
             <div>

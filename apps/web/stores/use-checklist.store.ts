@@ -39,6 +39,8 @@ export type SuccessData = {
   status_display_text: string;
   estimatedWaitMinutes: number;
   submitTime: string;
+  dnNumber?: string;
+  poNumber?: string;
 };
 
 export type ChecklistItem = {
