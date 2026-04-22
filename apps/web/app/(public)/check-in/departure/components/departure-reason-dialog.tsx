@@ -20,6 +20,8 @@ interface DepartureReasonDialogProps {
   onConfirm: (payload: { departure_status: string; delay_departure_reason_id?: number }) => void;
   isSubmitting: boolean;
   detectedStatus?: 'On-Time' | 'Overdue';
+  plannedTime?: string | null;
+  actualTime?: string;
 }
 
 export function DepartureReasonDialog({
@@ -28,6 +30,8 @@ export function DepartureReasonDialog({
   onConfirm,
   isSubmitting,
   detectedStatus = 'On-Time',
+  plannedTime,
+  actualTime,
 }: DepartureReasonDialogProps) {
   const [departureStatus, setDepartureStatus] = useState<string>(detectedStatus);
   const [selectedReasonId, setSelectedReasonId] = useState<number | undefined>();
@@ -58,9 +62,21 @@ export function DepartureReasonDialog({
           <DialogTitle>Konfirmasi Check-Out</DialogTitle>
           <DialogDescription>
             {detectedStatus === 'Overdue'
-              ? 'Status keberangkatan Anda terdeteksi Overdue (Molor). Mohon sertakan alasannya.'
+              ? `Status keberangkatan Anda terdeteksi Overdue (Molor).`
               : 'Pilih status keberangkatan Anda. Jika jadwal Anda molor/Overdue dari target, mohon sertakan alasannya.'}
           </DialogDescription>
+          {detectedStatus === 'Overdue' && plannedTime && (
+            <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-md text-xs text-amber-800 flex flex-col gap-1">
+              <div className="flex justify-between">
+                <span>Target Keluar:</span>
+                <span className="font-bold">{plannedTime}</span>
+              </div>
+              <div className="flex justify-between text-red-600">
+                <span>Waktu Sekarang:</span>
+                <span className="font-bold">{actualTime}</span>
+              </div>
+            </div>
+          )}
         </DialogHeader>
 
         <div className="py-4 space-y-6">

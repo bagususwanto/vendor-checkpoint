@@ -44,6 +44,7 @@ export default function DeparturePage() {
     useDepartureCheck();
 
   const [detectedStatus, setDetectedStatus] = useState<'On-Time' | 'Overdue'>('On-Time');
+  const [departureTimes, setDepartureTimes] = useState<{ planned: string | null; actual: string } | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -65,6 +66,10 @@ export default function DeparturePage() {
     try {
       const result = await checkDeparture(queueData.queue_number);
       setDetectedStatus(result.departure_status);
+      setDepartureTimes({
+        planned: result.planned_departure_time,
+        actual: result.actual_time,
+      });
       setIsDialogOpen(true);
     } catch (error) {
       toast.error('Gagal memvalidasi status keberangkatan', {
@@ -246,6 +251,8 @@ export default function DeparturePage() {
           onConfirm={handleConfirmCheckout}
           isSubmitting={isCheckingOut}
           detectedStatus={detectedStatus}
+          plannedTime={departureTimes?.planned}
+          actualTime={departureTimes?.actual}
         />
       </main>
     </div>
