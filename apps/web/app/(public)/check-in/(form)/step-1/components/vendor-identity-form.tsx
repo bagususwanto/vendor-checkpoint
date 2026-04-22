@@ -23,12 +23,14 @@ import { fetchChecklistByCategory } from '@/hooks/api/use-checklist';
 import { DropdownVendorCategory } from '@/components/dropdown-vendor-category';
 import { useVendors } from '@/hooks/api/use-vendors';
 import { useInfiniteVendorCategories } from '@/hooks/api/use-vendor-categories';
+import { useArrivalCheck } from '@/hooks/api/use-check-in';
 
 export function VendorIdentityForm() {
   const { step1Data, setStep1Data, setChecklistCategories } =
     useChecklistStore();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { mutateAsync: arrivalCheck } = useArrivalCheck();
 
   // Search States
   const [search, setSearch] = useState('');
@@ -152,16 +154,21 @@ export function VendorIdentityForm() {
           staleTime: 60 * 1000,
         });
 
+        // Arrival Check
+        const arrivalData = await arrivalCheck(Number(value.company.value));
+
         setChecklistCategories(checklistData);
         setStep1Data({
           ...value,
-          vendorCategory: value.vendorCategory
+          vendorCategory: value.vendorCategory,
+          arrivalStatus: arrivalData.arrival_status,
         });
         
-        // Go to Step 1b (Arrival Reason) if late, but for now we skip to AI Safety (Step 2)
-        // Wait, where is arrival status logic? 
-        // We will fetch it from backend or just continue. 
-        router.push('/check-in/step-2');
+        if (arrivalData.arrival_status === 'Late') {
+          router.push('/check-in/step-1b');
+        } else {
+          router.push('/check-in/step-2');
+        }
       } catch (error) {
         console.error('Failed to fetch checklist', error);
       } finally {

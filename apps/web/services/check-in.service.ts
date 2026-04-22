@@ -1,7 +1,18 @@
-import { CheckIn, PaginatedResponse } from '@repo/types';
+import { CheckIn, PaginatedResponse, ArrivalCheckResponse } from '@repo/types';
 import { axiosInstance } from '@/lib/axios';
 
 export const checkInService = {
+  getArrivalCheck: async (vendorId: number) => {
+    try {
+      const response = await axiosInstance.get<{ data: ArrivalCheckResponse }>(
+        `/check-in/arrival-check/${vendorId}`,
+      );
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   submitCheckIn: async (payload: CheckIn) => {
     try {
       const response = await axiosInstance.post<{ data: any }>(

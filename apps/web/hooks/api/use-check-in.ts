@@ -92,3 +92,9 @@ export function useResumeCheckIn() {
       checkInService.resumeCheckIn(queueNumber),
   });
 }
+
+export function useArrivalCheck() {
+  return useMutation({
+    mutationFn: (vendorId: number) => checkInService.getArrivalCheck(vendorId),
+  });
+}
