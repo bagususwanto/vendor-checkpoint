@@ -30,6 +30,12 @@ import { QueueStatus } from '@repo/types';
 @UseInterceptors(AuditLogInterceptor)
 export class CheckInController {
   constructor(private readonly checkInService: CheckInService) {}
+  
+  // PUBLIC - Vendor cek status kedatangan (On-Time/Late)
+  @Get('/arrival-check/:vendorId')
+  checkArrivalStatus(@Param('vendorId') vendorId: string) {
+    return this.checkInService.checkArrivalStatus(+vendorId);
+  }
 
   // PUBLIC - Vendor submit check-in tanpa login
   @Post()

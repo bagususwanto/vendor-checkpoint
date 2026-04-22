@@ -5,6 +5,7 @@ import { VerifyCheckInDto } from './dto/verify-check-in.dto';
 import { CheckoutCheckInDto } from './dto/checkout-check-in.dto';
 import { HoldCheckInDto } from './dto/hold-check-in.dto';
 import { ResumeCheckInDto } from './dto/resume-check-in.dto';
+import { ArrivalCheckResponseDto } from './dto/arrival-check-response.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { VendorService } from '../vendor/vendor.service';
 import { generateQueueNumber } from 'src/common/utils/queue-number.util.';
@@ -76,6 +77,11 @@ export class CheckInService {
                 gte: startOfDay,
               },
               status: 'Open',
+            },
+            orderBy: {
+              schedule: {
+                arrival_time: 'asc',
+              },
             },
           });
 
@@ -185,6 +191,74 @@ export class CheckInService {
         throw error;
       }
     }
+  }
+
+  async checkArrivalStatus(vendorId: number): Promise<ArrivalCheckResponseDto> {
+    const dateNow = new Date();
+    const startOfDay = new Date(dateNow);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const bufferConfig = await this.systemConfigService.findByConfigKey(
+      'ARRIVAL_BUFFER_MINUTES',
+    );
+    const bufferMinutes = bufferConfig
+      ? parseInt(bufferConfig.config_value)
+      : 30;
+
+    const slot = await this.prisma.ops_delivery_slot.findFirst({
+      where: {
+        schedule: {
+          vendor_id: vendorId,
+        },
+        expected_date: {
+          gte: startOfDay,
+        },
+        status: 'Open',
+      },
+      include: {
+        schedule: true,
+      },
+      orderBy: {
+        schedule: {
+          arrival_time: 'asc',
+        },
+      },
+    });
+
+    const actualTimeStr = dateNow.toTimeString().substring(0, 5); // HH:mm
+
+    if (!slot) {
+      return {
+        arrival_status: 'On-Time',
+        actual_time: actualTimeStr,
+        slot_id: null,
+      };
+    }
+
+    const plannedArrivalStr = slot.schedule.arrival_time; // HH:mm
+    const [plannedHours, plannedMinutes] = plannedArrivalStr
+      .split(':')
+      .map(Number);
+
+    const plannedDate = new Date(dateNow);
+    plannedDate.setHours(plannedHours, plannedMinutes, 0, 0);
+
+    const diffMs = dateNow.getTime() - plannedDate.getTime();
+    const diffMinutes = Math.floor(diffMs / 60000);
+
+    let status: 'On-Time' | 'Late' | 'Early' = 'On-Time';
+    if (diffMinutes > bufferMinutes) {
+      status = 'Late';
+    } else if (diffMinutes < -bufferMinutes) {
+      status = 'Early';
+    }
+
+    return {
+      arrival_status: status,
+      planned_arrival_time: plannedArrivalStr,
+      actual_time: actualTimeStr,
+      slot_id: slot.slot_id,
+    };
   }
 
   findAll() {
