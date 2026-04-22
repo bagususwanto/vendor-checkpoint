@@ -10,6 +10,8 @@ import {
   CircleArrowRight,
   User,
   Box,
+  AlertCircle,
+  CheckCircle2,
 } from 'lucide-react';
 import { ComboboxVendor } from '@/components/combobox-vendor';
 import IconLabel from '@/components/icon-label';
@@ -24,6 +26,8 @@ import { DropdownVendorCategory } from '@/components/dropdown-vendor-category';
 import { useVendors } from '@/hooks/api/use-vendors';
 import { useInfiniteVendorCategories } from '@/hooks/api/use-vendor-categories';
 import { useArrivalCheck } from '@/hooks/api/use-check-in';
+import { cn } from '@/lib/utils';
+import { ArrivalCheckResponse } from '@repo/types';
 
 export function VendorIdentityForm() {
   const { step1Data, setStep1Data, setChecklistCategories } =
@@ -31,6 +35,8 @@ export function VendorIdentityForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { mutateAsync: arrivalCheck } = useArrivalCheck();
+
+  const [arrivalInfo, setArrivalInfo] = useState<ArrivalCheckResponse | null>(null);
 
   // Search States
   const [search, setSearch] = useState('');
@@ -177,12 +183,22 @@ export function VendorIdentityForm() {
     },
   });
 
-  const handleSelectVendor = (value: string) => {
+  const handleSelectVendor = async (value: string) => {
     const vendor = displayVendors.find((c) => c.value === value);
     setSelectedVendor(vendor || null);
     if (vendor) {
       form.setFieldValue('company.value', vendor.value);
       form.setFieldValue('company.label', vendor.label);
+
+      // Trigger arrival check
+      try {
+        const data = await arrivalCheck(Number(vendor.value));
+        setArrivalInfo(data);
+      } catch (error) {
+        console.error('Arrival check failed', error);
+      }
+    } else {
+      setArrivalInfo(null);
     }
   };
 
@@ -319,6 +335,25 @@ export function VendorIdentityForm() {
                     }}
                     isLoading={isFetchingVendors}
                   />
+                  
+                  {arrivalInfo && (
+                    <div className={cn(
+                      "mt-2 p-3 rounded-lg border flex items-center gap-3",
+                      arrivalInfo.arrival_status === 'Late' ? "bg-red-50 border-red-200 text-red-700" : "bg-green-50 border-green-200 text-green-700"
+                    )}>
+                      {arrivalInfo.arrival_status === 'Late' ? <AlertCircle className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
+                      <div className="text-sm">
+                        <span className="font-bold">{arrivalInfo.arrival_status === 'Late' ? 'Terlambat' : 'Tepat Waktu'}</span>
+                        {arrivalInfo.planned_arrival_time && (
+                          <span className="ml-1">(Jadwal: {arrivalInfo.planned_arrival_time})</span>
+                        )}
+                        {arrivalInfo.arrival_status === 'Late' && (
+                          <p className="mt-0.5 opacity-80 italic text-xs">Anda akan diminta mengisi alasan di tahap berikutnya.</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
