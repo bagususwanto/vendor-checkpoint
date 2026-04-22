@@ -105,6 +105,8 @@ export default function CheckInStep4() {
         submitTime: formatDateTime(result.submission_time),
         dnNumber: step1Data.dnNumber,
         poNumber: step1Data.poNumber,
+        arrivalStatus: step1Data.arrivalStatus,
+        delayArrivalReasonLabel: step1Data.delayArrivalReasonLabel,
       };
 
       setSuccessData(successData);

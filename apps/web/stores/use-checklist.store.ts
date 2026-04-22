@@ -41,6 +41,8 @@ export type SuccessData = {
   submitTime: string;
   dnNumber?: string;
   poNumber?: string;
+  arrivalStatus?: string;
+  delayArrivalReasonLabel?: string;
 };
 
 export type ChecklistItem = {

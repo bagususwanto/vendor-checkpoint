@@ -1,11 +1,18 @@
 'use client';
 
 import { motion, Variants } from 'framer-motion';
-import { CheckCircle2, Home, Search, Clock, Building2, User } from 'lucide-react';
+import {
+  CheckCircle2,
+  Home,
+  Search,
+  Clock,
+  Building2,
+  User,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SuccessData } from '@/stores/use-checklist.store';
 import { cn } from '@/lib/utils';
-import QRCode from "react-qr-code";
+import QRCode from 'react-qr-code';
 import { useEffect, useState } from 'react';
 
 interface SuccessCardProps {
@@ -16,28 +23,32 @@ interface SuccessCardProps {
 
 const ticketVariants: Variants = {
   hidden: { opacity: 0, y: 50, scale: 0.9 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
+  visible: {
+    opacity: 1,
+    y: 0,
     scale: 1,
-    transition: { 
-      type: "spring",
+    transition: {
+      type: 'spring',
       damping: 25,
       stiffness: 300,
-      duration: 0.5
-    }
+      duration: 0.5,
+    },
   },
 };
 
 const contentVariants: Variants = {
   hidden: { opacity: 0 },
-  visible: { 
+  visible: {
     opacity: 1,
-    transition: { delay: 0.2, duration: 0.3 }
-  }
+    transition: { delay: 0.2, duration: 0.3 },
+  },
 };
 
-export function SuccessCard({ data, onCheckStatus, onGoHome }: SuccessCardProps) {
+export function SuccessCard({
+  data,
+  onCheckStatus,
+  onGoHome,
+}: SuccessCardProps) {
   const [origin, setOrigin] = useState('');
 
   useEffect(() => {
@@ -46,7 +57,9 @@ export function SuccessCard({ data, onCheckStatus, onGoHome }: SuccessCardProps)
     }
   }, []);
 
-  const queueUrl = origin ? `${origin}/queue-status?queueNumber=${data.queueNumber}` : '';
+  const queueUrl = origin
+    ? `${origin}/queue-status?queueNumber=${data.queueNumber}`
+    : '';
 
   return (
     <div className="w-full max-w-md mx-auto perspective-1000">
@@ -61,15 +74,17 @@ export function SuccessCard({ data, onCheckStatus, onGoHome }: SuccessCardProps)
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <CheckCircle2 className="w-32 h-32 transform translate-x-8 -translate-y-8" />
           </div>
-          
-          <motion.div 
+
+          <motion.div
             variants={contentVariants}
             className="relative z-10 flex flex-col items-center text-center space-y-2"
           >
             <div className="bg-white/20 p-3 rounded-full backdrop-blur-sm mb-2">
               <CheckCircle2 className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-sm font-medium opacity-90 uppercase tracking-widest">Nomor Antrean Anda</h2>
+            <h2 className="text-sm font-medium opacity-90 uppercase tracking-widest">
+              Nomor Antrean Anda
+            </h2>
             <div className="text-5xl font-mono font-bold tracking-tighter">
               {data.queueNumber}
             </div>
@@ -89,51 +104,67 @@ export function SuccessCard({ data, onCheckStatus, onGoHome }: SuccessCardProps)
 
         {/* Ticket Body */}
         <div className="bg-background p-6 rounded-b-3xl relative">
-          <motion.div 
-            variants={contentVariants}
-            className="space-y-6"
-          >
+          <motion.div variants={contentVariants} className="space-y-6">
             {/* Info Grid */}
             <div className="grid grid-cols-2 gap-y-6 gap-x-4">
-              <InfoItem 
-                icon={<User className="w-3.5 h-3.5" />} 
-                label="Driver" 
-                value={data.driverName} 
+              <InfoItem
+                icon={<User className="w-3.5 h-3.5" />}
+                label="Driver"
+                value={data.driverName}
               />
-              <InfoItem 
-                icon={<Clock className="w-3.5 h-3.5" />} 
-                label="Waktu" 
-                value={data.submitTime} 
+              <InfoItem
+                icon={<Clock className="w-3.5 h-3.5" />}
+                label="Waktu"
+                value={data.submitTime}
               />
-              <InfoItem 
-                icon={<Building2 className="w-3.5 h-3.5" />} 
-                label="Perusahaan" 
-                value={data.companyName} 
+              <InfoItem
+                icon={<Building2 className="w-3.5 h-3.5" />}
+                label="Perusahaan"
+                value={data.companyName}
               />
-              <InfoItem 
-                icon={<Clock className="w-3.5 h-3.5" />} 
-                label="Waktu Antrean" 
-                value={`${data.estimatedWaitMinutes} Menit`} 
+              <InfoItem
+                icon={<Clock className="w-3.5 h-3.5" />}
+                label="Waktu Antrean"
+                value={`${data.estimatedWaitMinutes} Menit`}
               />
-              <InfoItem 
-                icon={<Search className="w-3.5 h-3.5" />} 
-                label="No. DN" 
-                value={data.dnNumber || '-'} 
+              <InfoItem
+                icon={<Search className="w-3.5 h-3.5" />}
+                label="No. DN"
+                value={data.dnNumber || '-'}
               />
-              <InfoItem 
-                icon={<Search className="w-3.5 h-3.5" />} 
-                label="No. PO" 
-                value={data.poNumber || '-'} 
+              <InfoItem
+                icon={<Search className="w-3.5 h-3.5" />}
+                label="No. PO"
+                value={data.poNumber || '-'}
               />
+              <InfoItem
+                icon={<Clock className="w-3.5 h-3.5" />}
+                label="Status"
+                value={
+                  data.arrivalStatus === 'Late' ? 'Terlambat' : 'Tepat Waktu'
+                }
+                valueClassName={
+                  data.arrivalStatus === 'Late'
+                    ? 'text-red-600'
+                    : 'text-green-600'
+                }
+              />
+              {data.arrivalStatus === 'Late' && (
+                <InfoItem
+                  icon={<Search className="w-3.5 h-3.5" />}
+                  label="Alasan"
+                  value={data.delayArrivalReasonLabel || '-'}
+                />
+              )}
             </div>
 
             {/* QR Code Section */}
             <div className="pt-6 border-t border-dashed border-muted-foreground/20 flex flex-col items-center gap-2">
               <div className="bg-white p-2 rounded-xl shadow-sm border">
                 {queueUrl && (
-                   <QRCode
+                  <QRCode
                     size={256}
-                    style={{ height: "auto", maxWidth: "100%", width: "120px" }}
+                    style={{ height: 'auto', maxWidth: '100%', width: '120px' }}
                     value={queueUrl}
                     viewBox={`0 0 256 256`}
                     level="H"
@@ -147,7 +178,7 @@ export function SuccessCard({ data, onCheckStatus, onGoHome }: SuccessCardProps)
 
             {/* Actions */}
             <div className="flex gap-3 pt-2">
-              <Button 
+              <Button
                 onClick={onCheckStatus}
                 variant="outline"
                 size="lg"
@@ -156,11 +187,7 @@ export function SuccessCard({ data, onCheckStatus, onGoHome }: SuccessCardProps)
                 <Search className="mr-2 w-4 h-4" />
                 Status
               </Button>
-              <Button 
-                onClick={onGoHome} 
-                className="flex-1"
-                size="lg"
-              >
+              <Button onClick={onGoHome} className="flex-1" size="lg">
                 <Home className="mr-2 w-4 h-4" />
                 Beranda
               </Button>
@@ -172,24 +199,33 @@ export function SuccessCard({ data, onCheckStatus, onGoHome }: SuccessCardProps)
   );
 }
 
-function InfoItem({ 
-  icon, 
-  label, 
-  value, 
-  className 
-}: { 
-  icon: React.ReactNode; 
-  label: string; 
+function InfoItem({
+  icon,
+  label,
+  value,
+  className,
+  valueClassName,
+}: {
+  icon: React.ReactNode;
+  label: string;
   value: string;
   className?: string;
+  valueClassName?: string;
 }) {
   return (
-    <div className={cn("space-y-1.5", className)}>
+    <div className={cn('space-y-1.5', className)}>
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground uppercase tracking-wide">
         {icon}
         <span>{label}</span>
       </div>
-      <p className="font-semibold text-sm break-words leading-tight">{value}</p>
+      <p
+        className={cn(
+          'font-semibold text-sm wrap-break-word leading-tight',
+          valueClassName,
+        )}
+      >
+        {value}
+      </p>
     </div>
   );
 }
