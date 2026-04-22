@@ -20,7 +20,11 @@ import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import IconLabel from '@/components/icon-label';
 
-import { useQueueStatus, useCheckoutCheckIn, useDepartureCheck } from '@/hooks/api/use-check-in';
+import {
+  useQueueStatus,
+  useCheckoutCheckIn,
+  useDepartureCheck,
+} from '@/hooks/api/use-check-in';
 import { DepartureReasonDialog } from './components/departure-reason-dialog';
 
 const SearchSchema = z.object({
@@ -43,8 +47,13 @@ export default function DeparturePage() {
   const { mutateAsync: checkDeparture, isPending: isCheckingDeparture } =
     useDepartureCheck();
 
-  const [detectedStatus, setDetectedStatus] = useState<'On-Time' | 'Overdue'>('On-Time');
-  const [departureTimes, setDepartureTimes] = useState<{ planned: string | null; actual: string } | null>(null);
+  const [detectedStatus, setDetectedStatus] = useState<'On-Time' | 'Overdue'>(
+    'On-Time',
+  );
+  const [departureTimes, setDepartureTimes] = useState<{
+    planned: string | null;
+    actual: string;
+  } | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -184,57 +193,67 @@ export default function DeparturePage() {
             </form>
 
             {searchedQueue && queueData && (
-              <div className="mt-8 p-4 border rounded-xl bg-slate-50 space-y-4 animate-in fade-in slide-in-from-bottom-4">
-                <div className="text-center border-b pb-4">
-                  <p className="text-sm text-slate-500 uppercase tracking-widest">
+              <Card className="mt-8 bg-slate-50/50 border-dashed shadow-none animate-in fade-in slide-in-from-bottom-4">
+                <CardHeader className="text-center border-b pb-6">
+                  <CardDescription className="text-xs text-slate-900 uppercase tracking-widest font-medium">
                     Vendor
-                  </p>
-                  <h3 className="font-bold text-xl text-slate-900 mt-1">
+                  </CardDescription>
+                  <CardTitle className="text-xl text-slate-900">
                     {queueData.snapshot_company_name}
-                  </h3>
-                </div>
+                  </CardTitle>
+                </CardHeader>
 
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div>
-                    <p className="text-xs text-slate-500">Driver</p>
-                    <p className="font-medium text-slate-900">
-                      {queueData.driver_name}
-                    </p>
+                <CardContent className="py-6">
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div className="space-y-1">
+                      <p className="text-xs text-slate-600 uppercase font-medium">
+                        Driver
+                      </p>
+                      <p className="font-semibold text-slate-900">
+                        {queueData.driver_name}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-slate-600 uppercase font-medium">
+                        Status Saat Ini
+                      </p>
+                      <p className="font-semibold text-slate-900">
+                        {queueData.ops_queue_status?.status_display_text ||
+                          queueData.current_status}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs text-slate-500">Status Saat Ini</p>
-                    <p className="font-medium text-slate-900">
+                </CardContent>
+
+                <CardFooter className="pb-6 pt-0">
+                  {queueData.current_status === 'SELESAI' ? (
+                    <div className="w-full p-3 bg-blue-50 text-blue-700 rounded-lg text-center text-sm font-medium border border-blue-100">
+                      Antrean ini sudah berhasil Check-Out (SELESAI).
+                    </div>
+                  ) : queueData.current_status !== 'AKTIF' &&
+                    queueData.current_status !== 'DISETUJUI' ? (
+                    <div className="w-full p-3 bg-amber-50 text-amber-700 rounded-lg text-center text-sm font-bold border border-amber-100">
+                      Antrean ini masih{' '}
                       {queueData.ops_queue_status?.status_display_text ||
                         queueData.current_status}
-                    </p>
-                  </div>
-                </div>
-
-                {queueData.current_status === 'SELESAI' ? (
-                  <div className="pt-4 text-center text-red-500 font-medium">
-                    Antrean ini sudah berhasil Check-Out (SELESAI).
-                  </div>
-                ) : queueData.current_status !== 'AKTIF' &&
-                  queueData.current_status !== 'DISETUJUI' ? (
-                  <div className="pt-4 text-center text-red-500 font-bold">
-                    Antrean ini masih{' '}
-                    {queueData.ops_queue_status?.status_display_text ||
-                      queueData.current_status}
-                    , tidak dapat Checkout.
-                  </div>
-                ) : (
-                  <Button
-                    onClick={handleCheckoutClick}
-                    size="xl"
-                    variant="default"
-                    className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white"
-                    disabled={isCheckingOut || isCheckingDeparture}
-                  >
-                    <LogOut className="w-5 h-5 mr-2" />
-                    {isCheckingDeparture ? 'Memvalidasi...' : 'Konfirmasi Check-Out'}
-                  </Button>
-                )}
-              </div>
+                      , tidak dapat Checkout.
+                    </div>
+                  ) : (
+                    <Button
+                      onClick={handleCheckoutClick}
+                      size="xl"
+                      variant="default"
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200"
+                      disabled={isCheckingOut || isCheckingDeparture}
+                    >
+                      <LogOut className="w-5 h-5 mr-2" />
+                      {isCheckingDeparture
+                        ? 'Memvalidasi...'
+                        : 'Konfirmasi Check-Out'}
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
             )}
 
             {searchedQueue && !queueData && !isSearching && (
