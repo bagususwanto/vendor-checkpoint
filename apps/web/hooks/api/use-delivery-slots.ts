@@ -7,7 +7,7 @@ import { FindDeliverySlotParams, PaginatedResponse } from '@repo/types';
 
 export const useDeliverySlots = (
   params: FindDeliverySlotParams,
-  refetchInterval = 15000,
+  refetchInterval?: number | false,
 ) => {
   return useQuery<PaginatedResponse<DeliverySlotResponse>>({
     queryKey: ['delivery-slots', params],
@@ -15,10 +15,7 @@ export const useDeliverySlots = (
       deliverySlotService.findAll({
         ...params,
       }),
-    // Auto polling setiap `refetchInterval` ms (15 detik default) sehingga bisa dipakai memonitor layar yang selalu aktif.
     refetchInterval,
-    // Jangan hentikan re-fetch meskipun layar kehilangan fokus
-    refetchIntervalInBackground: true,
   });
 };
 

@@ -40,10 +40,7 @@ export default function DeliverySlotPage() {
     limit,
   };
 
-  const { data: paginatedData, isLoading } = useDeliverySlots(
-    queryParams,
-    10000,
-  ); // Poll setiap 10 detik
+  const { data: paginatedData, isLoading } = useDeliverySlots(queryParams);
 
   const slots = paginatedData?.data || [];
   const meta = paginatedData?.meta;
@@ -88,8 +85,7 @@ export default function DeliverySlotPage() {
             Monitoring Pengiriman
           </h2>
           <p className="text-muted-foreground text-sm">
-            Pantau status kedatangan seluruh vendor secara *real-time* atau pada
-            tanggal spesifik. Layar ini akan _auto-refresh_ setiap 10 detik.
+            Pantau status kedatangan seluruh vendor.
           </p>
         </div>
       </div>
