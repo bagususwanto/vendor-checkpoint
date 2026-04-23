@@ -186,7 +186,7 @@ export function ChecklistItemDialog({
           {form.watch('item_type') === ChecklistItemType.KHUSUS && (
             <div className="py-2">
               <Field>
-                <FieldLabel required>Kategori Material</FieldLabel>
+                <FieldLabel required>Kategori Vendor</FieldLabel>
                 <FieldContent>
                   <Select
                     onValueChange={(value) =>
@@ -199,7 +199,7 @@ export function ChecklistItemDialog({
                     }
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Pilih kategori material" />
+                      <SelectValue placeholder="Pilih kategori vendor" />
                     </SelectTrigger>
                     <SelectContent>
                       {materialCategories?.map((category) => (

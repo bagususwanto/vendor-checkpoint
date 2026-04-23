@@ -96,7 +96,7 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
       <Card>
         <CardHeader>
           <CardTitle className="text-sm font-medium">
-            Breakdown Kategori Material
+            Breakdown Kategori Vendor
           </CardTitle>
         </CardHeader>
         <CardContent>

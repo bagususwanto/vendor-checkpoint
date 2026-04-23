@@ -389,7 +389,7 @@ export class ReportService {
       'Queue Number',
       'Vendor',
       'Driver',
-      'Kategori Material',
+      'Kategori Vendor',
       'Checklist Category',
       'Item',
       'Submission Time',
@@ -535,7 +535,9 @@ export class ReportService {
         expectedCheckin,
         this.formatDateTime(entry.submission_time),
         entry.arrival_status || '-',
-        entry.ops_timelog?.checkout_time ? this.formatDateTime(entry.ops_timelog.checkout_time) : '-',
+        entry.ops_timelog?.checkout_time
+          ? this.formatDateTime(entry.ops_timelog.checkout_time)
+          : '-',
         entry.ops_timelog?.departure_status || '-',
         entry.ops_timelog?.duration_minutes || '-',
         entry.dn_number || '-',
