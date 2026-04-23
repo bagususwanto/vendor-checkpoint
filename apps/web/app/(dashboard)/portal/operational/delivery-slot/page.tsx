@@ -98,7 +98,7 @@ export default function DeliverySlotPage() {
             datang mengirimkan barang.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4">
           <SlotToolbar
             searchTerm={searchTerm}
             onSearchChange={handleSearch}

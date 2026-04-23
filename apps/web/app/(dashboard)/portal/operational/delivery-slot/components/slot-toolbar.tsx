@@ -35,18 +35,23 @@ export function SlotToolbar({
   onReset,
 }: SlotToolbarProps) {
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2">
-        <Input
-          placeholder="Cari vendor..."
-          className="h-8 w-[150px] lg:w-[250px]"
-          value={searchTerm}
-          onChange={onSearchChange}
-        />
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-1 items-center space-x-2 min-w-[300px]">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Cari vendor..."
+            className="pl-8 h-9"
+            value={searchTerm}
+            onChange={onSearchChange}
+          />
+        </div>
+      </div>
+      <div className="flex items-center gap-2 flex-wrap">
         <DatePickerWithRange 
           date={date} 
           setDate={setDate} 
-          className="h-8" 
+          className="h-9" 
         />
         
         <DropdownMenu>
@@ -54,7 +59,7 @@ export function SlotToolbar({
             <Button
               variant="outline"
               size="sm"
-              className="h-8 justify-start"
+              className="h-9 justify-start"
             >
               <Filter className="mr-2 h-4 w-4" />
               {status !== 'all' ? status : 'Status'}
@@ -86,15 +91,12 @@ export function SlotToolbar({
           <Button
             variant="ghost"
             onClick={onReset}
-            className="h-8 px-2 lg:px-3"
+            className="h-9 px-2 lg:px-3"
           >
             Reset
             <X className="ml-2 h-4 w-4" />
           </Button>
         )}
-      </div>
-      <div className="flex items-center space-x-2">
-        {/* Right side actions could go here */}
       </div>
     </div>
   );
