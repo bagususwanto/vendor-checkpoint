@@ -7,30 +7,56 @@ export class DeliverySlotService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(query: FindDeliverySlotDto) {
-    const { date, dateFrom, dateTo, status, vendor_id } = query;
-    return this.prisma.ops_delivery_slot.findMany({
-      where: {
-        expected_date: date
-          ? new Date(date)
-          : dateFrom || dateTo
-            ? {
-                gte: dateFrom ? new Date(dateFrom) : undefined,
-                lte: dateTo ? new Date(dateTo) : undefined,
-              }
-            : undefined,
-        status: status ? status : undefined,
-        schedule: vendor_id ? { vendor_id } : undefined,
-      },
-      include: {
-        schedule: {
-          include: {
-            vendor: true,
+    const {
+      date,
+      dateFrom,
+      dateTo,
+      status,
+      vendor_id,
+      page = 1,
+      limit = 10,
+    } = query;
+
+    const where = {
+      expected_date: date
+        ? new Date(date)
+        : dateFrom || dateTo
+          ? {
+              gte: dateFrom ? new Date(dateFrom) : undefined,
+              lte: dateTo ? new Date(dateTo) : undefined,
+            }
+          : undefined,
+      status: status ? status : undefined,
+      schedule: vendor_id ? { vendor_id } : undefined,
+    };
+
+    const [total, data] = await Promise.all([
+      this.prisma.ops_delivery_slot.count({ where }),
+      this.prisma.ops_delivery_slot.findMany({
+        where,
+        include: {
+          schedule: {
+            include: {
+              vendor: true,
+            },
           },
+          ops_checkin_entry: true,
         },
-        ops_checkin_entry: true,
+        orderBy: { expected_date: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        total_pages: Math.ceil(total / limit),
       },
-      orderBy: { expected_date: 'desc' },
-    });
+    };
   }
 
   async findMissed(query: FindMissedSlotDto) {
