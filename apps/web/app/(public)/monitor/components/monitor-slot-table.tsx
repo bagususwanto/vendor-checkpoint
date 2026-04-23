@@ -1,6 +1,6 @@
 'use client';
 
-import { Users, ArrowRight } from 'lucide-react';
+import { Users, ArrowRight, Clock, AlertTriangle, CheckCircle2, RotateCw, BadgeCheck, XCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -48,10 +48,10 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
             variant="outline"
             className={cn(
               baseClass,
-              'bg-muted text-muted-foreground border-border',
+              'bg-muted text-muted-foreground border-border gap-1.5',
             )}
           >
-            ● PENDING
+            <Clock className="w-3 h-3" /> PENDING
           </Badge>
         );
       case 'OVERDUE':
@@ -60,10 +60,10 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
             variant="outline"
             className={cn(
               baseClass,
-              'bg-orange-500/10 text-orange-500 border-orange-500/20 animate-pulse',
+              'bg-orange-500/10 text-orange-500 border-orange-500/20 animate-pulse gap-1.5',
             )}
           >
-            ⚠ OVERDUE
+            <AlertTriangle className="w-3 h-3" /> OVERDUE
           </Badge>
         );
       case 'ARRIVED':
@@ -72,10 +72,10 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
             variant="outline"
             className={cn(
               baseClass,
-              'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+              'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 gap-1.5',
             )}
           >
-            ✓ ARRIVED
+            <CheckCircle2 className="w-3 h-3" /> ARRIVED
           </Badge>
         );
       case 'IN_PROGRESS':
@@ -84,10 +84,10 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
             variant="outline"
             className={cn(
               baseClass,
-              'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+              'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20 gap-1.5',
             )}
           >
-            <span className="inline-block animate-spin mr-1.5">◌</span>
+            <RotateCw className="w-3 h-3 animate-spin" />
             IN PROGRESS
           </Badge>
         );
@@ -97,10 +97,10 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
             variant="outline"
             className={cn(
               baseClass,
-              'bg-muted/50 text-muted-foreground border-border',
+              'bg-muted/50 text-muted-foreground border-border gap-1.5',
             )}
           >
-            💨 COMPLETED
+            <BadgeCheck className="w-3 h-3" /> COMPLETED
           </Badge>
         );
       case 'MISSED':
@@ -109,10 +109,10 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
             variant="outline"
             className={cn(
               baseClass,
-              'bg-red-500/10 text-red-500 border-red-500/20',
+              'bg-red-500/10 text-red-500 border-red-500/20 gap-1.5',
             )}
           >
-            ✖ MISSED
+            <XCircle className="w-3 h-3" /> MISSED
           </Badge>
         );
     }

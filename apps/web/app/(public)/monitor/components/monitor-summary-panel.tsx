@@ -1,12 +1,11 @@
 'use client';
 
-import { CheckCircle2, Clock, AlertTriangle, XCircle, BarChart3, RotateCw } from 'lucide-react';
+import { CheckCircle2, Clock, AlertTriangle, XCircle, BarChart3, RotateCw, BadgeCheck } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
 export interface MonitorStats {
   total: number;
-  arrived: number;
   inProgress: number;
   completed: number;
   pending: number;
@@ -66,19 +65,19 @@ export function MonitorSummaryPanel({ stats }: MonitorSummaryPanelProps) {
 
         <div className="grid grid-cols-1 gap-3">
           <CardItem 
-            label="Arrived" 
-            value={stats.arrived} 
-            icon={CheckCircle2} 
-            colorClass="bg-emerald-500 text-white" 
-            textClass="text-emerald-500"
-          />
-          
-          <CardItem 
             label="In Progress" 
             value={stats.inProgress} 
             icon={RotateCw} 
             colorClass="bg-teal-500 text-white" 
             textClass="text-teal-500"
+          />
+
+          <CardItem 
+            label="Completed" 
+            value={stats.completed} 
+            icon={BadgeCheck} 
+            colorClass="bg-blue-500 text-white" 
+            textClass="text-blue-500"
           />
 
           <CardItem 

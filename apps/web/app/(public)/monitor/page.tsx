@@ -65,8 +65,7 @@ export default function MonitorPage() {
 
   const stats: MonitorStats = {
     total: parsedSlots.length,
-    arrived: parsedSlots.filter(s => s.status === 'ARRIVED').length,
-    inProgress: parsedSlots.filter(s => s.status === 'IN_PROGRESS').length,
+    inProgress: parsedSlots.filter(s => s.status === 'IN_PROGRESS' || s.status === 'ARRIVED').length,
     completed: parsedSlots.filter(s => s.status === 'COMPLETED').length,
     pending: parsedSlots.filter(s => s.status === 'PENDING').length,
     overdue: parsedSlots.filter(s => s.status === 'OVERDUE').length,
