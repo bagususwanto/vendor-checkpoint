@@ -8,7 +8,7 @@ export class MissedCycleCheckerJob {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  @Cron('0 23 * * *') // Runs at 23:00 everyday
+  @Cron('0 17 * * *') // Runs at 5 PM everyday
   async handleCron() {
     this.logger.debug('Running missed cycle checker job...');
     const today = new Date();
@@ -37,7 +37,7 @@ export class MissedCycleCheckerJob {
           action_description: `Delivery slot ${slot.slot_id} marked as missed`,
         },
       });
-      
+
       this.logger.debug(`Marked slot ${slot.slot_id} as Missed`);
     }
   }
