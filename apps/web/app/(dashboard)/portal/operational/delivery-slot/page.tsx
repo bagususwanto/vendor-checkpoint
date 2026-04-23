@@ -61,7 +61,7 @@ export default function DeliverySlotPage() {
         <CardHeader>
           <CardTitle>Daftar Slot Pengiriman (Delivery Slots)</CardTitle>
           <CardDescription>
-            Menampilkan seluruh vendor yang telah dise-jadwal oleh Generator untuk datang mengirimkan barang.
+            Menampilkan seluruh vendor yang telah dijadwalkan oleh sistem untuk datang mengirimkan barang.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

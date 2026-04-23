@@ -11,7 +11,10 @@ export interface DeliverySlotResponse {
   updated_at: string;
   schedule: {
     vendor_id: number;
-    expected_arrival: string | null;
+    arrival_time: string | null;
+    departure_time: string | null;
+    rit: number;
+    truck_station: string | null;
     vendor: findVendorResponse;
   };
   ops_checkin_entry?: any[];

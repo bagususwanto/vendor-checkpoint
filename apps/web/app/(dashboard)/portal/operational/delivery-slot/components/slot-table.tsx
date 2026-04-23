@@ -43,7 +43,10 @@ export function SlotTable({ data, isLoading }: SlotTableProps) {
               <TableHead className="w-[50px] text-center">No</TableHead>
               <TableHead>Vendor</TableHead>
               <TableHead className="w-[150px]">Tanggal</TableHead>
-              <TableHead className="w-[130px]">Waktu Tiba</TableHead>
+              <TableHead className="w-[80px] text-center">Rit</TableHead>
+              <TableHead className="w-[100px]">Tiba</TableHead>
+              <TableHead className="w-[100px]">Pulang</TableHead>
+              <TableHead className="w-[150px]">Station</TableHead>
               <TableHead className="w-[130px] text-center">Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -62,8 +65,17 @@ export function SlotTable({ data, isLoading }: SlotTableProps) {
                 <TableCell>
                   {slot.expected_date ? format(new Date(slot.expected_date), 'dd MMM yyyy', { locale: id }) : '-'}
                 </TableCell>
+                <TableCell className="text-center font-medium">
+                  {slot.schedule?.rit || '-'}
+                </TableCell>
                 <TableCell>
-                  {slot.schedule?.expected_arrival ? slot.schedule.expected_arrival : 'Bebas / Penuh'}
+                  {slot.schedule?.arrival_time ? slot.schedule.arrival_time : '-'}
+                </TableCell>
+                <TableCell>
+                  {slot.schedule?.departure_time ? slot.schedule.departure_time : '-'}
+                </TableCell>
+                <TableCell>
+                  {slot.schedule?.truck_station || '-'}
                 </TableCell>
                 <TableCell className="text-center">
                   <Badge 
