@@ -4,7 +4,7 @@ import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
 import { useDeliverySlotMonitor } from '@/hooks/api/use-delivery-slots';
 import { MonitorHeader } from './components/monitor-header';
 import { MonitorSummaryPanel, MonitorStats } from './components/monitor-summary-panel';
-import { MonitorSlotTable, ParsedMonitorSlot, DisplayStatus } from './components/monitor-slot-table';
+import { MonitorSlotTable, ParsedMonitorSlot, ArrivalDisplayStatus } from './components/monitor-slot-table';
 import { DeliverySlotMonitorItem } from '@repo/types';
 
 export default function MonitorPage() {
@@ -22,13 +22,16 @@ export default function MonitorPage() {
   const slots = slotsData || [];
   const now = new Date();
 
-  function deriveDisplayStatus(slot: DeliverySlotMonitorItem): DisplayStatus {
+  function deriveArrivalStatus(slot: DeliverySlotMonitorItem): ArrivalDisplayStatus {
     const latestEntry = slot.ops_checkin_entry?.[0];
     if (slot.status === 'Missed') return 'MISSED';
     if (latestEntry) {
-      if (latestEntry.current_status === 'SELESAI') return 'COMPLETED';
-      if (latestEntry.current_status === 'AKTIF') return 'IN_PROGRESS';
-      return 'ARRIVED';
+      const arrStatus = latestEntry.arrival_status;
+      if (arrStatus === 'On-Time') return 'ON_TIME';
+      if (arrStatus === 'Late') return 'LATE';
+      if (arrStatus === 'Early') return 'EARLY';
+      // Sudah check-in tapi arrival_status belum di-set
+      return 'ON_TIME';
     }
     if (slot.schedule?.arrival_time) {
       const parts = slot.schedule.arrival_time.split(':').map(Number);
@@ -43,7 +46,7 @@ export default function MonitorPage() {
   }
 
   const parsedSlots: ParsedMonitorSlot[] = slots.map((slot) => {
-    const status = deriveDisplayStatus(slot);
+    const status = deriveArrivalStatus(slot);
     let arrivalTime = null;
     const latestEntry = slot.ops_checkin_entry?.[0];
     if (latestEntry && latestEntry.submission_time) {
@@ -65,8 +68,9 @@ export default function MonitorPage() {
 
   const stats: MonitorStats = {
     total: parsedSlots.length,
-    inProgress: parsedSlots.filter(s => s.status === 'IN_PROGRESS' || s.status === 'ARRIVED').length,
-    completed: parsedSlots.filter(s => s.status === 'COMPLETED').length,
+    onTime: parsedSlots.filter(s => s.status === 'ON_TIME').length,
+    late: parsedSlots.filter(s => s.status === 'LATE').length,
+    early: parsedSlots.filter(s => s.status === 'EARLY').length,
     pending: parsedSlots.filter(s => s.status === 'PENDING').length,
     overdue: parsedSlots.filter(s => s.status === 'OVERDUE').length,
     missed: parsedSlots.filter(s => s.status === 'MISSED').length,

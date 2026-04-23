@@ -1,6 +1,6 @@
 'use client';
 
-import { Users, ArrowRight, Clock, AlertTriangle, CheckCircle2, RotateCw, BadgeCheck, XCircle } from 'lucide-react';
+import { Users, ArrowRight, Clock, AlertTriangle, CheckCircle2, Timer, XCircle, Zap } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -13,13 +13,13 @@ import {
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 
-export type DisplayStatus =
+export type ArrivalDisplayStatus =
   | 'PENDING'
   | 'OVERDUE'
-  | 'ARRIVED'
-  | 'MISSED'
-  | 'IN_PROGRESS'
-  | 'COMPLETED';
+  | 'ON_TIME'
+  | 'LATE'
+  | 'EARLY'
+  | 'MISSED';
 
 export interface ParsedMonitorSlot {
   id: string;
@@ -28,7 +28,7 @@ export interface ParsedMonitorSlot {
   vendorCode: string;
   rit: number;
   truckStation: string | null;
-  status: DisplayStatus;
+  status: ArrivalDisplayStatus;
   arrivalTime: string | null;
 }
 
@@ -37,7 +37,7 @@ interface MonitorSlotTableProps {
 }
 
 export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
-  const getStatusBadge = (status: DisplayStatus) => {
+  const getStatusBadge = (status: ArrivalDisplayStatus) => {
     const baseClass =
       'px-3 py-1 font-black text-[10px] tracking-widest transition-all duration-300 shadow-xs uppercase';
 
@@ -46,73 +46,54 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
         return (
           <Badge
             variant="outline"
-            className={cn(
-              baseClass,
-              'bg-muted text-muted-foreground border-border gap-1.5',
-            )}
+            className={cn(baseClass, 'bg-muted text-muted-foreground border-border gap-1.5')}
           >
-            <Clock className="w-3 h-3" /> PENDING
+            <Clock className="w-3 h-3" /> Menunggu
           </Badge>
         );
       case 'OVERDUE':
         return (
           <Badge
             variant="outline"
-            className={cn(
-              baseClass,
-              'bg-orange-500/10 text-orange-500 border-orange-500/20 animate-pulse gap-1.5',
-            )}
+            className={cn(baseClass, 'bg-orange-500/10 text-orange-500 border-orange-500/20 animate-pulse gap-1.5')}
           >
-            <AlertTriangle className="w-3 h-3" /> OVERDUE
+            <AlertTriangle className="w-3 h-3" /> Belum Tiba
           </Badge>
         );
-      case 'ARRIVED':
+      case 'ON_TIME':
         return (
           <Badge
             variant="outline"
-            className={cn(
-              baseClass,
-              'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 gap-1.5',
-            )}
+            className={cn(baseClass, 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 gap-1.5')}
           >
-            <CheckCircle2 className="w-3 h-3" /> ARRIVED
+            <CheckCircle2 className="w-3 h-3" /> Tepat Waktu
           </Badge>
         );
-      case 'IN_PROGRESS':
+      case 'LATE':
         return (
           <Badge
             variant="outline"
-            className={cn(
-              baseClass,
-              'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20 gap-1.5',
-            )}
+            className={cn(baseClass, 'bg-red-500/10 text-red-500 border-red-500/20 animate-pulse gap-1.5')}
           >
-            <RotateCw className="w-3 h-3 animate-spin" />
-            IN PROGRESS
+            <Timer className="w-3 h-3" /> Terlambat
           </Badge>
         );
-      case 'COMPLETED':
+      case 'EARLY':
         return (
           <Badge
             variant="outline"
-            className={cn(
-              baseClass,
-              'bg-muted/50 text-muted-foreground border-border gap-1.5',
-            )}
+            className={cn(baseClass, 'bg-blue-500/10 text-blue-500 border-blue-500/20 gap-1.5')}
           >
-            <BadgeCheck className="w-3 h-3" /> COMPLETED
+            <Zap className="w-3 h-3" /> Lebih Awal
           </Badge>
         );
       case 'MISSED':
         return (
           <Badge
             variant="outline"
-            className={cn(
-              baseClass,
-              'bg-red-500/10 text-red-500 border-red-500/20 gap-1.5',
-            )}
+            className={cn(baseClass, 'bg-slate-500/10 text-slate-500 border-slate-500/20 gap-1.5')}
           >
-            <XCircle className="w-3 h-3" /> MISSED
+            <XCircle className="w-3 h-3" /> Missed
           </Badge>
         );
     }
@@ -136,7 +117,7 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
               Station
             </TableHead>
             <TableHead className="w-[12%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-              Check-In
+              Tiba
             </TableHead>
             <TableHead className="w-[18%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] text-right">
               Status
@@ -161,8 +142,8 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
               </TableRow>
             ) : (
               slots.map((slot) => {
-                const isActive =
-                  slot.status === 'ARRIVED' || slot.status === 'IN_PROGRESS';
+                const isActive = slot.status === 'ON_TIME' || slot.status === 'EARLY';
+                const isLate = slot.status === 'LATE';
                 const isMissed = slot.status === 'MISSED';
 
                 return (
@@ -171,20 +152,24 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
                     className={cn(
                       'transition-all duration-300 relative group h-16 border-border',
                       isActive && 'bg-emerald',
+                      isLate && 'bg-red-500/5',
                       isMissed && 'opacity-50 grayscale-[0.2]',
                     )}
                   >
-                    {/* Active Indicator */}
+                    {/* Arrival Status Indicator */}
                     <TableCell className="w-[12%] px-6 py-0">
                       {isActive && (
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 bg-emerald-500 rounded-r-full shadow-[2px_0_8px_rgba(16,185,129,0.3)]" />
                       )}
+                      {isLate && (
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 bg-red-500 rounded-r-full shadow-[2px_0_8px_rgba(239,68,68,0.3)]" />
+                      )}
                       <div
                         className={cn(
                           'text-2xl font-mono font-black tabular-nums tracking-tighter',
-                          isActive
-                            ? 'text-emerald-600 dark:text-emerald-400'
-                            : 'text-foreground',
+                          isActive ? 'text-emerald-600 dark:text-emerald-400' : '',
+                          isLate ? 'text-red-500' : '',
+                          !isActive && !isLate ? 'text-foreground' : '',
                         )}
                       >
                         {slot.expectedTime}

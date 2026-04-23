@@ -1,13 +1,14 @@
 'use client';
 
-import { CheckCircle2, Clock, AlertTriangle, XCircle, BarChart3, RotateCw, BadgeCheck } from 'lucide-react';
+import { CheckCircle2, Clock, AlertTriangle, XCircle, BarChart3, Timer, Zap } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
 export interface MonitorStats {
   total: number;
-  inProgress: number;
-  completed: number;
+  onTime: number;
+  late: number;
+  early: number;
   pending: number;
   overdue: number;
   missed: number;
@@ -65,23 +66,31 @@ export function MonitorSummaryPanel({ stats }: MonitorSummaryPanelProps) {
 
         <div className="grid grid-cols-1 gap-3">
           <CardItem 
-            label="In Progress" 
-            value={stats.inProgress} 
-            icon={RotateCw} 
-            colorClass="bg-teal-500 text-white" 
-            textClass="text-teal-500"
+            label="Tepat Waktu" 
+            value={stats.onTime} 
+            icon={CheckCircle2} 
+            colorClass="bg-emerald-500 text-white" 
+            textClass="text-emerald-500"
           />
 
           <CardItem 
-            label="Completed" 
-            value={stats.completed} 
-            icon={BadgeCheck} 
+            label="Terlambat" 
+            value={stats.late} 
+            icon={Timer} 
+            colorClass="bg-red-500 text-white" 
+            textClass="text-red-500"
+          />
+
+          <CardItem 
+            label="Lebih Awal" 
+            value={stats.early} 
+            icon={Zap} 
             colorClass="bg-blue-500 text-white" 
             textClass="text-blue-500"
           />
 
           <CardItem 
-            label="Pending" 
+            label="Menunggu" 
             value={stats.pending} 
             icon={Clock} 
             colorClass="bg-slate-400 text-white" 
@@ -89,7 +98,7 @@ export function MonitorSummaryPanel({ stats }: MonitorSummaryPanelProps) {
           />
 
           <CardItem 
-            label="Overdue" 
+            label="Belum Tiba" 
             value={stats.overdue} 
             icon={AlertTriangle} 
             colorClass="bg-orange-500 text-white" 
@@ -100,8 +109,8 @@ export function MonitorSummaryPanel({ stats }: MonitorSummaryPanelProps) {
             label="Missed" 
             value={stats.missed} 
             icon={XCircle} 
-            colorClass="bg-red-500 text-white" 
-            textClass="text-red-500"
+            colorClass="bg-slate-500 text-white" 
+            textClass="text-slate-500"
           />
         </div>
       </CardContent>
