@@ -232,7 +232,7 @@ export class CheckInService {
 
     if (!slot) {
       return {
-        arrival_status: 'On-Time',
+        arrival_status: 'Unscheduled',
         actual_time: actualTimeStr,
         slot_id: null,
       };
