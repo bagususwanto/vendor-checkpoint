@@ -12,6 +12,7 @@ import {
   Box,
   AlertCircle,
   CheckCircle2,
+  Info,
 } from 'lucide-react';
 import { ComboboxVendor } from '@/components/combobox-vendor';
 import IconLabel from '@/components/icon-label';
@@ -36,7 +37,9 @@ export function VendorIdentityForm() {
   const queryClient = useQueryClient();
   const { mutateAsync: arrivalCheck } = useArrivalCheck();
 
-  const [arrivalInfo, setArrivalInfo] = useState<ArrivalCheckResponse | null>(null);
+  const [arrivalInfo, setArrivalInfo] = useState<ArrivalCheckResponse | null>(
+    null,
+  );
 
   // Search States
   const [search, setSearch] = useState('');
@@ -169,7 +172,7 @@ export function VendorIdentityForm() {
           vendorCategory: value.vendorCategory,
           arrivalStatus: arrivalData.arrival_status,
         });
-        
+
         if (arrivalData.arrival_status === 'Late') {
           router.push('/check-in/step-1b');
         } else {
@@ -271,7 +274,9 @@ export function VendorIdentityForm() {
                     onChange={(e) => field.handleChange(e.target.value)}
                     aria-invalid={isInvalid}
                   />
-                  <p className="text-sm text-gray-500">Opsional, bisa di-scan jika ada barcode.</p>
+                  <p className="text-sm text-gray-500">
+                    Opsional, bisa di-scan jika ada barcode.
+                  </p>
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
@@ -335,20 +340,48 @@ export function VendorIdentityForm() {
                     }}
                     isLoading={isFetchingVendors}
                   />
-                  
+
                   {arrivalInfo && (
-                    <div className={cn(
-                      "mt-2 p-3 rounded-lg border flex items-center gap-3",
-                      arrivalInfo.arrival_status === 'Late' ? "bg-red-50 border-red-200 text-red-700" : "bg-green-50 border-green-200 text-green-700"
-                    )}>
-                      {arrivalInfo.arrival_status === 'Late' ? <AlertCircle className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
+                    <div
+                      className={cn(
+                        'mt-2 p-3 rounded-lg border flex items-center gap-3',
+                        arrivalInfo.arrival_status === 'Late'
+                          ? 'bg-red-50 border-red-200 text-red-700'
+                          : arrivalInfo.arrival_status === 'Unscheduled'
+                            ? 'bg-blue-50 border-blue-200 text-blue-700'
+                            : 'bg-green-50 border-green-200 text-green-700',
+                      )}
+                    >
+                      {arrivalInfo.arrival_status === 'Late' ? (
+                        <AlertCircle className="w-5 h-5" />
+                      ) : arrivalInfo.arrival_status === 'Unscheduled' ? (
+                        <Info className="w-5 h-5" />
+                      ) : (
+                        <CheckCircle2 className="w-5 h-5" />
+                      )}
                       <div className="text-sm">
-                        <span className="font-bold">{arrivalInfo.arrival_status === 'Late' ? 'Terlambat' : 'Tepat Waktu'}</span>
+                        <span className="font-bold">
+                          {arrivalInfo.arrival_status === 'Late'
+                            ? 'Terlambat'
+                            : arrivalInfo.arrival_status === 'Unscheduled'
+                              ? 'Tanpa Jadwal'
+                              : 'Tepat Waktu'}
+                        </span>
                         {arrivalInfo.planned_arrival_time && (
-                          <span className="ml-1">(Jadwal: {arrivalInfo.planned_arrival_time})</span>
+                          <span className="ml-1">
+                            (Jadwal: {arrivalInfo.planned_arrival_time})
+                          </span>
                         )}
                         {arrivalInfo.arrival_status === 'Late' && (
-                          <p className="mt-0.5 opacity-80 italic text-xs">Anda akan diminta mengisi alasan di tahap berikutnya.</p>
+                          <p className="mt-0.5 opacity-80 italic text-xs">
+                            Anda akan diminta mengisi alasan di tahap
+                            berikutnya.
+                          </p>
+                        )}
+                        {arrivalInfo.arrival_status === 'Unscheduled' && (
+                          <p className="mt-0.5 opacity-80 italic text-xs">
+                            Kedatangan Anda akan dicatat sebagai tanpa jadwal.
+                          </p>
                         )}
                       </div>
                     </div>
@@ -378,9 +411,7 @@ export function VendorIdentityForm() {
                     options={vendorCategories}
                     value={field.state.value}
                     onSelect={(val) => {
-                      const mat = vendorCategories.find(
-                        (m) => m.value === val,
-                      );
+                      const mat = vendorCategories.find((m) => m.value === val);
                       if (mat) {
                         form.setFieldValue('vendorCategory.value', mat.value);
                         form.setFieldValue('vendorCategory.label', mat.label);
@@ -393,8 +424,7 @@ export function VendorIdentityForm() {
                     isLoading={isFetchingVendorCategories}
                     onSearch={setVendorCategorySearch}
                     onLoadMore={() => {
-                      if (hasNextVendorCategories)
-                        fetchNextVendorCategories();
+                      if (hasNextVendorCategories) fetchNextVendorCategories();
                     }}
                     hasMore={hasNextVendorCategories}
                   />

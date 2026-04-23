@@ -105,7 +105,12 @@ export function QueueTable({
                 </TableCell>
                 <TableCell>
                   {checkin.arrival_status ? (
-                    <Badge variant={checkin.arrival_status === 'Late' ? 'destructive' : checkin.arrival_status === 'Early' ? 'secondary' : 'default'}>
+                    <Badge variant={
+                      checkin.arrival_status === 'Late' ? 'destructive' : 
+                      checkin.arrival_status === 'Early' ? 'secondary' : 
+                      checkin.arrival_status === 'Unscheduled' ? 'outline' : 
+                      'default'
+                    }>
                       {checkin.arrival_status}
                     </Badge>
                   ) : '-'}

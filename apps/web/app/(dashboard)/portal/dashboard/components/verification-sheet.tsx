@@ -243,7 +243,9 @@ export function VerificationSheet({
                                   ? 'destructive'
                                   : detailData.arrival_status === 'Early'
                                     ? 'secondary'
-                                    : 'default'
+                                    : detailData.arrival_status === 'Unscheduled'
+                                      ? 'outline'
+                                      : 'default'
                               }
                               className="mt-1"
                             >
