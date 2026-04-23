@@ -6,6 +6,8 @@ import { Separator } from '@/components/ui/separator';
 import { DynamicBreadcrumb } from '@/app/(dashboard)/components/dynamic-breadcrumb';
 import { ThemeToggleButton } from '@/components/ui/shadcn-io/theme-toggle-button';
 import { useTheme } from 'next-themes';
+import { Button } from '@/components/ui/button';
+import { MonitorPlay } from 'lucide-react';
 
 export function DashboardHeader() {
   const { theme, setTheme } = useTheme();
@@ -27,6 +29,18 @@ export function DashboardHeader() {
       </div>
 
       <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground h-9"
+          onClick={() => window.open('/monitor', '_blank')}
+        >
+          <MonitorPlay className="w-4 h-4 mr-2" />
+          <span className="hidden md:inline font-medium text-xs">Arrival Status</span>
+        </Button>
+
+        <Separator orientation="vertical" className="h-4 mx-1" />
+
         {mounted ? (
           <ThemeToggleButton
             theme={theme === 'light' ? 'light' : 'dark'}

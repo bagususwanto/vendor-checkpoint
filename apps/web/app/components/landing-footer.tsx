@@ -24,16 +24,6 @@ export function LandingFooter() {
               <span className="hidden sm:inline">Display</span>
             </Button>
 
-            <div className="bg-border w-px h-4" />
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => window.open('/monitor', '_blank')}
-            >
-              <MonitorPlay className="w-4 h-4" />
-              <span className="hidden sm:inline">Arrival Monitor</span>
-            </Button>
 
             <Button
               variant="ghost"
