@@ -6,6 +6,7 @@ import { useDebounce } from '@/hooks/use-debounce';
 import { useDeliverySlots } from '@/hooks/api/use-delivery-slots';
 import { SlotToolbar } from './components/slot-toolbar';
 import { SlotTable } from './components/slot-table';
+import { DateRange } from 'react-day-picker';
 import {
   Card,
   CardContent,
@@ -16,15 +17,22 @@ import {
 
 export default function DeliverySlotPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date(),
+  });
   const [status, setStatus] = useState('all');
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  // Parameter yang dikirimkan ke backend API, default ke hari ini
+  // Parameter yang dikirimkan ke backend API
   const queryParams = {
-    date: date ? format(date, 'yyyy-MM-dd') : undefined,
-    status: status === 'all' ? undefined : (status as "Open" | "Filled" | "Missed" | "Check-In" | "Delay"),
+    dateFrom: date?.from ? format(date.from, 'yyyy-MM-dd') : undefined,
+    dateTo: date?.to ? format(date.to, 'yyyy-MM-dd') : undefined,
+    status:
+      status === 'all'
+        ? undefined
+        : (status as 'Open' | 'Filled' | 'Missed' | 'Check-In' | 'Delay'),
   };
 
   const { data: slots, isLoading } = useDeliverySlots(queryParams, 10000); // Poll setiap 10 detik
@@ -42,7 +50,10 @@ export default function DeliverySlotPage() {
 
   const handleReset = () => {
     setSearchTerm('');
-    setDate(new Date());
+    setDate({
+      from: new Date(),
+      to: new Date(),
+    });
     setStatus('all');
   };
 

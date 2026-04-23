@@ -7,10 +7,17 @@ export class DeliverySlotService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(query: FindDeliverySlotDto) {
-    const { date, status, vendor_id } = query;
+    const { date, dateFrom, dateTo, status, vendor_id } = query;
     return this.prisma.ops_delivery_slot.findMany({
       where: {
-        expected_date: date ? new Date(date) : undefined,
+        expected_date: date
+          ? new Date(date)
+          : dateFrom || dateTo
+            ? {
+                gte: dateFrom ? new Date(dateFrom) : undefined,
+                lte: dateTo ? new Date(dateTo) : undefined,
+              }
+            : undefined,
         status: status ? status : undefined,
         schedule: vendor_id ? { vendor_id } : undefined,
       },

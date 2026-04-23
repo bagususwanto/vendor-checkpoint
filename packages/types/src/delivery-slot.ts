@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 export const findDeliverySlotParamsSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format tanggal harus YYYY-MM-DD').optional(),
+  dateFrom: z.string().optional(),
+  dateTo: z.string().optional(),
   status: z.enum(['Open', 'Filled', 'Missed', 'Check-In', 'Delay']).optional(),
   vendor_id: z.coerce.number().optional(),
 });
