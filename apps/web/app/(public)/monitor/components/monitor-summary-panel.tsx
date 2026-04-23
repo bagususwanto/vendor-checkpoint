@@ -11,7 +11,6 @@ export interface MonitorStats {
   early: number;
   pending: number;
   overdue: number;
-  missed: number;
 }
 
 interface MonitorSummaryPanelProps {
@@ -103,14 +102,6 @@ export function MonitorSummaryPanel({ stats }: MonitorSummaryPanelProps) {
             icon={AlertTriangle} 
             colorClass="bg-orange-500 text-white" 
             textClass="text-orange-500"
-          />
-
-          <CardItem 
-            label="Missed" 
-            value={stats.missed} 
-            icon={XCircle} 
-            colorClass="bg-slate-500 text-white" 
-            textClass="text-slate-500"
           />
         </div>
       </CardContent>

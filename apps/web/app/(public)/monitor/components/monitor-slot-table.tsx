@@ -1,6 +1,15 @@
 'use client';
 
-import { Users, ArrowRight, Clock, AlertTriangle, CheckCircle2, Timer, XCircle, Zap } from 'lucide-react';
+import {
+  Users,
+  ArrowRight,
+  Clock,
+  AlertTriangle,
+  CheckCircle2,
+  Timer,
+  XCircle,
+  Zap,
+} from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -18,8 +27,7 @@ export type ArrivalDisplayStatus =
   | 'OVERDUE'
   | 'ON_TIME'
   | 'LATE'
-  | 'EARLY'
-  | 'MISSED';
+  | 'EARLY';
 
 export interface ParsedMonitorSlot {
   id: string;
@@ -46,7 +54,10 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
         return (
           <Badge
             variant="outline"
-            className={cn(baseClass, 'bg-muted text-muted-foreground border-border gap-1.5')}
+            className={cn(
+              baseClass,
+              'bg-muted text-muted-foreground border-border gap-1.5',
+            )}
           >
             <Clock className="w-3 h-3" /> Menunggu
           </Badge>
@@ -55,7 +66,10 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
         return (
           <Badge
             variant="outline"
-            className={cn(baseClass, 'bg-orange-500/10 text-orange-500 border-orange-500/20 animate-pulse gap-1.5')}
+            className={cn(
+              baseClass,
+              'bg-orange-500/10 text-orange-500 border-orange-500/20 animate-pulse gap-1.5',
+            )}
           >
             <AlertTriangle className="w-3 h-3" /> Belum Tiba
           </Badge>
@@ -64,7 +78,10 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
         return (
           <Badge
             variant="outline"
-            className={cn(baseClass, 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 gap-1.5')}
+            className={cn(
+              baseClass,
+              'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 gap-1.5',
+            )}
           >
             <CheckCircle2 className="w-3 h-3" /> Tepat Waktu
           </Badge>
@@ -73,7 +90,10 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
         return (
           <Badge
             variant="outline"
-            className={cn(baseClass, 'bg-red-500/10 text-red-500 border-red-500/20 animate-pulse gap-1.5')}
+            className={cn(
+              baseClass,
+              'bg-red-500/10 text-red-500 border-red-500/20 animate-pulse gap-1.5',
+            )}
           >
             <Timer className="w-3 h-3" /> Terlambat
           </Badge>
@@ -82,18 +102,12 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
         return (
           <Badge
             variant="outline"
-            className={cn(baseClass, 'bg-blue-500/10 text-blue-500 border-blue-500/20 gap-1.5')}
+            className={cn(
+              baseClass,
+              'bg-blue-500/10 text-blue-500 border-blue-500/20 gap-1.5',
+            )}
           >
             <Zap className="w-3 h-3" /> Lebih Awal
-          </Badge>
-        );
-      case 'MISSED':
-        return (
-          <Badge
-            variant="outline"
-            className={cn(baseClass, 'bg-slate-500/10 text-slate-500 border-slate-500/20 gap-1.5')}
-          >
-            <XCircle className="w-3 h-3" /> Missed
           </Badge>
         );
     }
@@ -105,10 +119,10 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
         <TableHeader className="bg-muted/30 sticky top-0 z-20">
           <TableRow className="hover:bg-transparent border-b border-border">
             <TableHead className="w-[12%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-              Scheduled
+              Jadwal
             </TableHead>
             <TableHead className="w-[35%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-              Vendor Name
+              Perusahaan
             </TableHead>
             <TableHead className="w-[8%] px-4 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] text-center">
               Rit
@@ -142,9 +156,9 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
               </TableRow>
             ) : (
               slots.map((slot) => {
-                const isActive = slot.status === 'ON_TIME' || slot.status === 'EARLY';
+                const isActive =
+                  slot.status === 'ON_TIME' || slot.status === 'EARLY';
                 const isLate = slot.status === 'LATE';
-                const isMissed = slot.status === 'MISSED';
 
                 return (
                   <TableRow
@@ -153,7 +167,6 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
                       'transition-all duration-300 relative group h-16 border-border',
                       isActive && 'bg-emerald',
                       isLate && 'bg-red-500/5',
-                      isMissed && 'opacity-50 grayscale-[0.2]',
                     )}
                   >
                     {/* Arrival Status Indicator */}
@@ -167,7 +180,9 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
                       <div
                         className={cn(
                           'text-2xl font-mono font-black tabular-nums tracking-tighter',
-                          isActive ? 'text-emerald-600 dark:text-emerald-400' : '',
+                          isActive
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : '',
                           isLate ? 'text-red-500' : '',
                           !isActive && !isLate ? 'text-foreground' : '',
                         )}
@@ -181,9 +196,7 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
                         <span
                           className={cn(
                             'text-lg font-black tracking-tight leading-tight truncate transition-colors',
-                            isMissed
-                              ? 'text-red-500'
-                              : 'text-foreground group-hover:text-primary',
+                            'text-foreground group-hover:text-primary',
                           )}
                         >
                           {slot.companyName}

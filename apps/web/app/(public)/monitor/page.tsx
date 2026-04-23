@@ -24,7 +24,6 @@ export default function MonitorPage() {
 
   function deriveArrivalStatus(slot: DeliverySlotMonitorItem): ArrivalDisplayStatus {
     const latestEntry = slot.ops_checkin_entry?.[0];
-    if (slot.status === 'Missed') return 'MISSED';
     if (latestEntry) {
       const arrStatus = latestEntry.arrival_status;
       if (arrStatus === 'On-Time') return 'ON_TIME';
@@ -73,7 +72,6 @@ export default function MonitorPage() {
     early: parsedSlots.filter(s => s.status === 'EARLY').length,
     pending: parsedSlots.filter(s => s.status === 'PENDING').length,
     overdue: parsedSlots.filter(s => s.status === 'OVERDUE').length,
-    missed: parsedSlots.filter(s => s.status === 'MISSED').length,
   };
 
   return (
