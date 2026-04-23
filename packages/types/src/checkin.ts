@@ -106,7 +106,7 @@ export const departureScanSchema = z.object({
 export type DepartureScan = z.infer<typeof departureScanSchema>;
 
 export const arrivalCheckResponseSchema = z.object({
-  arrival_status: z.enum(['On-Time', 'Late', 'Early']),
+  arrival_status: z.enum(['On-Time', 'Late', 'Early', 'Unscheduled']),
   planned_arrival_time: z.string().optional(),
   actual_time: z.string(),
   slot_id: z.number().nullable(),
