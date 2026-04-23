@@ -29,7 +29,9 @@ export function SlotTable({ data, isLoading }: SlotTableProps) {
   if (data.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center rounded-md border border-dashed">
-        <p className="text-muted-foreground">Belum ada data jadwal pengiriman ditemukan</p>
+        <p className="text-muted-foreground">
+          Belum ada data jadwal pengiriman ditemukan
+        </p>
       </div>
     );
   }
@@ -58,31 +60,46 @@ export function SlotTable({ data, isLoading }: SlotTableProps) {
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-col">
-                    <span className="font-medium">{slot.schedule?.vendor?.company_name || '-'}</span>
-                    <span className="text-xs text-muted-foreground">{slot.schedule?.vendor?.vendor_code}</span>
+                    <span className="font-medium">
+                      {slot.schedule?.vendor?.company_name || '-'}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {slot.schedule?.vendor?.vendor_code}
+                    </span>
                   </div>
                 </TableCell>
                 <TableCell>
-                  {slot.expected_date ? format(new Date(slot.expected_date), 'dd MMM yyyy', { locale: id }) : '-'}
+                  {slot.expected_date
+                    ? format(new Date(slot.expected_date), 'dd MMM yyyy', {
+                        locale: id,
+                      })
+                    : '-'}
                 </TableCell>
                 <TableCell className="text-center font-medium">
                   {slot.schedule?.rit || '-'}
                 </TableCell>
                 <TableCell>
-                  {slot.schedule?.arrival_time ? slot.schedule.arrival_time : '-'}
+                  {slot.schedule?.arrival_time
+                    ? slot.schedule.arrival_time
+                    : '-'}
                 </TableCell>
                 <TableCell>
-                  {slot.schedule?.departure_time ? slot.schedule.departure_time : '-'}
+                  {slot.schedule?.departure_time
+                    ? slot.schedule.departure_time
+                    : '-'}
                 </TableCell>
-                <TableCell>
-                  {slot.schedule?.truck_station || '-'}
-                </TableCell>
+                <TableCell>{slot.schedule?.truck_station || '-'}</TableCell>
                 <TableCell className="text-center">
-                  <Badge 
+                  <Badge
                     variant={
-                      slot.status === 'Open' ? 'outline' :
-                      slot.status === 'Check-In' ? 'default' :
-                      slot.status === 'Delay' ? 'secondary' : 'destructive'}
+                      slot.status === 'Open'
+                        ? 'outline'
+                        : slot.status === 'Check-In'
+                          ? 'default'
+                          : slot.status === 'Delay'
+                            ? 'secondary'
+                            : 'destructive'
+                    }
                   >
                     {slot.status}
                   </Badge>
@@ -95,4 +112,3 @@ export function SlotTable({ data, isLoading }: SlotTableProps) {
     </div>
   );
 }
-
