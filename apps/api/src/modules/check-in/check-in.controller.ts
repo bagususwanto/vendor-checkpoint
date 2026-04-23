@@ -136,7 +136,7 @@ export class CheckInController {
     buildDetails: (req, res) => ({
       entry_id: res.entry_id,
       user_id: res.user_id,
-      old_value: { status: QueueStatus.DISETUJUI },
+      old_value: { status: res?.previous_status || QueueStatus.DISETUJUI },
       new_value: {
         status: QueueStatus.SELESAI,
         checkout_time: res.checkout_time,

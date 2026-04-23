@@ -739,6 +739,13 @@ export class CheckInService {
     const { queue_number } = checkoutDto;
     const localUserId = await this.resolveLocalUser(userId);
 
+    const verificationModeConfig =
+      await this.systemConfigService.findByConfigKey(
+        'VERIFICATION_MODE_ENABLED',
+      );
+    const isVerificationEnabled =
+      verificationModeConfig?.config_value === 'true';
+
     return await this.prisma.$transaction(async (tx) => {
       // 1. Find and validate entry
       const entry = await tx.ops_checkin_entry.findUnique({
@@ -762,10 +769,21 @@ export class CheckInService {
         throw new BadRequestException('Nomor antrean tidak ditemukan');
       }
 
-      if (entry.current_status !== QueueStatus.DISETUJUI) {
-        throw new BadRequestException(
-          `Checkout hanya dapat dilakukan untuk status DISETUJUI. Status saat ini: ${entry.current_status}`,
-        );
+      if (isVerificationEnabled) {
+        if (entry.current_status !== QueueStatus.DISETUJUI) {
+          throw new BadRequestException(
+            `Checkout hanya dapat dilakukan untuk status DISETUJUI. Status saat ini: ${entry.current_status}`,
+          );
+        }
+      } else {
+        if (
+          entry.current_status !== QueueStatus.DISETUJUI &&
+          entry.current_status !== QueueStatus.AKTIF
+        ) {
+          throw new BadRequestException(
+            `Checkout hanya dapat dilakukan untuk status DISETUJUI atau AKTIF. Status saat ini: ${entry.current_status}`,
+          );
+        }
       }
 
       if (!entry.ops_timelog) {
@@ -831,6 +849,7 @@ export class CheckInService {
         entry_id: entry.entry_id,
         user_id: localUserId,
         queue_number,
+        previous_status: entry.current_status,
         status: QueueStatus.SELESAI,
         status_display_text: statusDisplayText.config_value,
         driver_name: entry.driver_name,
