@@ -6,6 +6,7 @@ import { useDebounce } from '@/hooks/use-debounce';
 import { useDeliverySlots } from '@/hooks/api/use-delivery-slots';
 import { SlotToolbar } from './components/slot-toolbar';
 import { SlotTable } from './components/slot-table';
+import { SlotPagination } from './components/slot-pagination';
 import { DateRange } from 'react-day-picker';
 import {
   Card,
@@ -22,6 +23,8 @@ export default function DeliverySlotPage() {
     to: new Date(),
   });
   const [status, setStatus] = useState('all');
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -30,13 +33,24 @@ export default function DeliverySlotPage() {
     dateFrom: date?.from ? format(date.from, 'yyyy-MM-dd') : undefined,
     dateTo: date?.to ? format(date.to, 'yyyy-MM-dd') : undefined,
     status:
-      status === 'all' ? undefined : (status as 'Open' | 'Filled' | 'Missed'),
+      status === 'all'
+        ? undefined
+        : (status as 'Open' | 'Filled' | 'Missed' | 'Check-In' | 'Delay'),
+    page,
+    limit,
   };
 
-  const { data: slots, isLoading } = useDeliverySlots(queryParams, 10000); // Poll setiap 10 detik
+  const { data: paginatedData, isLoading } = useDeliverySlots(
+    queryParams,
+    10000,
+  ); // Poll setiap 10 detik
+
+  const slots = paginatedData?.data || [];
+  const meta = paginatedData?.meta;
 
   // Filter client-side jika butuh search by vendor
-  const filteredSlots = (slots || []).filter((slot) => {
+  // Catatan: Idealnya search dilakukan di server-side agar pagination akurat
+  const filteredSlots = slots.filter((slot) => {
     if (!debouncedSearchTerm) return true;
     const vendorName = slot.schedule?.vendor?.company_name?.toLowerCase() || '';
     return vendorName.includes(debouncedSearchTerm.toLowerCase());
@@ -44,6 +58,7 @@ export default function DeliverySlotPage() {
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+    setPage(1); // Reset ke halaman pertama saat mencari
   };
 
   const handleReset = () => {
@@ -53,6 +68,16 @@ export default function DeliverySlotPage() {
       to: new Date(),
     });
     setStatus('all');
+    setPage(1);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
+    setPage(1); // Reset ke halaman pertama saat limit berubah
   };
 
   return (
@@ -84,11 +109,29 @@ export default function DeliverySlotPage() {
             date={date}
             setDate={setDate}
             status={status}
-            setStatus={setStatus}
+            setStatus={(s) => {
+              setStatus(s);
+              setPage(1);
+            }}
             onReset={handleReset}
           />
 
-          <SlotTable data={filteredSlots} isLoading={isLoading} />
+          <SlotTable
+            data={filteredSlots}
+            isLoading={isLoading}
+            page={page}
+            limit={limit}
+          />
+
+          {meta && (
+            <SlotPagination
+              total={meta.total}
+              page={meta.page}
+              limit={meta.limit}
+              onPageChange={handlePageChange}
+              onLimitChange={handleLimitChange}
+            />
+          )}
         </CardContent>
       </Card>
     </div>

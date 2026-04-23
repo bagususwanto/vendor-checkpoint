@@ -15,9 +15,16 @@ import { Loader2 } from 'lucide-react';
 interface SlotTableProps {
   data: DeliverySlotResponse[];
   isLoading: boolean;
+  page?: number;
+  limit?: number;
 }
 
-export function SlotTable({ data, isLoading }: SlotTableProps) {
+export function SlotTable({
+  data,
+  isLoading,
+  page = 1,
+  limit = 10,
+}: SlotTableProps) {
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center rounded-md border border-dashed">
@@ -56,7 +63,7 @@ export function SlotTable({ data, isLoading }: SlotTableProps) {
             {data.map((slot, idx) => (
               <TableRow key={slot.slot_id}>
                 <TableCell className="text-center font-medium text-muted-foreground">
-                  {idx + 1}
+                  {(page - 1) * limit + idx + 1}
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-col">

@@ -2,6 +2,7 @@ import {
   findVendorResponse,
   FindDeliverySlotParams,
   DeliverySlotMonitorItem,
+  PaginatedResponse,
 } from '@repo/types';
 import { axiosInstance } from '@/lib/axios';
 
@@ -10,7 +11,7 @@ export interface DeliverySlotResponse {
   slot_id: number;
   schedule_id: number;
   expected_date: string;
-  status: 'Open' | 'Filled' | 'Missed';
+  status: 'Open' | 'Filled' | 'Missed' | 'Check-In' | 'Delay';
   created_at: string;
   updated_at: string;
   schedule: {
@@ -27,14 +28,18 @@ export interface DeliverySlotResponse {
 export const deliverySlotService = {
   findAll: async (
     params: FindDeliverySlotParams,
-  ): Promise<DeliverySlotResponse[]> => {
-    const response = await axiosInstance.get<{ data: DeliverySlotResponse[] }>(
-      '/delivery-slots',
-      {
-        params,
-      },
+  ): Promise<PaginatedResponse<DeliverySlotResponse>> => {
+    const response = await axiosInstance.get<
+      PaginatedResponse<DeliverySlotResponse>
+    >('/delivery-slots', {
+      params,
+    });
+    return (
+      response.data ?? {
+        data: [],
+        meta: { total: 0, page: 1, limit: 10, total_pages: 0 },
+      }
     );
-    return response.data.data ?? [];
   },
 
   findMonitor: async (): Promise<DeliverySlotMonitorItem[]> => {
