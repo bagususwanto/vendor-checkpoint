@@ -14,8 +14,10 @@ import { Plus, Search, RefreshCw, Loader2 } from 'lucide-react';
 import { VendorScheduleResponse } from '@repo/types';
 import { ScheduleTable } from './components/schedule-table';
 import { ScheduleForm } from './components/schedule-form';
+import { ScheduleToolbar } from './components/schedule-toolbar';
 import { useVendorSchedules } from '@/hooks/api/use-vendor-schedule';
 import { useTriggerSlotGenerator } from '@/hooks/api/use-scheduler';
+import { useDebounce } from '@/hooks/use-debounce';
 
 export default function VendorSchedulePage() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -23,9 +25,16 @@ export default function VendorSchedulePage() {
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(10);
   const [search, setSearch] = React.useState('');
-  const [searchInput, setSearchInput] = React.useState('');
+  const [dayOfWeek, setDayOfWeek] = React.useState('');
 
-  const { data: result, isLoading } = useVendorSchedules({ page, limit, search: search || undefined });
+  const debouncedSearch = useDebounce(search, 500);
+
+  const { data: result, isLoading } = useVendorSchedules({ 
+    page, 
+    limit, 
+    search: debouncedSearch || undefined,
+    day_of_week: dayOfWeek ? Number(dayOfWeek) : undefined,
+  });
   const { mutate: triggerGenerator, isPending: isTriggering } = useTriggerSlotGenerator();
 
   const handleAddSchedule = () => {
@@ -38,9 +47,19 @@ export default function VendorSchedulePage() {
     setIsDialogOpen(true);
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearch(searchInput);
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setPage(1);
+  };
+
+  const handleDayOfWeekChange = (value: string) => {
+    setDayOfWeek(value);
+    setPage(1);
+  };
+
+  const handleReset = () => {
+    setSearch('');
+    setDayOfWeek('');
     setPage(1);
   };
 
@@ -85,29 +104,13 @@ export default function VendorSchedulePage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Search bar */}
-          <form onSubmit={handleSearch} className="flex items-center gap-2 max-w-sm">
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Cari nama vendor..."
-                className="pl-8"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-              />
-            </div>
-            <Button type="submit" variant="outline" size="sm">Cari</Button>
-            {search && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => { setSearch(''); setSearchInput(''); setPage(1); }}
-              >
-                Reset
-              </Button>
-            )}
-          </form>
+          <ScheduleToolbar
+            searchTerm={search}
+            onSearchChange={handleSearchChange}
+            dayOfWeek={dayOfWeek}
+            setDayOfWeek={handleDayOfWeekChange}
+            onReset={handleReset}
+          />
 
           <ScheduleTable
             data={result?.data ?? []}
