@@ -94,11 +94,11 @@ export function SlotTable({ data, isLoading }: SlotTableProps) {
                     variant={
                       slot.status === 'Open'
                         ? 'outline'
-                        : slot.status === 'Check-In'
+                        : slot.status === 'Filled'
                           ? 'default'
-                          : slot.status === 'Delay'
-                            ? 'secondary'
-                            : 'destructive'
+                          : slot.status === 'Missed'
+                            ? 'destructive'
+                            : 'default'
                     }
                   >
                     {slot.status}

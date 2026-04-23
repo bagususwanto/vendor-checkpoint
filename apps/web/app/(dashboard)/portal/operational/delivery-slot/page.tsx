@@ -30,9 +30,7 @@ export default function DeliverySlotPage() {
     dateFrom: date?.from ? format(date.from, 'yyyy-MM-dd') : undefined,
     dateTo: date?.to ? format(date.to, 'yyyy-MM-dd') : undefined,
     status:
-      status === 'all'
-        ? undefined
-        : (status as 'Open' | 'Filled' | 'Missed' | 'Check-In' | 'Delay'),
+      status === 'all' ? undefined : (status as 'Open' | 'Filled' | 'Missed'),
   };
 
   const { data: slots, isLoading } = useDeliverySlots(queryParams, 10000); // Poll setiap 10 detik
@@ -61,9 +59,12 @@ export default function DeliverySlotPage() {
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Monitoring Pengiriman</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Monitoring Pengiriman
+          </h2>
           <p className="text-muted-foreground text-sm">
-            Pantau status kedatangan seluruh vendor secara *real-time* atau pada tanggal spesifik. Layar ini akan _auto-refresh_ setiap 10 detik.
+            Pantau status kedatangan seluruh vendor secara *real-time* atau pada
+            tanggal spesifik. Layar ini akan _auto-refresh_ setiap 10 detik.
           </p>
         </div>
       </div>
@@ -72,7 +73,8 @@ export default function DeliverySlotPage() {
         <CardHeader>
           <CardTitle>Daftar Slot Pengiriman (Delivery Slots)</CardTitle>
           <CardDescription>
-            Menampilkan seluruh vendor yang telah dijadwalkan oleh sistem untuk datang mengirimkan barang.
+            Menampilkan seluruh vendor yang telah dijadwalkan oleh sistem untuk
+            datang mengirimkan barang.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -86,10 +88,7 @@ export default function DeliverySlotPage() {
             onReset={handleReset}
           />
 
-          <SlotTable
-            data={filteredSlots}
-            isLoading={isLoading}
-          />
+          <SlotTable data={filteredSlots} isLoading={isLoading} />
         </CardContent>
       </Card>
     </div>

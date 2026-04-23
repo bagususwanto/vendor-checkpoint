@@ -1,4 +1,8 @@
-import { findVendorResponse, FindDeliverySlotParams, DeliverySlotMonitorItem } from '@repo/types';
+import {
+  findVendorResponse,
+  FindDeliverySlotParams,
+  DeliverySlotMonitorItem,
+} from '@repo/types';
 import { axiosInstance } from '@/lib/axios';
 
 // Since the DB has ops_delivery_slot, we approximate the type
@@ -6,7 +10,7 @@ export interface DeliverySlotResponse {
   slot_id: number;
   schedule_id: number;
   expected_date: string;
-  status: 'Open' | 'Check-In' | 'Delay' | 'Missed';
+  status: 'Open' | 'Filled' | 'Missed';
   created_at: string;
   updated_at: string;
   schedule: {
@@ -21,17 +25,22 @@ export interface DeliverySlotResponse {
 }
 
 export const deliverySlotService = {
-  findAll: async (params: FindDeliverySlotParams): Promise<DeliverySlotResponse[]> => {
-    const response = await axiosInstance.get<{ data: DeliverySlotResponse[] }>('/delivery-slots', {
-      params,
-    });
+  findAll: async (
+    params: FindDeliverySlotParams,
+  ): Promise<DeliverySlotResponse[]> => {
+    const response = await axiosInstance.get<{ data: DeliverySlotResponse[] }>(
+      '/delivery-slots',
+      {
+        params,
+      },
+    );
     return response.data.data ?? [];
   },
 
   findMonitor: async (): Promise<DeliverySlotMonitorItem[]> => {
-    const response = await axiosInstance.get<{ data: DeliverySlotMonitorItem[] }>(
-      '/delivery-slots/monitor'
-    );
+    const response = await axiosInstance.get<{
+      data: DeliverySlotMonitorItem[];
+    }>('/delivery-slots/monitor');
     return response.data.data ?? response.data; // nestjs standard response
   },
 };
