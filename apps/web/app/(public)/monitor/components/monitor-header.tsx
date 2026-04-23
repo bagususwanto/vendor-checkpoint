@@ -125,7 +125,7 @@ export function MonitorHeader() {
           <div className="w-px h-8 bg-border" />
           <div className="text-left min-w-[90px]">
             <div className="text-foreground font-black text-xs uppercase leading-tight">
-              {currentTime.toLocaleDateString('id-ID', { weekday: 'short' })}
+              {currentTime.toLocaleDateString('id-ID', { weekday: 'long' })}
             </div>
             <div className="text-muted-foreground font-bold text-[10px] uppercase tracking-wider">
               {currentTime.toLocaleDateString('id-ID', {
