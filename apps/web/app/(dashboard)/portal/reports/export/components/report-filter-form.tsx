@@ -21,6 +21,10 @@ interface ReportFilterFormProps {
   setDate: (date: DateRange | undefined) => void;
   status: string;
   setStatus: (status: string) => void;
+  arrivalStatus: string;
+  setArrivalStatus: (status: string) => void;
+  departureStatus: string;
+  setDepartureStatus: (status: string) => void;
   vendorCategoryId: string | undefined;
   setVendorCategoryId: (id: string | undefined) => void;
   onReset: () => void;
@@ -31,6 +35,10 @@ export function ReportFilterForm({
   setDate,
   status,
   setStatus,
+  arrivalStatus,
+  setArrivalStatus,
+  departureStatus,
+  setDepartureStatus,
   vendorCategoryId,
   setVendorCategoryId,
   onReset,
@@ -47,7 +55,12 @@ export function ReportFilterForm({
     );
   }, [vendorCategoriesData]);
 
-  const hasFilters = !!date || status !== '' || !!vendorCategoryId;
+  const hasFilters =
+    !!date ||
+    status !== '' ||
+    arrivalStatus !== '' ||
+    departureStatus !== '' ||
+    !!vendorCategoryId;
 
   return (
     <div className="rounded-xl border bg-card p-4 shadow-sm">
@@ -69,13 +82,15 @@ export function ReportFilterForm({
                 {status
                   ? status === 'MENUNGGU'
                     ? 'Menunggu'
-                    : status === 'VERIFIKASI'
-                      ? 'Verifikasi'
-                      : status === 'SELESAI'
-                        ? 'Selesai'
-                        : status === 'DITOLAK'
-                          ? 'Ditolak'
-                          : 'Status'
+                    : status === 'DISETUJUI'
+                      ? 'Disetujui'
+                      : status === 'AKTIF'
+                        ? 'Aktif'
+                        : status === 'SELESAI'
+                          ? 'Selesai'
+                          : status === 'DITOLAK'
+                            ? 'Ditolak'
+                            : 'Status'
                   : 'Status'}
               </Button>
             </DropdownMenuTrigger>
@@ -92,14 +107,99 @@ export function ReportFilterForm({
                 <DropdownMenuRadioItem value="MENUNGGU">
                   Menunggu
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="VERIFIKASI">
-                  Verifikasi
+                <DropdownMenuRadioItem value="DISETUJUI">
+                  Disetujui
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="AKTIF">
+                  Aktif
                 </DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="SELESAI">
                   Selesai
                 </DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="DITOLAK">
                   Ditolak
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-[170px] justify-start text-left font-normal"
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                {arrivalStatus
+                  ? arrivalStatus === 'On-Time'
+                    ? 'Arrival: On-Time'
+                    : arrivalStatus === 'Late'
+                      ? 'Arrival: Late'
+                      : arrivalStatus === 'Early'
+                        ? 'Arrival: Early'
+                        : arrivalStatus === 'Unscheduled'
+                          ? 'Arrival: Unscheduled'
+                          : 'Arrival Status'
+                  : 'Arrival Status'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px]">
+              <DropdownMenuLabel>Filter Arrival Status</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={arrivalStatus}
+                onValueChange={(val) => setArrivalStatus(val)}
+              >
+                <DropdownMenuRadioItem value="">
+                  Semua Arrival Status
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="On-Time">
+                  On-Time
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="Late">
+                  Late
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="Early">
+                  Early
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="Unscheduled">
+                  Unscheduled
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-[180px] justify-start text-left font-normal"
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                {departureStatus
+                  ? departureStatus === 'On-Time'
+                    ? 'Departure: On-Time'
+                    : departureStatus === 'Overdue'
+                      ? 'Departure: Overdue'
+                      : 'Departure Status'
+                  : 'Departure Status'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px]">
+              <DropdownMenuLabel>Filter Departure Status</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={departureStatus}
+                onValueChange={(val) => setDepartureStatus(val)}
+              >
+                <DropdownMenuRadioItem value="">
+                  Semua Departure Status
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="On-Time">
+                  On-Time
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="Overdue">
+                  Overdue
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
