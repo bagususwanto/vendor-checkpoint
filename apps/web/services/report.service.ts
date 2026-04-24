@@ -5,6 +5,8 @@ export interface ReportFilter {
   dateTo: string;
   status?: string;
   vendorCategoryId?: number;
+  arrivalStatus?: string;
+  departureStatus?: string;
 }
 
 export interface ReportPreviewData {
@@ -22,6 +24,20 @@ export interface ReportPreviewData {
     category: string;
     count: number;
   }[];
+  arrivalStatusBreakdown: {
+    status: string;
+    count: number;
+  }[];
+  departureStatusBreakdown: {
+    status: string;
+    count: number;
+  }[];
+  aiSafetyBreakdown: {
+    status: string;
+    count: number;
+  }[];
+  onTimeArrivalRate: number;
+  onTimeDepartureRate: number;
   nonCompliantItems: number;
 }
 
