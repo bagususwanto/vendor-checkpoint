@@ -17,6 +17,8 @@ export default function ReportsPage() {
     to: new Date(),
   });
   const [status, setStatus] = React.useState<string>('');
+  const [arrivalStatus, setArrivalStatus] = React.useState<string>('');
+  const [departureStatus, setDepartureStatus] = React.useState<string>('');
   const [vendorCategoryId, setVendorCategoryId] = React.useState<
     string | undefined
   >(undefined);
@@ -26,11 +28,13 @@ export default function ReportsPage() {
       dateFrom: date?.from ? format(date.from, 'yyyy-MM-dd') : '',
       dateTo: date?.to ? format(date.to, 'yyyy-MM-dd') : '',
       status: status === 'ALL' ? undefined : status,
+      arrivalStatus: arrivalStatus || undefined,
+      departureStatus: departureStatus || undefined,
       vendorCategoryId: vendorCategoryId
         ? parseInt(vendorCategoryId)
         : undefined,
     };
-  }, [date, status, vendorCategoryId]);
+  }, [date, status, arrivalStatus, departureStatus, vendorCategoryId]);
 
   const { data: previewData, isLoading: isPreviewLoading } =
     useReportPreview(filter);
@@ -63,6 +67,8 @@ export default function ReportsPage() {
       to: new Date(),
     });
     setStatus('');
+    setArrivalStatus('');
+    setDepartureStatus('');
     setVendorCategoryId(undefined);
   };
 
@@ -93,6 +99,10 @@ export default function ReportsPage() {
         setDate={setDate}
         status={status}
         setStatus={setStatus}
+        arrivalStatus={arrivalStatus}
+        setArrivalStatus={setArrivalStatus}
+        departureStatus={departureStatus}
+        setDepartureStatus={setDepartureStatus}
         vendorCategoryId={vendorCategoryId}
         setVendorCategoryId={setVendorCategoryId}
         onReset={handleReset}

@@ -19,8 +19,8 @@ interface ReportPreviewProps {
 export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
   if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-3 mt-6">
-        {[1, 2, 3].map((i) => (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-6">
+        {[1, 2, 3, 4].map((i) => (
           <div key={i} className="h-32 rounded-xl bg-muted/50 animate-pulse" />
         ))}
       </div>
@@ -33,10 +33,10 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
 
   return (
     <div className="space-y-6 mt-6">
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Records</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Check-in</CardTitle>
             <ReceiptText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -46,12 +46,30 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
             <p className="text-xs text-muted-foreground">
               Periode {data.period?.from} - {data.period?.to}
             </p>
-            {data.totalCheckins > 0 && (
-              <p className="text-xs text-status-info-fg mt-2">
-                <Info className="inline w-4 h-4" /> {data.totalCheckins} records
-                akan di-export
-              </p>
-            )}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              On-Time Arrival
+            </CardTitle>
+            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{data.onTimeArrivalRate}%</div>
+            <p className="text-xs text-muted-foreground">Rate kedatangan tepat waktu</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              On-Time Departure
+            </CardTitle>
+            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{data.onTimeDepartureRate}%</div>
+            <p className="text-xs text-muted-foreground">Rate keberangkatan tepat waktu</p>
           </CardContent>
         </Card>
         <Card>
@@ -59,7 +77,7 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
             <CardTitle className="text-sm font-medium">
               Compliance Rate
             </CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.complianceRate}%</div>
@@ -68,16 +86,65 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
             </p>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Status Check-in
+              Arrival Status
             </CardTitle>
             <PieChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="space-y-1">
-              {data.statusBreakdown?.map((s) => (
+              {data.arrivalStatusBreakdown?.map((s) => (
+                <div
+                  key={s.status}
+                  className="flex items-center justify-between text-xs"
+                >
+                  <span className="font-medium text-muted-foreground">
+                    {s.status}
+                  </span>
+                  <span>{s.count}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Departure Status
+            </CardTitle>
+            <PieChart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              {data.departureStatusBreakdown?.map((s) => (
+                <div
+                  key={s.status}
+                  className="flex items-center justify-between text-xs"
+                >
+                  <span className="font-medium text-muted-foreground">
+                    {s.status}
+                  </span>
+                  <span>{s.count}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              AI Safety Status
+            </CardTitle>
+            <PieChart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              {data.aiSafetyBreakdown?.map((s) => (
                 <div
                   key={s.status}
                   className="flex items-center justify-between text-xs"
