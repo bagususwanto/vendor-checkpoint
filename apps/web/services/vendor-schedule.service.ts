@@ -41,4 +41,22 @@ export const vendorScheduleService = {
     const response = await axiosInstance.delete<{ data: VendorScheduleResponse }>(`/vendor-schedules/${id}`);
     return response.data.data ?? response.data;
   },
+
+  downloadTemplate: async () => {
+    const response = await axiosInstance.get('/vendor-schedules/template', {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
+
+  uploadExcel: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axiosInstance.post('/vendor-schedules/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
 };

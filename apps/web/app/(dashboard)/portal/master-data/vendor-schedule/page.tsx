@@ -10,17 +10,19 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, RefreshCw, Loader2 } from 'lucide-react';
+import { Plus, Search, RefreshCw, Loader2, FileSpreadsheet } from 'lucide-react';
 import { VendorScheduleResponse } from '@repo/types';
 import { ScheduleTable } from './components/schedule-table';
 import { ScheduleForm } from './components/schedule-form';
 import { ScheduleToolbar } from './components/schedule-toolbar';
+import { UploadScheduleModal } from './components/upload-schedule-modal';
 import { useVendorSchedules } from '@/hooks/api/use-vendor-schedule';
 import { useTriggerSlotGenerator } from '@/hooks/api/use-scheduler';
 import { useDebounce } from '@/hooks/use-debounce';
 
 export default function VendorSchedulePage() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = React.useState(false);
   const [selectedSchedule, setSelectedSchedule] = React.useState<VendorScheduleResponse | null>(null);
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(10);
@@ -90,6 +92,9 @@ export default function VendorSchedulePage() {
             )}
             Generate Slot Hari Ini
           </Button>
+          <Button variant="outline" onClick={() => setIsUploadModalOpen(true)}>
+            <FileSpreadsheet className="mr-2 h-4 w-4" /> Upload Excel
+          </Button>
           <Button onClick={handleAddSchedule}>
             <Plus className="mr-2 h-4 w-4" /> Tambah Jadwal
           </Button>
@@ -130,6 +135,11 @@ export default function VendorSchedulePage() {
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         schedule={selectedSchedule}
+      />
+
+      <UploadScheduleModal
+        open={isUploadModalOpen}
+        onOpenChange={setIsUploadModalOpen}
       />
     </div>
   );

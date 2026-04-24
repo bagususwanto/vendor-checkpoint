@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { CreateVendorScheduleDto } from './dto/create-vendor-schedule.dto';
 import { UpdateVendorScheduleDto } from './dto/update-vendor-schedule.dto';
@@ -134,5 +134,82 @@ export class VendorScheduleService {
 
     const buffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(buffer);
+  }
+
+  async uploadExcel(buffer: Buffer) {
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buffer as any);
+    const sheet = workbook.getWorksheet(1);
+
+    if (!sheet) throw new BadRequestException('File Excel kosong atau tidak valid');
+
+    const data: any[] = [];
+    const vendorCodes = new Set<string>();
+
+    sheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return;
+
+      const vendorCode = row.getCell(1).text?.trim();
+      const dayOfWeek = row.getCell(2).value;
+      const rit = row.getCell(3).value || 1;
+      const arrivalTime = row.getCell(4).text?.trim();
+      const departureTime = row.getCell(5).text?.trim();
+      const truckStation = row.getCell(6).text?.trim();
+
+      if (!vendorCode || !dayOfWeek || !arrivalTime || !departureTime) return;
+
+      if (typeof dayOfWeek !== 'number' || dayOfWeek < 1 || dayOfWeek > 7) {
+        throw new BadRequestException(`Baris ${rowNumber}: Day of Week harus angka 1-7`);
+      }
+
+      const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+      if (!timeRegex.test(arrivalTime)) {
+        throw new BadRequestException(`Baris ${rowNumber}: Format Arrival Time harus HH:mm (24h)`);
+      }
+      if (!timeRegex.test(departureTime)) {
+        throw new BadRequestException(`Baris ${rowNumber}: Format Departure Time harus HH:mm (24h)`);
+      }
+
+      vendorCodes.add(vendorCode);
+      data.push({
+        vendor_code: vendorCode,
+        day_of_week: dayOfWeek,
+        rit: Number(rit),
+        arrival_time: arrivalTime,
+        departure_time: departureTime,
+        truck_station: truckStation || null,
+      });
+    });
+
+    if (data.length === 0) throw new BadRequestException('Tidak ada data yang valid untuk diunggah');
+    if (data.length > 1000) throw new BadRequestException('Maksimal 1000 baris per upload');
+
+    const vendors = await this.prisma.mst_vendor.findMany({
+      where: { vendor_code: { in: Array.from(vendorCodes) } },
+      select: { vendor_id: true, vendor_code: true },
+    });
+
+    const vendorMap = new Map(vendors.map((v) => [v.vendor_code, v.vendor_id]));
+
+    const finalData = data.map((d) => {
+      const vendor_id = vendorMap.get(d.vendor_code);
+      if (!vendor_id) {
+        throw new BadRequestException(`Vendor Code "${d.vendor_code}" tidak ditemukan`);
+      }
+      const { vendor_code, ...rest } = d;
+      return { ...rest, vendor_id };
+    });
+
+    const affectedVendorIds = Array.from(new Set(finalData.map((d) => d.vendor_id)));
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.mst_vendor_schedule.deleteMany({
+        where: { vendor_id: { in: affectedVendorIds } },
+      });
+
+      return tx.mst_vendor_schedule.createMany({
+        data: finalData,
+      });
+    });
   }
 }

@@ -11,8 +11,10 @@ import {
   UseInterceptors,
   Res,
   Header,
+  UploadedFile,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { VendorScheduleService } from './vendor-schedule.service';
 import { CreateVendorScheduleDto } from './dto/create-vendor-schedule.dto';
 import { UpdateVendorScheduleDto } from './dto/update-vendor-schedule.dto';
@@ -37,6 +39,21 @@ export class VendorScheduleController {
   })
   create(@Body() createVendorScheduleDto: CreateVendorScheduleDto) {
     return this.vendorScheduleService.create(createVendorScheduleDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @AuditLog({
+    actionType: 'VENDOR_SCHEDULE_UPLOAD',
+    actionDescription: 'Vendor schedule uploaded via Excel',
+    buildDetails: (req, res) => ({
+      user_id: req.user?.userId,
+      result: res,
+    }),
+  })
+  async uploadExcel(@UploadedFile() file: { buffer: Buffer; originalname: string; mimetype: string }) {
+    return this.vendorScheduleService.uploadExcel(file.buffer);
   }
 
   @Get('template')

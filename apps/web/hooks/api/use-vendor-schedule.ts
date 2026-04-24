@@ -52,3 +52,29 @@ export const useDeleteVendorSchedule = () => {
     },
   });
 };
+
+export const useDownloadVendorScheduleTemplate = () => {
+  return useMutation({
+    mutationFn: () => vendorScheduleService.downloadTemplate(),
+    onSuccess: (data) => {
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'template_jadwal_vendor.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    },
+  });
+};
+
+export const useUploadVendorSchedule = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (file: File) => vendorScheduleService.uploadExcel(file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vendor-schedules'] });
+    },
+  });
+};
+
