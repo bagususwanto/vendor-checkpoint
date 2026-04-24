@@ -14,18 +14,33 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
   Building2,
   Package,
   User,
   Clock,
   LogOut,
   AlertTriangle,
+  Loader2,
+  icons,
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useCheckoutCheckIn, useVerificationDetail } from '@/hooks/api/use-check-in';
+import {
+  useCheckoutCheckIn,
+  useVerificationDetail,
+} from '@/hooks/api/use-check-in';
 import { toast } from 'sonner';
 import { Separator } from '@/components/ui/separator';
 import { formatDateTime } from '@/lib/utils';
+import { StatusBadge } from '@/app/(dashboard)/components/status-badge';
 
 interface CheckinData {
   id: string;
@@ -49,30 +64,45 @@ export function CheckoutSheet({
 }: CheckoutSheetProps) {
   const [open, setOpen] = useState(false);
   const checkoutMutation = useCheckoutCheckIn();
-  const { data: detailData } = useVerificationDetail(open ? checkin.id : '');
+
+  // Fetch detail data
+  const { data: detailData, isLoading } = useVerificationDetail(
+    open ? checkin.id : '',
+  );
 
   const handleCheckout = () => {
-    checkoutMutation.mutate({ queue_number: checkin.id }, {
-      onSuccess: () => {
-        toast.success('Checkout Berhasil', {
-          description: `Driver ${checkin.driver} telah berhasil check-out.`,
-        });
-        setOpen(false);
-        onSuccess?.();
+    checkoutMutation.mutate(
+      { queue_number: checkin.id },
+      {
+        onSuccess: () => {
+          toast.success('Checkout Berhasil', {
+            description: `Driver ${checkin.driver} telah berhasil check-out.`,
+          });
+          setOpen(false);
+          onSuccess?.();
+        },
+        onError: (error) => {
+          toast.error('Gagal Checkout', {
+            description:
+              error.message || 'Terjadi kesalahan saat memproses checkout.',
+          });
+        },
       },
-      onError: (error) => {
-        toast.error('Gagal Checkout', {
-          description:
-            error.message || 'Terjadi kesalahan saat memproses checkout.',
-        });
-      },
-    });
+    );
   };
+
+  // Calculate non-compliant items count
+  const nonCompliantCount =
+    detailData?.checklist_responses?.reduce(
+      (acc: number, category: any) =>
+        acc + category.items.filter((item: any) => !item.is_compliant).length,
+      0,
+    ) || 0;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
-      <SheetContent className="sm:max-w-xl w-full flex flex-col h-full ring-offset-0 focus-visible:outline-none [&>button]:hidden">
+      <SheetContent className="sm:max-w-2xl w-full flex flex-col h-full ring-offset-0 focus-visible:outline-none [&>button]:hidden">
         <SheetHeader>
           <div className="flex items-center justify-between">
             <SheetTitle className="flex items-center gap-2">
@@ -90,108 +120,372 @@ export function CheckoutSheet({
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto p-6">
-          <div className="space-y-6">
-            <div className="flex items-center gap-4 bg-orange-50 p-4 rounded-lg border border-orange-100 text-orange-800">
-              <AlertTriangle className="h-5 w-5 shrink-0" />
-              <p className="text-sm">
-                Tindakan ini akan menyelesaikan sesi kunjungan driver ini di
-                area perusahaan.
-              </p>
+          {isLoading ? (
+            <div className="flex h-full items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
-
-            <div>
-              <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
-                Identitas Pengirim
-              </h4>
-              <div className="grid grid-cols-2 gap-4">
-                <Card className="p-4 shadow-sm col-span-2">
-                  <div className="flex items-start gap-4">
-                    <div className="rounded-lg bg-primary/10 p-2 text-primary">
-                      <Building2 className="h-5 w-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs font-medium text-muted-foreground">
-                        Perusahaan
-                      </p>
-                      <p className="font-semibold">{checkin.company}</p>
-                    </div>
-                  </div>
-                </Card>
-                <Card className="p-4 shadow-sm">
-                  <div className="flex items-start gap-4">
-                    <div className="rounded-lg bg-status-info-bg p-2 text-status-info-fg">
-                      <User className="h-5 w-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs font-medium text-muted-foreground">
-                        Driver
-                      </p>
-                      <p className="font-semibold text-sm truncate w-[140px]">
-                        {checkin.driver}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-                <Card className="p-4 shadow-sm">
-                  <div className="flex items-start gap-4">
-                    <div className="rounded-lg bg-orange-100 p-2 text-orange-600">
-                      <Package className="h-5 w-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs font-medium text-muted-foreground">
-                        Kategori
-                      </p>
-                      <p className="font-semibold text-sm">
-                        {checkin.category}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-                {detailData && (
-                  <Card className="p-4 shadow-sm col-span-2 bg-blue-50/50">
-                     <div className="flex justify-between items-center w-full">
-                        <div>
-                          <p className="text-xs font-medium text-muted-foreground">DN / PO Number</p>
-                          <p className="font-semibold text-sm mt-1">{detailData.dn_number || '-'} / {detailData.po_number || '-'}</p>
-                        </div>
-                     </div>
-                  </Card>
-                )}
+          ) : detailData ? (
+            <div className="grid grid-cols-1 gap-6">
+              <div className="flex items-center gap-4 bg-orange-50 p-4 rounded-lg border border-orange-100 text-orange-800">
+                <AlertTriangle className="h-5 w-5 shrink-0" />
+                <p className="text-sm">
+                  Tindakan ini akan menyelesaikan sesi kunjungan driver ini di
+                  area perusahaan.
+                </p>
               </div>
-            </div>
 
-            <Separator />
+              {/* Identitas Section */}
+              <div>
+                <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
+                  Identitas Pengirim
+                </h4>
+                <div className="space-y-4">
+                  <Card className="p-4 shadow-sm">
+                    <div className="flex items-start gap-4">
+                      <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                        <Building2 className="h-5 w-5" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Perusahaan
+                        </p>
+                        <p className="font-semibold text-base">
+                          {detailData.snapshot_company_name}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                  <Card className="p-4 shadow-sm">
+                    <div className="flex items-start gap-4">
+                      <div className="rounded-lg bg-orange-100 p-2 text-orange-600">
+                        <Package className="h-5 w-5" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Kategori Vendor
+                        </p>
+                        <p className="font-semibold text-base">
+                          {detailData.snapshot_category_name}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                  <Card className="p-4 shadow-sm">
+                    <div className="flex items-start gap-4">
+                      <div className="rounded-lg bg-status-info-bg p-2 text-status-info-fg">
+                        <User className="h-5 w-5" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Driver
+                        </p>
+                        <p className="font-semibold text-base">
+                          {detailData.driver_name}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
 
-            <div>
-              <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
-                Ringkasan Waktu
-              </h4>
-              <Card className="p-4 shadow-sm">
-                <div className="flex items-start gap-4">
-                  <div className="rounded-lg bg-slate-100 p-2 text-slate-600">
-                    <Clock className="h-5 w-5" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground">
-                      Check-In
-                    </p>
-                    <p className="font-semibold text-base">
-                      {checkin.time
-                        ? formatDateTime(checkin.time, 'dd MMMM yyyy, HH:mm')
-                        : '-'}
-                    </p>
+                  <Card className="p-4 shadow-sm">
+                    <div className="flex items-start gap-4">
+                      <div className="rounded-lg bg-blue-100 p-2 text-blue-600">
+                        <Package className="h-5 w-5" />
+                      </div>
+                      <div className="space-y-1 flex-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          DN / PO Number
+                        </p>
+                        <p className="font-semibold text-base">
+                          {detailData.dn_number || '-'} /{' '}
+                          {detailData.po_number || '-'}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="p-4 shadow-sm h-full">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Arrival Status
+                        </p>
+                        {detailData.arrival_status ? (
+                          <Badge
+                            variant={
+                              detailData.arrival_status === 'Late'
+                                ? 'destructive'
+                                : detailData.arrival_status === 'Early'
+                                  ? 'secondary'
+                                  : detailData.arrival_status === 'Unscheduled'
+                                    ? 'outline'
+                                    : 'default'
+                            }
+                            className="mt-1"
+                          >
+                            {detailData.arrival_status}
+                          </Badge>
+                        ) : (
+                          '-'
+                        )}
+                      </div>
+                    </Card>
+
+                    <Card className="p-4 shadow-sm h-full">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          AI Verification
+                        </p>
+                        {detailData.ai_safety_status ? (
+                          <Badge
+                            variant={
+                              detailData.ai_safety_status === 'Fail'
+                                ? 'destructive'
+                                : detailData.ai_safety_status === 'Pass'
+                                  ? 'default'
+                                  : 'outline'
+                            }
+                            className="mt-1"
+                          >
+                            {detailData.ai_safety_status}
+                          </Badge>
+                        ) : (
+                          '-'
+                        )}
+                      </div>
+                    </Card>
                   </div>
                 </div>
-              </Card>
+              </div>
+
+              {/* Log Waktu Section */}
+              <div>
+                <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
+                  Log Waktu
+                </h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="p-4 shadow-sm">
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Waktu Submit
+                      </p>
+                      <p className="font-semibold text-sm">
+                        {detailData.submission_time
+                          ? formatDateTime(
+                              detailData.submission_time,
+                              'dd MMM yyyy, HH:mm',
+                            )
+                          : '-'}
+                      </p>
+                    </div>
+                  </Card>
+                  <Card className="p-4 shadow-sm">
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Check-in Time
+                      </p>
+                      <p className="font-semibold text-sm">
+                        {detailData.ops_timelog?.checkin_time
+                          ? formatDateTime(
+                              detailData.ops_timelog.checkin_time,
+                              'dd MMM yyyy, HH:mm',
+                            )
+                          : '-'}
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+              </div>
+
+              {/* Informasi Verifikasi Section */}
+              {detailData.ops_verification && (
+                <div>
+                  <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
+                    Informasi Verifikasi
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="p-4 shadow-sm">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Status Verifikasi
+                        </p>
+                        <StatusBadge
+                          status={
+                            detailData.ops_verification.verification_status
+                          }
+                        />
+                      </div>
+                    </Card>
+                    <Card className="p-4 shadow-sm text-right">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Diverifikasi Oleh
+                        </p>
+                        <p className="font-semibold text-sm">
+                          {detailData.ops_verification.user?.full_name || '-'}
+                        </p>
+                      </div>
+                    </Card>
+                    <Card className="p-4 shadow-sm col-span-2">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Waktu Verifikasi
+                        </p>
+                        <p className="font-semibold text-sm">
+                          {detailData.ops_verification.verification_time
+                            ? formatDateTime(
+                                detailData.ops_verification.verification_time,
+                                'dd MMM yyyy, HH:mm',
+                              )
+                            : '-'}
+                        </p>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+              )}
+
+              {/* Checklist Section */}
+              <div>
+                <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
+                  Hasil Pemeriksaan
+                </h4>
+
+                {nonCompliantCount > 0 && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Perhatian</AlertTitle>
+                    <AlertDescription>
+                      {nonCompliantCount} item tidak memenuhi standar pada saat
+                      check-in.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <Accordion
+                  type="single"
+                  collapsible
+                  className="w-full border rounded-lg bg-card"
+                >
+                  {detailData.checklist_responses?.map(
+                    (category: any, index: number) => {
+                      const CategoryIcon =
+                        icons[category.icon_name as keyof typeof icons] ||
+                        icons.Activity;
+                      const categoryNonCompliantCount = category.items.filter(
+                        (item: any) => !item.is_compliant,
+                      ).length;
+
+                      return (
+                        <AccordionItem
+                          key={index}
+                          value={`item-${index}`}
+                          className={
+                            index === detailData.checklist_responses.length - 1
+                              ? 'border-none'
+                              : 'border-b'
+                          }
+                        >
+                          <AccordionTrigger className="px-4 hover:no-underline hover:bg-muted/50">
+                            <div className="flex w-full items-center justify-between pr-2">
+                              <div className="flex items-center gap-2">
+                                <CategoryIcon
+                                  className={`h-4 w-4 ${category.color_code}`}
+                                />
+                                <span className="font-medium">
+                                  {category.category_name}
+                                </span>
+                              </div>
+                              {categoryNonCompliantCount > 0 && (
+                                <Badge
+                                  variant="destructive"
+                                  className="rounded-sm"
+                                >
+                                  {categoryNonCompliantCount} Tidak
+                                </Badge>
+                              )}
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="px-0 pb-0">
+                            <div className="divide-y">
+                              {category.items.map((item: any, idx: number) => (
+                                <div
+                                  key={idx}
+                                  className="flex items-start justify-between gap-4 p-4 hover:bg-muted/30 transition-colors"
+                                >
+                                  <div className="space-y-1">
+                                    <p
+                                      className={`text-sm ${
+                                        !item.is_compliant
+                                          ? 'font-medium text-destructive'
+                                          : 'text-foreground'
+                                      }`}
+                                    >
+                                      {item.item_text_snapshot}
+                                    </p>
+                                    <div className="flex gap-2 mt-1">
+                                      {item.item_type && (
+                                        <Badge
+                                          variant="secondary"
+                                          className="text-[10px] px-1.5 py-0 h-5 capitalize"
+                                        >
+                                          {item.item_type.toLowerCase()}
+                                        </Badge>
+                                      )}
+                                      {item.material_category_name && (
+                                        <Badge
+                                          variant="outline"
+                                          className="text-[10px] px-1.5 py-0 h-5 text-muted-foreground"
+                                        >
+                                          {item.material_category_name}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="shrink-0">
+                                    <Badge
+                                      variant={
+                                        item.is_compliant
+                                          ? 'outline'
+                                          : 'destructive'
+                                      }
+                                      className={`${
+                                        item.is_compliant
+                                          ? 'bg-status-success-bg text-status-success-fg border-status-success-border'
+                                          : ''
+                                      }`}
+                                    >
+                                      {item.is_compliant ? (
+                                        <CheckCircle className="mr-1 h-3 w-3" />
+                                      ) : (
+                                        <XCircle className="mr-1 h-3 w-3" />
+                                      )}
+                                      {item.response_value ? 'Ya' : 'Tidak'}
+                                    </Badge>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      );
+                    },
+                  )}
+                </Accordion>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="text-center py-4 text-muted-foreground">
+              Gagal memuat data detail.
+            </div>
+          )}
         </div>
 
-        <SheetFooter className="mt-auto pt-4 border-t">
+        <SheetFooter className="mt-auto pt-4 border-t gap-2 sm:gap-0">
           <Button
             size="lg"
+            className="w-full sm:w-auto"
             onClick={handleCheckout}
-            disabled={checkoutMutation.isPending}
+            disabled={checkoutMutation.isPending || !detailData}
           >
             {checkoutMutation.isPending ? 'Memproses...' : 'Proses Check-Out'}
           </Button>
@@ -199,7 +493,7 @@ export function CheckoutSheet({
             <Button
               variant="outline"
               size="lg"
-              className="w-full sm:w-auto mt-2 sm:mt-0"
+              className="w-full sm:w-auto"
             >
               Batal
             </Button>
