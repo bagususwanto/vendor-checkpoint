@@ -83,7 +83,9 @@ export class ReportService {
       arrivalBreakdown.find((a) => a.arrival_status === 'On-Time')?._count
         .entry_id || 0;
     const onTimeArrivalRate =
-      totalCheckins > 0 ? Math.round((onTimeArrivals / totalCheckins) * 100) : 0;
+      totalCheckins > 0
+        ? Math.round((onTimeArrivals / totalCheckins) * 100)
+        : 0;
 
     const totalCheckouts = await this.prisma.ops_timelog.count({
       where: {
@@ -291,7 +293,7 @@ export class ReportService {
 
     // Title
     sheet.mergeCells('A1:B1');
-    sheet.getCell('A1').value = 'LAPORAN CHECK-IN VENDOR';
+    sheet.getCell('A1').value = 'LAPORAN KINERJA VENDOR';
     sheet.getCell('A1').font = { bold: true, size: 16 };
     sheet.getCell('A1').alignment = { horizontal: 'center' };
 
@@ -325,7 +327,8 @@ export class ReportService {
     });
 
     // Departure Status Breakdown
-    const departureStart = arrivalStart + preview.arrivalStatusBreakdown.length + 2;
+    const departureStart =
+      arrivalStart + preview.arrivalStatusBreakdown.length + 2;
     sheet.getCell(`A${departureStart}`).value = 'Breakdown Departure Status';
     sheet.getCell(`A${departureStart}`).font = { bold: true };
 
@@ -335,7 +338,8 @@ export class ReportService {
     });
 
     // AI Safety Breakdown
-    const aiSafetyStart = departureStart + preview.departureStatusBreakdown.length + 2;
+    const aiSafetyStart =
+      departureStart + preview.departureStatusBreakdown.length + 2;
     sheet.getCell(`A${aiSafetyStart}`).value = 'Breakdown AI Safety';
     sheet.getCell(`A${aiSafetyStart}`).font = { bold: true };
 
