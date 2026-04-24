@@ -78,7 +78,7 @@ export default function ReportsPage() {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Export Laporan</h2>
           <p className="text-muted-foreground">
-            Download laporan check-in vendor dalam format Excel
+            Download laporan kinerja vendor dalam format Excel
           </p>
         </div>
         <div className="flex items-center space-x-2">
