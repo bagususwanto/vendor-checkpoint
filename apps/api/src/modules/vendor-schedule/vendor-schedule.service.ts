@@ -5,6 +5,7 @@ import { UpdateVendorScheduleDto } from './dto/update-vendor-schedule.dto';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 import { PaginatedResponse } from '@repo/types';
 import { Prisma } from 'generated/prisma/client';
+import * as ExcelJS from 'exceljs';
 
 @Injectable()
 export class VendorScheduleService {
@@ -86,5 +87,52 @@ export class VendorScheduleService {
     return this.prisma.mst_vendor_schedule.delete({
       where: { schedule_id: id },
     });
+  }
+
+  async downloadTemplate(): Promise<Buffer> {
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Template Jadwal');
+
+    // Define columns
+    sheet.columns = [
+      { header: 'Vendor Code', key: 'vendor_code', width: 20 },
+      { header: 'Day Of Week (1-7)', key: 'day_of_week', width: 20 },
+      { header: 'Rit', key: 'rit', width: 10 },
+      { header: 'Arrival Time (HH:mm)', key: 'arrival_time', width: 20 },
+      { header: 'Departure Time (HH:mm)', key: 'departure_time', width: 20 },
+      { header: 'Truck Station', key: 'truck_station', width: 20 },
+    ];
+
+    // Style the header
+    const headerRow = sheet.getRow(1);
+    headerRow.font = { bold: true };
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE0E0E0' },
+      };
+      cell.border = {
+        bottom: { style: 'thin' },
+      };
+    });
+
+    // Add note/guide about day of week
+    sheet.getCell('G1').value = 'PANDUAN HARI:';
+    sheet.getCell('G1').font = { bold: true };
+    sheet.getCell('H1').value = '1=Senin, 2=Selasa, 3=Rabu, 4=Kamis, 5=Jumat, 6=Sabtu, 7=Minggu';
+
+    // Add a sample row (optional)
+    sheet.addRow({
+      vendor_code: 'VND001',
+      day_of_week: 1,
+      rit: 1,
+      arrival_time: '08:00',
+      departure_time: '10:00',
+      truck_station: 'DOCK-1',
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
   }
 }

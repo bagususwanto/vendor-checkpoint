@@ -9,7 +9,10 @@ import {
   Query,
   UseGuards,
   UseInterceptors,
+  Res,
+  Header,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { VendorScheduleService } from './vendor-schedule.service';
 import { CreateVendorScheduleDto } from './dto/create-vendor-schedule.dto';
 import { UpdateVendorScheduleDto } from './dto/update-vendor-schedule.dto';
@@ -34,6 +37,14 @@ export class VendorScheduleController {
   })
   create(@Body() createVendorScheduleDto: CreateVendorScheduleDto) {
     return this.vendorScheduleService.create(createVendorScheduleDto);
+  }
+
+  @Get('template')
+  @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+  @Header('Content-Disposition', 'attachment; filename=template_jadwal_vendor.xlsx')
+  async downloadTemplate(@Res() res: Response) {
+    const buffer = await this.vendorScheduleService.downloadTemplate();
+    res.send(buffer);
   }
 
   @Get()
