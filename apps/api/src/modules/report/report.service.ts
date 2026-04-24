@@ -55,6 +55,50 @@ export class ReportService {
           )
         : 0;
 
+    // v2: Get arrival status breakdown
+    const arrivalBreakdown = await this.prisma.ops_checkin_entry.groupBy({
+      by: ['arrival_status'],
+      where: whereClause,
+      _count: { entry_id: true },
+    });
+
+    // v2: Get departure status breakdown (via timelog)
+    const departureBreakdown = await this.prisma.ops_timelog.groupBy({
+      by: ['departure_status'],
+      where: {
+        entry: whereClause,
+      },
+      _count: { entry_id: true },
+    });
+
+    // v2: Get AI Safety breakdown
+    const aiSafetyBreakdown = await this.prisma.ops_checkin_entry.groupBy({
+      by: ['ai_safety_status'],
+      where: whereClause,
+      _count: { entry_id: true },
+    });
+
+    // v2: Calculate On-Time rates
+    const onTimeArrivals =
+      arrivalBreakdown.find((a) => a.arrival_status === 'On-Time')?._count
+        .entry_id || 0;
+    const onTimeArrivalRate =
+      totalCheckins > 0 ? Math.round((onTimeArrivals / totalCheckins) * 100) : 0;
+
+    const totalCheckouts = await this.prisma.ops_timelog.count({
+      where: {
+        entry: whereClause,
+        is_checked_out: true,
+      },
+    });
+    const onTimeDepartures =
+      departureBreakdown.find((d) => d.departure_status === 'On-Time')?._count
+        .entry_id || 0;
+    const onTimeDepartureRate =
+      totalCheckouts > 0
+        ? Math.round((onTimeDepartures / totalCheckouts) * 100)
+        : 0;
+
     return {
       period: {
         from: filter.dateFrom,
@@ -70,6 +114,20 @@ export class ReportService {
         category: c.snapshot_category_name,
         count: c._count.entry_id,
       })),
+      arrivalStatusBreakdown: arrivalBreakdown.map((a) => ({
+        status: a.arrival_status || 'Unknown',
+        count: a._count.entry_id,
+      })),
+      departureStatusBreakdown: departureBreakdown.map((d) => ({
+        status: d.departure_status || 'Unknown',
+        count: d._count.entry_id,
+      })),
+      aiSafetyBreakdown: aiSafetyBreakdown.map((a) => ({
+        status: a.ai_safety_status || 'Pending',
+        count: a._count.entry_id,
+      })),
+      onTimeArrivalRate,
+      onTimeDepartureRate,
       nonCompliantItems: complianceStats._sum?.non_compliant_count || 0,
     };
   }
@@ -107,7 +165,17 @@ export class ReportService {
         ops_verification: {
           include: { user: true },
         },
-        ops_timelog: true,
+        ops_timelog: {
+          include: {
+            delay_departure_reason: true,
+          },
+        },
+        delay_arrival_reason: true,
+        delivery_slot: {
+          include: {
+            schedule: true,
+          },
+        },
         ops_checkin_response: {
           include: {
             checklist_category: true,
@@ -201,6 +269,16 @@ export class ReportService {
       where.snapshot_vendor_category_id = filter.vendorCategoryId;
     }
 
+    if (filter.arrivalStatus) {
+      where.arrival_status = filter.arrivalStatus;
+    }
+
+    if (filter.departureStatus) {
+      where.ops_timelog = {
+        departure_status: filter.departureStatus,
+      };
+    }
+
     return where;
   }
 
@@ -226,6 +304,8 @@ export class ReportService {
     const stats = [
       ['Total Check-in', preview.totalCheckins],
       ['Compliance Rate', `${preview.complianceRate}%`],
+      ['On-Time Arrival Rate', `${preview.onTimeArrivalRate}%`],
+      ['On-Time Departure Rate', `${preview.onTimeDepartureRate}%`],
       ['Total Non-Compliant Items', preview.nonCompliantItems],
     ];
 
@@ -234,8 +314,38 @@ export class ReportService {
       sheet.getCell(`B${statsStart + index}`).value = stat[1];
     });
 
+    // Arrival Status Breakdown
+    const arrivalStart = statsStart + stats.length + 2;
+    sheet.getCell(`A${arrivalStart}`).value = 'Breakdown Arrival Status';
+    sheet.getCell(`A${arrivalStart}`).font = { bold: true };
+
+    preview.arrivalStatusBreakdown.forEach((a: any, index: number) => {
+      sheet.getCell(`A${arrivalStart + 1 + index}`).value = a.status;
+      sheet.getCell(`B${arrivalStart + 1 + index}`).value = a.count;
+    });
+
+    // Departure Status Breakdown
+    const departureStart = arrivalStart + preview.arrivalStatusBreakdown.length + 2;
+    sheet.getCell(`A${departureStart}`).value = 'Breakdown Departure Status';
+    sheet.getCell(`A${departureStart}`).font = { bold: true };
+
+    preview.departureStatusBreakdown.forEach((d: any, index: number) => {
+      sheet.getCell(`A${departureStart + 1 + index}`).value = d.status;
+      sheet.getCell(`B${departureStart + 1 + index}`).value = d.count;
+    });
+
+    // AI Safety Breakdown
+    const aiSafetyStart = departureStart + preview.departureStatusBreakdown.length + 2;
+    sheet.getCell(`A${aiSafetyStart}`).value = 'Breakdown AI Safety';
+    sheet.getCell(`A${aiSafetyStart}`).font = { bold: true };
+
+    preview.aiSafetyBreakdown.forEach((a: any, index: number) => {
+      sheet.getCell(`A${aiSafetyStart + 1 + index}`).value = a.status;
+      sheet.getCell(`B${aiSafetyStart + 1 + index}`).value = a.count;
+    });
+
     // Status Breakdown
-    const statusStart = statsStart + stats.length + 2;
+    const statusStart = aiSafetyStart + preview.aiSafetyBreakdown.length + 2;
     sheet.getCell(`A${statusStart}`).value = 'Breakdown per Status';
     sheet.getCell(`A${statusStart}`).font = { bold: true };
 
@@ -270,9 +380,16 @@ export class ReportService {
       'Driver',
       'Kategori',
       'Status',
+      'DN Number',
+      'PO Number',
+      'Arrival Status',
+      'Alasan Terlambat Datang',
+      'AI Safety Status',
       'Check-in Time',
       'Checkout Time',
       'Duration (min)',
+      'Departure Status',
+      'Alasan Terlambat Keluar',
       'Compliance',
       'Non-Compliant Count',
     ];
@@ -299,6 +416,11 @@ export class ReportService {
         entry.driver_name,
         entry.snapshot_category_name,
         entry.current_status,
+        entry.dn_number || '-',
+        entry.po_number || '-',
+        entry.arrival_status || '-',
+        entry.delay_arrival_reason?.reason_text || '-',
+        entry.ai_safety_status || '-',
         entry.ops_timelog?.checkin_time
           ? this.formatDateTime(entry.ops_timelog.checkin_time)
           : '-',
@@ -306,6 +428,8 @@ export class ReportService {
           ? this.formatDateTime(entry.ops_timelog.checkout_time)
           : '-',
         entry.ops_timelog?.duration_minutes || '-',
+        entry.ops_timelog?.departure_status || '-',
+        entry.ops_timelog?.delay_departure_reason?.reason_text || '-',
         entry.has_non_compliant_items ? 'TIDAK PATUH' : 'PATUH',
         entry.non_compliant_count,
       ]);
