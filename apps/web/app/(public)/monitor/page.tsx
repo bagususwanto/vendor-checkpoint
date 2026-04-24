@@ -130,7 +130,7 @@ export default function MonitorPage() {
                   Tidak Terjadwal
                 </span>
                 <span className="text-lg font-black text-primary leading-none">
-                  Kedatangan
+                  Vendor
                 </span>
               </div>
             </div>

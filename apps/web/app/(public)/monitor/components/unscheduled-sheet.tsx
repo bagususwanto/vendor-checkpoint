@@ -24,21 +24,70 @@ interface UnscheduledSheetProps {
   data: any[];
 }
 
-export function UnscheduledSheet({ open, onOpenChange, data }: UnscheduledSheetProps) {
+export function UnscheduledSheet({
+  open,
+  onOpenChange,
+  data,
+}: UnscheduledSheetProps) {
   const getStatusBadge = (status: string) => {
-    const baseClass = 'px-2 py-0.5 text-[9px] font-black uppercase tracking-widest';
-    
+    const baseClass =
+      'px-2 py-0.5 text-[9px] font-black uppercase tracking-widest';
+
     switch (status) {
       case 'MENUNGGU':
-        return <Badge variant="outline" className={cn(baseClass, "bg-orange-500/10 text-orange-500 border-orange-500/20")}>Menunggu</Badge>;
+        return (
+          <Badge
+            variant="outline"
+            className={cn(
+              baseClass,
+              'bg-orange-500/10 text-orange-500 border-orange-500/20',
+            )}
+          >
+            Menunggu
+          </Badge>
+        );
       case 'DISETUJUI':
-        return <Badge variant="outline" className={cn(baseClass, "bg-emerald-500/10 text-emerald-600 border-emerald-500/20")}>Disetujui</Badge>;
+        return (
+          <Badge
+            variant="outline"
+            className={cn(
+              baseClass,
+              'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+            )}
+          >
+            Disetujui
+          </Badge>
+        );
       case 'AKTIF':
-        return <Badge variant="outline" className={cn(baseClass, "bg-blue-500/10 text-blue-600 border-blue-500/20")}>Aktif</Badge>;
+        return (
+          <Badge
+            variant="outline"
+            className={cn(
+              baseClass,
+              'bg-blue-500/10 text-blue-600 border-blue-500/20',
+            )}
+          >
+            Aktif
+          </Badge>
+        );
       case 'SELESAI':
-        return <Badge variant="outline" className={cn(baseClass, "bg-muted text-muted-foreground border-border")}>Selesai</Badge>;
+        return (
+          <Badge
+            variant="outline"
+            className={cn(
+              baseClass,
+              'bg-muted text-muted-foreground border-border',
+            )}
+          >
+            Selesai
+          </Badge>
+        );
       default:
-        return <Badge variant="outline" className={baseClass}>{status}</Badge>;
+        return (
+          <Badge variant="outline" className={baseClass}>
+            {status}
+          </Badge>
+        );
     }
   };
 
@@ -48,7 +97,7 @@ export function UnscheduledSheet({ open, onOpenChange, data }: UnscheduledSheetP
         <SheetHeader className="pb-6">
           <SheetTitle className="text-xl font-black uppercase tracking-tighter flex items-center gap-2">
             <Users className="w-5 h-5 text-primary" />
-            Vendor Unscheduled
+            Vendor Tidak Terjadwal
           </SheetTitle>
         </SheetHeader>
 
@@ -57,20 +106,31 @@ export function UnscheduledSheet({ open, onOpenChange, data }: UnscheduledSheetP
             {data.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/30">
                 <Users className="w-12 h-12 mb-2 opacity-10" />
-                <p className="text-sm font-bold uppercase tracking-widest">No Unscheduled Vendors</p>
+                <p className="text-sm font-bold uppercase tracking-widest">
+                  Tidak Ada Vendor Tidak Terjadwal
+                </p>
               </div>
             ) : (
               <Table>
                 <TableHeader className="bg-muted/50">
                   <TableRow>
-                    <TableHead className="text-[10px] font-black uppercase tracking-widest">Perusahaan</TableHead>
-                    <TableHead className="text-[10px] font-black uppercase tracking-widest text-center">Tiba</TableHead>
-                    <TableHead className="text-[10px] font-black uppercase tracking-widest text-right">Status</TableHead>
+                    <TableHead className="text-[10px] font-black uppercase tracking-widest">
+                      Perusahaan
+                    </TableHead>
+                    <TableHead className="text-[10px] font-black uppercase tracking-widest text-center">
+                      Tiba
+                    </TableHead>
+                    <TableHead className="text-[10px] font-black uppercase tracking-widest text-right">
+                      Status
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {data.map((item) => (
-                    <TableRow key={item.entry_id} className="border-border/50 group hover:bg-muted/30 transition-colors">
+                    <TableRow
+                      key={item.entry_id}
+                      className="border-border/50 group hover:bg-muted/30 transition-colors"
+                    >
                       <TableCell className="py-4">
                         <div className="flex flex-col">
                           <span className="font-bold text-sm leading-none group-hover:text-primary transition-colors">
@@ -84,9 +144,14 @@ export function UnscheduledSheet({ open, onOpenChange, data }: UnscheduledSheetP
                       <TableCell className="py-4 text-center">
                         <div className="flex items-center justify-center gap-1 font-mono text-xs font-bold text-primary">
                           <Clock className="w-3 h-3 opacity-40" />
-                          {new Date(item.submission_time).toLocaleTimeString('id-ID', {
-                            hour: '2-digit', minute: '2-digit', hour12: false
-                          })}
+                          {new Date(item.submission_time).toLocaleTimeString(
+                            'id-ID',
+                            {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: false,
+                            },
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="py-4 text-right">
