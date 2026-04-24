@@ -89,6 +89,74 @@ export class VendorScheduleService {
     });
   }
 
+  async exportExcel(
+    query: PaginatedParamsDto,
+    vendor_id?: number,
+    day_of_week?: number,
+  ): Promise<Buffer> {
+    const { search } = query;
+    const where: Prisma.mst_vendor_scheduleWhereInput = {
+      vendor_id: vendor_id ?? undefined,
+      day_of_week: day_of_week ?? undefined,
+    };
+
+    if (search?.trim()) {
+      where.vendor = {
+        OR: [
+          { company_name: { contains: search } },
+          { vendor_code: { contains: search } },
+        ],
+      };
+    }
+
+    const data = await this.prisma.mst_vendor_schedule.findMany({
+      where,
+      include: { vendor: true },
+      orderBy: { created_at: 'desc' },
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Data Jadwal Vendor');
+
+    sheet.columns = [
+      { header: 'Vendor Code', key: 'vendor_code', width: 20 },
+      { header: 'Nama Vendor', key: 'company_name', width: 30 },
+      { header: 'Day Of Week', key: 'day_of_week', width: 15 },
+      { header: 'Rit', key: 'rit', width: 10 },
+      { header: 'Arrival Time', key: 'arrival_time', width: 15 },
+      { header: 'Departure Time', key: 'departure_time', width: 15 },
+      { header: 'Truck Station', key: 'truck_station', width: 20 },
+    ];
+
+    const headerRow = sheet.getRow(1);
+    headerRow.font = { bold: true };
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE0E0E0' },
+      };
+      cell.border = {
+        bottom: { style: 'thin' },
+      };
+    });
+
+    data.forEach((item) => {
+      sheet.addRow({
+        vendor_code: item.vendor.vendor_code,
+        company_name: item.vendor.company_name,
+        day_of_week: item.day_of_week,
+        rit: item.rit,
+        arrival_time: item.arrival_time,
+        departure_time: item.departure_time,
+        truck_station: item.truck_station,
+      });
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
+  }
+
   async downloadTemplate(): Promise<Buffer> {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Template Jadwal');

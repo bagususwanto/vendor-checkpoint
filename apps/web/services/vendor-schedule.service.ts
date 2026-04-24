@@ -59,4 +59,12 @@ export const vendorScheduleService = {
     });
     return response.data;
   },
+
+  exportData: async (params: VendorScheduleQuery) => {
+    const response = await axiosInstance.get('/vendor-schedules/export', {
+      params,
+      responseType: 'blob',
+    });
+    return response.data;
+  },
 };

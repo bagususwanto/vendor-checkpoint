@@ -10,13 +10,13 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, RefreshCw, Loader2, FileSpreadsheet } from 'lucide-react';
+import { Plus, Search, RefreshCw, Loader2, FileSpreadsheet, Download } from 'lucide-react';
 import { VendorScheduleResponse } from '@repo/types';
 import { ScheduleTable } from './components/schedule-table';
 import { ScheduleForm } from './components/schedule-form';
 import { ScheduleToolbar } from './components/schedule-toolbar';
 import { UploadScheduleModal } from './components/upload-schedule-modal';
-import { useVendorSchedules } from '@/hooks/api/use-vendor-schedule';
+import { useVendorSchedules, useExportVendorSchedule } from '@/hooks/api/use-vendor-schedule';
 import { useTriggerSlotGenerator } from '@/hooks/api/use-scheduler';
 import { useDebounce } from '@/hooks/use-debounce';
 
@@ -38,6 +38,7 @@ export default function VendorSchedulePage() {
     day_of_week: dayOfWeek ? Number(dayOfWeek) : undefined,
   });
   const { mutate: triggerGenerator, isPending: isTriggering } = useTriggerSlotGenerator();
+  const { mutate: exportData, isPending: isExporting } = useExportVendorSchedule();
 
   const handleAddSchedule = () => {
     setSelectedSchedule(null);
@@ -70,6 +71,13 @@ export default function VendorSchedulePage() {
     setPage(1);
   };
 
+  const handleExport = () => {
+    exportData({
+      search: debouncedSearch || undefined,
+      day_of_week: dayOfWeek ? Number(dayOfWeek) : undefined,
+    });
+  };
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -94,6 +102,14 @@ export default function VendorSchedulePage() {
           </Button>
           <Button variant="outline" onClick={() => setIsUploadModalOpen(true)}>
             <FileSpreadsheet className="mr-2 h-4 w-4" /> Upload Excel
+          </Button>
+          <Button variant="outline" onClick={handleExport} disabled={isExporting}>
+            {isExporting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
+            Download Data
           </Button>
           <Button onClick={handleAddSchedule}>
             <Plus className="mr-2 h-4 w-4" /> Tambah Jadwal

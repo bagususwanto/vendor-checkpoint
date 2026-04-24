@@ -78,3 +78,19 @@ export const useUploadVendorSchedule = () => {
   });
 };
 
+export const useExportVendorSchedule = () => {
+  return useMutation({
+    mutationFn: (params: VendorScheduleQuery) => vendorScheduleService.exportData(params),
+    onSuccess: (data) => {
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'data_jadwal_vendor.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    },
+  });
+};
+
+

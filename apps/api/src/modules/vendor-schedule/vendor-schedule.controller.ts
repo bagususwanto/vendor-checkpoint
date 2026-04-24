@@ -64,6 +64,23 @@ export class VendorScheduleController {
     res.send(buffer);
   }
 
+  @Get('export')
+  @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+  @Header('Content-Disposition', 'attachment; filename=data_jadwal_vendor.xlsx')
+  async exportData(
+    @Res() res: Response,
+    @Query() query: import('src/common/dto/paginated-params.dto').PaginatedParamsDto,
+    @Query('vendor_id') vendor_id?: string,
+    @Query('day_of_week') day_of_week?: string,
+  ) {
+    const buffer = await this.vendorScheduleService.exportExcel(
+      query,
+      vendor_id ? +vendor_id : undefined,
+      day_of_week ? +day_of_week : undefined,
+    );
+    res.send(buffer);
+  }
+
   @Get()
   findAll(
     @Query() query: import('src/common/dto/paginated-params.dto').PaginatedParamsDto,
