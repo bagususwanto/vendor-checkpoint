@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { InteractiveBackground } from '@/components/interactive-background';
 import { CheckInHeader } from './components/check-in-header';
 import { CheckInExitDialog } from './components/check-in-exit-dialog';
@@ -11,6 +11,19 @@ export default function CheckInLayout({
   children: React.ReactNode;
 }) {
   const [showExitDialog, setShowExitDialog] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
   return (
     <div className="relative flex flex-col min-h-screen">
