@@ -63,9 +63,11 @@ export function QueueToolbar({
               {status
                 ? status === QueueStatus.DISETUJUI
                   ? 'Disetujui'
-                  : status === QueueStatus.DITOLAK
-                    ? 'Ditolak'
-                    : 'Menunggu'
+                  : status === QueueStatus.AKTIF
+                    ? 'Aktif'
+                    : status === QueueStatus.DITOLAK
+                      ? 'Ditolak'
+                      : 'Menunggu'
                 : 'Status'}
             </Button>
           </DropdownMenuTrigger>
@@ -78,6 +80,9 @@ export function QueueToolbar({
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value={QueueStatus.DISETUJUI}>
                 Disetujui
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value={QueueStatus.AKTIF}>
+                Aktif
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value={QueueStatus.DITOLAK}>
                 Ditolak

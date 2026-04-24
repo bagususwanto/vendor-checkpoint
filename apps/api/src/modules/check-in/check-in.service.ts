@@ -469,7 +469,11 @@ export class CheckInService {
       }
 
       if (filter.status) {
-        where.current_status = filter.status;
+        if (typeof filter.status === 'string' && filter.status.includes(',')) {
+          where.current_status = { in: filter.status.split(',') as QueueStatus[] };
+        } else {
+          where.current_status = filter.status;
+        }
       }
     }
 
@@ -769,21 +773,13 @@ export class CheckInService {
         throw new BadRequestException('Nomor antrean tidak ditemukan');
       }
 
-      if (isVerificationEnabled) {
-        if (entry.current_status !== QueueStatus.DISETUJUI) {
-          throw new BadRequestException(
-            `Checkout hanya dapat dilakukan untuk status DISETUJUI. Status saat ini: ${entry.current_status}`,
-          );
-        }
-      } else {
-        if (
-          entry.current_status !== QueueStatus.DISETUJUI &&
-          entry.current_status !== QueueStatus.AKTIF
-        ) {
-          throw new BadRequestException(
-            `Checkout hanya dapat dilakukan untuk status DISETUJUI atau AKTIF. Status saat ini: ${entry.current_status}`,
-          );
-        }
+      if (
+        entry.current_status !== QueueStatus.DISETUJUI &&
+        entry.current_status !== QueueStatus.AKTIF
+      ) {
+        throw new BadRequestException(
+          `Checkout hanya dapat dilakukan untuk status DISETUJUI atau AKTIF. Status saat ini: ${entry.current_status}`,
+        );
       }
 
       if (!entry.ops_timelog) {

@@ -32,7 +32,7 @@ export function RecentCheckinsTable() {
             <CheckinList status={QueueStatus.MENUNGGU} />
           </TabsContent>
           <TabsContent value="approved" className="space-y-4">
-            <CheckinList status={QueueStatus.DISETUJUI} />
+            <CheckinList status={`${QueueStatus.DISETUJUI},${QueueStatus.AKTIF}`} />
           </TabsContent>
           <TabsContent value="held" className="space-y-4">
             <CheckinList status={QueueStatus.TERTAHAN} />

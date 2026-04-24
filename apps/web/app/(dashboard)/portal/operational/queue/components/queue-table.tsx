@@ -131,8 +131,8 @@ export function QueueTable({
                   <StatusBadge status={checkin.current_status} />
                 </TableCell>
                 <TableCell className="text-right">
-                  {/* DETAIL VIEW: Applies to everything if verification is disabled OR if it's already finished */}
-                  {(!verificationMode || checkin.current_status === QueueStatus.SELESAI || checkin.current_status === QueueStatus.DITOLAK) ? (
+                  {checkin.current_status === QueueStatus.SELESAI ||
+                  checkin.current_status === QueueStatus.DITOLAK ? (
                     <VerificationSheet
                       checkin={{
                         id: checkin.queue_number,
@@ -150,8 +150,7 @@ export function QueueTable({
                       readonly={true}
                     />
                   ) : (
-                    <>
-                      {/* VERIFICATION ACTIONS (Only if mode=true) */}
+                    <div className="flex justify-end gap-2">
                       {checkin.current_status === QueueStatus.MENUNGGU && (
                         <VerificationSheet
                           checkin={{
@@ -167,7 +166,8 @@ export function QueueTable({
                         />
                       )}
 
-                      {checkin.current_status === QueueStatus.DISETUJUI && (
+                      {(checkin.current_status === QueueStatus.DISETUJUI ||
+                        checkin.current_status === QueueStatus.AKTIF) && (
                         <CheckoutSheet
                           checkin={{
                             id: checkin.queue_number,
@@ -185,7 +185,26 @@ export function QueueTable({
                           onSuccess={handleSuccess}
                         />
                       )}
-                    </>
+
+                      {checkin.current_status === QueueStatus.TERTAHAN && (
+                         <VerificationSheet
+                            checkin={{
+                              id: checkin.queue_number,
+                              company: checkin.snapshot_company_name,
+                              driver: checkin.driver_name,
+                              category: checkin.snapshot_category_name,
+                              time: checkin.submission_time,
+                              status: checkin.current_status.toLowerCase(),
+                            }}
+                            trigger={
+                              <Button size="sm" variant="outline">
+                                Detail
+                              </Button>
+                            }
+                            readonly={true}
+                          />
+                      )}
+                    </div>
                   )}
                 </TableCell>
               </TableRow>

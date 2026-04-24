@@ -29,7 +29,7 @@ import { QueueStatus } from '@repo/types';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface CheckinListProps {
-  status: QueueStatus.MENUNGGU | QueueStatus.DISETUJUI | QueueStatus.DITOLAK | QueueStatus.TERTAHAN;
+  status: string;
 }
 
 export function CheckinList({ status }: CheckinListProps) {
@@ -118,17 +118,24 @@ export function CheckinList({ status }: CheckinListProps) {
                   />
                 )}
 
-                {checkin.current_status === QueueStatus.DISETUJUI && (
+                {(checkin.current_status === QueueStatus.DISETUJUI ||
+                  checkin.current_status === QueueStatus.AKTIF) && (
                   <div className="flex justify-end gap-2">
-                    <HoldDialog
-                      queueNumber={checkin.queue_number}
-                      trigger={
-                        <Button size="sm" variant="outline" className="border-orange-200 text-orange-600 hover:bg-orange-50 hover:text-orange-700">
-                          Tahan
-                        </Button>
-                      }
-                      onSuccess={handleSuccess}
-                    />
+                    {checkin.current_status === QueueStatus.DISETUJUI && (
+                      <HoldDialog
+                        queueNumber={checkin.queue_number}
+                        trigger={
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-orange-200 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
+                          >
+                            Tahan
+                          </Button>
+                        }
+                        onSuccess={handleSuccess}
+                      />
+                    )}
                     <CheckoutSheet
                       checkin={{
                         id: checkin.queue_number,
