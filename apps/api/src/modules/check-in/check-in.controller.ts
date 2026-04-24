@@ -82,6 +82,12 @@ export class CheckInController {
     return this.checkInService.findActiveQueue(query);
   }
 
+  // PUBLIC - Monitor screen unscheduled list (no auth required)
+  @Get('/monitor/unscheduled')
+  findUnscheduledMonitor() {
+    return this.checkInService.findUnscheduledMonitor();
+  }
+
   // PROTECTED - Staff only
   @UseGuards(JwtAuthGuard)
   @Get('/verification-list')

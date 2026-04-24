@@ -430,6 +430,64 @@ export class CheckInService {
     };
   }
 
+  async findUnscheduledMonitor() {
+    const now = new Date();
+
+    // Cari data untuk "Hari Ini" dalam format UTC YYYY-MM-DD
+    const startOfTodayUtc = new Date(
+      Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0),
+    );
+    const endOfTodayUtc = new Date(
+      Date.UTC(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        23,
+        59,
+        59,
+        999,
+      ),
+    );
+
+    // Gunakan juga waktu lokal Jakarta (UTC+7)
+    const jakartaTime = new Date(
+      now.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }),
+    );
+    const startOfJakarta = new Date(jakartaTime);
+    startOfJakarta.setHours(0, 0, 0, 0);
+    const endOfJakarta = new Date(jakartaTime);
+    endOfJakarta.setHours(23, 59, 59, 999);
+
+    return this.prisma.ops_checkin_entry.findMany({
+      where: {
+        arrival_status: 'Unscheduled',
+        OR: [
+          {
+            submission_time: {
+              gte: startOfTodayUtc,
+              lte: endOfTodayUtc,
+            },
+          },
+          {
+            submission_time: {
+              gte: startOfJakarta,
+              lte: endOfJakarta,
+            },
+          },
+        ],
+      },
+      select: {
+        entry_id: true,
+        queue_number: true,
+        driver_name: true,
+        snapshot_company_name: true,
+        submission_time: true,
+        current_status: true,
+      },
+      orderBy: { submission_time: 'desc' },
+    });
+  }
+
   async findVerificationList(
     query: PaginatedParamsDto,
   ): Promise<PaginatedResponse<VerificationList>> {
