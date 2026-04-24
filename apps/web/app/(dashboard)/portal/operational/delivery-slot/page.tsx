@@ -8,6 +8,9 @@ import { SlotToolbar } from './components/slot-toolbar';
 import { SlotTable } from './components/slot-table';
 import { SlotPagination } from './components/slot-pagination';
 import { DateRange } from 'react-day-picker';
+import { RefreshCw, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useTriggerSlotGenerator } from '@/hooks/api/use-scheduler';
 import {
   Card,
   CardContent,
@@ -41,6 +44,7 @@ export default function DeliverySlotPage() {
   };
 
   const { data: paginatedData, isLoading } = useDeliverySlots(queryParams);
+  const { mutate: triggerGenerator, isPending: isTriggering } = useTriggerSlotGenerator();
 
   const slots = paginatedData?.data || [];
   const meta = paginatedData?.meta;
@@ -87,6 +91,20 @@ export default function DeliverySlotPage() {
           <p className="text-muted-foreground text-sm">
             Pantau status kedatangan seluruh vendor.
           </p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="secondary"
+            onClick={() => triggerGenerator()}
+            disabled={isTriggering}
+          >
+            {isTriggering ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Generate Slot Hari Ini
+          </Button>
         </div>
       </div>
 

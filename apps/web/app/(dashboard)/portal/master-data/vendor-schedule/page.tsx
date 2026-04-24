@@ -10,20 +10,24 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, RefreshCw, Loader2, FileSpreadsheet, Download } from 'lucide-react';
+import { Plus, Search, FileSpreadsheet, Download, Loader2 } from 'lucide-react';
 import { VendorScheduleResponse } from '@repo/types';
 import { ScheduleTable } from './components/schedule-table';
 import { ScheduleForm } from './components/schedule-form';
 import { ScheduleToolbar } from './components/schedule-toolbar';
 import { UploadScheduleModal } from './components/upload-schedule-modal';
-import { useVendorSchedules, useExportVendorSchedule } from '@/hooks/api/use-vendor-schedule';
-import { useTriggerSlotGenerator } from '@/hooks/api/use-scheduler';
+import {
+  useVendorSchedules,
+  useExportVendorSchedule,
+} from '@/hooks/api/use-vendor-schedule';
+
 import { useDebounce } from '@/hooks/use-debounce';
 
 export default function VendorSchedulePage() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = React.useState(false);
-  const [selectedSchedule, setSelectedSchedule] = React.useState<VendorScheduleResponse | null>(null);
+  const [selectedSchedule, setSelectedSchedule] =
+    React.useState<VendorScheduleResponse | null>(null);
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(10);
   const [search, setSearch] = React.useState('');
@@ -31,14 +35,15 @@ export default function VendorSchedulePage() {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data: result, isLoading } = useVendorSchedules({ 
-    page, 
-    limit, 
+  const { data: result, isLoading } = useVendorSchedules({
+    page,
+    limit,
     search: debouncedSearch || undefined,
     day_of_week: dayOfWeek ? Number(dayOfWeek) : undefined,
   });
-  const { mutate: triggerGenerator, isPending: isTriggering } = useTriggerSlotGenerator();
-  const { mutate: exportData, isPending: isExporting } = useExportVendorSchedule();
+
+  const { mutate: exportData, isPending: isExporting } =
+    useExportVendorSchedule();
 
   const handleAddSchedule = () => {
     setSelectedSchedule(null);
@@ -82,28 +87,23 @@ export default function VendorSchedulePage() {
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Jadwal Operasional Vendor</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Jadwal Operasional Vendor
+          </h2>
           <p className="text-muted-foreground text-sm">
-            Tentukan hari operasional serta waktu kedatangan &amp; keberangkatan masing-masing vendor.
+            Tentukan hari operasional serta waktu kedatangan &amp; keberangkatan
+            masing-masing vendor.
           </p>
         </div>
         <div className="flex items-center space-x-2">
-          <Button
-            variant="secondary"
-            onClick={() => triggerGenerator()}
-            disabled={isTriggering}
-          >
-            {isTriggering ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="mr-2 h-4 w-4" />
-            )}
-            Generate Slot Hari Ini
-          </Button>
           <Button variant="outline" onClick={() => setIsUploadModalOpen(true)}>
             <FileSpreadsheet className="mr-2 h-4 w-4" /> Upload Excel
           </Button>
-          <Button variant="outline" onClick={handleExport} disabled={isExporting}>
+          <Button
+            variant="outline"
+            onClick={handleExport}
+            disabled={isExporting}
+          >
             {isExporting ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
@@ -121,7 +121,8 @@ export default function VendorSchedulePage() {
         <CardHeader>
           <CardTitle>Daftar Jadwal</CardTitle>
           <CardDescription>
-            Data ini menjadi acuan slot harian untuk menghitung Missed Cycle dan keterlambatan.
+            Data ini menjadi acuan slot harian untuk menghitung Missed Cycle dan
+            keterlambatan.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
