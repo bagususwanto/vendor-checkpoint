@@ -104,3 +104,12 @@ export function useDepartureCheck() {
     mutationFn: (queueNumber: string) => checkInService.getDepartureCheck(queueNumber),
   });
 }
+
+export function useUnscheduledMonitor(refetchInterval = 10000) {
+  return useQuery({
+    queryKey: ['unscheduled-monitor'],
+    queryFn: () => checkInService.getUnscheduledMonitor(),
+    refetchInterval,
+    refetchIntervalInBackground: true,
+  });
+}
