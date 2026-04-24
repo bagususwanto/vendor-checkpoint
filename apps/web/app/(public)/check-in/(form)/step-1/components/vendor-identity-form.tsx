@@ -440,23 +440,21 @@ export function VendorIdentityForm() {
         <Button
           disabled={isSubmitting}
           type="button"
-          size={'xl'}
           variant="outline"
-          className="w-1/2"
+          className="w-1/2 h-12 sm:h-14 text-sm sm:text-base"
           onClick={() => router.back()}
         >
-          <ArrowLeft className="mr-2 w-6 h-6" />
+          <ArrowLeft className="mr-1 sm:mr-2 w-5 h-5 sm:w-6 sm:h-6" />
           Kembali
         </Button>
         <Button
-          size={'xl'}
           type="submit"
           onClick={form.handleSubmit}
-          className="w-1/2"
+          className="w-1/2 h-12 sm:h-14 text-sm sm:text-base"
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Memuat...' : 'Lanjut'}
-          <CircleArrowRight className="ml-2 w-6 h-6" />
+          <CircleArrowRight className="ml-1 sm:ml-2 w-5 h-5 sm:w-6 sm:h-6" />
         </Button>
       </CardFooter>
     </>

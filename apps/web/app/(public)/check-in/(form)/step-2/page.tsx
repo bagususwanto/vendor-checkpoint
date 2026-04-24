@@ -155,9 +155,9 @@ export default function CheckInStep2() {
   return (
     <div>
       <Card className="w-full max-w-4xl">
-        <CardHeader className="items-center text-center">
-          <CardTitle className="text-2xl">Pemeriksaan APD</CardTitle>
-          <CardDescription className="vendor-text">
+        <CardHeader className="items-center text-center pb-4 sm:pb-6">
+          <CardTitle className="text-xl sm:text-2xl">Pemeriksaan APD</CardTitle>
+          <CardDescription className="vendor-text text-xs sm:text-sm">
             Pastikan Anda memakai helm dan rompi keselamatan, lalu lakukan
             peninjauan dengan kamera.
           </CardDescription>
@@ -201,26 +201,24 @@ export default function CheckInStep2() {
           )}
         </CardContent>
 
-        <CardFooter className="flex flex-row justify-between gap-2">
+        <CardFooter className="flex flex-row justify-between gap-2 px-4 sm:px-6">
           <Button
             type="button"
-            size="xl"
             variant="outline"
-            className="w-1/2"
+            className="w-1/2 h-12 sm:h-14 text-sm sm:text-base"
             onClick={() => router.back()}
           >
-            <ArrowLeft className="mr-2 h-6 w-6" />
+            <ArrowLeft className="mr-1 sm:mr-2 h-5 w-5 sm:h-6 sm:w-6" />
             Kembali
           </Button>
           <Button
             type="button"
-            size="xl"
-            className="w-1/2"
+            className="w-1/2 h-12 sm:h-14 text-sm sm:text-base"
             onClick={handleContinue}
             disabled={!complianceResult?.isCompliant}
           >
             Lanjut
-            <CircleArrowRight className="ml-2 h-6 w-6" />
+            <CircleArrowRight className="ml-1 sm:ml-2 h-5 w-5 sm:h-6 sm:w-6" />
           </Button>
         </CardFooter>
       </Card>

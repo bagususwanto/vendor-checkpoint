@@ -13,9 +13,9 @@ export default function CheckInStep1b() {
   return (
     <div>
       <Card className="w-full max-w-4xl">
-        <CardHeader className="items-center text-center">
-          <CardTitle className="text-2xl">Alasan Keterlambatan</CardTitle>
-          <CardDescription className="vendor-text">
+        <CardHeader className="items-center text-center pb-4 sm:pb-6">
+          <CardTitle className="text-xl sm:text-2xl">Alasan Keterlambatan</CardTitle>
+          <CardDescription className="vendor-text text-xs sm:text-sm">
             Sistem mendeteksi kedatangan Anda melewati batas waktu jadwal yang
             ditentukan. Mohon pilih alasan keterlambatan Anda.
           </CardDescription>

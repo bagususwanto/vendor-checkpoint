@@ -50,7 +50,7 @@ export function ChecklistForm() {
 
   return (
     <>
-      <div className="top-32 z-20 sticky bg-card/80 shadow-sm backdrop-blur-md py-2 border-b w-full transition-all duration-300">
+      <div className="top-[40px] sm:top-26 z-20 sticky bg-card/80 shadow-sm backdrop-blur-md py-2 border-b w-full transition-all duration-300">
         <form.Subscribe
           selector={(state) => state.values.checklistItems}
           children={(checklistItems) => {
@@ -128,14 +128,14 @@ export function ChecklistForm() {
           </div>
         </form>
       </CardContent>
-      <CardFooter className="flex flex-row justify-between gap-2">
+      <CardFooter className="flex flex-row justify-between gap-2 px-4 sm:px-6">
         <Button
-          size={'xl'}
+          type="button"
           variant="outline"
-          className="w-1/2"
+          className="w-1/2 h-12 sm:h-14 text-sm sm:text-base"
           onClick={() => router.back()}
         >
-          <Icons.ArrowLeft className="mr-2 size-6" />
+          <Icons.ArrowLeft className="mr-1 sm:mr-2 w-5 h-5 sm:w-6 sm:h-6" />
           Kembali
         </Button>
         <form.Subscribe
@@ -154,14 +154,13 @@ export function ChecklistForm() {
 
             return (
               <Button
-                size={'xl'}
                 type="submit"
-                className="w-1/2"
+                className="w-1/2 h-12 sm:h-14 text-sm sm:text-base"
                 form="checklist-form"
                 disabled={Math.round(progress) < 100}
               >
                 Lanjut
-                <Icons.CircleArrowRight className="ml-2 size-6" />
+                <Icons.CircleArrowRight className="ml-1 sm:ml-2 w-5 h-5 sm:w-6 sm:h-6" />
               </Button>
             );
           }}

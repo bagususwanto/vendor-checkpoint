@@ -40,38 +40,38 @@ export function CheckInHeader({ onShowExitDialog }: CheckInHeaderProps) {
   return (
     <>
       {/* Fixed Back Button */}
-      <div className="top-4 left-4 z-50 fixed">
+      <div className="top-2 left-2 sm:top-4 sm:left-4 z-50 fixed">
         <Button
           variant="ghost"
           onClick={handleBack}
-          className="bg-background/50 backdrop-blur-sm hover:bg-background/80"
+          className="bg-background/50 backdrop-blur-sm hover:bg-background/80 h-9 w-9 sm:h-10 sm:w-auto px-0 sm:px-4"
         >
-          <ArrowLeft className="mr-1 w-4 h-4" />
-          <span>{pathname === '/check-in/step-1' ? 'Kembali' : 'Kembali'}</span>
+          <ArrowLeft className="h-5 w-5 sm:mr-1 sm:h-4 sm:w-4" />
+          <span className="hidden sm:inline">{pathname === '/check-in/step-1' ? 'Kembali' : 'Kembali'}</span>
         </Button>
       </div>
 
       {/* Fixed Theme Toggle */}
-      <div className="top-4 right-4 z-50 fixed">
+      <div className="top-2 right-2 sm:top-4 sm:right-4 z-50 fixed">
         {mounted ? (
           <ThemeToggleButton
             theme={theme === 'light' ? 'light' : 'dark'}
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
             variant="circle-blur"
             start="top-right"
-            className="bg-background/50 backdrop-blur-sm hover:bg-background/80"
+            className="bg-background/50 backdrop-blur-sm hover:bg-background/80 h-9 w-9 sm:h-10 sm:w-10"
           />
         ) : (
-          <div className="w-10 h-10" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10" />
         )}
       </div>
 
       {/* Header Container primarily for Steps and Background */}
       <header className="top-0 z-30 sticky bg-background/95 supports-backdrop-filter:bg-background/60 backdrop-blur border-b">
-        <div className="mx-auto px-6 py-4 container">
+        <div className="mx-auto px-4 sm:px-6 py-2 sm:py-4 container">
           {/* Progress Steps - Centered */}
           <div className="flex justify-center w-full">
-            <div className="w-full max-w-4xl">
+            <div className="w-full max-w-4xl px-12 sm:px-0">
               <CheckInSteps />
             </div>
           </div>

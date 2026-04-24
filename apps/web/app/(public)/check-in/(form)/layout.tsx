@@ -31,7 +31,7 @@ export default function CheckInLayout({
       <div className="z-10 relative flex flex-col min-h-screen">
         <CheckInHeader onShowExitDialog={() => setShowExitDialog(true)} />
 
-        <main className="flex-1 mx-auto px-6 py-8 w-full max-w-4xl">
+        <main className="flex-1 mx-auto px-4 sm:px-6 py-4 sm:py-8 w-full max-w-4xl">
           <div className="slide-in-from-bottom-4 animate-in duration-500 fade-in">
             {children}
           </div>

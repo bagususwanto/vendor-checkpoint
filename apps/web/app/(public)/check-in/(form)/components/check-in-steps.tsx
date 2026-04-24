@@ -32,7 +32,7 @@ export function CheckInSteps() {
             <div className="flex flex-col items-center">
               <div
                 className={`
-                flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 
+                flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full transition-all duration-300 
                 ${
                   isCompleted
                     ? 'bg-accent text-accent-foreground shadow-lg shadow-accent/30'
@@ -43,16 +43,18 @@ export function CheckInSteps() {
               `}
               >
                 {isCompleted ? (
-                  <CheckCircle2 className="w-4 h-4" />
+                  <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4" />
                 ) : (
-                  <span className="font-semibold text-xs">{index + 1}</span>
+                  <span className="font-semibold text-[10px] sm:text-xs">
+                    {index + 1}
+                  </span>
                 )}
               </div>
 
               {/* Step Label */}
               <span
                 className={`
-                mt-1 vendor-text font-medium text-xs text-center transition-colors duration-300
+                mt-1 vendor-text font-medium text-xs text-center transition-colors duration-300 hidden sm:block
                 ${isActive ? 'text-primary' : 'text-foreground/70'}
               `}
               >
@@ -62,7 +64,7 @@ export function CheckInSteps() {
 
             {/* Connector Line */}
             {index < steps.length - 1 && (
-              <div className="flex-1 mx-2 mt-3 h-0.5">
+              <div className="flex-1 mx-1 sm:mx-2 mt-2 sm:mt-3 h-0.5">
                 <div
                   className={`
                   h-full transition-all duration-500 rounded-full

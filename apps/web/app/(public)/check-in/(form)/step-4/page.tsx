@@ -131,9 +131,9 @@ export default function CheckInStep4() {
   return (
     <div>
       <Card className="w-full max-w-4xl">
-        <CardHeader className="items-center text-center">
-          <CardTitle className="text-2xl">Konfirmasi Data</CardTitle>
-          <CardDescription className="vendor-text">
+        <CardHeader className="items-center text-center pb-4 sm:pb-6">
+          <CardTitle className="text-xl sm:text-2xl">Konfirmasi Data</CardTitle>
+          <CardDescription className="vendor-text text-xs sm:text-sm">
             Periksa kembali data Anda sebelum submit.
           </CardDescription>
         </CardHeader>
