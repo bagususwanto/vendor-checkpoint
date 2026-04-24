@@ -5,6 +5,8 @@ export const reportFilterSchema = z.object({
   dateTo: z.string().date('Invalid date format (YYYY-MM-DD)'),
   status: z.string().optional(),
   vendorCategoryId: z.coerce.number().optional(),
+  arrivalStatus: z.string().optional(),
+  departureStatus: z.string().optional(),
 });
 
 export type ReportFilter = z.infer<typeof reportFilterSchema>;
