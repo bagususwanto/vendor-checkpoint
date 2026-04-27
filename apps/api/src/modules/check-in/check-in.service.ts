@@ -387,6 +387,11 @@ export class CheckInService {
           driver_name: true,
           snapshot_company_name: true,
           has_non_compliant_items: true,
+          mst_vendor: {
+            select: {
+              vendor_code: true,
+            },
+          },
           ops_queue_status: {
             select: {
               priority_order: true,
@@ -407,7 +412,11 @@ export class CheckInService {
     ]);
 
     return {
-      data,
+      data: data.map((item: any) => ({
+        ...item,
+        vendor_code: item.mst_vendor?.vendor_code,
+        mst_vendor: undefined,
+      })),
       meta: {
         total,
         page,

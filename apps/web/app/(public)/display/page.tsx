@@ -33,6 +33,7 @@ export default function DisplayPage() {
           currentQueueData.current_status,
         driverName: currentQueueData.driver_name,
         companyName: currentQueueData.snapshot_company_name || '-',
+        vendorCode: currentQueueData.vendor_code || '-',
       }
     : null;
 
@@ -43,6 +44,7 @@ export default function DisplayPage() {
       q.ops_queue_status?.status_display_text || q.current_status,
     driverName: q.driver_name,
     companyName: q.snapshot_company_name || '-',
+    vendorCode: q.vendor_code || '-',
   }));
 
   return (

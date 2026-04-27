@@ -94,9 +94,14 @@ export function DisplayTableQueue({
                   >
                     {queue.companyName}
                   </p>
-                  <p className="text-sm text-muted-foreground truncate">
-                    {queue.driverName}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold bg-muted text-muted-foreground px-1 py-0.5 rounded uppercase tracking-wider shrink-0">
+                      {queue.vendorCode}
+                    </span>
+                    <span className="text-sm text-muted-foreground truncate">
+                      {queue.driverName}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Status */}

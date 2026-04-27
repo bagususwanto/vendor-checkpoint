@@ -8,6 +8,7 @@ export interface QueueItem {
   statusDisplayText: string;
   driverName: string;
   companyName: string;
+  vendorCode: string;
 }
 
 interface DisplayCurrentQueueProps {
@@ -84,6 +85,14 @@ export function DisplayCurrentQueue({
           <p className="font-bold text-foreground text-lg line-clamp-2 leading-snug">
             {currentQueue.companyName}
           </p>
+          <div className="mt-1 flex items-center gap-1.5">
+            <span className="text-[10px] font-bold bg-primary/10 text-primary px-1.5 py-0.5 rounded uppercase tracking-wider">
+              Code
+            </span>
+            <span className="text-sm font-mono font-bold text-muted-foreground">
+              {currentQueue.vendorCode}
+            </span>
+          </div>
         </div>
 
         {/* Driver */}

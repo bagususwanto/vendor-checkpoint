@@ -16,9 +16,11 @@ export type DisplayQueue = {
   current_status: string;
   driver_name: string;
   snapshot_company_name: string;
+  vendor_code?: string;
   ops_queue_status: {
     priority_order: number;
     estimated_wait_minutes: number;
+    status_display_text?: string;
   };
 };
 
