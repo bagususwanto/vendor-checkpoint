@@ -26,7 +26,7 @@ export class SlotGeneratorJob {
     const schedules = await this.prisma.mst_vendor_schedule.findMany({
       where: {
         is_active: true,
-        day_of_week: currentDayOfWeek,
+        day_of_week: { in: [currentDayOfWeek, 0] },
       },
     });
 

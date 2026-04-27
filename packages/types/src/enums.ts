@@ -60,6 +60,7 @@ export enum SlotStatus {
 }
 
 export enum DayOfWeek {
+  EVERYDAY = 0,
   MONDAY = 1,
   TUESDAY = 2,
   WEDNESDAY = 3,
@@ -70,6 +71,7 @@ export enum DayOfWeek {
 }
 
 export const DAY_NAMES: Record<number, string> = {
+  [DayOfWeek.EVERYDAY]: 'Setiap Hari',
   [DayOfWeek.MONDAY]: 'Senin',
   [DayOfWeek.TUESDAY]: 'Selasa',
   [DayOfWeek.WEDNESDAY]: 'Rabu',
@@ -80,6 +82,7 @@ export const DAY_NAMES: Record<number, string> = {
 };
 
 export const DAY_OPTIONS = [
+  { value: DayOfWeek.EVERYDAY, label: DAY_NAMES[DayOfWeek.EVERYDAY] },
   { value: DayOfWeek.MONDAY, label: DAY_NAMES[DayOfWeek.MONDAY] },
   { value: DayOfWeek.TUESDAY, label: DAY_NAMES[DayOfWeek.TUESDAY] },
   { value: DayOfWeek.WEDNESDAY, label: DAY_NAMES[DayOfWeek.WEDNESDAY] },
@@ -88,3 +91,4 @@ export const DAY_OPTIONS = [
   { value: DayOfWeek.SATURDAY, label: DAY_NAMES[DayOfWeek.SATURDAY] },
   { value: DayOfWeek.SUNDAY, label: DAY_NAMES[DayOfWeek.SUNDAY] },
 ];
+

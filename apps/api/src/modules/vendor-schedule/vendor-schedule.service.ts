@@ -164,7 +164,7 @@ export class VendorScheduleService {
     // Define columns
     sheet.columns = [
       { header: 'Vendor Code', key: 'vendor_code', width: 20 },
-      { header: 'Day Of Week (1-7)', key: 'day_of_week', width: 20 },
+      { header: 'Day Of Week (0-7)', key: 'day_of_week', width: 20 },
       { header: 'Rit', key: 'rit', width: 10 },
       { header: 'Arrival Time (HH:mm)', key: 'arrival_time', width: 20 },
       { header: 'Departure Time (HH:mm)', key: 'departure_time', width: 20 },
@@ -188,7 +188,7 @@ export class VendorScheduleService {
     // Add note/guide about day of week
     sheet.getCell('G1').value = 'PANDUAN HARI:';
     sheet.getCell('G1').font = { bold: true };
-    sheet.getCell('H1').value = '1=Senin, 2=Selasa, 3=Rabu, 4=Kamis, 5=Jumat, 6=Sabtu, 7=Minggu';
+    sheet.getCell('H1').value = '0=Setiap Hari, 1=Senin, 2=Selasa, 3=Rabu, 4=Kamis, 5=Jumat, 6=Sabtu, 7=Minggu';
 
     // Add a sample row (optional)
     sheet.addRow({
@@ -224,10 +224,10 @@ export class VendorScheduleService {
       const departureTime = row.getCell(5).text?.trim();
       const truckStation = row.getCell(6).text?.trim();
 
-      if (!vendorCode || !dayOfWeek || !arrivalTime || !departureTime) return;
+      if (!vendorCode || dayOfWeek === null || dayOfWeek === undefined || !arrivalTime || !departureTime) return;
 
-      if (typeof dayOfWeek !== 'number' || dayOfWeek < 1 || dayOfWeek > 7) {
-        throw new BadRequestException(`Baris ${rowNumber}: Day of Week harus angka 1-7`);
+      if (typeof dayOfWeek !== 'number' || dayOfWeek < 0 || dayOfWeek > 7) {
+        throw new BadRequestException(`Baris ${rowNumber}: Day of Week harus angka 0-7`);
       }
 
       const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
