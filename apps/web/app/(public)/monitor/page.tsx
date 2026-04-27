@@ -56,7 +56,14 @@ export default function MonitorPage() {
       const parts = slot.schedule.arrival_time.split(':').map(Number);
       const hours = parts[0] ?? 0;
       const minutes = parts[1] ?? 0;
+
       const scheduleTime = new Date(slot.expected_date);
+
+      // JIKA jam < 07:15, maka secara operasional ini adalah H+1 dari expected_date
+      if (hours < 7 || (hours === 7 && minutes < 15)) {
+        scheduleTime.setDate(scheduleTime.getDate() + 1);
+      }
+
       scheduleTime.setHours(hours, minutes, 0, 0);
       const bufferMs = arrivalBufferMinutes * 60 * 1000;
       if (now.getTime() > scheduleTime.getTime() + bufferMs) return 'OVERDUE';
