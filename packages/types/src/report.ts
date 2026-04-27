@@ -21,3 +21,13 @@ export const auditLogFilterSchema = z.object({
 });
 
 export type AuditLogFilter = z.infer<typeof auditLogFilterSchema>;
+
+export const vendorPerformanceFilterSchema = z.object({
+  dateFrom: z.string().date('Invalid date format (YYYY-MM-DD)'),
+  dateTo: z.string().date('Invalid date format (YYYY-MM-DD)'),
+  granularity: z.enum(['daily', 'monthly', 'yearly']).default('daily'),
+  vendorId: z.coerce.number().optional(),
+  vendorCategoryId: z.coerce.number().optional(),
+});
+
+export type VendorPerformanceFilter = z.infer<typeof vendorPerformanceFilterSchema>;
