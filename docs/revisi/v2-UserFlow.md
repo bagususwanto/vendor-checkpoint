@@ -4,7 +4,7 @@
 > **Versi:** 2.3 | **Tanggal Revisi:** 2026-04-27
 > **Changelog v2.1:** Proses verifikasi Staff dinonaktifkan secara default (self-service mode).
 > **Changelog v2.2:** Verifikasi Staff **dikembalikan sebagai fitur opsional** yang dikontrol via `cfg_system.VERIFICATION_MODE_ENABLED`.
-> **Changelog v2.3:** Penambahan konsep **Operational Date** & **Cut-off Time (misal: 07:15 AM)** untuk mengakomodir cycle yang melewati tengah malam (hingga 05:00 AM hari berikutnya).
+> **Changelog v2.3:** Penambahan konsep **expected_date (Operational Date)** & **Cut-off Time (misal: 07:15 AM)** untuk mengakomodir cycle yang melewati tengah malam (hingga 07:00 AM hari berikutnya).
 
 ---
 
@@ -31,7 +31,7 @@ flowchart TD
     classDef endpoint fill:#000,stroke:#000,color:#fff
 
     %% --- SYSTEM: CUT-OFF AWAL HARI ---
-    S_SlotGen["🕗 Awal Hari Operasional (Scheduler: 07:15 AM) Generate ops_delivery_slot Set operational_date = Hari Ini Berdasarkan mst_vendor_schedule Status: Open"]:::new
+    S_SlotGen["🕗 Awal Hari Operasional (Scheduler: 07:15 AM) Generate ops_delivery_slot Set expected_date = Hari Ini Berdasarkan mst_vendor_schedule Status: Open"]:::new
 
     %% --- VENDOR ARRIVAL ---
     subgraph VENDOR_ARRIVAL ["🚛 VENDOR — Kedatangan (Arrival)"]
@@ -72,7 +72,7 @@ flowchart TD
     end
 
     %% --- SYSTEM EOD ---
-    S_MissedCheck["🌅 End of Operational Day (Scheduler: 07:00 AM) Cek ops_delivery_slot untuk operational_date kemarin yang entry_id masih NULL"]:::system
+    S_MissedCheck["🌅 End of Operational Day (Scheduler: 07:00 AM) Cek ops_delivery_slot untuk expected_date kemarin yang entry_id masih NULL"]:::system
     S_MissedCycle["Set status → Missed log_audit: SLOT_MISSED"]:::system
 
     %% FLOW
@@ -125,9 +125,9 @@ stateDiagram-v2
 
 ---
 
-## 3. Diagram Delivery Slot — Missed Cycle Detection & Operational Date
+## 3. Diagram Delivery Slot — Missed Cycle Detection & Expected Date
 
-Untuk mengakomodir cycle dari pagi hingga jam 05:00 pagi keesokan harinya, sistem menggunakan **`operational_date`** alih-alih bergantung pada waktu scan vendor aktual. Master jadwal menggunakan `day_offset` (+1) untuk cycle yang melewati tengah malam.
+Untuk mengakomodir cycle dari pagi hingga jam 07:00 pagi keesokan harinya, sistem menggunakan **`expected_date`** sebagai penanda hari operasional. Penentuan hari didasarkan pada waktu scan dikurangi batas cut-off (time-shift logic).
 
 ```mermaid
 flowchart LR
@@ -136,14 +136,14 @@ flowchart LR
     classDef entry fill:#e8f5e9,stroke:#2e7d32
     classDef missed fill:#ffebee,stroke:#c62828
 
-    MST["mst_vendor_schedule planned_arrival_time (contoh: 02:00 AM) day_offset: +1"]:::schedule
+    MST["mst_vendor_schedule planned_arrival_time (contoh: 02:00 AM)"]:::schedule
 
-    SLOT_OPEN["ops_delivery_slot operational_date: Hari Ini planned_arrival: Besok 02:00 status: Open entry_id: NULL"]:::slot
+    SLOT_OPEN["ops_delivery_slot expected_date: Hari Ini planned_arrival: Besok 02:00 status: Open entry_id: NULL"]:::slot
     SLOT_FILLED["ops_delivery_slot status: Filled entry_id: ✅"]:::entry
     SLOT_MISSED["ops_delivery_slot status: Missed entry_id: NULL"]:::missed
 
     MST -- "Scheduler Pagi (Jam 07:15 AM)" --> SLOT_OPEN
-    SLOT_OPEN -- "Vendor Scan DN → Jodohkan berdasarkan operational_date yang sama" --> SLOT_FILLED
+    SLOT_OPEN -- "Vendor Scan DN → Jodohkan berdasarkan expected_date (Operational Date)" --> SLOT_FILLED
     SLOT_OPEN -- "EOD Scheduler (Jam 07:00 AM H+1)" --> SLOT_MISSED
 ```
 
