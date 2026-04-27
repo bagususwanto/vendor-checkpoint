@@ -52,11 +52,11 @@ export default function MonitorPage() {
       // Sudah check-in tapi arrival_status belum di-set
       return 'ON_TIME';
     }
-    if (slot.schedule?.arrival_time) {
+    if (slot.schedule?.arrival_time && slot.expected_date) {
       const parts = slot.schedule.arrival_time.split(':').map(Number);
       const hours = parts[0] ?? 0;
       const minutes = parts[1] ?? 0;
-      const scheduleTime = new Date(now);
+      const scheduleTime = new Date(slot.expected_date);
       scheduleTime.setHours(hours, minutes, 0, 0);
       const bufferMs = arrivalBufferMinutes * 60 * 1000;
       if (now.getTime() > scheduleTime.getTime() + bufferMs) return 'OVERDUE';
@@ -78,9 +78,19 @@ export default function MonitorPage() {
         },
       );
     }
+    let expectedDate = '-';
+    if (slot.expected_date) {
+      expectedDate = new Date(slot.expected_date).toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      });
+    }
+
     return {
       id: String(slot.slot_id),
       expectedTime: slot.schedule?.arrival_time || '-',
+      expectedDate,
       companyName: slot.schedule?.vendor?.company_name || '-',
       vendorCode: slot.schedule?.vendor?.vendor_code || '-',
       rit: slot.schedule?.rit || 1,
@@ -89,6 +99,8 @@ export default function MonitorPage() {
       arrivalTime,
     };
   });
+
+  // Frontend sort removed: sorting is now handled in the backend
 
   const stats: MonitorStats = {
     total: parsedSlots.length,

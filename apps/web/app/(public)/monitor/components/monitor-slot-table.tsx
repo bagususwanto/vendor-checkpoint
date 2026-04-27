@@ -32,6 +32,7 @@ export type ArrivalDisplayStatus =
 export interface ParsedMonitorSlot {
   id: string;
   expectedTime: string;
+  expectedDate: string;
   companyName: string;
   vendorCode: string;
   rit: number;
@@ -177,17 +178,22 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
                       {isLate && (
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 bg-red-500 rounded-r-full shadow-[2px_0_8px_rgba(239,68,68,0.3)]" />
                       )}
-                      <div
-                        className={cn(
-                          'text-2xl font-mono font-black tabular-nums tracking-tighter',
-                          isActive
-                            ? 'text-emerald-600 dark:text-emerald-400'
-                            : '',
-                          isLate ? 'text-red-500' : '',
-                          !isActive && !isLate ? 'text-foreground' : '',
-                        )}
-                      >
-                        {slot.expectedTime}
+                      <div className="flex flex-col">
+                        <div
+                          className={cn(
+                            'text-2xl font-mono font-black tabular-nums tracking-tighter leading-none',
+                            isActive
+                              ? 'text-emerald-600 dark:text-emerald-400'
+                              : '',
+                            isLate ? 'text-red-500' : '',
+                            !isActive && !isLate ? 'text-foreground' : '',
+                          )}
+                        >
+                          {slot.expectedTime}
+                        </div>
+                        <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-widest mt-1">
+                          {slot.expectedDate}
+                        </span>
                       </div>
                     </TableCell>
 

@@ -109,7 +109,7 @@ export class DeliverySlotService {
     const endOfJakarta = new Date(jakartaTime);
     endOfJakarta.setHours(23, 59, 59, 999);
 
-    return this.prisma.ops_delivery_slot.findMany({
+    const slots = await this.prisma.ops_delivery_slot.findMany({
       where: {
         OR: [
           {
@@ -136,7 +136,30 @@ export class DeliverySlotService {
           include: { ops_timelog: true },
         },
       },
-      orderBy: [{ schedule: { arrival_time: 'asc' } }],
     });
+
+    // Custom sort to handle shift logic: 00:00 - 06:59 is considered the end of the operational day
+    slots.sort((a, b) => {
+      // First sort by expected_date
+      const dateA = a.expected_date.getTime();
+      const dateB = b.expected_date.getTime();
+      if (dateA !== dateB) return dateA - dateB;
+
+      // Then sort by arrival_time with shift logic (times < 07:00 moved to end of day)
+      const getSortValue = (timeStr?: string | null) => {
+        if (!timeStr) return 0;
+        const parts = timeStr.split(':').map(Number);
+        const h = parts[0] ?? 0;
+        const m = parts[1] ?? 0;
+        return h < 7 ? (h + 24) * 60 + m : h * 60 + m;
+      };
+
+      return (
+        getSortValue(a.schedule?.arrival_time) -
+        getSortValue(b.schedule?.arrival_time)
+      );
+    });
+
+    return slots;
   }
 }
