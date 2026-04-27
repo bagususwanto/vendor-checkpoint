@@ -40,19 +40,25 @@ export function VendorDetailSheet({ vendorId, isOpen, onClose, filter }: VendorD
             <ListFilter className="h-3 w-3" />
             Vendor Detail
           </div>
-          {isLoading ? (
-            <Skeleton className="h-8 w-[250px]" />
-          ) : (
-            <>
-              <SheetTitle className="text-2xl font-bold">{detail?.company_name}</SheetTitle>
-              <SheetDescription className="flex items-center gap-2">
+          <SheetTitle className="text-2xl font-bold">
+            {isLoading ? (
+              <Skeleton className="h-8 w-[250px]" />
+            ) : (
+              detail?.company_name
+            )}
+          </SheetTitle>
+          <SheetDescription className="flex items-center gap-2">
+            {isLoading ? (
+              <Skeleton className="h-4 w-[150px]" />
+            ) : (
+              <>
                 <Badge variant="secondary" className="rounded-sm px-1 font-normal uppercase text-[10px]">
                   {detail?.category_name}
                 </Badge>
                 <span>ID: {detail?.vendor_id}</span>
-              </SheetDescription>
-            </>
-          )}
+              </>
+            )}
+          </SheetDescription>
         </SheetHeader>
 
         <Separator className="mb-6" />
@@ -154,5 +160,5 @@ export function VendorDetailSheet({ vendorId, isOpen, onClose, filter }: VendorD
 }
 
 function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-md bg-muted", className)} />;
+  return <span className={cn("animate-pulse rounded-md bg-muted inline-block", className)} />;
 }
