@@ -8,6 +8,7 @@ import {
   SPECIFIC_CHECKLIST_ITEMS,
   SYSTEM_CONFIGS,
   VENDOR_CATEGORIES,
+  MASTER_VENDOR_SCHEDULE,
 } from './seeds/data';
 
 const prisma = new PrismaService();
@@ -173,50 +174,42 @@ async function seedDelayReasons() {
 
 async function seedVendorSchedules() {
   console.log('Creating vendor schedules...');
-  const vendors = await prisma.mst_vendor.findMany({ take: 20 });
-  const schedules = [];
-  const stations = ['Pos A', 'Pos B', 'Pos C', 'Dock 1', 'Dock 2'];
 
-  for (let i = 0; i < vendors.length; i++) {
-    const vendor = vendors[i];
-    // Vendor 0 gets 16 rits per day
-    // Vendor 1 gets 4 rits per day
-    // Vendor 2 gets 2 rits per day
-    // Others get 1 rit per day
-    let numRits = 1;
-    if (i === 0) numRits = 16;
-    else if (i === 1) numRits = 4;
-    else if (i === 2) numRits = 2;
+  // Fetch all vendors to map vendor_code to vendor_id
+  const vendors = await prisma.mst_vendor.findMany({
+    select: { vendor_id: true, vendor_code: true },
+  });
 
-    for (let day = 1; day <= 5; day++) {
-      for (let r = 1; r <= numRits; r++) {
-        const startHour = 8;
-        const intervalMinutes = i === 0 ? 30 : 120;
-        
-        const totalMinutes = (startHour * 60) + ((r - 1) * intervalMinutes);
-        const arrivalH = Math.floor(totalMinutes / 60);
-        const arrivalM = totalMinutes % 60;
-        const departureH = Math.floor((totalMinutes + 45) / 60);
-        const departureM = (totalMinutes + 45) % 60;
+  const vendorMap = new Map(vendors.map((v) => [v.vendor_code, v.vendor_id]));
 
-        const pad = (n: number) => n.toString().padStart(2, '0');
+  const schedules = MASTER_VENDOR_SCHEDULE.map((s) => {
+    const vendor_id = vendorMap.get(s.vendor_code.toString());
 
-        schedules.push({
-          vendor_id: vendor.vendor_id,
-          day_of_week: day,
-          rit: r,
-          arrival_time: `${pad(arrivalH)}:${pad(arrivalM)}`,
-          departure_time: `${pad(departureH)}:${pad(departureM)}`,
-          truck_station: stations[(i + r + day) % stations.length],
-        });
-      }
+    if (!vendor_id) {
+      // Silently skip if vendor not found to avoid cluttering logs
+      return null;
     }
-  }
+
+    return {
+      vendor_id,
+      day_of_week: s.day_of_week,
+      rit: s.rit,
+      arrival_time: s.arrival_time,
+      departure_time: s.departure_time,
+      truck_station: s.truck_station,
+    };
+  }).filter((s) => s !== null);
 
   if (schedules.length > 0) {
-    await prisma.mst_vendor_schedule.createMany({
-      data: schedules,
-    });
+    // Batch insert to avoid SQL Server limits if any
+    const batchSize = 500;
+    for (let i = 0; i < schedules.length; i += batchSize) {
+      const batch = schedules.slice(i, i + batchSize);
+      await prisma.mst_vendor_schedule.createMany({
+        data: batch as any,
+      });
+    }
+    console.log(`Created ${schedules.length} vendor schedules.`);
   }
 }
 
