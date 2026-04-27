@@ -8,19 +8,19 @@ export class MissedCycleCheckerJob {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  @Cron('0 19 * * *') // Runs at 7 PM everyday
+  @Cron('0 0 7 * * *') // Runs at 07:00 AM everyday (before new day cut-off)
   async handleCron() {
     this.logger.debug('Running missed cycle checker job...');
-    const today = new Date();
-    const endOfDay = new Date(today);
-    endOfDay.setHours(23, 59, 59, 999);
+    const now = new Date();
+    // Start of calendar today (e.g., 2026-04-28 00:00:00)
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
 
-    // Find all 'Open' slots for dates <= today
+    // Find all 'Open' slots for dates < today (i.e., operational yesterday and before)
     const missedSlots = await this.prisma.ops_delivery_slot.findMany({
       where: {
         status: 'Open',
         expected_date: {
-          lte: endOfDay,
+          lt: startOfToday,
         },
       },
     });

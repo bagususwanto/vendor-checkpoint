@@ -13,7 +13,7 @@ export class SlotGeneratorJob {
    * Bisa mengubah jadwalnya pada decorator Cron di bawah ini.
    * Format: 'detik menit jam hari-dalam-bulan bulan hari-dalam-minggu'
    */
-  @Cron('0 0 7 * * *') // 7 AM every day
+  @Cron('0 15 7 * * *') // 07:15 AM every day
   async handleCron() {
     this.logger.debug('Running slot generator job...');
     const today = new Date();
