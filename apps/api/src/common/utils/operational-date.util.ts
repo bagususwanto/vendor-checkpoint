@@ -5,40 +5,48 @@
 
 /**
  * Returns the start of the Operational Date for a given timestamp.
- * If time is before 07:15 AM, it returns the start of the previous day.
+ * Operational day in WIB (UTC+7). Cut-off is 07:15 AM WIB.
  */
 export function getOperationalDate(date: Date = new Date()): Date {
-  const result = new Date(date);
-  const hours = result.getHours();
-  const minutes = result.getMinutes();
+  // Get current time in Jakarta
+  const jakartaTime = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+  const hours = jakartaTime.getHours();
+  const minutes = jakartaTime.getMinutes();
 
-  // If before 07:15 AM, operational date is yesterday
+  const result = new Date(date);
+  // If before 07:15 AM WIB, operational date is yesterday
   if (hours < 7 || (hours === 7 && minutes < 15)) {
     result.setDate(result.getDate() - 1);
   }
 
-  result.setHours(0, 0, 0, 0);
-  return result;
+  // Normalize to start of day in local-relative terms, 
+  // but we want the UTC date part to represent the operational date.
+  // Using the same logic as SlotGeneratorJob for consistency.
+  return new Date(
+    Date.UTC(
+      result.getFullYear(),
+      result.getMonth(),
+      result.getDate(),
+      0, 0, 0, 0
+    )
+  );
 }
 
 /**
  * Calculates the full planned DateTime for a schedule based on the Operational Date.
- * Handles midnight crossings: if the scheduled time is before 07:15 AM,
- * it's treated as H+1 from the operational date.
- * 
- * @param operationalDate The start of the operational day (00:00:00)
- * @param timeStr Schedule time in "HH:mm" format
+ * Handles midnight crossings relative to WIB.
  */
 export function getPlannedDateTime(operationalDate: Date, timeStr: string): Date {
   const [hours, minutes] = timeStr.split(':').map(Number);
   const plannedDate = new Date(operationalDate);
 
-  // If the scheduled time is in the early morning (before cut-off),
+  // If the scheduled time is in the early morning WIB (before 07:15),
   // it belongs to the "next calendar day" relative to the operational date.
   if (hours < 7 || (hours === 7 && minutes < 15)) {
-    plannedDate.setDate(plannedDate.getDate() + 1);
+    plannedDate.setUTCDate(plannedDate.getUTCDate() + 1);
   }
 
-  plannedDate.setHours(hours, minutes, 0, 0);
+  // Set time as WIB (UTC+7)
+  plannedDate.setUTCHours(hours - 7, minutes, 0, 0);
   return plannedDate;
 }

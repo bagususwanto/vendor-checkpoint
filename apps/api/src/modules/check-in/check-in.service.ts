@@ -13,6 +13,7 @@ import { SystemConfigService } from '../system-config/system-config.service';
 import { extractSequence } from 'src/common/utils/extract-sequence.util';
 import { ChecklistService } from '../checklist/checklist.service';
 import { getStartOfToday } from 'src/common/utils/today-date.util';
+import { getOperationalDate, getPlannedDateTime } from 'src/common/utils/operational-date.util';
 
 // Removed TimeLogService import
 
@@ -65,17 +66,14 @@ export class CheckInService {
             : QueueStatus.AKTIF;
 
           let slotId = null;
-          const startOfDay = new Date(dateNow);
-          startOfDay.setHours(0, 0, 0, 0);
+          const operationalDate = getOperationalDate(dateNow);
 
           const slot = await tx.ops_delivery_slot.findFirst({
             where: {
               schedule: {
                 vendor_id: createCheckInDto.vendor_id,
               },
-              expected_date: {
-                gte: startOfDay,
-              },
+              expected_date: operationalDate,
               status: 'Open',
             },
             orderBy: {
@@ -195,8 +193,7 @@ export class CheckInService {
 
   async checkArrivalStatus(vendorId: number): Promise<ArrivalCheckResponseDto> {
     const dateNow = new Date();
-    const startOfDay = new Date(dateNow);
-    startOfDay.setHours(0, 0, 0, 0);
+    const operationalDate = getOperationalDate(dateNow);
 
     const bufferConfig = await this.systemConfigService.findByConfigKey(
       'ARRIVAL_BUFFER_MINUTES',
@@ -210,9 +207,7 @@ export class CheckInService {
         schedule: {
           vendor_id: vendorId,
         },
-        expected_date: {
-          gte: startOfDay,
-        },
+        expected_date: operationalDate,
         status: 'Open',
       },
       include: {
@@ -239,14 +234,7 @@ export class CheckInService {
     }
 
     const plannedArrivalStr = slot.schedule.arrival_time; // HH:mm
-    const [plannedHours, plannedMinutes] = plannedArrivalStr
-      .split(':')
-      .map(Number);
-
-    const plannedDate = new Date(dateNow);
-    // Menggunakan setUTCHours agar logic ini server-agnostic (tidak peduli timezone server)
-    // Karena target kita adalah WIB (UTC+7), maka jam 08:00 WIB = 01:00 UTC.
-    plannedDate.setUTCHours(plannedHours - 7, plannedMinutes, 0, 0);
+    const plannedDate = getPlannedDateTime(operationalDate, plannedArrivalStr);
 
     const diffMs = dateNow.getTime() - plannedDate.getTime();
     const diffMinutes = Math.floor(diffMs / 60000);
@@ -305,12 +293,7 @@ export class CheckInService {
     }
 
     const plannedDepartureStr = entry.delivery_slot.schedule.departure_time; // HH:mm
-    const [plannedHours, plannedMinutes] = plannedDepartureStr
-      .split(':')
-      .map(Number);
-
-    const plannedDate = new Date(dateNow);
-    plannedDate.setUTCHours(plannedHours - 7, plannedMinutes, 0, 0);
+    const plannedDate = getPlannedDateTime(entry.delivery_slot.expected_date, plannedDepartureStr);
 
     const diffMs = dateNow.getTime() - plannedDate.getTime();
     const diffMinutes = Math.floor(diffMs / 60000);
@@ -382,6 +365,10 @@ export class CheckInService {
       };
     }
 
+    const now = new Date();
+    const opDate = getOperationalDate(now);
+    const windowStart = getPlannedDateTime(opDate, '07:15');
+
     const [data, total] = await Promise.all([
       this.prisma.ops_checkin_entry.findMany({
         skip,
@@ -391,7 +378,7 @@ export class CheckInService {
             in: ['MENUNGGU', 'DISETUJUI', 'TERTAHAN', 'AKTIF'],
           },
           submission_time: {
-            gte: dateNow,
+            gte: windowStart,
           },
         },
         select: {
@@ -413,7 +400,7 @@ export class CheckInService {
       this.prisma.ops_checkin_entry.count({
         where: {
           submission_time: {
-            gte: dateNow,
+            gte: windowStart,
           },
         },
       }),
@@ -432,49 +419,17 @@ export class CheckInService {
 
   async findUnscheduledMonitor() {
     const now = new Date();
-
-    // Cari data untuk "Hari Ini" dalam format UTC YYYY-MM-DD
-    const startOfTodayUtc = new Date(
-      Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0),
-    );
-    const endOfTodayUtc = new Date(
-      Date.UTC(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        23,
-        59,
-        59,
-        999,
-      ),
-    );
-
-    // Gunakan juga waktu lokal Jakarta (UTC+7)
-    const jakartaTime = new Date(
-      now.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }),
-    );
-    const startOfJakarta = new Date(jakartaTime);
-    startOfJakarta.setHours(0, 0, 0, 0);
-    const endOfJakarta = new Date(jakartaTime);
-    endOfJakarta.setHours(23, 59, 59, 999);
+    const opDate = getOperationalDate(now);
+    const windowStart = getPlannedDateTime(opDate, '07:15');
+    const windowEnd = new Date(windowStart.getTime() + 24 * 60 * 60 * 1000 - 1);
 
     return this.prisma.ops_checkin_entry.findMany({
       where: {
         arrival_status: 'Unscheduled',
-        OR: [
-          {
-            submission_time: {
-              gte: startOfTodayUtc,
-              lte: endOfTodayUtc,
-            },
-          },
-          {
-            submission_time: {
-              gte: startOfJakarta,
-              lte: endOfJakarta,
-            },
-          },
-        ],
+        submission_time: {
+          gte: windowStart,
+          lte: windowEnd,
+        },
       },
       select: {
         entry_id: true,
