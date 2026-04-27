@@ -8,6 +8,7 @@ import {
   History,
   FileText,
   Users,
+  TrendingUp,
   type LucideIcon,
 } from 'lucide-react';
 import { UserRole } from '@repo/types';
@@ -154,6 +155,16 @@ export const navData: NavData = {
           title: 'Export Log',
           url: '/portal/reports/log-export',
           icon: FileText, // Using same icon for now
+          roles: [
+            UserRole.SUPER_ADMIN,
+            UserRole.GROUP_LEADER,
+            UserRole.SECTION_HEAD,
+          ],
+        },
+        {
+          title: 'Vendor Performance',
+          url: '/portal/reports/vendor-performance',
+          icon: TrendingUp,
           roles: [
             UserRole.SUPER_ADMIN,
             UserRole.GROUP_LEADER,
