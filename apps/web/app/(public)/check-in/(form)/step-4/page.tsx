@@ -14,6 +14,7 @@ import { useChecklistStore } from '@/stores/use-checklist.store';
 import { useSubmitCheckIn } from '@/hooks/api/use-check-in';
 import { formatDateTime } from '@/lib/utils';
 import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
+import { checkInService } from '@/services/check-in.service';
 import { ReviewIdentity } from './components/review-identity';
 import { ReviewChecklist } from './components/review-checklist';
 import { ReviewActions } from './components/review-actions';
@@ -67,6 +68,25 @@ export default function CheckInStep4() {
       return;
     }
 
+    setIsProcessing(true);
+
+    let ppeImagePath: string | undefined;
+
+    // Upload foto APD jika tersedia (non-blocking)
+    if (isApdEnabled && ppeData?.capturedImage) {
+      try {
+        const uploadResult = await checkInService.uploadPpeImage(
+          ppeData.capturedImage,
+        );
+        ppeImagePath = uploadResult.image_path;
+      } catch (error) {
+        console.warn(
+          'PPE image upload failed, proceeding without image:',
+          error,
+        );
+      }
+    }
+
     const payload = {
       vendor_id: Number(step1Data.company.value),
       driver_name: step1Data.fullName,
@@ -78,6 +98,9 @@ export default function CheckInStep4() {
           ? 'Pass'
           : 'Fail'
         : 'Skipped',
+      ppe_has_hardhat: ppeData?.hasHardhat,
+      ppe_has_safety_vest: ppeData?.hasSafetyVest,
+      ppe_image_path: ppeImagePath,
       arrival_status: step1Data.arrivalStatus,
       delay_arrival_reason_id: step1Data.delayArrivalReasonId,
       checklist_responses: Object.entries(step2Data.checklistItems).map(
@@ -87,8 +110,6 @@ export default function CheckInStep4() {
         }),
       ),
     };
-
-    setIsProcessing(true);
 
     try {
       // Artificial minimum delay for better UX (optional, but good for "processing" feel)

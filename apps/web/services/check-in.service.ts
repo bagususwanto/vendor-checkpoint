@@ -154,4 +154,21 @@ export const checkInService = {
       throw error;
     }
   },
+
+  uploadPpeImage: async (
+    imageDataUrl: string,
+  ): Promise<{ image_path: string }> => {
+    const res = await fetch(imageDataUrl);
+    const blob = await res.blob();
+
+    const formData = new FormData();
+    formData.append('file', blob, 'ppe-scan.jpg');
+
+    const response = await axiosInstance.post<{
+      data: { image_path: string };
+    }>('/check-in/ppe-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data.data;
+  },
 };
