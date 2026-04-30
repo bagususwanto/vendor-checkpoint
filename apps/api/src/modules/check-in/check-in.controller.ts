@@ -10,7 +10,12 @@ import {
   Query,
   UseGuards,
   UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { v4 as uuidv4 } from 'uuid';
 import { CheckInService } from './check-in.service';
 import { CreateCheckInDto } from './dto/create-check-in.dto';
 import { UpdateCheckInDto } from './dto/update-check-in.dto';
@@ -31,6 +36,34 @@ import { QueueStatus } from '@repo/types';
 export class CheckInController {
   constructor(private readonly checkInService: CheckInService) {}
   
+  // PUBLIC - Vendor upload foto APD sebelum submit check-in
+  @Post('/ppe-image')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/ppe',
+        filename: (req, file, cb) => {
+          const uniqueName = `${uuidv4()}.jpg`;
+          cb(null, uniqueName);
+        },
+      }),
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.startsWith('image/')) {
+          return cb(
+            new BadRequestException('Hanya file gambar yang diizinkan'),
+            false,
+          );
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  uploadPpeImage(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('File tidak ditemukan');
+    return { image_path: `uploads/ppe/${file.filename}` };
+  }
+
   // PUBLIC - Vendor cek status kedatangan (On-Time/Late)
   @Get('/arrival-check/:vendorId')
   checkArrivalStatus(@Param('vendorId') vendorId: string) {
