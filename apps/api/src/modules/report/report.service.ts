@@ -233,6 +233,7 @@ export class ReportService {
           },
           orderBy: [{ checklist_category_id: 'asc' }, { display_order: 'asc' }],
         },
+        ops_ppe_scan: true,
       },
       orderBy: { submission_time: 'desc' },
     });
