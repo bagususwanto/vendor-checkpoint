@@ -141,15 +141,10 @@ vendor-checkpoint/
    cd apps/ppe-detection
    
    # Buat virtual environment
-   python -m venv .venv
+   python -m venv venv
    
-   # Aktivasi venv (Mac/Linux)
-   source .venv/bin/activate
-   # Aktivasi venv (Windows Command Prompt)
-   # .venv\Scripts\activate.bat
-   
-   # Install dependensi Python
-   pip install -r requirement.txt
+   # Install dependensi Python (Gunakan python dari venv agar pasti masuk ke folder venv)
+   .\venv\Scripts\python.exe -m pip install -r requirement.txt
    
    # Kembali ke root folder
    cd ../..
