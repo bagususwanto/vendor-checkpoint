@@ -16,13 +16,22 @@ async function bootstrap() {
   // Ensure upload directories exist
   mkdirSync(join(process.cwd(), 'uploads', 'ppe'), { recursive: true });
 
+  app.setGlobalPrefix('vendor-checkpoint');
+
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: 'cross-origin' },
     }),
   );
+
+  const frontendUrls = process.env.FRONTEND_URL 
+    ? process.env.FRONTEND_URL.split(',') 
+    : ['http://localhost:3001', 'http://localhost:3000'];
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    origin: frontendUrls,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
     exposedHeaders: ['Content-Disposition'],
   });
 
