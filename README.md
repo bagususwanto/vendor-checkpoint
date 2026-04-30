@@ -87,45 +87,77 @@ vendor-checkpoint/
 ### Prerequisites
 
 - **Node.js** >= 18.x
-- **npm** >= 11.x
-- **SQL Server** (for database)
+- **pnpm** >= 10.x
+- **Python** >= 3.9 (untuk fitur PPE Detection)
+- **SQL Server** (sebagai database utama)
 
-### Installation
+### Installation & Setup
 
-1. **Clone the repository**
+1. **Clone repository dari GitHub**
 
    ```bash
    git clone <repository-url>
    cd vendor-checkpoint
    ```
 
-2. **Install dependencies**
+2. **Install Dependencies (JS/TS)**
+
+   Karena proyek ini menggunakan Turborepo dan PNPM workspace, gunakan `pnpm` untuk instalasi:
 
    ```bash
-   npm install
+   pnpm install
    ```
 
-3. **Configure environment variables**
+3. **Configure Environment Variables**
+
+   Duplikasi file `.env.example` ke `.env` untuk masing-masing aplikasi:
 
    ```bash
-   # Copy environment templates
+   # Backend API
    cp apps/api/.env.example apps/api/.env
+   
+   # Frontend Web
    cp apps/web/.env.example apps/web/.env
    ```
+   > **Note:** Pastikan Anda mengisi credential koneksi database (SQL Server) di `apps/api/.env` sebelum melanjutkan ke langkah berikutnya.
 
-4. **Setup database**
+4. **Setup Database (Prisma)**
+
+   Jalankan perintah berikut dari root folder untuk melakukan generate schema, apply migrasi, dan menjalankan file seed awal (menggunakan script `reset` yang ada di API):
 
    ```bash
-   # Generate Prisma client
-   npm run db:generate --workspace=apps/api
+   pnpm --filter api run reset
+   ```
+   *(Atau jika Anda hanya ingin meng-generate Prisma client tanpa reset database, gunakan: `pnpm --filter api exec prisma generate`)*
 
-   # Run migrations
-   npm run db:migrate --workspace=apps/api
+5. **Setup PPE Detection (Python FastAPI)**
+
+   Fitur deteksi APD menggunakan FastAPI. Anda perlu melakukan setup *virtual environment*:
+
+   ```bash
+   cd apps/ppe-detection
+   
+   # Buat virtual environment
+   python -m venv venv
+   
+   # Aktivasi venv (Mac/Linux)
+   source venv/bin/activate
+   # Aktivasi venv (Windows Command Prompt)
+   # venv\Scripts\activate.bat
+   
+   # Install dependensi Python
+   pip install -r requirement.txt
+   
+   # Kembali ke root folder
+   cd ../..
    ```
 
-5. **Start development server**
+6. **Start Development Server**
+
+   Jalankan semua service (Frontend Web, Backend API NestJS, dan PPE FastAPI) secara serentak dari root direktori:
+
    ```bash
-   npm run dev
+   pnpm run dev
    ```
 
 ---
