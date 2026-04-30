@@ -189,6 +189,51 @@ Untuk menjalankan Backend API di lingkungan production menggunakan PM2:
 
 ---
 
+## 🌐 Frontend Deployment (Firebase Hosting)
+
+Ikuti langkah-langkah berikut untuk men-deploy frontend Next.js ke Firebase Hosting menggunakan metode **Static Export**:
+
+### 1. Persiapan Firebase CLI
+Pastikan Anda sudah menginstall Firebase Tools secara global:
+```bash
+npm install -g firebase-tools
+firebase login
+```
+
+### 2. Konfigurasi Next.js (Static Export)
+Ubah `apps/web/next.config.js` untuk mengaktifkan mode export:
+```javascript
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'export', // Tambahkan baris ini
+  // ... config lainnya
+};
+```
+
+### 3. Inisialisasi Firebase
+Jalankan perintah ini di **root folder**:
+```bash
+firebase init hosting
+```
+- Pilih project Firebase Anda.
+- Tentukan direktori publik: `apps/web/out`
+- Konfigurasikan sebagai single-page app: `Yes`
+- Setup GitHub Actions: (Opsional)
+
+### 4. Build & Deploy
+Jalankan build untuk aplikasi web, lalu deploy:
+```bash
+# Build aplikasi web
+pnpm --filter web build
+
+# Deploy ke Firebase
+firebase deploy --only hosting
+```
+
+> **Note:** Jika Anda memerlukan fitur Server-Side Rendering (SSR) atau API Routes di Next.js, disarankan menggunakan **Firebase App Hosting** (lebih modern & mendukung Next.js secara native).
+
+---
+
 ## 📝 Available Scripts
 
 | Command            | Description                           |
