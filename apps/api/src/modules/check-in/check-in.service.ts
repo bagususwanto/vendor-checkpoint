@@ -1,4 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import FormData from 'form-data';
 import { CreateCheckInDto } from './dto/create-check-in.dto';
 import { UpdateCheckInDto } from './dto/update-check-in.dto';
 import { VerifyCheckInDto } from './dto/verify-check-in.dto';
@@ -34,9 +36,38 @@ export class CheckInService {
     private readonly vendorService: VendorService,
     private readonly systemConfigService: SystemConfigService,
     private readonly checklistService: ChecklistService,
-
     private readonly vendorCategoryService: VendorCategoryService,
+    private readonly httpService: HttpService,
   ) {}
+
+  /**
+   * Proxy PPE Detection request ke FastAPI service.
+   * Frontend cukup panggil NestJS, tidak perlu tahu alamat FastAPI.
+   */
+  async detectPPE(imageBuffer: Buffer, mimetype: string): Promise<any> {
+    const ppeServiceUrl =
+      process.env.PPE_SERVICE_URL || 'http://localhost:8000';
+
+    const form = new FormData();
+    form.append('file', imageBuffer, {
+      filename: 'capture.jpg',
+      contentType: mimetype,
+    });
+
+    try {
+      const response = await this.httpService.axiosRef.post(
+        `${ppeServiceUrl}/api/detect/?return_json=true`,
+        form,
+        { headers: form.getHeaders() },
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new InternalServerErrorException(
+        error?.response?.data?.detail ||
+          'Gagal menghubungi layanan PPE Detection',
+      );
+    }
+  }
 
   async create(createCheckInDto: CreateCheckInDto, requestInfo: any) {
     const maxRetries = 5;

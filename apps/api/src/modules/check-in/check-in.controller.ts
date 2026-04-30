@@ -14,7 +14,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { diskStorage, memoryStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { CheckInService } from './check-in.service';
 import { CreateCheckInDto } from './dto/create-check-in.dto';
@@ -62,6 +62,28 @@ export class CheckInController {
   uploadPpeImage(@UploadedFile() file: Express.Multer.File) {
     if (!file) throw new BadRequestException('File tidak ditemukan');
     return { image_path: `uploads/ppe/${file.filename}` };
+  }
+
+  // PUBLIC - Proxy PPE Detection ke FastAPI (agar frontend tidak hit FastAPI langsung)
+  @Post('/detect-ppe')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.startsWith('image/')) {
+          return cb(
+            new BadRequestException('Hanya file gambar yang diizinkan'),
+            false,
+          );
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  async detectPpe(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('File tidak ditemukan');
+    return this.checkInService.detectPPE(file.buffer, file.mimetype);
   }
 
   // PUBLIC - Vendor cek status kedatangan (On-Time/Late)

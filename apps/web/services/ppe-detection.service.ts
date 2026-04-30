@@ -20,12 +20,14 @@ export type PPEComplianceResult = {
 };
 
 // PPE Detection Service
-const PPE_API_URL =
-  process.env.NEXT_PUBLIC_PPE_API_URL || 'http://localhost:8000';
+// Semua request PPE Detection diproxy melalui NestJS API utama,
+// agar tidak langsung hit FastAPI (menghindari masalah CORS & keamanan)
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 export const ppeDetectionService = {
   /**
-   * Detect PPE in an image
+   * Detect PPE in an image (via NestJS proxy → FastAPI)
    * @param imageBlob - Image blob from camera capture
    * @returns Promise with detection response
    */
@@ -35,7 +37,7 @@ export const ppeDetectionService = {
       formData.append('file', imageBlob, 'capture.jpg');
 
       const response = await axios.post<DetectionResponse>(
-        `${PPE_API_URL}/api/detect/?return_json=true`,
+        `${API_BASE_URL}/check-in/detect-ppe`,
         formData,
         {
           headers: {

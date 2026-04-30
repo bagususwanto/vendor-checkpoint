@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { CheckInService } from './check-in.service';
 import { CheckInController } from './check-in.controller';
 import { VendorModule } from '../vendor/vendor.module';
@@ -9,6 +10,7 @@ import { VendorCategoryModule } from '../vendor_category/vendor_category.module'
 
 @Module({
   imports: [
+    HttpModule,
     VendorModule,
     SystemConfigModule,
     ChecklistModule,
