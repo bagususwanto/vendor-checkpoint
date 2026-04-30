@@ -78,6 +78,49 @@ export class ReportService {
       _count: { entry_id: true },
     });
 
+    // v2: Get PPE status breakdown
+    const ppeStatusBreakdownRaw = await this.prisma.ops_ppe_scan.groupBy({
+      by: ['is_compliant'],
+      where: {
+        entry: whereClause,
+      },
+      _count: { ppe_scan_id: true },
+    });
+
+    // v2: Get PPE incomplete breakdown
+    const ppeIncompleteScans = await this.prisma.ops_ppe_scan.findMany({
+      where: {
+        entry: whereClause,
+        is_compliant: false,
+      },
+      select: {
+        has_hardhat: true,
+        has_safety_vest: true,
+      },
+    });
+
+    const incompleteCounts = {
+      hardhat: 0,
+      vest: 0,
+      both: 0,
+    };
+
+    ppeIncompleteScans.forEach((scan) => {
+      if (!scan.has_hardhat && !scan.has_safety_vest) {
+        incompleteCounts.both++;
+      } else if (!scan.has_hardhat) {
+        incompleteCounts.hardhat++;
+      } else if (!scan.has_safety_vest) {
+        incompleteCounts.vest++;
+      }
+    });
+
+    const ppeIncompleteBreakdown = [
+      { detail: 'Helm', count: incompleteCounts.hardhat },
+      { detail: 'Rompi', count: incompleteCounts.vest },
+      { detail: 'Helm & Rompi', count: incompleteCounts.both },
+    ];
+
     // v2: Calculate On-Time rates
     const onTimeArrivals =
       arrivalBreakdown.find((a) => a.arrival_status === 'On-Time')?._count
@@ -128,6 +171,11 @@ export class ReportService {
         status: a.ai_safety_status || 'Pending',
         count: a._count.entry_id,
       })),
+      ppeStatusBreakdown: ppeStatusBreakdownRaw.map((p) => ({
+        status: p.is_compliant ? 'Lengkap' : 'Tidak Lengkap',
+        count: p._count.ppe_scan_id,
+      })),
+      ppeIncompleteBreakdown,
       onTimeArrivalRate,
       onTimeDepartureRate,
       nonCompliantItems: complianceStats._sum?.non_compliant_count || 0,
