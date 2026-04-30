@@ -36,7 +36,7 @@ export const ppeDetectionService = {
       const formData = new FormData();
       formData.append('file', imageBlob, 'capture.jpg');
 
-      const response = await axios.post<DetectionResponse>(
+      const response = await axios.post<any>(
         `${API_BASE_URL}/check-in/detect-ppe`,
         formData,
         {
@@ -46,7 +46,12 @@ export const ppeDetectionService = {
         },
       );
 
-      return response.data;
+      // Robust unwrapping: handle both direct and nested response structures
+      const data = response.data;
+      if (data?.data?.detected_objects) return data.data;
+      if (data?.detected_objects) return data;
+      
+      return data;
     } catch (error) {
       console.error('PPE Detection Error:', error);
       throw error;
