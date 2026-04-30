@@ -445,6 +445,8 @@ export class ReportService {
       'Alasan Terlambat Keluar',
       'Compliance',
       'Non-Compliant Count',
+      'PPE Status',
+      'PPE Incomplete Detail',
     ];
 
     const headerRow = sheet.addRow(headers);
@@ -462,6 +464,20 @@ export class ReportService {
 
     // Data rows
     entries.forEach((entry, index) => {
+      let ppeStatus = '-';
+      let ppeDetail = '-';
+      if (entry.ops_ppe_scan) {
+        ppeStatus = entry.ops_ppe_scan.is_compliant
+          ? 'LENGKAP'
+          : 'TIDAK LENGKAP';
+        if (!entry.ops_ppe_scan.is_compliant) {
+          const details = [];
+          if (!entry.ops_ppe_scan.has_hardhat) details.push('Helm');
+          if (!entry.ops_ppe_scan.has_safety_vest) details.push('Rompi');
+          ppeDetail = details.join(' & ');
+        }
+      }
+
       sheet.addRow([
         index + 1,
         entry.queue_number,
@@ -485,6 +501,8 @@ export class ReportService {
         entry.ops_timelog?.delay_departure_reason?.reason_text || '-',
         entry.has_non_compliant_items ? 'TIDAK PATUH' : 'PATUH',
         entry.non_compliant_count,
+        ppeStatus,
+        ppeDetail,
       ]);
     });
 
