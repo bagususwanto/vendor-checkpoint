@@ -43,3 +43,22 @@ async def detect_image(
     
     # Return image with bounding boxes
     return Response(content=buffer.tobytes(), media_type="image/jpeg")
+
+
+@router.get("/test", response_model=DetectionResponse)
+async def test_detection():
+    """Test endpoint that returns dummy detection data"""
+    return DetectionResponse(
+        detected_objects=[
+            {
+                "class_name": "Hardhat",
+                "bbox": [100, 100, 200, 200],
+                "confidence": 0.95
+            },
+            {
+                "class_name": "Safety Vest",
+                "bbox": [150, 150, 250, 250],
+                "confidence": 0.88
+            }
+        ]
+    )
