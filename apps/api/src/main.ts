@@ -16,9 +16,14 @@ async function bootstrap() {
   // Ensure upload directories exist
   mkdirSync(join(process.cwd(), 'uploads', 'ppe'), { recursive: true });
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    }),
+  );
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    // origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    origin: true,
     credentials: true,
     exposedHeaders: ['Content-Disposition'],
   });

@@ -606,6 +606,14 @@ export class CheckInService {
             },
           },
         },
+        ops_ppe_scan: {
+          select: {
+            is_compliant: true,
+            has_hardhat: true,
+            has_safety_vest: true,
+            image_path: true,
+          },
+        },
         ops_verification: {
           select: {
             verification_status: true,

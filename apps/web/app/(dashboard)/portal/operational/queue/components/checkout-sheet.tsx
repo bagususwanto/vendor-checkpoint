@@ -31,6 +31,9 @@ import {
   icons,
   CheckCircle,
   XCircle,
+  ShieldCheck,
+  ShieldAlert,
+  Maximize2,
 } from 'lucide-react';
 import { useState } from 'react';
 import {
@@ -253,6 +256,95 @@ export function CheckoutSheet({
                         )}
                       </div>
                     </Card>
+                    
+                    {detailData.ops_ppe_scan && (
+                      <Card className={`overflow-hidden border-2 transition-all col-span-2 ${detailData.ops_ppe_scan.is_compliant 
+                        ? 'border-emerald-100 bg-emerald-50/30' 
+                        : 'border-rose-100 bg-rose-50/30'}`}>
+                        <div className="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-border/50">
+                          <div className="p-4 flex-1 space-y-3">
+                            <div className="flex items-center gap-2">
+                              {detailData.ops_ppe_scan.is_compliant ? (
+                                <div className="p-1.5 rounded-full bg-emerald-100 text-emerald-600">
+                                  <ShieldCheck className="h-4 w-4" />
+                                </div>
+                              ) : (
+                                <div className="p-1.5 rounded-full bg-rose-100 text-rose-600">
+                                  <ShieldAlert className="h-4 w-4" />
+                                </div>
+                              )}
+                              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                                PPE Scan Analysis
+                              </span>
+                            </div>
+
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Badge
+                                  className={`rounded-sm px-2 py-0.5 text-[10px] font-bold uppercase ${
+                                    detailData.ops_ppe_scan.is_compliant 
+                                      ? 'bg-emerald-600 hover:bg-emerald-700' 
+                                      : 'bg-rose-600 hover:bg-rose-700'
+                                  }`}
+                                >
+                                  {detailData.ops_ppe_scan.is_compliant ? 'Pass' : 'Fail'}
+                                </Badge>
+                                <span className={`text-sm font-semibold ${
+                                  detailData.ops_ppe_scan.is_compliant ? 'text-emerald-700' : 'text-rose-700'
+                                }`}>
+                                  {detailData.ops_ppe_scan.is_compliant 
+                                    ? 'APD Lengkap' 
+                                    : 'Atribut Tidak Lengkap'}
+                                </span>
+                              </div>
+
+                              {!detailData.ops_ppe_scan.is_compliant && (
+                                <div className="flex flex-wrap gap-1.5 pt-1">
+                                  {[
+                                    { key: 'has_hardhat', label: 'Helm Safety' },
+                                    { key: 'has_safety_vest', label: 'Rompi Safety' }
+                                  ].map((item) => (
+                                    <Badge
+                                      key={item.key}
+                                      variant="outline"
+                                      className={`text-[10px] py-0 h-5 border-rose-200 ${
+                                        !detailData.ops_ppe_scan[item.key]
+                                          ? 'bg-rose-100 text-rose-700 font-bold'
+                                          : 'bg-transparent text-muted-foreground line-through opacity-50'
+                                      }`}
+                                    >
+                                      {item.label}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {detailData.ops_ppe_scan.image_path && (
+                            <div className="p-4 bg-muted/20 flex flex-col items-center justify-center min-w-[140px]">
+                              <div 
+                                className="group relative h-24 w-24 rounded-lg overflow-hidden border-2 border-white shadow-sm cursor-pointer"
+                                onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/${detailData.ops_ppe_scan.image_path}`, '_blank')}
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img 
+                                  src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/${detailData.ops_ppe_scan.image_path}`} 
+                                  alt="PPE Scan" 
+                                  className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                  <Maximize2 className="h-5 w-5 text-white" />
+                                </div>
+                              </div>
+                              <span className="text-[10px] font-medium text-muted-foreground mt-2">
+                                Bukti Foto Scan
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </Card>
+                    )}
                   </div>
                 </div>
               </div>
