@@ -185,7 +185,7 @@ Untuk menjalankan Backend API di lingkungan production menggunakan PM2:
    cd apps/ppe-detection
 
     # Linux/macOS
-    pm2 start ./.venv/bin/uvicorn --name "ppe-detection" -- main:app --host 0.0.0.0 --port 8000
+    pm2 start ./venv/bin/uvicorn --name "ppe-detection" -- main:app --host 0.0.0.0 --port 8000
 
     # Windows (Rekomendasi: Pakai ecosystem.config.js)
     pm2 start ecosystem.config.js
