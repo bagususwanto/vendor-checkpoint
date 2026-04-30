@@ -35,7 +35,7 @@ import { QueueStatus } from '@repo/types';
 @UseInterceptors(AuditLogInterceptor)
 export class CheckInController {
   constructor(private readonly checkInService: CheckInService) {}
-  
+
   // PUBLIC - Vendor upload foto APD sebelum submit check-in
   @Post('/ppe-image')
   @UseInterceptors(
