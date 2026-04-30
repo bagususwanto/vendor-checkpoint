@@ -177,14 +177,18 @@ Untuk menjalankan Backend API di lingkungan production menggunakan PM2:
 2. **Jalankan API (NestJS)**
    ```bash
    cd apps/api
-   pm2 start dist/main.js --name "vendor-api"
+   pm2 start dist/src/main.js --name "vendor-api"
    ```
 
 3. **Jalankan PPE Detection (FastAPI)**
    ```bash
    cd apps/ppe-detection
-   # Pastikan .venv sudah dibuat & dependensi sudah diinstall
+
+   # Linux/macOS
    pm2 start "python -m uvicorn main:app --host 0.0.0.0 --port 8000" --name "ppe-detection" --interpreter ./.venv/bin/python
+
+   # Windows
+   pm2 start "python -m uvicorn main:app --host 0.0.0.0 --port 8000" --name "ppe-detection" --interpreter ./.venv/Scripts/python.exe
    ```
 
 ---
