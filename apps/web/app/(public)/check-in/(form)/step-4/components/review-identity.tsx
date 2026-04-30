@@ -122,6 +122,14 @@ export function ReviewIdentity({
                   <p className={`font-medium text-lg ${ppeData.isCompliant ? 'text-green-600' : 'text-red-600'}`}>
                     {ppeData.isCompliant ? 'Lengkap' : 'Tidak Lengkap'}
                   </p>
+                  {!ppeData.isCompliant && (
+                    <p className="text-sm text-red-500 italic">
+                      Tanpa: {[
+                        !ppeData.hasHardhat && 'Helm',
+                        !ppeData.hasSafetyVest && 'Rompi'
+                      ].filter(Boolean).join(', ')}
+                    </p>
+                  )}
                 </div>
                 <Badge variant={ppeData.isCompliant ? 'default' : 'destructive'} className="h-6">
                   {ppeData.isCompliant ? 'PASS' : 'FAIL'}
