@@ -397,8 +397,31 @@ export class ReportService {
       sheet.getCell(`B${aiSafetyStart + 1 + index}`).value = a.count;
     });
 
+    // PPE Status Breakdown
+    const ppeStatusStart =
+      aiSafetyStart + preview.aiSafetyBreakdown.length + 2;
+    sheet.getCell(`A${ppeStatusStart}`).value = 'Breakdown PPE Status';
+    sheet.getCell(`A${ppeStatusStart}`).font = { bold: true };
+
+    preview.ppeStatusBreakdown.forEach((p: any, index: number) => {
+      sheet.getCell(`A${ppeStatusStart + 1 + index}`).value = p.status;
+      sheet.getCell(`B${ppeStatusStart + 1 + index}`).value = p.count;
+    });
+
+    // PPE Incomplete Breakdown
+    const ppeIncompleteStart =
+      ppeStatusStart + preview.ppeStatusBreakdown.length + 2;
+    sheet.getCell(`A${ppeIncompleteStart}`).value = 'Breakdown PPE Incomplete';
+    sheet.getCell(`A${ppeIncompleteStart}`).font = { bold: true };
+
+    preview.ppeIncompleteBreakdown.forEach((p: any, index: number) => {
+      sheet.getCell(`A${ppeIncompleteStart + 1 + index}`).value = p.detail;
+      sheet.getCell(`B${ppeIncompleteStart + 1 + index}`).value = p.count;
+    });
+
     // Status Breakdown
-    const statusStart = aiSafetyStart + preview.aiSafetyBreakdown.length + 2;
+    const statusStart =
+      ppeIncompleteStart + preview.ppeIncompleteBreakdown.length + 2;
     sheet.getCell(`A${statusStart}`).value = 'Breakdown per Status';
     sheet.getCell(`A${statusStart}`).font = { bold: true };
 
