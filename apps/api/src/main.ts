@@ -16,8 +16,6 @@ async function bootstrap() {
   // Ensure upload directories exist
   mkdirSync(join(process.cwd(), 'uploads', 'ppe'), { recursive: true });
 
-  app.setGlobalPrefix('vendor-checkpoint-api');
-
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: 'cross-origin' },
