@@ -123,12 +123,15 @@ vendor-checkpoint/
 
 4. **Setup Database (Prisma)**
 
-   Jalankan perintah berikut dari root folder untuk melakukan generate schema, apply migrasi, dan menjalankan file seed awal (menggunakan script `reset` yang ada di API):
+   Jalankan perintah berikut dari root folder secara berurutan. Pertama untuk meng-generate Prisma Client, kemudian mereset database untuk meng-apply migrasi dan menjalankan file seed awal:
 
    ```bash
+   # Generate Prisma Client
+   pnpm --filter api exec prisma generate
+   
+   # Reset DB, Apply Migrasi, & Run Seed
    pnpm --filter api run reset
    ```
-   *(Atau jika Anda hanya ingin meng-generate Prisma client tanpa reset database, gunakan: `pnpm --filter api exec prisma generate`)*
 
 5. **Setup PPE Detection (Python FastAPI)**
 
