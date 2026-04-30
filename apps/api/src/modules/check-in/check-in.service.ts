@@ -92,8 +92,20 @@ export class CheckInService {
           }
 
           // 3. Compliance Check
+          // PPE scan dianggap non-compliant jika scan dilakukan tapi hasilnya bukan 'Pass'
+          const ppeScanDone =
+            createCheckInDto.ai_safety_status &&
+            createCheckInDto.ai_safety_status !== 'Skipped' &&
+            createCheckInDto.ppe_has_hardhat !== undefined &&
+            createCheckInDto.ppe_has_safety_vest !== undefined;
+          const ppeIsNonCompliant =
+            ppeScanDone && createCheckInDto.ai_safety_status !== 'Pass';
+
           const { hasNonCompliantItems, nonCompliantCount } =
-            this.calculateCompliance(createCheckInDto.checklist_responses);
+            this.calculateCompliance(
+              createCheckInDto.checklist_responses,
+              ppeIsNonCompliant,
+            );
 
           // 4. Create CheckIn Entry
           const checkIn = await tx.ops_checkin_entry.create({
@@ -1193,13 +1205,18 @@ export class CheckInService {
     return generateQueueNumber(format.config_value, nextSeq);
   }
 
-  private calculateCompliance(checklist_responses: any[]) {
-    const hasNonCompliantItems = checklist_responses.some(
-      (item: any) => item.response_value === false,
-    );
-    const nonCompliantCount = checklist_responses.filter(
+  private calculateCompliance(
+    checklist_responses: any[],
+    ppeIsNonCompliant = false,
+  ) {
+    const checklistNonCompliantCount = checklist_responses.filter(
       (item: any) => item.response_value === false,
     ).length;
+
+    // PPE scan yang tidak compliant dihitung sebagai 1 non-compliant item tambahan
+    const nonCompliantCount =
+      checklistNonCompliantCount + (ppeIsNonCompliant ? 1 : 0);
+    const hasNonCompliantItems = nonCompliantCount > 0;
 
     return { hasNonCompliantItems, nonCompliantCount };
   }

@@ -241,11 +241,7 @@ export class DashboardService {
       },
       select: {
         submission_time: true,
-        ops_checkin_response: {
-          select: {
-            is_compliant: true,
-          },
-        },
+        has_non_compliant_items: true,
       },
     });
 
@@ -266,26 +262,17 @@ export class DashboardService {
         };
       }
 
-      // Calculate average compliance score across all entries in this hour
-      // For each entry: score = (compliant_items / total_items) * 100
-      // Hour score = sum(entry_scores) / total_entries
+      // Entry-level compliance: sebuah kunjungan dihitung compliant
+      // jika has_non_compliant_items === false (100% semua item lolos)
+      const compliantEntries = entriesInHour.filter(
+        (entry) => !entry.has_non_compliant_items,
+      ).length;
 
-      const sumScores = entriesInHour.reduce((sum, entry) => {
-        const totalItems = entry.ops_checkin_response.length;
-        if (totalItems === 0) return sum + 100; // No items = 100% compliant compliant by default? Or ignored. Assuming 100.
-
-        const compliantItems = entry.ops_checkin_response.filter(
-          (r) => r.is_compliant,
-        ).length;
-        const entryScore = (compliantItems / totalItems) * 100;
-        return sum + entryScore;
-      }, 0);
-
-      const avgRate = sumScores / totalEntries;
+      const rate = (compliantEntries / totalEntries) * 100;
 
       return {
         hour: `${hour.toString().padStart(2, '0')}:00`,
-        compliance_rate: Math.round(avgRate),
+        compliance_rate: Math.round(rate),
         total_entries: totalEntries,
       };
     });
