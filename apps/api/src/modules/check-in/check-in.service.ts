@@ -60,7 +60,10 @@ export class CheckInService {
         form,
         { headers: form.getHeaders() },
       );
-      return response.data;
+
+      // Jika FastAPI membungkus dalam field 'data', kita ambil isinya.
+      // Jika tidak, kita ambil response.data langsung.
+      return response.data?.data || response.data;
     } catch (error: any) {
       throw new InternalServerErrorException(
         error?.response?.data?.detail ||
