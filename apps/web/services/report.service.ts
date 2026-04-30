@@ -36,6 +36,14 @@ export interface ReportPreviewData {
     status: string;
     count: number;
   }[];
+  ppeStatusBreakdown: {
+    status: string;
+    count: number;
+  }[];
+  ppeIncompleteBreakdown: {
+    detail: string;
+    count: number;
+  }[];
   onTimeArrivalRate: number;
   onTimeDepartureRate: number;
   nonCompliantItems: number;

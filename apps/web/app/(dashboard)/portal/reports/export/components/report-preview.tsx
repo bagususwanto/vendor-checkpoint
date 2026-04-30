@@ -160,6 +160,63 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
         </Card>
       </div>
 
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              PPE Scan Status
+            </CardTitle>
+            <PieChart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              {data.ppeStatusBreakdown?.map((s) => (
+                <div
+                  key={s.status}
+                  className="flex items-center justify-between text-xs"
+                >
+                  <span className="font-medium text-muted-foreground">
+                    {s.status}
+                  </span>
+                  <span>{s.count}</span>
+                </div>
+              ))}
+              {(!data.ppeStatusBreakdown ||
+                data.ppeStatusBreakdown.length === 0) && (
+                <p className="text-xs text-muted-foreground">Tidak ada data</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              PPE Incomplete Details
+            </CardTitle>
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              {data.ppeIncompleteBreakdown?.map((s) => (
+                <div
+                  key={s.detail}
+                  className="flex items-center justify-between text-xs"
+                >
+                  <span className="font-medium text-muted-foreground">
+                    {s.detail}
+                  </span>
+                  <span>{s.count}</span>
+                </div>
+              ))}
+              {(!data.ppeIncompleteBreakdown ||
+                data.ppeIncompleteBreakdown.length === 0) && (
+                <p className="text-xs text-muted-foreground">Tidak ada data</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-sm font-medium">
