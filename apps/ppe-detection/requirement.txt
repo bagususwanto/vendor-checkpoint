@@ -3,5 +3,5 @@ fastapi
 ultralytics
 uvicorn
 python-multipart
-numpy<2.0
+numpy
 pydantic-settings
