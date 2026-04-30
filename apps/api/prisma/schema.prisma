@@ -190,6 +190,7 @@ model ops_checkin_entry {
   ops_verification     ops_verification?
   ops_timelog          ops_timelog?
   ops_queue_status     ops_queue_status?
+  ops_ppe_scan         ops_ppe_scan?
   log_audit            log_audit[]
 
   @@index([queue_number], name: "idx_ops_checkin_entry_queue_number")
@@ -324,4 +325,20 @@ model cfg_system {
   user mst_user? @relation(fields: [updated_by_user_id], references: [user_id])
 
   @@index([config_key], name: "idx_cfg_system_config_key")
+}
+
+model ops_ppe_scan {
+  ppe_scan_id     Int      @id @default(autoincrement())
+  entry_id        Int      @unique
+  has_hardhat     Boolean
+  has_safety_vest Boolean
+  is_compliant    Boolean
+  image_path      String?  @db.VarChar(1000)
+  scan_time       DateTime
+  created_at      DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  entry ops_checkin_entry @relation(fields: [entry_id], references: [entry_id])
+
+  @@index([entry_id], name: "idx_ops_ppe_scan_entry_id")
+  @@index([is_compliant], name: "idx_ops_ppe_scan_is_compliant")
 }

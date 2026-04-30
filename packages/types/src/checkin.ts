@@ -54,6 +54,9 @@ export const checkInSchema = z.object({
   arrival_status: z.string().optional(), 
   delay_arrival_reason_id: z.number().optional(),
   ai_safety_status: z.string().optional(),
+  ppe_has_hardhat: z.boolean().optional(),
+  ppe_has_safety_vest: z.boolean().optional(),
+  ppe_image_path: z.string().optional(),
   snapshot_vendor_category_id: z.number().optional(),
   checklist_responses: z.array(
     z.object({
