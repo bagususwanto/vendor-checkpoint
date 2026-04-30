@@ -117,9 +117,9 @@ vendor-checkpoint/
    cp apps/api/.env.example apps/api/.env
    
    # Frontend Web
-   cp apps/web/.env.example apps/web/.env
+   cp apps/web/.env.example apps/web/.env.local
    ```
-   > **Note:** Pastikan Anda mengisi credential koneksi database (SQL Server) di `apps/api/.env` sebelum melanjutkan ke langkah berikutnya.
+   > **Note:** Pastikan Anda mengisi credential koneksi database (SQL Server) di `apps/api/.env` sebelum melanjutkan.
 
 4. **Setup Database (Prisma)**
 
