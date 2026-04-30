@@ -141,12 +141,12 @@ vendor-checkpoint/
    cd apps/ppe-detection
    
    # Buat virtual environment
-   python -m venv venv
+   python -m venv .venv
    
    # Aktivasi venv (Mac/Linux)
-   source venv/bin/activate
+   source .venv/bin/activate
    # Aktivasi venv (Windows Command Prompt)
-   # venv\Scripts\activate.bat
+   # .venv\Scripts\activate.bat
    
    # Install dependensi Python
    pip install -r requirement.txt
@@ -161,6 +161,30 @@ vendor-checkpoint/
 
    ```bash
    pnpm run dev
+   ```
+
+---
+
+## 🌐 Backend Production (PM2)
+
+Untuk menjalankan Backend API di lingkungan production menggunakan PM2:
+
+1. **Build Project**
+   ```bash
+   pnpm run build
+   ```
+
+2. **Jalankan API (NestJS)**
+   ```bash
+   cd apps/api
+   pm2 start dist/main.js --name "vendor-api"
+   ```
+
+3. **Jalankan PPE Detection (FastAPI)**
+   ```bash
+   cd apps/ppe-detection
+   # Pastikan .venv sudah dibuat & dependensi sudah diinstall
+   pm2 start "python -m uvicorn main:app --host 0.0.0.0 --port 8000" --name "ppe-detection" --interpreter ./.venv/bin/python
    ```
 
 ---
