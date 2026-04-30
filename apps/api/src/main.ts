@@ -16,7 +16,7 @@ async function bootstrap() {
   // Ensure upload directories exist
   mkdirSync(join(process.cwd(), 'uploads', 'ppe'), { recursive: true });
 
-  app.setGlobalPrefix('vendor-checkpoint');
+  app.setGlobalPrefix('vendor-checkpoint-api');
 
   app.use(
     helmet({
@@ -24,8 +24,8 @@ async function bootstrap() {
     }),
   );
 
-  const frontendUrls = process.env.FRONTEND_URL 
-    ? process.env.FRONTEND_URL.split(',') 
+  const frontendUrls = process.env.FRONTEND_URL
+    ? process.env.FRONTEND_URL.split(',')
     : ['http://localhost:3001', 'http://localhost:3000'];
 
   app.enableCors({
