@@ -10,15 +10,24 @@ import {
   Tag,
   ScanBarcode,
   Clock,
+  ShieldCheck,
+  ShieldAlert,
 } from 'lucide-react';
 
-import { Step1Data } from '@/stores/use-checklist.store';
+import { Step1Data, PPEScanData } from '@/stores/use-checklist.store';
+import { Badge } from '@/components/ui/badge';
 
 interface ReviewIdentityProps {
   step1Data: Step1Data | null;
+  ppeData: PPEScanData | null;
+  isApdEnabled: boolean;
 }
 
-export function ReviewIdentity({ step1Data }: ReviewIdentityProps) {
+export function ReviewIdentity({ 
+  step1Data, 
+  ppeData, 
+  isApdEnabled 
+}: ReviewIdentityProps) {
   if (!step1Data) return null;
 
   return (
@@ -99,6 +108,27 @@ export function ReviewIdentity({ step1Data }: ReviewIdentityProps) {
               </div>
             </div>
           </div>
+
+          {isApdEnabled && ppeData && (
+            <div className="flex items-center gap-3 pt-2 border-t mt-3">
+              {ppeData.isCompliant ? (
+                <ShieldCheck className="w-5 h-5 text-muted-foreground" />
+              ) : (
+                <ShieldAlert className="w-5 h-5 text-muted-foreground" />
+              )}
+              <div className="flex-1 flex items-center justify-between">
+                <div>
+                  <p className="text-muted-foreground text-sm">Pemeriksaan APD</p>
+                  <p className={`font-medium text-lg ${ppeData.isCompliant ? 'text-green-600' : 'text-red-600'}`}>
+                    {ppeData.isCompliant ? 'Lengkap' : 'Tidak Lengkap'}
+                  </p>
+                </div>
+                <Badge variant={ppeData.isCompliant ? 'default' : 'destructive'} className="h-6">
+                  {ppeData.isCompliant ? 'PASS' : 'FAIL'}
+                </Badge>
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

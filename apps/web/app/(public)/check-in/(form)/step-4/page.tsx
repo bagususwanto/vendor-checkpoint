@@ -138,7 +138,11 @@ export default function CheckInStep4() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <ReviewIdentity step1Data={step1Data} />
+          <ReviewIdentity 
+            step1Data={step1Data} 
+            ppeData={ppeData} 
+            isApdEnabled={isApdEnabled} 
+          />
           <ReviewChecklist step2Data={step2Data} />
         </CardContent>
         <ReviewActions onConfirm={handleSubmit} isSubmitting={isProcessing} />

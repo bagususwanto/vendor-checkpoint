@@ -133,10 +133,8 @@ export default function CheckInStep2() {
 
     if (!complianceResult.isCompliant) {
       toast.warning('APD Belum Lengkap', {
-        description:
-          'Mohon pastikan Anda sudah memakai helm dan rompi keselamatan.',
+        description: 'Data akan tetap dikirim untuk keperluan evaluasi vendor.',
       });
-      return;
     }
 
     // Save APD data to store
@@ -215,7 +213,7 @@ export default function CheckInStep2() {
             type="button"
             className="w-1/2 h-12 sm:h-14 text-sm sm:text-base"
             onClick={handleContinue}
-            disabled={!complianceResult?.isCompliant}
+            disabled={!complianceResult}
           >
             Lanjut
             <CircleArrowRight className="ml-1 sm:ml-2 h-5 w-5 sm:h-6 sm:w-6" />
