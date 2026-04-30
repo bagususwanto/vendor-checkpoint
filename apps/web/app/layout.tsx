@@ -17,6 +17,9 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: 'Vendor Checkpoint',
   description: 'Integrated Security and Vendor Management System',
+  icons: {
+    icon: '/icon.png',
+  },
 };
 
 export default function RootLayout({
