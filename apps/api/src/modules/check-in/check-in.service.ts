@@ -141,6 +141,21 @@ export class CheckInService {
           // 7. Create Time Log
           await this.createTimeLog(tx, checkIn.entry_id, dateNow);
 
+          // 8. Create PPE Scan Record jika APD detection dilakukan
+          if (
+            createCheckInDto.ai_safety_status &&
+            createCheckInDto.ai_safety_status !== 'Skipped' &&
+            createCheckInDto.ppe_has_hardhat !== undefined &&
+            createCheckInDto.ppe_has_safety_vest !== undefined
+          ) {
+            await this.createPpeScan(
+              tx,
+              checkIn.entry_id,
+              createCheckInDto,
+              dateNow,
+            );
+          }
+
           // Audit log moved to interceptor
 
           const estimatedWaitMinutes =
@@ -1276,6 +1291,24 @@ export class CheckInService {
         priority_order: nextPriority,
         estimated_wait_minutes: toInt(estimatedWaitMinutes.config_value),
         last_updated: date,
+      },
+    });
+  }
+
+  private async createPpeScan(
+    tx: any,
+    entryId: number,
+    dto: CreateCheckInDto,
+    scanTime: Date,
+  ) {
+    await tx.ops_ppe_scan.create({
+      data: {
+        entry_id: entryId,
+        has_hardhat: dto.ppe_has_hardhat ?? false,
+        has_safety_vest: dto.ppe_has_safety_vest ?? false,
+        is_compliant: dto.ai_safety_status === 'Pass',
+        image_path: dto.ppe_image_path ?? null,
+        scan_time: scanTime,
       },
     });
   }
