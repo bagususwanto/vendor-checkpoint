@@ -26,6 +26,7 @@ export function PPECamera({
   const [cameraError, setCameraError] = useState<string>('');
   const [isInitializing, setIsInitializing] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [lastCapturedFrame, setLastCapturedFrame] = useState<string | null>(null);
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
@@ -120,6 +121,7 @@ export function PPECamera({
     canvas.toBlob((blob) => {
       if (blob) {
         const imageDataUrl = canvas.toDataURL('image/jpeg');
+        setLastCapturedFrame(imageDataUrl);
         onCapture(blob, imageDataUrl);
       }
     }, 'image/jpeg');
@@ -194,9 +196,18 @@ export function PPECamera({
           playsInline
           muted
           className={`h-full w-full object-cover ${
-            isCameraActive ? 'block' : 'hidden'
+            isCameraActive && !(isProcessing && lastCapturedFrame) ? 'block' : 'hidden'
           }`}
         />
+
+        {/* Freeze Frame Overlay During Processing */}
+        {isProcessing && lastCapturedFrame && (
+          <img
+            src={lastCapturedFrame}
+            alt="Menganalisis"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
 
         {/* Hidden canvas for capturing */}
         <canvas ref={canvasRef} className="hidden" />

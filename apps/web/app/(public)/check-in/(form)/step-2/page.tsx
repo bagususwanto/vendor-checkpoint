@@ -51,8 +51,9 @@ export default function CheckInStep2() {
   const { mutateAsync: detectPPE, isPending: isDetecting } = usePPEDetection();
 
   // Check if AI APD detection is enabled via system config
-  const { data: apdConfig, isLoading: isLoadingConfig } =
-    useSystemConfigByKey('AI_APD_DETECTION_ENABLED');
+  const { data: apdConfig, isLoading: isLoadingConfig } = useSystemConfigByKey(
+    'AI_APD_DETECTION_ENABLED',
+  );
   const isApdEnabled = !isLoadingConfig && apdConfig?.config_value !== 'false';
 
   useEffect(() => {
@@ -78,8 +79,14 @@ export default function CheckInStep2() {
       });
       router.replace('/check-in/step-3');
     }
-  }, [step1Data, checklistCategories, isApdEnabled, isLoadingConfig, router, setPPEData]);
-
+  }, [
+    step1Data,
+    checklistCategories,
+    isApdEnabled,
+    isLoadingConfig,
+    router,
+    setPPEData,
+  ]);
 
   const handleCapture = async (imageBlob: Blob, imageDataUrl: string) => {
     try {
