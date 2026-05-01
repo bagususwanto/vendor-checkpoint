@@ -130,8 +130,9 @@ export function VerificationSheet({
         };
       });
       toast.success('Foto bukti berhasil diunggah');
-    } catch (error) {
-      toast.error('Gagal mengunggah foto bukti');
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Gagal mengunggah foto bukti';
+      toast.error(message);
     }
   };
 
@@ -180,8 +181,9 @@ export function VerificationSheet({
         },
       );
     } catch (error: any) {
+      const message = error.response?.data?.message || error.message || 'Terjadi kesalahan saat menyimpan catatan ketidaksesuaian.';
       toast.error('Gagal menyimpan temuan', {
-        description: error.message || 'Terjadi kesalahan saat menyimpan catatan ketidaksesuaian.',
+        description: message,
       });
     }
   };
