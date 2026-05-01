@@ -3,6 +3,12 @@ import { LoginDto } from './dto/login.dto';
 import { lastValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig } from 'axios';
+import * as https from 'https';
+
+// Agent untuk bypass validasi SSL (mengatasi error "unable to verify the first certificate")
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false,
+});
 
 export interface AuthResponse {
   accessToken: string;
@@ -18,6 +24,7 @@ export class AuthService {
       const resp$ = this.httpService.post(
         `${process.env.EXTERNAL_API_URL}/login`,
         dto,
+        { httpsAgent },
       );
       const response = await lastValueFrom(resp$);
 
@@ -39,6 +46,7 @@ export class AuthService {
         headers: {
           Cookie: cookies, // Forward cookies to external API
         },
+        httpsAgent,
       };
 
       const resp$ = this.httpService.get(
@@ -73,6 +81,7 @@ export class AuthService {
         headers: {
           Cookie: cookies,
         },
+        httpsAgent,
       };
 
       const resp$ = this.httpService.delete(
