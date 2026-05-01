@@ -316,6 +316,21 @@ export class DashboardService {
       select: {
         checklist_category_id: true,
         is_compliant: true,
+        response_id: true,
+      },
+    });
+
+    // Get all officer discrepancies for today to match in-memory
+    const discrepancies = await this.prisma.ops_officer_discrepancy.findMany({
+      where: {
+        entry: {
+          submission_time: {
+            gte: startOfWindow,
+          },
+        },
+      },
+      select: {
+        response_id: true,
       },
     });
 
@@ -326,7 +341,9 @@ export class DashboardService {
 
       const total = categoryResponses.length;
       const compliantCount = categoryResponses.filter(
-        (r) => r.is_compliant,
+        (r) =>
+          r.is_compliant &&
+          !discrepancies.some((d) => d.response_id === r.response_id),
       ).length;
       const rate = total > 0 ? (compliantCount / total) * 100 : 0;
 
