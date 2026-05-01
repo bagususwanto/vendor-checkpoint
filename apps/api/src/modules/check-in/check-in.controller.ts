@@ -24,6 +24,7 @@ import { CheckoutCheckInDto } from './dto/checkout-check-in.dto';
 import { HoldCheckInDto } from './dto/hold-check-in.dto';
 import { ResumeCheckInDto } from './dto/resume-check-in.dto';
 import { AiSafetyDto } from './dto/ai-safety.dto';
+import { SubmitDiscrepancyDto } from './dto/submit-discrepancy.dto';
 import { getRequestInfo } from 'src/common/utils/request-info.util';
 import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -214,6 +215,26 @@ export class CheckInController {
       requestInfo,
       userId,
     );
+  }
+
+  // PROTECTED - Staff only
+  @UseGuards(JwtAuthGuard)
+  @Post('/discrepancy')
+  @AuditLog({
+    actionType: 'CHECKIN_DISCREPANCY',
+    actionDescription: 'Catatan ketidaksesuaian petugas ditambahkan',
+    buildDetails: (req, res) => ({
+      entry_id: res.entry_id,
+      user_id: res.user_id,
+      new_value: { discrepancies: req.body.discrepancies },
+    }),
+  })
+  submitDiscrepancy(
+    @Body() submitDiscrepancyDto: SubmitDiscrepancyDto,
+    @Req() req: any,
+  ) {
+    const userId = req.user.userId;
+    return this.checkInService.submitDiscrepancy(submitDiscrepancyDto, userId);
   }
 
   // PROTECTED - Staff only

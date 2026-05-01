@@ -8,6 +8,7 @@ import { CheckoutCheckInDto } from './dto/checkout-check-in.dto';
 import { HoldCheckInDto } from './dto/hold-check-in.dto';
 import { ResumeCheckInDto } from './dto/resume-check-in.dto';
 import { ArrivalCheckResponseDto } from './dto/arrival-check-response.dto';
+import { SubmitDiscrepancyDto } from './dto/submit-discrepancy.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { VendorService } from '../vendor/vendor.service';
 import { generateQueueNumber } from 'src/common/utils/queue-number.util.';
@@ -660,6 +661,20 @@ export class CheckInService {
             image_path: true,
           },
         },
+        ops_officer_discrepancy: {
+          select: {
+            discrepancy_id: true,
+            item_text_snapshot: true,
+            officer_note: true,
+            evidence_image_path: true,
+            created_at: true,
+            user: {
+              select: {
+                full_name: true,
+              },
+            },
+          },
+        },
         ops_verification: {
           select: {
             verification_status: true,
@@ -715,6 +730,7 @@ export class CheckInService {
     return {
       ...rest,
       checklist_responses,
+      officer_discrepancies: entry.ops_officer_discrepancy,
     };
   }
 
@@ -1119,6 +1135,78 @@ export class CheckInService {
         driver_name: entry.driver_name,
         company_name: entry.snapshot_company_name,
         resume_time: updateTime,
+      };
+    });
+  }
+
+  async submitDiscrepancy(
+    submitDiscrepancyDto: SubmitDiscrepancyDto,
+    userId: number,
+  ) {
+    const { queue_number, discrepancies } = submitDiscrepancyDto;
+    const localUserId = await this.resolveLocalUser(userId);
+
+    const entry = await this.prisma.ops_checkin_entry.findUnique({
+      where: { queue_number },
+      select: {
+        entry_id: true,
+        current_status: true,
+      },
+    });
+
+    if (!entry) {
+      throw new BadRequestException('Nomor antrean tidak ditemukan');
+    }
+
+    return await this.prisma.$transaction(async (tx) => {
+      // 1. Delete existing discrepancies for this entry if any (to support re-submission/update)
+      await tx.ops_officer_discrepancy.deleteMany({
+        where: { entry_id: entry.entry_id },
+      });
+
+      // 2. Create new discrepancies
+      if (discrepancies.length > 0) {
+        await tx.ops_officer_discrepancy.createMany({
+          data: discrepancies.map((d) => ({
+            entry_id: entry.entry_id,
+            response_id: d.response_id,
+            item_text_snapshot: d.item_text_snapshot,
+            officer_note: d.officer_note,
+            evidence_image_path: d.evidence_image_path,
+            marked_by_user_id: localUserId,
+          })),
+        });
+      }
+
+      // 3. Re-calculate entry compliance status
+      // An entry is non-compliant if:
+      // - Vendor self-report has non-compliant items
+      // - PPE scan is non-compliant
+      // - Officer found additional discrepancies
+      const vendorNonCompliant = await tx.ops_checkin_response.findFirst({
+        where: { entry_id: entry.entry_id, is_compliant: false },
+      });
+
+      const ppeNonCompliant = await tx.ops_ppe_scan.findFirst({
+        where: { entry_id: entry.entry_id, is_compliant: false },
+      });
+
+      const isActuallyNonCompliant =
+        !!vendorNonCompliant || !!ppeNonCompliant || discrepancies.length > 0;
+
+      await tx.ops_checkin_entry.update({
+        where: { entry_id: entry.entry_id },
+        data: {
+          has_non_compliant_items: isActuallyNonCompliant,
+          updated_at: new Date(),
+        },
+      });
+
+      return {
+        entry_id: entry.entry_id,
+        user_id: localUserId,
+        queue_number,
+        count: discrepancies.length,
       };
     });
   }

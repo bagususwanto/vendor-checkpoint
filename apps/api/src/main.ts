@@ -15,6 +15,7 @@ async function bootstrap() {
 
   // Ensure upload directories exist
   mkdirSync(join(process.cwd(), 'uploads', 'ppe'), { recursive: true });
+  mkdirSync(join(process.cwd(), 'uploads', 'discrepancy'), { recursive: true });
 
   app.use(
     helmet({
