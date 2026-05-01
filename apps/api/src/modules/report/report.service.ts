@@ -144,6 +144,14 @@ export class ReportService {
         ? Math.round((onTimeDepartures / totalCheckouts) * 100)
         : 0;
 
+    // v2: Get Officer Discrepancy count
+    const officerDiscrepancyCount =
+      await this.prisma.ops_officer_discrepancy.count({
+        where: {
+          entry: whereClause,
+        },
+      });
+
     return {
       period: {
         from: filter.dateFrom,
@@ -179,6 +187,7 @@ export class ReportService {
       onTimeArrivalRate,
       onTimeDepartureRate,
       nonCompliantItems: complianceStats._sum?.non_compliant_count || 0,
+      officerDiscrepancyCount,
     };
   }
 
@@ -234,6 +243,9 @@ export class ReportService {
           orderBy: [{ checklist_category_id: 'asc' }, { display_order: 'asc' }],
         },
         ops_ppe_scan: true,
+        ops_officer_discrepancy: {
+          include: { user: true },
+        },
       },
       orderBy: { submission_time: 'desc' },
     });
@@ -466,8 +478,9 @@ export class ReportService {
       'Duration (min)',
       'Departure Status',
       'Alasan Terlambat Keluar',
-      'Compliance',
       'Non-Compliant Count',
+      'Officer Findings',
+      'Officer Notes Summary',
       'PPE Status',
       'PPE Incomplete Detail',
     ];
@@ -501,6 +514,13 @@ export class ReportService {
         }
       }
 
+      const hasOfficerFindings = entry.ops_officer_discrepancy?.length > 0;
+      const officerNotes = hasOfficerFindings
+        ? entry.ops_officer_discrepancy
+            .map((d: any) => `[${d.item_text_snapshot}]: ${d.officer_note}`)
+            .join(' | ')
+        : '-';
+
       sheet.addRow([
         index + 1,
         entry.queue_number,
@@ -524,6 +544,8 @@ export class ReportService {
         entry.ops_timelog?.delay_departure_reason?.reason_text || '-',
         entry.has_non_compliant_items ? 'TIDAK PATUH' : 'PATUH',
         entry.non_compliant_count,
+        hasOfficerFindings ? 'ADA TEMUAN' : 'TIDAK ADA',
+        officerNotes,
         ppeStatus,
         ppeDetail,
       ]);
@@ -549,6 +571,8 @@ export class ReportService {
       'Item',
       'Response',
       'Compliant',
+      'Officer Note',
+      'Officer Name',
     ];
 
     const headerRow = sheet.addRow(headers);
@@ -567,6 +591,10 @@ export class ReportService {
     // Data rows
     entries.forEach((entry) => {
       entry.ops_checkin_response.forEach((response: any) => {
+        const discrepancy = entry.ops_officer_discrepancy?.find(
+          (d: any) => d.response_id === response.response_id,
+        );
+
         const row = sheet.addRow([
           entry.queue_number,
           entry.snapshot_company_name,
@@ -574,15 +602,17 @@ export class ReportService {
           response.item_text_snapshot,
           response.response_value ? 'YA' : 'TIDAK',
           response.is_compliant ? 'YA' : 'TIDAK',
+          discrepancy?.officer_note || '-',
+          discrepancy?.user?.full_name || '-',
         ]);
 
-        // Highlight non-compliant rows
-        if (!response.is_compliant) {
+        // Highlight non-compliant or has officer discrepancy rows
+        if (!response.is_compliant || discrepancy) {
           row.eachCell((cell) => {
             cell.fill = {
               type: 'pattern',
               pattern: 'solid',
-              fgColor: { argb: 'FFFFCCCC' },
+              fgColor: { argb: discrepancy ? 'FFFFE0B2' : 'FFFFCCCC' },
             };
           });
         }
@@ -610,6 +640,8 @@ export class ReportService {
       'Kategori Vendor',
       'Checklist Category',
       'Item',
+      'Officer Note',
+      'Officer Name',
       'Submission Time',
     ];
 
@@ -626,14 +658,23 @@ export class ReportService {
       };
     });
 
-    // Filter only non-compliant responses
+    // Filter non-compliant responses OR items with officer discrepancies
     let rowNum = 0;
     entries.forEach((entry) => {
-      const nonCompliantResponses = entry.ops_checkin_response.filter(
-        (r: any) => !r.is_compliant,
+      const problematicResponses = entry.ops_checkin_response.filter(
+        (r: any) => {
+          const hasDiscrepancy = entry.ops_officer_discrepancy?.some(
+            (d: any) => d.response_id === r.response_id,
+          );
+          return !r.is_compliant || hasDiscrepancy;
+        },
       );
 
-      nonCompliantResponses.forEach((response: any) => {
+      problematicResponses.forEach((response: any) => {
+        const discrepancy = entry.ops_officer_discrepancy?.find(
+          (d: any) => d.response_id === response.response_id,
+        );
+
         rowNum++;
         sheet.addRow([
           rowNum,
@@ -643,6 +684,8 @@ export class ReportService {
           entry.snapshot_category_name,
           response.checklist_category?.category_name || '-',
           response.item_text_snapshot,
+          discrepancy?.officer_note || '-',
+          discrepancy?.user?.full_name || '-',
           this.formatDateTime(entry.submission_time),
         ]);
       });

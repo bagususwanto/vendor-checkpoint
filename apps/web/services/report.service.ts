@@ -47,6 +47,7 @@ export interface ReportPreviewData {
   onTimeArrivalRate: number;
   onTimeDepartureRate: number;
   nonCompliantItems: number;
+  officerDiscrepancyCount: number;
 }
 
 export const reportService = {
