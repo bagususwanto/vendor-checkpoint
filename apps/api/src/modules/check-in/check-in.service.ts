@@ -449,6 +449,7 @@ export class CheckInService {
           driver_name: true,
           snapshot_company_name: true,
           has_non_compliant_items: true,
+          non_compliant_count: true,
           mst_vendor: {
             select: {
               vendor_code: true,
@@ -594,6 +595,7 @@ export class CheckInService {
           snapshot_category_name: true,
           current_status: true,
           has_non_compliant_items: true,
+          non_compliant_count: true,
           dn_number: true,
           po_number: true,
           arrival_status: true,
@@ -638,6 +640,9 @@ export class CheckInService {
         po_number: true,
         arrival_status: true,
         ai_safety_status: true,
+        current_status: true,
+        has_non_compliant_items: true,
+        non_compliant_count: true,
         ops_timelog: {
           select: {
             checkin_time: true,
@@ -1186,21 +1191,24 @@ export class CheckInService {
       // - Vendor self-report has non-compliant items
       // - PPE scan is non-compliant
       // - Officer found additional discrepancies
-      const vendorNonCompliant = await tx.ops_checkin_response.findFirst({
+      const vendorNonCompliantCount = await tx.ops_checkin_response.count({
         where: { entry_id: entry.entry_id, is_compliant: false },
       });
 
-      const ppeNonCompliant = await tx.ops_ppe_scan.findFirst({
+      const ppeNonCompliantCount = await tx.ops_ppe_scan.count({
         where: { entry_id: entry.entry_id, is_compliant: false },
       });
 
-      const isActuallyNonCompliant =
-        !!vendorNonCompliant || !!ppeNonCompliant || discrepancies.length > 0;
+      const totalNonCompliantCount =
+        vendorNonCompliantCount + ppeNonCompliantCount + discrepancies.length;
+
+      const isActuallyNonCompliant = totalNonCompliantCount > 0;
 
       await tx.ops_checkin_entry.update({
         where: { entry_id: entry.entry_id },
         data: {
           has_non_compliant_items: isActuallyNonCompliant,
+          non_compliant_count: totalNonCompliantCount,
           updated_at: new Date(),
         },
       });
