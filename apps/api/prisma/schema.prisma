@@ -154,6 +154,7 @@ model mst_user {
   cfg_system        cfg_system[]
   log_audit         log_audit[]
   log_report_export log_report_export[]
+  ops_officer_discrepancy ops_officer_discrepancy[]
 
   @@index([external_user_id], name: "idx_mst_user_external_user_id")
 }
@@ -192,6 +193,7 @@ model ops_checkin_entry {
   ops_queue_status     ops_queue_status?
   ops_ppe_scan         ops_ppe_scan?
   log_audit            log_audit[]
+  ops_officer_discrepancy ops_officer_discrepancy[]
 
   @@index([queue_number], name: "idx_ops_checkin_entry_queue_number")
   @@index([current_status, submission_time], name: "idx_ops_checkin_entry_status_time")
@@ -341,4 +343,20 @@ model ops_ppe_scan {
 
   @@index([entry_id], name: "idx_ops_ppe_scan_entry_id")
   @@index([is_compliant], name: "idx_ops_ppe_scan_is_compliant")
+}
+
+model ops_officer_discrepancy {
+  discrepancy_id      Int      @id @default(autoincrement())
+  entry_id            Int      
+  response_id         Int?     
+  item_text_snapshot  String   @db.Text
+  officer_note        String?  @db.Text
+  evidence_image_path String?  @db.VarChar(1000)
+  marked_by_user_id   Int
+  created_at          DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  entry ops_checkin_entry @relation(fields: [entry_id], references: [entry_id])
+  user  mst_user          @relation(fields: [marked_by_user_id], references: [user_id])
+
+  @@index([entry_id], name: "idx_ops_officer_discrepancy_entry_id")
 }

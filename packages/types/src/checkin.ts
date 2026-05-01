@@ -118,3 +118,19 @@ export const arrivalCheckResponseSchema = z.object({
 });
 
 export type ArrivalCheckResponse = z.infer<typeof arrivalCheckResponseSchema>;
+
+export const officerDiscrepancyItemSchema = z.object({
+  response_id: z.number().optional(),
+  item_text_snapshot: z.string(),
+  officer_note: z.string().optional(),
+  evidence_image_path: z.string().optional(),
+});
+
+export type OfficerDiscrepancyItem = z.infer<typeof officerDiscrepancyItemSchema>;
+
+export const submitDiscrepancySchema = z.object({
+  queue_number: z.string().min(1),
+  discrepancies: z.array(officerDiscrepancyItemSchema),
+});
+
+export type SubmitDiscrepancy = z.infer<typeof submitDiscrepancySchema>;
