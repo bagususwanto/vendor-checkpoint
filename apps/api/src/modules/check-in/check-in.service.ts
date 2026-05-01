@@ -664,6 +664,7 @@ export class CheckInService {
         ops_officer_discrepancy: {
           select: {
             discrepancy_id: true,
+            response_id: true,
             item_text_snapshot: true,
             officer_note: true,
             evidence_image_path: true,
@@ -689,6 +690,7 @@ export class CheckInService {
         },
         ops_checkin_response: {
           select: {
+            response_id: true,
             item_text_snapshot: true,
             response_value: true,
             is_compliant: true,
@@ -724,6 +726,7 @@ export class CheckInService {
 
     const checklist_responses = this.formatCheckinResponses(
       entry.ops_checkin_response,
+      entry.ops_officer_discrepancy
     );
 
     const { ops_checkin_response, ...rest } = entry;
@@ -1235,7 +1238,7 @@ export class CheckInService {
     return vendor;
   }
 
-  private formatCheckinResponses(responses: any[]) {
+  private formatCheckinResponses(responses: any[], discrepancies: any[] = []) {
     const grouped = responses.reduce((acc, response) => {
       const categoryName = response.checklist_category.category_name;
       if (!acc[categoryName]) {
@@ -1247,7 +1250,12 @@ export class CheckInService {
           items: [],
         };
       }
+
+      // Find if this response has a discrepancy from the officer
+      const discrepancy = discrepancies.find(d => d.response_id === response.response_id);
+
       acc[categoryName].items.push({
+        response_id: response.response_id,
         item_type: response.item_type,
         item_text_snapshot: response.item_text_snapshot,
         response_value: response.response_value,
@@ -1256,6 +1264,11 @@ export class CheckInService {
         vendor_category_name:
           response.checklist_item?.vendor_category?.category_name,
         vendor_category_id: response.checklist_item?.vendor_category_id,
+        officer_discrepancy: discrepancy ? {
+          officer_note: discrepancy.officer_note,
+          evidence_image_path: discrepancy.evidence_image_path,
+          officer_name: discrepancy.user?.full_name
+        } : null
       });
       return acc;
     }, {});

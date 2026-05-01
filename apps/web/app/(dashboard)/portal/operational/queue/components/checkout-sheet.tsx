@@ -129,12 +129,25 @@ export function CheckoutSheet({
             </div>
           ) : detailData ? (
             <div className="grid grid-cols-1 gap-6">
-              <div className="flex items-center gap-4 bg-orange-50 p-4 rounded-lg border border-orange-100 text-orange-800">
-                <AlertTriangle className="h-5 w-5 shrink-0" />
-                <p className="text-sm">
-                  Tindakan ini akan menyelesaikan sesi kunjungan driver ini di
-                  area perusahaan.
-                </p>
+              {/* Summary Alerts */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-4 bg-orange-50 p-4 rounded-lg border border-orange-100 text-orange-800">
+                  <AlertTriangle className="h-5 w-5 shrink-0" />
+                  <p className="text-sm">
+                    Tindakan ini akan menyelesaikan sesi kunjungan driver ini di
+                    area perusahaan.
+                  </p>
+                </div>
+
+                {detailData.ops_officer_discrepancy?.length > 0 && (
+                  <Alert variant="destructive" className="border-2 border-rose-200 bg-rose-50/50">
+                    <ShieldAlert className="h-4 w-4 text-rose-600" />
+                    <AlertTitle className="text-rose-800 font-bold">Temuan Petugas Keamanan</AlertTitle>
+                    <AlertDescription className="text-rose-700">
+                      Terdapat {detailData.ops_officer_discrepancy.length} temuan ketidaksesuaian fisik yang dicatat oleh petugas saat verifikasi.
+                    </AlertDescription>
+                  </Alert>
+                )}
               </div>
 
               {/* Identitas Section */}
@@ -500,60 +513,106 @@ export function CheckoutSheet({
                           <AccordionContent className="px-0 pb-0">
                             <div className="divide-y">
                               {category.items.map((item: any, idx: number) => (
-                                <div
+                                <div 
                                   key={idx}
-                                  className="flex items-start justify-between gap-4 p-4 hover:bg-muted/30 transition-colors"
+                                  className="flex flex-col border-b last:border-b-0"
                                 >
-                                  <div className="space-y-1">
-                                    <p
-                                      className={`text-sm ${
-                                        !item.is_compliant
-                                          ? 'font-medium text-destructive'
-                                          : 'text-foreground'
-                                      }`}
-                                    >
-                                      {item.item_text_snapshot}
-                                    </p>
-                                    <div className="flex gap-2 mt-1">
-                                      {item.item_type && (
-                                        <Badge
-                                          variant="secondary"
-                                          className="text-[10px] px-1.5 py-0 h-5 capitalize"
-                                        >
-                                          {item.item_type.toLowerCase()}
-                                        </Badge>
-                                      )}
-                                      {item.material_category_name && (
-                                        <Badge
-                                          variant="outline"
-                                          className="text-[10px] px-1.5 py-0 h-5 text-muted-foreground"
-                                        >
-                                          {item.material_category_name}
-                                        </Badge>
-                                      )}
+                                  <div
+                                    className="flex items-start justify-between gap-4 p-4 hover:bg-muted/30 transition-colors"
+                                  >
+                                    <div className="space-y-1">
+                                      <p
+                                        className={`text-sm ${
+                                          !item.is_compliant || item.officer_discrepancy
+                                            ? 'font-medium text-destructive'
+                                            : 'text-foreground'
+                                        }`}
+                                      >
+                                        {item.item_text_snapshot}
+                                      </p>
+                                      <div className="flex gap-2 mt-1">
+                                        {item.item_type && (
+                                          <Badge
+                                            variant="secondary"
+                                            className="text-[10px] px-1.5 py-0 h-5 capitalize"
+                                          >
+                                            {item.item_type.toLowerCase()}
+                                          </Badge>
+                                        )}
+                                        {item.material_category_name && (
+                                          <Badge
+                                            variant="outline"
+                                            className="text-[10px] px-1.5 py-0 h-5 text-muted-foreground"
+                                          >
+                                            {item.material_category_name}
+                                          </Badge>
+                                        )}
+                                        {item.officer_discrepancy && (
+                                          <Badge
+                                            variant="destructive"
+                                            className="text-[10px] px-1.5 py-0 h-5 font-bold uppercase animate-pulse"
+                                          >
+                                            Temuan Petugas
+                                          </Badge>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="shrink-0">
+                                      <Badge
+                                        variant={
+                                          item.is_compliant
+                                            ? 'outline'
+                                            : 'destructive'
+                                        }
+                                        className={`${
+                                          item.is_compliant
+                                            ? 'bg-status-success-bg text-status-success-fg border-status-success-border'
+                                            : ''
+                                        }`}
+                                      >
+                                        {item.is_compliant ? (
+                                          <CheckCircle className="mr-1 h-3 w-3" />
+                                        ) : (
+                                          <XCircle className="mr-1 h-3 w-3" />
+                                        )}
+                                        {item.response_value ? 'Ya' : 'Tidak'}
+                                      </Badge>
                                     </div>
                                   </div>
-                                  <div className="shrink-0">
-                                    <Badge
-                                      variant={
-                                        item.is_compliant
-                                          ? 'outline'
-                                          : 'destructive'
-                                      }
-                                      className={`${
-                                        item.is_compliant
-                                          ? 'bg-status-success-bg text-status-success-fg border-status-success-border'
-                                          : ''
-                                      }`}
-                                    >
-                                      {item.is_compliant ? (
-                                        <CheckCircle className="mr-1 h-3 w-3" />
-                                      ) : (
-                                        <XCircle className="mr-1 h-3 w-3" />
+
+                                  {/* Officer Discrepancy Detail */}
+                                  {item.officer_discrepancy && (
+                                    <div className="mx-4 mb-4 mt-0 p-3 rounded-md bg-rose-50 border border-rose-100 flex gap-4 items-start shadow-sm">
+                                      <div className="flex-1 space-y-1">
+                                        <div className="flex items-center gap-1.5 text-rose-700">
+                                          <ShieldAlert className="h-3.5 w-3.5" />
+                                          <span className="text-[10px] font-bold uppercase tracking-tight">Catatan Petugas</span>
+                                        </div>
+                                        <p className="text-xs text-rose-900 font-medium leading-relaxed italic">
+                                          &quot;{item.officer_discrepancy.officer_note || 'Tidak ada catatan spesifik.'}&quot;
+                                        </p>
+                                        <p className="text-[9px] text-muted-foreground pt-1">
+                                          Oleh: {item.officer_discrepancy.officer_name || 'Petugas'}
+                                        </p>
+                                      </div>
+
+                                      {item.officer_discrepancy.evidence_image_path && (
+                                        <div 
+                                          className="shrink-0 relative group h-16 w-16 rounded border-2 border-white shadow-sm overflow-hidden cursor-pointer"
+                                          onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/${item.officer_discrepancy.evidence_image_path}`, '_blank')}
+                                        >
+                                          <img 
+                                            src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/${item.officer_discrepancy.evidence_image_path}`} 
+                                            className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                                            alt="Discrepancy proof"
+                                          />
+                                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <Maximize2 className="h-4 w-4 text-white" />
+                                          </div>
+                                        </div>
                                       )}
-                                      {item.response_value ? 'Ya' : 'Tidak'}
-                                    </Badge>
-                                  </div>
+                                    </div>
+                                  )}
                                 </div>
                               ))}
                             </div>
