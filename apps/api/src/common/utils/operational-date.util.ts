@@ -50,3 +50,15 @@ export function getPlannedDateTime(operationalDate: Date, timeStr: string): Date
   plannedDate.setUTCHours(hours - 7, minutes, 0, 0);
   return plannedDate;
 }
+
+/**
+ * Returns the hour (0-23) in WIB (UTC+7) for a given date.
+ */
+export function getWIBHour(date: Date): number {
+  const jakartaTimeStr = date.toLocaleString('en-US', {
+    timeZone: 'Asia/Jakarta',
+    hour: 'numeric',
+    hour12: false,
+  });
+  return parseInt(jakartaTimeStr, 10);
+}

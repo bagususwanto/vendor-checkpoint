@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { getStartOfToday } from 'src/common/utils/today-date.util';
 import { formatDate } from 'src/common/utils/format-date.util';
+import { 
+  getOperationalDate, 
+  getPlannedDateTime, 
+  getWIBHour 
+} from 'src/common/utils/operational-date.util';
 
 import { QueueStatus } from '@repo/types';
 
@@ -10,13 +15,16 @@ export class DashboardService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findDailyStats() {
-    const today = getStartOfToday();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+    const opDate = getOperationalDate();
+    const todayStart = getPlannedDateTime(opDate, '07:15');
+    
+    const yesterdayOpDate = new Date(opDate);
+    yesterdayOpDate.setUTCDate(yesterdayOpDate.getUTCDate() - 1);
+    const yesterdayStart = getPlannedDateTime(yesterdayOpDate, '07:15');
 
     const [todayStats, yesterdayStats, verificationMode] = await Promise.all([
-      this.getStatsForDate(today),
-      this.getStatsForDate(yesterday, true), // end date is today (exclusive)
+      this.getStatsForRange(todayStart, new Date()),
+      this.getStatsForRange(yesterdayStart, todayStart),
       this.prisma.cfg_system.findUnique({
         where: { config_key: 'VERIFICATION_MODE_ENABLED' }
       })
@@ -41,7 +49,7 @@ export class DashboardService {
     };
 
     return {
-      date: formatDate(today),
+      date: formatDate(opDate),
       ...todayStats,
       trends: {
         total_checkins: calculateTrend(
@@ -65,11 +73,8 @@ export class DashboardService {
     };
   }
 
-  // Helper to get stats for a specific date range (single day)
-  private async getStatsForDate(startDate: Date, isYesterday = false) {
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 1);
-
+  // Helper to get stats for a specific date range
+  private async getStatsForRange(startDate: Date, endDate: Date) {
     const [
       totalCheckins,
       totalApproved,
@@ -184,12 +189,14 @@ export class DashboardService {
   }
 
   async findHourlyLeadTime() {
-    const today = getStartOfToday();
+    const opDate = getOperationalDate();
+    const startOfWindow = getPlannedDateTime(opDate, '07:15');
+
     const completedEntries = await this.prisma.ops_timelog.findMany({
       where: {
         entry: {
           submission_time: {
-            gte: today,
+            gte: startOfWindow,
           },
         },
         duration_minutes: {
@@ -209,7 +216,7 @@ export class DashboardService {
     const hours = Array.from({ length: 14 }, (_, i) => i + 7); // 07:00 to 20:00
     const result = hours.map((hour) => {
       const entriesInHour = completedEntries.filter((record) => {
-        const entryHour = new Date(record.entry.submission_time).getHours();
+        const entryHour = getWIBHour(new Date(record.entry.submission_time));
         return entryHour === hour;
       });
 
@@ -231,12 +238,13 @@ export class DashboardService {
   }
 
   async findComplianceRateByHour() {
-    const today = getStartOfToday();
+    const opDate = getOperationalDate();
+    const startOfWindow = getPlannedDateTime(opDate, '07:15');
 
     const entries = await this.prisma.ops_checkin_entry.findMany({
       where: {
         submission_time: {
-          gte: today,
+          gte: startOfWindow,
         },
       },
       select: {
@@ -248,7 +256,7 @@ export class DashboardService {
     const hours = Array.from({ length: 14 }, (_, i) => i + 7); // 07:00 to 20:00
     const result = hours.map((hour) => {
       const entriesInHour = entries.filter((entry) => {
-        const entryHour = new Date(entry.submission_time).getHours();
+        const entryHour = getWIBHour(new Date(entry.submission_time));
         return entryHour === hour;
       });
 
@@ -281,7 +289,8 @@ export class DashboardService {
   }
 
   async findChecklistBreakdown() {
-    const today = getStartOfToday();
+    const opDate = getOperationalDate();
+    const startOfWindow = getPlannedDateTime(opDate, '07:15');
 
     // Get all categories first
     const categories = await this.prisma.mst_checklist_category.findMany({
@@ -300,7 +309,7 @@ export class DashboardService {
       where: {
         entry: {
           submission_time: {
-            gte: today,
+            gte: startOfWindow,
           },
         },
       },
