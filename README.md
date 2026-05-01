@@ -115,10 +115,11 @@ vendor-checkpoint/
    ```bash
    # Backend API
    cp apps/api/.env.example apps/api/.env
-   
+
    # Frontend Web
    cp apps/web/.env.example apps/web/.env.local
    ```
+
    > **Note:** Pastikan Anda mengisi credential koneksi database (SQL Server) di `apps/api/.env` sebelum melanjutkan.
 
 4. **Setup Database (Prisma)**
@@ -128,24 +129,24 @@ vendor-checkpoint/
    ```bash
    # Generate Prisma Client
    pnpm --filter api exec prisma generate
-   
+
    # Reset DB, Apply Migrasi, & Run Seed
    pnpm --filter api run reset
    ```
 
 5. **Setup PPE Detection (Python FastAPI)**
 
-   Fitur deteksi APD menggunakan FastAPI. Anda perlu melakukan setup *virtual environment*:
+   Fitur deteksi APD menggunakan FastAPI. Anda perlu melakukan setup _virtual environment_:
 
    ```bash
    cd apps/ppe-detection
-   
+
    # Buat virtual environment
    python -m venv venv
-   
+
    # Install dependensi Python (Gunakan python dari venv agar pasti masuk ke folder venv)
    .\venv\Scripts\python.exe -m pip install -r requirement.txt
-   
+
    # Kembali ke root folder
    cd ../..
    ```
@@ -165,17 +166,20 @@ vendor-checkpoint/
 Untuk menjalankan Backend API di lingkungan production menggunakan PM2:
 
 1. **Build Project**
+
    ```bash
    pnpm run build
    ```
 
 2. **Jalankan API (NestJS)**
+
    ```bash
    cd apps/api
    pm2 start dist/src/main.js --name "vendor-api"
    ```
 
 3. **Jalankan PPE Detection (FastAPI)**
+
    ```bash
    cd apps/ppe-detection
 
@@ -184,7 +188,7 @@ Untuk menjalankan Backend API di lingkungan production menggunakan PM2:
 
     # Windows (Rekomendasi: Pakai ecosystem.config.js)
     pm2 start ecosystem.config.js
-    ```
+   ```
 
 ---
 
@@ -193,14 +197,18 @@ Untuk menjalankan Backend API di lingkungan production menggunakan PM2:
 Ikuti langkah-langkah berikut untuk men-deploy frontend Next.js ke Firebase Hosting menggunakan metode **Static Export**:
 
 ### 1. Persiapan Firebase CLI
+
 Pastikan Anda sudah menginstall Firebase Tools secara global:
+
 ```bash
 npm install -g firebase-tools
 firebase login
 ```
 
 ### 2. Konfigurasi Next.js (Static Export)
+
 Ubah `apps/web/next.config.js` untuk mengaktifkan mode export:
+
 ```javascript
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -210,17 +218,22 @@ const nextConfig = {
 ```
 
 ### 3. Inisialisasi Firebase
+
 Jalankan perintah ini di **root folder**:
+
 ```bash
 firebase init hosting
 ```
+
 - Pilih project Firebase Anda.
 - Tentukan direktori publik: `apps/web/out`
-- Konfigurasikan sebagai single-page app: `Yes`
+- Konfigurasikan sebagai single-page app: `No`
 - Setup GitHub Actions: (Opsional)
 
 ### 4. Build & Deploy
+
 Jalankan build untuk aplikasi web, lalu deploy:
+
 ```bash
 # Build aplikasi web
 pnpm --filter web build
