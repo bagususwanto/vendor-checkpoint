@@ -227,7 +227,7 @@ firebase init hosting
 
 - Pilih project Firebase Anda.
 - Tentukan direktori publik: `apps/web/out`
-- Konfigurasikan sebagai single-page app: `No`
+- Konfigurasikan sebagai single-page app: `Yes`
 - Setup GitHub Actions: (Opsional)
 
 ### 4. Build & Deploy
