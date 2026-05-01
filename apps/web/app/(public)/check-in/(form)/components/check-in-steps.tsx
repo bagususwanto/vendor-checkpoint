@@ -13,7 +13,9 @@ export function CheckInSteps() {
     { path: '/check-in/step-4', label: 'Konfirmasi' },
   ];
 
-  const currentStepIndex = steps.findIndex((step) => step.path === pathname);
+  const currentStepIndex = steps.findIndex(
+    (step) => step.path === pathname || pathname === `${step.path}/`
+  );
 
   return (
     <div className="flex justify-between items-center mb-1">
