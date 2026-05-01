@@ -1,7 +1,8 @@
-import { CheckIn, PaginatedResponse, ArrivalCheckResponse } from '@repo/types';
+import { CheckIn, PaginatedResponse, ArrivalCheckResponse, SubmitDiscrepancy } from '@repo/types';
 import { axiosInstance } from '@/lib/axios';
 
 export const checkInService = {
+  // ... existing methods ...
   getArrivalCheck: async (vendorId: number) => {
     try {
       const response = await axiosInstance.get<{ data: ArrivalCheckResponse }>(
@@ -170,5 +171,38 @@ export const checkInService = {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data.data;
+  },
+
+  uploadDiscrepancyImage: async (
+    fileOrDataUrl: File | string,
+  ): Promise<{ image_path: string }> => {
+    const formData = new FormData();
+    
+    if (fileOrDataUrl instanceof File) {
+      formData.append('file', fileOrDataUrl);
+    } else {
+      const res = await fetch(fileOrDataUrl);
+      const blob = await res.blob();
+      formData.append('file', blob, 'discrepancy.jpg');
+    }
+
+    const response = await axiosInstance.post<{
+      data: { image_path: string };
+    }>('/check-in/discrepancy-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data.data;
+  },
+
+  submitDiscrepancy: async (payload: SubmitDiscrepancy) => {
+    try {
+      const response = await axiosInstance.post<{ data: any }>(
+        '/check-in/discrepancy',
+        payload,
+      );
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
   },
 };

@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { checkInService } from '@/services/check-in.service';
-import { CheckIn } from '@repo/types';
+import { CheckIn, SubmitDiscrepancy } from '@repo/types';
 
 export function useSubmitCheckIn() {
   return useMutation({
@@ -111,5 +111,19 @@ export function useUnscheduledMonitor(refetchInterval = 10000) {
     queryFn: () => checkInService.getUnscheduledMonitor(),
     refetchInterval,
     refetchIntervalInBackground: true,
+  });
+}
+
+export function useUploadDiscrepancyImage() {
+  return useMutation({
+    mutationFn: (fileOrDataUrl: File | string) =>
+      checkInService.uploadDiscrepancyImage(fileOrDataUrl),
+  });
+}
+
+export function useSubmitDiscrepancy() {
+  return useMutation({
+    mutationFn: (payload: SubmitDiscrepancy) =>
+      checkInService.submitDiscrepancy(payload),
   });
 }
