@@ -64,6 +64,34 @@ export class CheckInController {
     return { image_path: `uploads/ppe/${file.filename}` };
   }
 
+  // PUBLIC - Officer upload foto bukti ketidaksesuaian saat verifikasi
+  @Post('/discrepancy-image')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/discrepancy',
+        filename: (req, file, cb) => {
+          const uniqueName = `${uuidv4()}.jpg`;
+          cb(null, uniqueName);
+        },
+      }),
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.startsWith('image/')) {
+          return cb(
+            new BadRequestException('Hanya file gambar yang diizinkan'),
+            false,
+          );
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  uploadDiscrepancyImage(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('File tidak ditemukan');
+    return { image_path: `uploads/discrepancy/${file.filename}` };
+  }
+
   // PUBLIC - Proxy PPE Detection ke FastAPI (agar frontend tidak hit FastAPI langsung)
   @Post('/detect-ppe')
   @UseInterceptors(
