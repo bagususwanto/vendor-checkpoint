@@ -1,6 +1,7 @@
 'use client';
 
 import { StatusBadge } from '../../../components/status-badge';
+import { OfficerDiscrepancyCard } from '@/components/officer-discrepancy-card';
 import {
   Sheet,
   SheetClose,
@@ -36,7 +37,7 @@ import {
   Package,
   Building2,
 } from 'lucide-react';
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useEffect } from 'react';
 import { Separator } from '@/components/ui/separator';
 import {
   useVerifyCheckIn,
@@ -83,13 +84,32 @@ export function VerificationSheet({
   const uploadImageMutation = useUploadDiscrepancyImage();
   const submitDiscrepancyMutation = useSubmitDiscrepancy();
 
-  // State for officer discrepancies
   const [officerFindings, setOfficerFindings] = useState<
     Record<
       number,
       { marked: boolean; note: string; imagePath?: string; item_text: string }
     >
   >({});
+
+  // Initialize officerFindings from existing data when detailData changes
+  useEffect(() => {
+    if (detailData?.checklist_responses) {
+      const initialFindings: Record<number, any> = {};
+      detailData.checklist_responses.forEach((category: any) => {
+        category.items.forEach((item: any) => {
+          if (item.officer_discrepancy) {
+            initialFindings[item.response_id] = {
+              marked: true,
+              note: item.officer_discrepancy.officer_note || '',
+              imagePath: item.officer_discrepancy.evidence_image_path,
+              item_text: item.item_text_snapshot,
+            };
+          }
+        });
+      });
+      setOfficerFindings(initialFindings);
+    }
+  }, [detailData]);
 
   const handleToggleFinding = (responseId: number, itemText: string) => {
     setOfficerFindings((prev) => {
@@ -224,6 +244,32 @@ export function VerificationSheet({
           ) : detailData ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-1">
               <div className="space-y-6">
+                {/* Global Alert for Officer Findings */}
+                {Object.values(officerFindings).some(f => f.marked) && (
+                  <Alert variant="destructive" className="border-2 border-rose-200 bg-rose-50/50">
+                    <ShieldAlert className="h-4 w-4 text-rose-600" />
+                    <AlertTitle className="text-rose-800 font-bold">Temuan Petugas Lapangan</AlertTitle>
+                    <AlertDescription className="text-rose-700 text-xs">
+                      <p className="mb-2">Terdapat {Object.values(officerFindings).filter(f => f.marked).length} temuan ketidaksesuaian fisik yang perlu ditinjau pada bagian:</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {detailData?.checklist_responses?.map((cat: any) => {
+                          const count = cat.items.filter((item: any) => officerFindings[item.response_id]?.marked).length;
+                          if (count === 0) return null;
+                          return (
+                            <Badge 
+                              key={cat.category_name}
+                              className="text-[10px] px-2 py-0 h-5 border-none shadow-sm" 
+                              style={{ backgroundColor: cat.color_code || '#e11d48', color: 'white' }}
+                            >
+                              {cat.category_name}: {count}
+                            </Badge>
+                          );
+                        })}
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 <div>
                   <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
                     Identitas Pengirim
@@ -804,98 +850,101 @@ export function VerificationSheet({
                                       </div>
                                     </div>
                                     
-                                    {/* Discrepancy Form Overlay */}
-                                    {officerFindings[item.response_id]
-                                      ?.marked && (
-                                      <div className="mx-4 mb-4 mt-0 p-4 rounded-lg bg-destructive/5 border border-destructive/20 animate-in fade-in slide-in-from-top-1 duration-200">
-                                        <div className="flex flex-col gap-3">
-                                          <div className="flex items-center gap-2 text-destructive">
-                                            <ShieldAlert className="h-4 w-4" />
-                                            <span className="text-xs font-bold uppercase tracking-tight">
-                                              Temuan Petugas
-                                            </span>
-                                          </div>
-                                          
-                                          <div className="flex gap-4 items-start">
-                                            <div className="flex-1 space-y-2">
-                                              <Textarea
-                                                placeholder="Berikan catatan ketidaksesuaian fisik yang ditemukan..."
-                                                className="min-h-[80px] bg-white/50 border-destructive/20 focus-visible:ring-destructive"
-                                                value={
-                                                  officerFindings[
-                                                    item.response_id
-                                                  ]?.note ?? ''
-                                                }
-                                                onChange={(e) =>
-                                                  handleUpdateNote(
-                                                    item.response_id,
-                                                    e.target.value,
-                                                  )
-                                                }
-                                              />
+                                      {/* Discrepancy Display/Form Overlay */}
+                                      {officerFindings[item.response_id]?.marked && (
+                                        <div className={`mx-4 mb-4 mt-0 p-4 rounded-lg border animate-in fade-in slide-in-from-top-1 duration-200 ${
+                                          readonly ? 'bg-rose-50 border-rose-100 shadow-sm' : 'bg-destructive/5 border-destructive/20'
+                                        }`}>
+                                          <div className="flex flex-col gap-3">
+                                            <div className={`flex items-center gap-2 ${readonly ? 'text-rose-700' : 'text-destructive'}`}>
+                                              <ShieldAlert className="h-4 w-4" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">
+                                                {readonly ? 'Catatan Temuan Petugas' : 'Temuan Petugas'}
+                                              </span>
                                             </div>
                                             
-                                            <div className="shrink-0 flex flex-col items-center gap-2">
-                                              <div 
-                                                className={`h-20 w-20 rounded-md border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden ${
-                                                  officerFindings[item.response_id]?.imagePath 
-                                                    ? 'border-emerald-500 bg-emerald-50' 
-                                                    : 'border-muted-foreground/30 hover:border-destructive hover:bg-destructive/5'
-                                                }`}
-                                                onClick={() => document.getElementById(`file-upload-${item.response_id}`)?.click()}
-                                              >
-                                                {officerFindings[item.response_id]?.imagePath ? (
-                                                  <div className="relative w-full h-full group">
-                                                    <img 
-                                                      src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/${officerFindings[item.response_id]?.imagePath}`}
-                                                      className="w-full h-full object-cover"
-                                                      alt="Finding proof"
-                                                    />
-                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                      <Camera className="h-5 w-5 text-white" />
-                                                    </div>
-                                                  </div>
+                                            <div className="flex gap-4 items-start">
+                                              <div className="flex-1 space-y-2">
+                                                {readonly ? (
+                                                  <OfficerDiscrepancyCard 
+                                                    note={officerFindings[item.response_id]?.note}
+                                                    officerName={item.officer_discrepancy?.officer_name}
+                                                    imagePath={officerFindings[item.response_id]?.imagePath}
+                                                    className="mx-0 mb-0" // Reset margins since it's already inside a container
+                                                  />
                                                 ) : (
-                                                  <>
-                                                    <ImagePlus className="h-6 w-6 text-muted-foreground mb-1" />
-                                                    <span className="text-[10px] text-muted-foreground font-medium">Foto Bukti</span>
-                                                  </>
+                                                  <Textarea
+                                                    placeholder="Berikan catatan ketidaksesuaian fisik yang ditemukan..."
+                                                    className="min-h-[80px] bg-white/50 border-destructive/20 focus-visible:ring-destructive text-sm"
+                                                    value={officerFindings[item.response_id]?.note ?? ''}
+                                                    onChange={(e) => handleUpdateNote(item.response_id, e.target.value)}
+                                                  />
                                                 )}
                                               </div>
-                                              <input 
-                                                type="file"
-                                                id={`file-upload-${item.response_id}`}
-                                                className="hidden"
-                                                accept="image/*"
-                                                onChange={(e) => {
-                                                  const file = e.target.files?.[0];
-                                                  if (file) handleUploadImage(item.response_id, file);
-                                                }}
-                                              />
-                                              {officerFindings[item.response_id]?.imagePath && (
-                                                <Button 
-                                                  variant="ghost" 
-                                                  size="icon" 
-                                                  className="h-6 w-6 text-destructive hover:bg-destructive/10"
-                                                  onClick={() => {
-                                                    setOfficerFindings(prev => {
-                                                      const current = prev[item.response_id];
-                                                      if (!current) return prev;
-                                                      return {
-                                                        ...prev,
-                                                        [item.response_id]: { ...current, imagePath: undefined }
-                                                      };
-                                                    });
-                                                  }}
-                                                >
-                                                  <Trash2 className="h-3.5 w-3.5" />
-                                                </Button>
+                                              
+                                              {!readonly && (
+                                                <div className="shrink-0 flex flex-col items-center gap-2">
+                                                  <div 
+                                                    className={`h-20 w-20 rounded-md border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden ${
+                                                      officerFindings[item.response_id]?.imagePath 
+                                                        ? 'border-emerald-500 bg-emerald-50' 
+                                                        : 'border-muted-foreground/30 hover:border-destructive hover:bg-destructive/5'
+                                                    }`}
+                                                    onClick={() => document.getElementById(`file-upload-${item.response_id}`)?.click()}
+                                                  >
+                                                    {officerFindings[item.response_id]?.imagePath ? (
+                                                      <div className="relative w-full h-full group">
+                                                        <img 
+                                                          src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/${officerFindings[item.response_id]?.imagePath}`}
+                                                          className="w-full h-full object-cover"
+                                                          alt="Finding proof"
+                                                        />
+                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                          <Camera className="h-5 w-5 text-white" />
+                                                        </div>
+                                                      </div>
+                                                    ) : (
+                                                      <>
+                                                        <ImagePlus className="h-6 w-6 text-muted-foreground mb-1" />
+                                                        <span className="text-[10px] text-muted-foreground font-medium">Foto Bukti</span>
+                                                      </>
+                                                    )}
+                                                  </div>
+                                                  <input 
+                                                    type="file"
+                                                    id={`file-upload-${item.response_id}`}
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    onChange={(e) => {
+                                                      const file = e.target.files?.[0];
+                                                      if (file) handleUploadImage(item.response_id, file);
+                                                    }}
+                                                  />
+                                                  {officerFindings[item.response_id]?.imagePath && (
+                                                    <Button 
+                                                      variant="ghost" 
+                                                      size="icon" 
+                                                      className="h-6 w-6 text-destructive hover:bg-destructive/10"
+                                                      onClick={() => {
+                                                        setOfficerFindings(prev => {
+                                                          const current = prev[item.response_id];
+                                                          if (!current) return prev;
+                                                          return {
+                                                            ...prev,
+                                                            [item.response_id]: { ...current, imagePath: undefined }
+                                                          };
+                                                        });
+                                                      }}
+                                                    >
+                                                      <Trash2 className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                  )}
+                                                </div>
                                               )}
                                             </div>
                                           </div>
                                         </div>
-                                      </div>
-                                    )}
+                                      )}
                                     </Fragment>
                                   ),
                                 )}

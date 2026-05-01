@@ -44,6 +44,7 @@ import { toast } from 'sonner';
 import { Separator } from '@/components/ui/separator';
 import { formatDateTime } from '@/lib/utils';
 import { StatusBadge } from '@/app/(dashboard)/components/status-badge';
+import { OfficerDiscrepancyCard } from '@/components/officer-discrepancy-card';
 
 interface CheckinData {
   id: string;
@@ -143,8 +144,23 @@ export function CheckoutSheet({
                   <Alert variant="destructive" className="border-2 border-rose-200 bg-rose-50/50">
                     <ShieldAlert className="h-4 w-4 text-rose-600" />
                     <AlertTitle className="text-rose-800 font-bold">Temuan Petugas Keamanan</AlertTitle>
-                    <AlertDescription className="text-rose-700">
-                      Terdapat {detailData.ops_officer_discrepancy.length} temuan ketidaksesuaian fisik yang dicatat oleh petugas saat verifikasi.
+                    <AlertDescription className="text-rose-700 text-xs">
+                      <p className="mb-2">Terdapat {detailData.ops_officer_discrepancy.length} temuan ketidaksesuaian fisik yang perlu ditinjau pada bagian:</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {detailData.checklist_responses?.map((cat: any) => {
+                          const count = cat.items.filter((item: any) => item.officer_discrepancy).length;
+                          if (count === 0) return null;
+                          return (
+                            <Badge 
+                              key={cat.category_name}
+                              className="text-[10px] px-2 py-0 h-5 border-none shadow-sm" 
+                              style={{ backgroundColor: cat.color_code || '#e11d48', color: 'white' }}
+                            >
+                              {cat.category_name}: {count}
+                            </Badge>
+                          );
+                        })}
+                      </div>
                     </AlertDescription>
                   </Alert>
                 )}
@@ -582,36 +598,11 @@ export function CheckoutSheet({
 
                                   {/* Officer Discrepancy Detail */}
                                   {item.officer_discrepancy && (
-                                    <div className="mx-4 mb-4 mt-0 p-3 rounded-md bg-rose-50 border border-rose-100 flex gap-4 items-start shadow-sm">
-                                      <div className="flex-1 space-y-1">
-                                        <div className="flex items-center gap-1.5 text-rose-700">
-                                          <ShieldAlert className="h-3.5 w-3.5" />
-                                          <span className="text-[10px] font-bold uppercase tracking-tight">Catatan Petugas</span>
-                                        </div>
-                                        <p className="text-xs text-rose-900 font-medium leading-relaxed italic">
-                                          &quot;{item.officer_discrepancy.officer_note || 'Tidak ada catatan spesifik.'}&quot;
-                                        </p>
-                                        <p className="text-[9px] text-muted-foreground pt-1">
-                                          Oleh: {item.officer_discrepancy.officer_name || 'Petugas'}
-                                        </p>
-                                      </div>
-
-                                      {item.officer_discrepancy.evidence_image_path && (
-                                        <div 
-                                          className="shrink-0 relative group h-16 w-16 rounded border-2 border-white shadow-sm overflow-hidden cursor-pointer"
-                                          onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/${item.officer_discrepancy.evidence_image_path}`, '_blank')}
-                                        >
-                                          <img 
-                                            src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/${item.officer_discrepancy.evidence_image_path}`} 
-                                            className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                                            alt="Discrepancy proof"
-                                          />
-                                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <Maximize2 className="h-4 w-4 text-white" />
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
+                                    <OfficerDiscrepancyCard 
+                                      note={item.officer_discrepancy.officer_note}
+                                      officerName={item.officer_discrepancy.officer_name}
+                                      imagePath={item.officer_discrepancy.evidence_image_path}
+                                    />
                                   )}
                                 </div>
                               ))}
