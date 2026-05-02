@@ -49,7 +49,8 @@ export const navData: NavData = {
           icon: LayoutDashboard,
           roles: [
             UserRole.SUPER_ADMIN,
-            UserRole.GROUP_LEADER,
+            UserRole.GROUP_HEAD,
+            UserRole.LINE_HEAD,
             UserRole.SECTION_HEAD,
           ],
         },
@@ -72,7 +73,8 @@ export const navData: NavData = {
           icon: SquareChartGantt,
           roles: [
             UserRole.SUPER_ADMIN,
-            UserRole.GROUP_LEADER,
+            UserRole.GROUP_HEAD,
+            UserRole.LINE_HEAD,
             UserRole.SECTION_HEAD,
           ],
         },
@@ -83,7 +85,8 @@ export const navData: NavData = {
           roles: [
             UserRole.SUPER_ADMIN,
             UserRole.WAREHOUSE_STAFF,
-            UserRole.GROUP_LEADER,
+            UserRole.GROUP_HEAD,
+            UserRole.LINE_HEAD,
             UserRole.SECTION_HEAD,
           ],
         },
@@ -100,7 +103,8 @@ export const navData: NavData = {
           icon: Tags,
           roles: [
             UserRole.SUPER_ADMIN,
-            UserRole.GROUP_LEADER,
+            UserRole.GROUP_HEAD,
+            UserRole.LINE_HEAD,
             UserRole.WAREHOUSE_STAFF,
           ],
         },
@@ -110,7 +114,8 @@ export const navData: NavData = {
           icon: Building2,
           roles: [
             UserRole.SUPER_ADMIN,
-            UserRole.GROUP_LEADER,
+            UserRole.GROUP_HEAD,
+            UserRole.LINE_HEAD,
             UserRole.SECTION_HEAD,
           ],
         },
@@ -120,7 +125,8 @@ export const navData: NavData = {
           icon: ClipboardCheck,
           roles: [
             UserRole.SUPER_ADMIN,
-            UserRole.GROUP_LEADER,
+            UserRole.GROUP_HEAD,
+            UserRole.LINE_HEAD,
             UserRole.WAREHOUSE_STAFF,
           ],
         },
@@ -130,7 +136,8 @@ export const navData: NavData = {
           icon: ClipboardCheck,
           roles: [
             UserRole.SUPER_ADMIN,
-            UserRole.GROUP_LEADER,
+            UserRole.GROUP_HEAD,
+            UserRole.LINE_HEAD,
             UserRole.WAREHOUSE_STAFF,
           ],
         },
@@ -147,7 +154,8 @@ export const navData: NavData = {
           icon: FileText,
           roles: [
             UserRole.SUPER_ADMIN,
-            UserRole.GROUP_LEADER,
+            UserRole.GROUP_HEAD,
+            UserRole.LINE_HEAD,
             UserRole.SECTION_HEAD,
           ],
         },
@@ -157,7 +165,8 @@ export const navData: NavData = {
           icon: FileText, // Using same icon for now
           roles: [
             UserRole.SUPER_ADMIN,
-            UserRole.GROUP_LEADER,
+            UserRole.GROUP_HEAD,
+            UserRole.LINE_HEAD,
             UserRole.SECTION_HEAD,
           ],
         },
@@ -167,7 +176,8 @@ export const navData: NavData = {
           icon: TrendingUp,
           roles: [
             UserRole.SUPER_ADMIN,
-            UserRole.GROUP_LEADER,
+            UserRole.GROUP_HEAD,
+            UserRole.LINE_HEAD,
             UserRole.SECTION_HEAD,
           ],
         },
@@ -184,7 +194,8 @@ export const navData: NavData = {
           icon: History,
           roles: [
             UserRole.SUPER_ADMIN,
-            UserRole.GROUP_LEADER,
+            UserRole.GROUP_HEAD,
+            UserRole.LINE_HEAD,
             UserRole.SECTION_HEAD,
           ],
         },
@@ -194,7 +205,8 @@ export const navData: NavData = {
           icon: Settings,
           roles: [
             UserRole.SUPER_ADMIN,
-            UserRole.GROUP_LEADER,
+            UserRole.GROUP_HEAD,
+            UserRole.LINE_HEAD,
             UserRole.WAREHOUSE_STAFF,
           ],
         },

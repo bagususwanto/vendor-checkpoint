@@ -1,8 +1,9 @@
 export enum UserRole {
   WAREHOUSE_STAFF = 'warehouse staff',
-  GROUP_LEADER = 'group leader',
+  GROUP_HEAD = 'group head',
   SECTION_HEAD = 'section head',
   SUPER_ADMIN = 'super admin',
+  LINE_HEAD = 'line head',
 }
 
 export enum QueueStatus {
@@ -91,4 +92,3 @@ export const DAY_OPTIONS = [
   { value: DayOfWeek.SATURDAY, label: DAY_NAMES[DayOfWeek.SATURDAY] },
   { value: DayOfWeek.SUNDAY, label: DAY_NAMES[DayOfWeek.SUNDAY] },
 ];
-
