@@ -9,6 +9,12 @@ import { FindVendorParamsDto } from './dto/find-vendor-params.dto';
 import { mst_vendor } from 'generated/prisma/client';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
+import * as https from 'https';
+
+// Agent untuk bypass validasi SSL (mengatasi error "unable to verify the first certificate")
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false,
+});
 
 interface ExternalVendor {
   supplierCode: string; // Mapped to vendor_code
@@ -85,6 +91,7 @@ export class VendorService {
     try {
       const resp$ = this.httpService.get(
         `${process.env.EXTERNAL_API_URL}/supplier-public`,
+        { httpsAgent },
       );
       const { data } = await lastValueFrom(resp$);
 

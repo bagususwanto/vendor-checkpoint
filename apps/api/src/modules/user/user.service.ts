@@ -8,6 +8,12 @@ import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { SyncResult } from '@repo/types';
 import { mst_user } from 'generated/prisma/client';
+import * as https from 'https';
+
+// Agent untuk bypass validasi SSL (mengatasi error "unable to verify the first certificate")
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false,
+});
 
 export interface ExternalUser {
   id: number;
@@ -45,6 +51,7 @@ export class UserService {
     try {
       const resp$ = this.httpService.get(
         `${process.env.EXTERNAL_API_URL}/user-public`,
+        { httpsAgent },
       );
       const { data } = await lastValueFrom(resp$);
 
