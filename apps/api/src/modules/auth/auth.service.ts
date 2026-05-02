@@ -35,7 +35,12 @@ export class AuthService {
         accessToken: response.data.accessToken,
         setCookieHeader,
       };
-    } catch (err) {
+    } catch (err: any) {
+      console.error('Login error:', {
+        status: err?.response?.status,
+        data: err?.response?.data,
+        message: err?.message,
+      });
       throw new UnauthorizedException('Invalid credentials');
     }
   }

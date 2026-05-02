@@ -57,6 +57,17 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // Jangan retry untuk endpoint auth itu sendiri
+    // (login gagal karena credentials salah, bukan karena token expired)
+    const url = originalRequest.url || '';
+    if (
+      url.includes('/auth/login') ||
+      url.includes('/auth/refresh') ||
+      url.includes('/auth/logout')
+    ) {
+      return Promise.reject(error);
+    }
+
     // If already refreshing, queue this request
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
