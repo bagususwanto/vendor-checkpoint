@@ -120,7 +120,13 @@ export class AuthController {
 
   // PROFILE -> protected route untuk debugging
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.WAREHOUSE_STAFF, UserRole.GROUP_LEADER, UserRole.SUPER_ADMIN)
+  @Roles(
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+    UserRole.SUPER_ADMIN,
+  )
   @Get('me')
   getProfile(@Req() req: any) {
     return req.user;
