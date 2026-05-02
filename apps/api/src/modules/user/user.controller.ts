@@ -5,6 +5,7 @@ import {
   Param,
   UseGuards,
   ParseIntPipe,
+  Headers,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -36,7 +37,7 @@ export class UserController {
       new_value: res,
     }),
   })
-  syncFromExternal() {
-    return this.userService.syncFromExternalApi();
+  syncFromExternal(@Headers('authorization') authHeader: string) {
+    return this.userService.syncFromExternalApi(authHeader);
   }
 }

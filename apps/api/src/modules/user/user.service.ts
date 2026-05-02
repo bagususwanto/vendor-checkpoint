@@ -47,11 +47,16 @@ export class UserService {
     return user;
   }
 
-  async syncFromExternalApi(): Promise<SyncResult> {
+  async syncFromExternalApi(token: string): Promise<SyncResult> {
     try {
       const resp$ = this.httpService.get(
         `${process.env.EXTERNAL_API_URL}/user-public`,
-        { httpsAgent },
+        {
+          httpsAgent,
+          headers: {
+            Authorization: token,
+          },
+        },
       );
       const { data } = await lastValueFrom(resp$);
 

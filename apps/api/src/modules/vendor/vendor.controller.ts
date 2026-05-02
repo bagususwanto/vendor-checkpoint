@@ -6,6 +6,7 @@ import {
   Query,
   UseGuards,
   ParseIntPipe,
+  Headers,
 } from '@nestjs/common';
 import { VendorService } from './vendor.service';
 import { FindVendorParamsDto } from './dto/find-vendor-params.dto';
@@ -41,7 +42,7 @@ export class VendorController {
       new_value: res,
     }),
   })
-  syncFromExternal() {
-    return this.vendorService.syncFromExternalApi();
+  syncFromExternal(@Headers('authorization') authHeader: string) {
+    return this.vendorService.syncFromExternalApi(authHeader);
   }
 }
