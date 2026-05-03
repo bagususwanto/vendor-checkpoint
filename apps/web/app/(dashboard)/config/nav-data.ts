@@ -58,7 +58,11 @@ export const navData: NavData = {
           title: 'Dasbor Petugas',
           url: '/portal/dashboard/staff',
           icon: LayoutDashboard,
-          roles: [UserRole.SUPER_ADMIN, UserRole.WAREHOUSE_STAFF],
+          roles: [
+            UserRole.SUPER_ADMIN,
+            UserRole.WAREHOUSE_STAFF,
+            UserRole.WAREHOUSE_MEMBER,
+          ],
         },
       ],
     },
@@ -85,6 +89,7 @@ export const navData: NavData = {
           roles: [
             UserRole.SUPER_ADMIN,
             UserRole.WAREHOUSE_STAFF,
+            UserRole.WAREHOUSE_MEMBER,
             UserRole.GROUP_HEAD,
             UserRole.LINE_HEAD,
             UserRole.SECTION_HEAD,
@@ -105,7 +110,6 @@ export const navData: NavData = {
             UserRole.SUPER_ADMIN,
             UserRole.GROUP_HEAD,
             UserRole.LINE_HEAD,
-            UserRole.WAREHOUSE_STAFF,
           ],
         },
         {
@@ -127,7 +131,6 @@ export const navData: NavData = {
             UserRole.SUPER_ADMIN,
             UserRole.GROUP_HEAD,
             UserRole.LINE_HEAD,
-            UserRole.WAREHOUSE_STAFF,
           ],
         },
         {
@@ -138,7 +141,6 @@ export const navData: NavData = {
             UserRole.SUPER_ADMIN,
             UserRole.GROUP_HEAD,
             UserRole.LINE_HEAD,
-            UserRole.WAREHOUSE_STAFF,
           ],
         },
       ],
@@ -207,7 +209,6 @@ export const navData: NavData = {
             UserRole.SUPER_ADMIN,
             UserRole.GROUP_HEAD,
             UserRole.LINE_HEAD,
-            UserRole.WAREHOUSE_STAFF,
           ],
         },
       ],

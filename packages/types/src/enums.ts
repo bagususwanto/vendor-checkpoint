@@ -1,5 +1,6 @@
 export enum UserRole {
   WAREHOUSE_STAFF = 'warehouse staff',
+  WAREHOUSE_MEMBER = 'warehouse member',
   GROUP_HEAD = 'group head',
   SECTION_HEAD = 'section head',
   SUPER_ADMIN = 'super admin',
