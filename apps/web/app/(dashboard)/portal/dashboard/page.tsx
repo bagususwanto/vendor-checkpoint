@@ -11,6 +11,7 @@ const ROLE_DASHBOARD_MAP: Record<string, string> = {
   [UserRole.GROUP_HEAD]: '/portal/dashboard/leader',
   [UserRole.LINE_HEAD]: '/portal/dashboard/leader',
   [UserRole.WAREHOUSE_STAFF]: '/portal/dashboard/staff',
+  [UserRole.WAREHOUSE_MEMBER]: '/portal/dashboard/staff',
   [UserRole.SECTION_HEAD]: '/portal/dashboard/leader',
   [UserRole.SUPER_ADMIN]: '/portal/dashboard/leader',
 };
