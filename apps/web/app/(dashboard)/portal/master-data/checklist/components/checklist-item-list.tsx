@@ -10,6 +10,8 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { ChecklistItemType } from '@repo/types';
 import { DeleteDialog } from '@/components/delete-dialog';
+import { cn } from '@/lib/utils';
+
 
 interface ChecklistItemListProps {
   items: ChecklistItemResponse[];
@@ -131,7 +133,10 @@ function ChecklistItem({
       value={item}
       dragListener={false}
       dragControls={dragControls}
-      className="flex items-center p-3 rounded-md border bg-muted/30"
+      className={cn(
+        'flex items-center p-3 rounded-md border bg-muted/30',
+        !item.is_active && 'opacity-60 grayscale-[0.5]'
+      )}
     >
       <div
         className="cursor-move mr-3 text-muted-foreground"
@@ -141,10 +146,26 @@ function ChecklistItem({
       </div>
 
       <div className="flex-1 flex items-center gap-2">
-        <span className="font-medium text-sm">{item.item_text}</span>
+        <span
+          className={cn(
+            'font-medium text-sm',
+            !item.is_active && 'text-muted-foreground'
+          )}
+        >
+          {item.item_text}
+        </span>
+        {!item.is_active && (
+          <Badge
+            variant="outline"
+            className="text-[10px] h-4 px-1 bg-muted text-muted-foreground border-muted-foreground/20"
+          >
+            Nonaktif
+          </Badge>
+        )}
         <Badge variant="outline" className="text-xs">
           {item.item_type}
         </Badge>
+
         {item.item_type === ChecklistItemType.KHUSUS &&
           item.material_category && (
             <Badge variant="secondary" className="text-xs bg-muted">

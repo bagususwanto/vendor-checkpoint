@@ -26,6 +26,9 @@ import { toast } from 'sonner';
 import { ChecklistItemDialog } from './checklist-item-dialog';
 import { ChecklistItemList } from './checklist-item-list';
 import { DeleteDialog } from '@/components/delete-dialog';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+
 
 interface ChecklistCategoryListProps {
   categories: ChecklistCategoryResponse[];
@@ -195,9 +198,13 @@ function ChecklistCategoryItem({
       value={category}
       dragListener={false}
       dragControls={dragControls}
-      className="mb-4 rounded-md border bg-secondary"
+      className={cn(
+        'mb-4 rounded-md border bg-secondary',
+        !category.is_active && 'opacity-75 grayscale-[0.3]'
+      )}
     >
       <div className="flex items-center p-4">
+
         <div
           className="cursor-move mr-4 text-muted-foreground"
           onPointerDown={(e) => dragControls.start(e)}
@@ -225,10 +232,26 @@ function ChecklistCategoryItem({
                   })()}
                 </div>
               )}
-              <span className="font-semibold">{category.category_name}</span>
+              <span
+                className={cn(
+                  'font-semibold',
+                  !category.is_active && 'text-muted-foreground'
+                )}
+              >
+                {category.category_name}
+              </span>
+              {!category.is_active && (
+                <Badge
+                  variant="outline"
+                  className="text-[10px] h-4 px-1 bg-muted text-muted-foreground border-muted-foreground/20"
+                >
+                  Nonaktif
+                </Badge>
+              )}
               <span className="text-xs text-muted-foreground ml-2">
                 ({category.mst_checklist_item?.length || 0} item)
               </span>
+
             </div>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="icon" onClick={onAddItem}>
