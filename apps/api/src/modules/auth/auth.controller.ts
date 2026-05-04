@@ -122,6 +122,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(
     UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
     UserRole.GROUP_HEAD,
     UserRole.LINE_HEAD,
     UserRole.SECTION_HEAD,
