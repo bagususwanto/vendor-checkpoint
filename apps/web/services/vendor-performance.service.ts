@@ -1,5 +1,5 @@
 import { axiosInstance } from '@/lib/axios';
-import { VendorPerformanceFilter } from '@repo/types';
+import { VendorPerformanceFilter, PaginatedResponse } from '@repo/types';
 
 export interface VendorRankingData {
   vendor_id: number;
@@ -38,11 +38,11 @@ export interface VendorDetailData {
 
 export const vendorPerformanceService = {
   getRanking: async (params: VendorPerformanceFilter) => {
-    const response = await axiosInstance.get<{ data: VendorRankingData[] }>(
+    const response = await axiosInstance.get<PaginatedResponse<VendorRankingData>>(
       '/vendor-performance/ranking',
       { params },
     );
-    return response.data.data;
+    return response.data;
   },
 
   getTrend: async (params: VendorPerformanceFilter) => {

@@ -19,6 +19,8 @@ export default function VendorPerformancePage() {
   const [granularity, setGranularity] = React.useState<'daily' | 'monthly' | 'yearly'>('daily');
   const [vendorCategoryId, setVendorCategoryId] = React.useState<string | undefined>(undefined);
   const [selectedVendorId, setSelectedVendorId] = React.useState<number | null>(null);
+  const [page, setPage] = React.useState(1);
+  const [limit, setLimit] = React.useState(10);
 
   const filter = React.useMemo<VendorPerformanceFilter>(() => {
     return {
@@ -26,8 +28,10 @@ export default function VendorPerformancePage() {
       dateTo: date?.to ? format(date.to, 'yyyy-MM-dd') : '',
       granularity,
       vendorCategoryId: vendorCategoryId ? parseInt(vendorCategoryId) : undefined,
+      page,
+      limit,
     };
-  }, [date, granularity, vendorCategoryId]);
+  }, [date, granularity, vendorCategoryId, page, limit]);
 
   const { data: trendData, isLoading: isTrendLoading } = useVendorTrend(filter);
   const { data: rankingData, isLoading: isRankingLoading } = useVendorRanking(filter);
@@ -70,8 +74,13 @@ export default function VendorPerformancePage() {
         />
         
         <VendorRankingTable 
-          data={rankingData} 
+          data={rankingData?.data} 
           isLoading={isRankingLoading} 
+          total={rankingData?.meta.total || 0}
+          page={page}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={setLimit}
           onVendorClick={(id) => setSelectedVendorId(id)}
         />
       </div>

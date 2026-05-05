@@ -32,6 +32,7 @@ export class VendorPerformanceService {
   }
 
   async getRanking(filter: VendorPerformanceFilterDto) {
+    const { page = 1, limit = 10 } = filter;
     const whereClause = this.buildWhereClause(filter);
 
     // Get all check-ins for the period
@@ -136,7 +137,22 @@ export class VendorPerformanceService {
     }));
 
     // Sort by on-time arrival rate descending
-    return result.sort((a, b) => b.on_time_arrival_rate - a.on_time_arrival_rate);
+    const sortedResult = result.sort((a, b) => b.on_time_arrival_rate - a.on_time_arrival_rate);
+    
+    const total = sortedResult.length;
+    const total_pages = Math.ceil(total / limit);
+    const start = (page - 1) * limit;
+    const paginatedData = sortedResult.slice(start, start + limit);
+
+    return {
+      data: paginatedData,
+      meta: {
+        total,
+        page,
+        limit,
+        total_pages,
+      },
+    };
   }
 
   async getTrend(filter: VendorPerformanceFilterDto) {

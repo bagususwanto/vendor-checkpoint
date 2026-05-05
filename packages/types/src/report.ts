@@ -28,6 +28,8 @@ export const vendorPerformanceFilterSchema = z.object({
   granularity: z.enum(['daily', 'monthly', 'yearly']).default('daily'),
   vendorId: z.coerce.number().optional(),
   vendorCategoryId: z.coerce.number().optional(),
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(100).default(10),
 });
 
 export type VendorPerformanceFilter = z.infer<typeof vendorPerformanceFilterSchema>;
