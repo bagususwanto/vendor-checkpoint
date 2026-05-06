@@ -80,6 +80,8 @@ export const navData: NavData = {
             UserRole.GROUP_HEAD,
             UserRole.LINE_HEAD,
             UserRole.SECTION_HEAD,
+            UserRole.WAREHOUSE_STAFF,
+            UserRole.WAREHOUSE_MEMBER,
           ],
         },
         {
