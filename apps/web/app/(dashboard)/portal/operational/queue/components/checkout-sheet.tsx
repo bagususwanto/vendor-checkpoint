@@ -427,84 +427,91 @@ export function CheckoutSheet({
                   Status Keberangkatan
                 </h4>
                 <Card className={cn(
-                  "p-4 border-2 transition-all",
+                  "border-2 transition-all overflow-hidden",
                   departureCheckMutation.isPending ? "bg-muted/30 animate-pulse border-muted" : 
                   detectedStatus === 'On-Time' ? "border-emerald-100 bg-emerald-50/30" : 
                   detectedStatus === 'Overdue' ? "border-rose-100 bg-rose-50/30" : "border-muted bg-muted/10"
                 )}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "p-2 rounded-full",
-                        departureCheckMutation.isPending ? "bg-muted text-muted-foreground" :
-                        detectedStatus === 'On-Time' ? "bg-emerald-100 text-emerald-600" : 
-                        detectedStatus === 'Overdue' ? "bg-rose-100 text-rose-600" : "bg-muted text-muted-foreground"
-                      )}>
-                        {detectedStatus === 'Overdue' ? <AlertTriangle className="h-5 w-5" /> : <Clock className="h-5 w-5" />}
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Departure Status</p>
-                        <p className={cn("text-lg font-bold", 
-                          detectedStatus === 'On-Time' ? "text-emerald-700" : 
-                          detectedStatus === 'Overdue' ? "text-rose-700" : "text-muted-foreground"
+                  <div className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "p-2 rounded-full",
+                          departureCheckMutation.isPending ? "bg-muted text-muted-foreground" :
+                          detectedStatus === 'On-Time' ? "bg-emerald-100 text-emerald-600" : 
+                          detectedStatus === 'Overdue' ? "bg-rose-100 text-rose-600" : "bg-muted text-muted-foreground"
                         )}>
-                          {departureCheckMutation.isPending ? 'Memeriksa...' : (detectedStatus || '-')}
-                        </p>
+                          {detectedStatus === 'Overdue' ? <AlertTriangle className="h-5 w-5" /> : <Clock className="h-5 w-5" />}
+                        </div>
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider text-[10px]">Departure Status</p>
+                          <p className={cn("text-lg font-bold leading-tight", 
+                            detectedStatus === 'On-Time' ? "text-emerald-700" : 
+                            detectedStatus === 'Overdue' ? "text-rose-700" : "text-muted-foreground"
+                          )}>
+                            {departureCheckMutation.isPending ? 'Memeriksa...' : (detectedStatus || '-')}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    {departureCheckMutation.isPending ? (
-                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                    ) : detectedStatus ? (
-                      <Badge
-                        variant={
-                          detectedStatus === 'On-Time'
-                            ? 'default'
+                      {departureCheckMutation.isPending ? (
+                        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                      ) : detectedStatus ? (
+                        <Badge
+                          variant={
+                            detectedStatus === 'On-Time'
+                              ? 'default'
+                              : detectedStatus === 'Unscheduled'
+                                ? 'outline'
+                                : 'destructive'
+                          }
+                        >
+                          {detectedStatus === 'On-Time'
+                            ? 'Sesuai Jadwal'
                             : detectedStatus === 'Unscheduled'
-                              ? 'outline'
-                              : 'destructive'
-                        }
-                      >
-                        {detectedStatus === 'On-Time'
-                          ? 'Sesuai Jadwal'
-                          : detectedStatus === 'Unscheduled'
-                            ? 'Tanpa Jadwal'
-                            : 'Terlambat Keluar'}
-                      </Badge>
-                    ) : null}
-                  </div>
-                </Card>
+                              ? 'Tanpa Jadwal'
+                              : 'Terlambat Keluar'}
+                        </Badge>
+                      ) : null}
+                    </div>
 
-                {detectedStatus === 'Overdue' && (
-                  <div className="mt-4 space-y-2">
-                    <Label htmlFor="delayReason" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Pilih Alasan Keterlambatan <span className="text-rose-500">*</span>
-                    </Label>
-                    <Select
-                      value={delayReasonId}
-                      onValueChange={setDelayReasonId}
-                    >
-                      <SelectTrigger id="delayReason" className="w-full">
-                        <SelectValue placeholder="--- Pilih Alasan ---" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {delayReasons?.data?.map((reason: any) => (
-                          <SelectItem
-                            key={reason.delay_reason_id}
-                            value={reason.delay_reason_id.toString()}
+                    {detectedStatus === 'Overdue' && (
+                      <div className="mt-4 pt-4 border-t border-rose-200/50 space-y-3">
+                        <div className="space-y-2">
+                          <Label htmlFor="delayReason" className="text-[10px] font-bold uppercase tracking-wider text-rose-800">
+                            Pilih Alasan Keterlambatan <span className="text-rose-500">*</span>
+                          </Label>
+                          <Select
+                            value={delayReasonId}
+                            onValueChange={setDelayReasonId}
                           >
-                            {reason.reason_text}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {detailData.arrival_status === 'Late' && (
-                      <p className="text-[10px] text-amber-600 font-medium bg-amber-50 p-2 rounded border border-amber-100 flex items-center gap-1.5 mt-2 animate-in fade-in slide-in-from-top-1">
-                        <AlertTriangle className="h-3 w-3" />
-                        Saran: Vendor ini tercatat datang terlambat, Anda dapat memilih alasan "Akumulasi Keterlambatan Kedatangan".
-                      </p>
+                            <SelectTrigger id="delayReason" className="w-full bg-white/50 border-rose-200 focus:ring-rose-500">
+                              <SelectValue placeholder="--- Pilih Alasan ---" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {delayReasons?.data?.map((reason: any) => (
+                                <SelectItem
+                                  key={reason.delay_reason_id}
+                                  value={reason.delay_reason_id.toString()}
+                                >
+                                  {reason.reason_text}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        {detailData.arrival_status === 'Late' && (
+                          <div className="text-[10px] text-amber-700 font-medium bg-amber-100/50 p-2.5 rounded-md border border-amber-200/50 flex items-start gap-2 animate-in fade-in slide-in-from-top-1">
+                            <AlertTriangle className="h-3 w-3 shrink-0 mt-0.5" />
+                            <p>
+                              <span className="font-bold">Saran:</span> Vendor ini tercatat datang terlambat, Anda dapat memilih alasan <span className="underline italic">"Akumulasi Keterlambatan Kedatangan"</span>.
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
-                )}
+                </Card>
               </div>
 
               {/* Log Waktu Section */}
