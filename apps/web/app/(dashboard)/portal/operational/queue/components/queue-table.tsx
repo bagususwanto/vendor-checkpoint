@@ -68,7 +68,6 @@ export function QueueTable({
             <TableHead>No. Antrean</TableHead>
             <TableHead>Perusahaan</TableHead>
             <TableHead>Driver</TableHead>
-            <TableHead>DN / PO</TableHead>
             <TableHead>Kedatangan</TableHead>
             <TableHead>AI APD</TableHead>
             <TableHead>Waktu</TableHead>
@@ -95,14 +94,15 @@ export function QueueTable({
                 <TableCell className="font-medium">
                   {checkin.queue_number}
                 </TableCell>
-                <TableCell>{checkin.snapshot_company_name}</TableCell>
-                <TableCell>{checkin.driver_name}</TableCell>
                 <TableCell>
-                  <div className="flex flex-col text-xs space-y-1">
-                    <span className="font-semibold">{checkin.dn_number || '-'}</span>
-                    <span className="text-muted-foreground">{checkin.po_number || '-'}</span>
+                  <div className="flex flex-col">
+                    <span className="font-medium text-sm">{checkin.snapshot_company_name}</span>
+                    <span className="text-[10px] font-mono text-muted-foreground bg-muted/50 w-fit px-1 rounded mt-0.5">
+                      {checkin.mst_vendor?.vendor_code || '-'}
+                    </span>
                   </div>
                 </TableCell>
+                <TableCell>{checkin.driver_name}</TableCell>
                 <TableCell>
                   {checkin.arrival_status ? (
                     <Badge variant={

@@ -578,6 +578,11 @@ export class CheckInService {
           po_number: true,
           arrival_status: true,
           ai_safety_status: true,
+          mst_vendor: {
+            select: {
+              vendor_code: true,
+            },
+          },
           ops_timelog: {
             select: {
               departure_status: true,
