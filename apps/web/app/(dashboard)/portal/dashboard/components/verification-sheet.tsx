@@ -388,6 +388,11 @@ export function VerificationSheet({
                           ) : (
                             '-'
                           )}
+                          {detailData.arrival_status === 'Late' && detailData.delay_arrival_reason?.reason_text && (
+                            <p className="text-[10px] text-destructive mt-1.5 font-semibold leading-tight italic">
+                              "{detailData.delay_arrival_reason.reason_text}"
+                            </p>
+                          )}
                         </div>
                       </Card>
 
@@ -414,6 +419,11 @@ export function VerificationSheet({
                           ) : (
                             <p className="text-xs text-muted-foreground italic mt-1">
                               Belum Check-out
+                            </p>
+                          )}
+                          {detailData.ops_timelog?.departure_status === 'Late' && detailData.ops_timelog?.delay_departure_reason?.reason_text && (
+                            <p className="text-[10px] text-destructive mt-1.5 font-semibold leading-tight italic">
+                              "{detailData.ops_timelog.delay_departure_reason.reason_text}"
                             </p>
                           )}
                         </div>

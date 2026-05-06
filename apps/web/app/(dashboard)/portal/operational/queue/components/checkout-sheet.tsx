@@ -279,31 +279,36 @@ export function CheckoutSheet({
                   </Card>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <Card className="p-4 shadow-sm h-full">
-                      <div className="space-y-1">
-                        <p className="text-xs font-medium text-muted-foreground">
-                          Arrival Status
-                        </p>
-                        {detailData.arrival_status ? (
-                          <Badge
-                            variant={
-                              detailData.arrival_status === 'Late'
-                                ? 'destructive'
-                                : detailData.arrival_status === 'Early'
-                                  ? 'secondary'
-                                  : detailData.arrival_status === 'Unscheduled'
-                                    ? 'outline'
-                                    : 'default'
-                            }
-                            className="mt-1"
-                          >
-                            {detailData.arrival_status}
-                          </Badge>
-                        ) : (
-                          '-'
-                        )}
-                      </div>
-                    </Card>
+                      <Card className="p-4 shadow-sm h-full">
+                        <div className="space-y-1">
+                          <p className="text-xs font-medium text-muted-foreground">
+                            Arrival Status
+                          </p>
+                          {detailData.arrival_status ? (
+                            <Badge
+                              variant={
+                                detailData.arrival_status === 'Late'
+                                  ? 'destructive'
+                                  : detailData.arrival_status === 'Early'
+                                    ? 'secondary'
+                                    : detailData.arrival_status === 'Unscheduled'
+                                      ? 'outline'
+                                      : 'default'
+                              }
+                              className="mt-1"
+                            >
+                              {detailData.arrival_status}
+                            </Badge>
+                          ) : (
+                            '-'
+                          )}
+                          {detailData.arrival_status === 'Late' && detailData.delay_arrival_reason?.reason_text && (
+                            <p className="text-[10px] text-destructive mt-1.5 font-semibold leading-tight italic">
+                              "{detailData.delay_arrival_reason.reason_text}"
+                            </p>
+                          )}
+                        </div>
+                      </Card>
 
                     <Card className="p-4 shadow-sm h-full">
                       <div className="space-y-1">

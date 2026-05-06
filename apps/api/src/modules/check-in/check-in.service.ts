@@ -621,6 +621,11 @@ export class CheckInService {
         current_status: true,
         has_non_compliant_items: true,
         non_compliant_count: true,
+        delay_arrival_reason: {
+          select: {
+            reason_text: true,
+          },
+        },
         ops_timelog: {
           select: {
             checkin_time: true,
@@ -628,7 +633,11 @@ export class CheckInService {
             duration_minutes: true,
             is_checked_out: true,
             departure_status: true,
-            delay_departure_reason_id: true,
+            delay_departure_reason: {
+              select: {
+                reason_text: true,
+              },
+            },
             user: {
               select: {
                 full_name: true,
