@@ -69,6 +69,7 @@ export function QueueTable({
             <TableHead>Perusahaan</TableHead>
             <TableHead>Driver</TableHead>
             <TableHead>Kedatangan</TableHead>
+            <TableHead>Keberangkatan</TableHead>
             <TableHead>AI APD</TableHead>
             <TableHead>Waktu</TableHead>
             <TableHead>Status</TableHead>
@@ -78,13 +79,13 @@ export function QueueTable({
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-4">
+              <TableCell colSpan={10} className="text-center py-4">
                 Loading...
               </TableCell>
             </TableRow>
           ) : checkins.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-4">
+              <TableCell colSpan={10} className="text-center py-4">
                 Tidak ada data ditemukan
               </TableCell>
             </TableRow>
@@ -112,6 +113,17 @@ export function QueueTable({
                       'default'
                     }>
                       {checkin.arrival_status}
+                    </Badge>
+                  ) : '-'}
+                </TableCell>
+                <TableCell>
+                  {checkin.ops_timelog?.departure_status ? (
+                    <Badge variant={
+                      checkin.ops_timelog.departure_status === 'Late' ? 'destructive' : 
+                      checkin.ops_timelog.departure_status === 'Unscheduled' ? 'outline' : 
+                      'default'
+                    }>
+                      {checkin.ops_timelog.departure_status}
                     </Badge>
                   ) : '-'}
                 </TableCell>
