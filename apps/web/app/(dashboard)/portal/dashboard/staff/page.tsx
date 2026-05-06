@@ -24,13 +24,13 @@ export default function StaffDashboardPage() {
               <span>{formatDateTime(today, 'EEEE, dd MMMM yyyy')}</span>
             </div>
           </div>
-          {stats && (
+          {/* {stats && (
             <Badge variant={stats.verification_mode ? 'default' : 'secondary'}>
               {stats.verification_mode
                 ? 'Mode Verifikasi Staff'
                 : 'Mode Self-Service'}
             </Badge>
-          )}
+          )} */}
         </div>
         {/* <Separator /> */}
         <StatsCard />
