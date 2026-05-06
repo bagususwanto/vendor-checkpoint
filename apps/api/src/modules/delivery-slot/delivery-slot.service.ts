@@ -81,77 +81,61 @@ export class DeliverySlotService {
   }
 
   async findTodayMonitor() {
-    // Gunakan UTC untuk konsistensi dengan SlotGeneratorJob
+    // 1. Dapatkan waktu Jakarta saat ini
     const now = new Date();
-
-    // Cari data untuk "Hari Ini" dalam format UTC YYYY-MM-DD
-    const startOfTodayUtc = new Date(
-      Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0),
-    );
-    const endOfTodayUtc = new Date(
-      Date.UTC(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        23,
-        59,
-        59,
-        999,
-      ),
-    );
-
-    // Opsi B: Gunakan juga waktu lokal Jakarta jika UTC tidak menemukan hasil (mencakup pergantian hari)
     const jakartaTime = new Date(
       now.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }),
     );
-    const startOfJakarta = new Date(jakartaTime);
-    startOfJakarta.setHours(0, 0, 0, 0);
-    const endOfJakarta = new Date(jakartaTime);
-    endOfJakarta.setHours(23, 59, 59, 999);
+
+    // 2. Tentukan Tanggal Operasional (Shift Logic)
+    // Jika jam sekarang < 07:00 pagi WIB, maka masih dianggap hari operasional sebelumnya
+    const operationalDate = new Date(jakartaTime);
+    if (jakartaTime.getHours() < 7) {
+      operationalDate.setDate(jakartaTime.getDate() - 1);
+    }
+
+    // Buat rentang waktu untuk tanggal operasional tersebut (00:00:00 - 23:59:59)
+    // Karena kolom expected_date di DB adalah DATE, kita cukup bandingkan dengan tanggal tersebut
+    const targetDate = new Date(
+      Date.UTC(
+        operationalDate.getFullYear(),
+        operationalDate.getMonth(),
+        operationalDate.getDate(),
+      ),
+    );
 
     const slots = await this.prisma.ops_delivery_slot.findMany({
       where: {
-        OR: [
-          {
-            expected_date: {
-              gte: startOfTodayUtc,
-              lte: endOfTodayUtc,
-            },
-          },
-          {
-            expected_date: {
-              gte: startOfJakarta,
-              lte: endOfJakarta,
-            },
-          },
-        ],
+        expected_date: targetDate,
       },
       include: {
         schedule: {
-          include: { vendor: { include: { vendor_category: true } } },
+          include: {
+            vendor: {
+              include: {
+                vendor_category: true,
+              },
+            },
+          },
         },
         ops_checkin_entry: {
           orderBy: { submission_time: 'desc' },
           take: 1,
-          include: { ops_timelog: true },
+          include: {
+            ops_timelog: true,
+          },
         },
       },
     });
 
-    // Custom sort to handle shift logic: 00:00 - 06:59 is considered the end of the operational day
+    // 3. Custom sort untuk menangani logika shift saat display
+    // Jam 00:00 - 06:59 diletakkan di akhir urutan hari operasional
     slots.sort((a, b) => {
-      // First sort by expected_date
-      const dateA = a.expected_date.getTime();
-      const dateB = b.expected_date.getTime();
-      if (dateA !== dateB) return dateA - dateB;
-
-      // Then sort by arrival_time with shift logic (times < 07:00 moved to end of day)
       const getSortValue = (timeStr?: string | null) => {
         if (!timeStr) return 0;
-        const parts = timeStr.split(':').map(Number);
-        const h = parts[0] ?? 0;
-        const m = parts[1] ?? 0;
-        return h < 7 ? (h + 24) * 60 + m : h * 60 + m;
+        const [h, m] = timeStr.split(':').map(Number);
+        // Jika jam < 7, tambahkan 24 jam agar berada di akhir daftar hari operasional
+        return h < 7 ? (h + 24) * 60 + (m || 0) : h * 60 + (m || 0);
       };
 
       return (
