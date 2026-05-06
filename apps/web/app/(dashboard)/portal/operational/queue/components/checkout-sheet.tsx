@@ -39,10 +39,12 @@ import { useState } from 'react';
 import {
   useCheckoutCheckIn,
   useVerificationDetail,
+  useDepartureCheck,
 } from '@/hooks/api/use-check-in';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { Separator } from '@/components/ui/separator';
-import { formatDateTime } from '@/lib/utils';
+import { formatDateTime, cn } from '@/lib/utils';
 import { StatusBadge } from '@/app/(dashboard)/components/status-badge';
 import { OfficerDiscrepancyCard } from '@/components/officer-discrepancy-card';
 
@@ -68,15 +70,32 @@ export function CheckoutSheet({
 }: CheckoutSheetProps) {
   const [open, setOpen] = useState(false);
   const checkoutMutation = useCheckoutCheckIn();
+  const departureCheckMutation = useDepartureCheck();
+  const [detectedStatus, setDetectedStatus] = useState<'On-Time' | 'Overdue' | null>(null);
 
   // Fetch detail data
   const { data: detailData, isLoading } = useVerificationDetail(
     open ? checkin.id : '',
   );
 
+  useEffect(() => {
+    if (open && checkin.id) {
+      departureCheckMutation.mutate(checkin.id, {
+        onSuccess: (data) => {
+          setDetectedStatus(data.departure_status);
+        },
+      });
+    } else if (!open) {
+      setDetectedStatus(null);
+    }
+  }, [open, checkin.id]);
+
   const handleCheckout = () => {
     checkoutMutation.mutate(
-      { queue_number: checkin.id },
+      { 
+        queue_number: checkin.id,
+        departure_status: detectedStatus || undefined
+      },
       {
         onSuccess: () => {
           toast.success('Checkout Berhasil', {
@@ -376,6 +395,48 @@ export function CheckoutSheet({
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* Status Keberangkatan Section */}
+              <div>
+                <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
+                  Status Keberangkatan
+                </h4>
+                <Card className={cn(
+                  "p-4 border-2 transition-all",
+                  departureCheckMutation.isPending ? "bg-muted/30 animate-pulse border-muted" : 
+                  detectedStatus === 'On-Time' ? "border-emerald-100 bg-emerald-50/30" : 
+                  detectedStatus === 'Overdue' ? "border-rose-100 bg-rose-50/30" : "border-muted bg-muted/10"
+                )}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "p-2 rounded-full",
+                        departureCheckMutation.isPending ? "bg-muted text-muted-foreground" :
+                        detectedStatus === 'On-Time' ? "bg-emerald-100 text-emerald-600" : 
+                        detectedStatus === 'Overdue' ? "bg-rose-100 text-rose-600" : "bg-muted text-muted-foreground"
+                      )}>
+                        {detectedStatus === 'Overdue' ? <AlertTriangle className="h-5 w-5" /> : <Clock className="h-5 w-5" />}
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Departure Status</p>
+                        <p className={cn("text-lg font-bold", 
+                          detectedStatus === 'On-Time' ? "text-emerald-700" : 
+                          detectedStatus === 'Overdue' ? "text-rose-700" : "text-muted-foreground"
+                        )}>
+                          {departureCheckMutation.isPending ? 'Memeriksa...' : (detectedStatus || '-')}
+                        </p>
+                      </div>
+                    </div>
+                    {departureCheckMutation.isPending ? (
+                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    ) : detectedStatus ? (
+                      <Badge variant={detectedStatus === 'On-Time' ? 'default' : 'destructive'}>
+                        {detectedStatus === 'On-Time' ? 'Sesuai Jadwal' : 'Terlambat Keluar'}
+                      </Badge>
+                    ) : null}
+                  </div>
+                </Card>
               </div>
 
               {/* Log Waktu Section */}

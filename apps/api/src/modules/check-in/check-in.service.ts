@@ -319,13 +319,6 @@ export class CheckInService {
   async checkDepartureStatus(queueNumber: string) {
     const dateNow = new Date();
 
-    const bufferConfig = await this.systemConfigService.findByConfigKey(
-      'ARRIVAL_BUFFER_MINUTES', // Fallback to Arrival Buffer if Departure buffer doesn't exist
-    );
-    const bufferMinutes = bufferConfig
-      ? parseInt(bufferConfig.config_value)
-      : 30;
-
     const entry = await this.prisma.ops_checkin_entry.findUnique({
       where: { queue_number: queueNumber },
       include: {
@@ -341,33 +334,18 @@ export class CheckInService {
       throw new BadRequestException('Nomor antrean tidak ditemukan');
     }
 
-    const actualTimeStr = dateNow.toLocaleTimeString('en-GB', {
-      timeZone: 'Asia/Jakarta',
-      hour12: false,
-    }).substring(0, 5);
+    const actualTimeStr = dateNow
+      .toLocaleTimeString('en-GB', {
+        timeZone: 'Asia/Jakarta',
+        hour12: false,
+      })
+      .substring(0, 5);
 
-    if (!entry.delivery_slot) {
-      return {
-        departure_status: 'On-Time',
-        actual_time: actualTimeStr,
-        planned_departure_time: null,
-      };
-    }
-
-    const plannedDepartureStr = entry.delivery_slot.schedule.departure_time; // HH:mm
-    const plannedDate = getPlannedDateTime(entry.delivery_slot.expected_date, plannedDepartureStr);
-
-    const diffMs = dateNow.getTime() - plannedDate.getTime();
-    const diffMinutes = Math.floor(diffMs / 60000);
-
-    let status: 'On-Time' | 'Overdue' = 'On-Time';
-    if (diffMinutes > bufferMinutes) {
-      status = 'Overdue';
-    }
+    const status = await this.calculateDepartureStatusInternal(entry, dateNow);
 
     return {
       departure_status: status,
-      planned_departure_time: plannedDepartureStr,
+      planned_departure_time: entry.delivery_slot?.schedule?.departure_time || null,
       actual_time: actualTimeStr,
     };
   }
@@ -869,11 +847,12 @@ export class CheckInService {
       // 1. Find and validate entry
       const entry = await tx.ops_checkin_entry.findUnique({
         where: { queue_number },
-        select: {
-          entry_id: true,
-          current_status: true,
-          driver_name: true,
-          snapshot_company_name: true,
+        include: {
+          delivery_slot: {
+            include: {
+              schedule: true,
+            },
+          },
           ops_timelog: {
             select: {
               timelog_id: true,
@@ -921,6 +900,10 @@ export class CheckInService {
       );
 
       // 4. Update ops_timelog
+      const departureStatus =
+        checkoutDto.departure_status ||
+        (await this.calculateDepartureStatusInternal(entry, checkoutTime));
+
       await tx.ops_timelog.update({
         where: { timelog_id: entry.ops_timelog.timelog_id },
         data: {
@@ -928,7 +911,7 @@ export class CheckInService {
           checkout_by_user_id: localUserId,
           is_checked_out: true,
           duration_minutes: durationMinutes,
-          departure_status: checkoutDto.departure_status,
+          departure_status: departureStatus,
           delay_departure_reason_id: checkoutDto.delay_departure_reason_id,
           updated_at: checkoutTime,
         },
@@ -1479,5 +1462,29 @@ export class CheckInService {
         scan_time: scanTime,
       },
     });
+  }
+
+  private async calculateDepartureStatusInternal(entry: any, dateNow: Date) {
+    const bufferConfig = await this.systemConfigService.findByConfigKey(
+      'ARRIVAL_BUFFER_MINUTES', // Fallback to Arrival Buffer if Departure buffer doesn't exist
+    );
+    const bufferMinutes = bufferConfig
+      ? parseInt(bufferConfig.config_value)
+      : 30;
+
+    if (!entry.delivery_slot) {
+      return 'On-Time';
+    }
+
+    const plannedDepartureStr = entry.delivery_slot.schedule.departure_time; // HH:mm
+    const plannedDate = getPlannedDateTime(
+      entry.delivery_slot.expected_date,
+      plannedDepartureStr,
+    );
+
+    const diffMs = dateNow.getTime() - plannedDate.getTime();
+    const diffMinutes = Math.floor(diffMs / 60000);
+
+    return diffMinutes > bufferMinutes ? 'Overdue' : 'On-Time';
   }
 }
