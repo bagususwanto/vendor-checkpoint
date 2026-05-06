@@ -168,6 +168,7 @@ async function seedDelayReasons() {
       { category: 'Departure', reason_text: 'Proses Bongkar/Muat Lama' },
       { category: 'Departure', reason_text: 'Menunggu Surat Jalan / Dokumen' },
       { category: 'Departure', reason_text: 'Kendala Internal Pabrik' },
+      { category: 'Departure', reason_text: 'Akumulasi Keterlambatan Kedatangan' },
     ],
   });
 }

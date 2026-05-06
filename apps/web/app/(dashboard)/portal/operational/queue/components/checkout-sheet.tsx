@@ -41,6 +41,15 @@ import {
   useVerificationDetail,
   useDepartureCheck,
 } from '@/hooks/api/use-check-in';
+import { useDelayReasons } from '@/hooks/api/use-delay-reasons';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { Separator } from '@/components/ui/separator';
@@ -72,6 +81,12 @@ export function CheckoutSheet({
   const checkoutMutation = useCheckoutCheckIn();
   const departureCheckMutation = useDepartureCheck();
   const [detectedStatus, setDetectedStatus] = useState<'On-Time' | 'Overdue' | 'Unscheduled' | null>(null);
+  const [delayReasonId, setDelayReasonId] = useState<string>('');
+
+  const { data: delayReasons } = useDelayReasons({
+    category: 'Departure',
+    isActive: true,
+  });
 
   // Fetch detail data
   const { data: detailData, isLoading } = useVerificationDetail(
@@ -87,14 +102,23 @@ export function CheckoutSheet({
       });
     } else if (!open) {
       setDetectedStatus(null);
+      setDelayReasonId('');
     }
   }, [open, checkin.id]);
 
   const handleCheckout = () => {
+    if (detectedStatus === 'Overdue' && !delayReasonId) {
+      toast.error('Alasan Diperlukan', {
+        description: 'Mohon pilih alasan keterlambatan keberangkatan.',
+      });
+      return;
+    }
+
     checkoutMutation.mutate(
       { 
         queue_number: checkin.id,
-        departure_status: detectedStatus || undefined
+        departure_status: detectedStatus || undefined,
+        delay_departure_reason_id: delayReasonId ? parseInt(delayReasonId) : undefined
       },
       {
         onSuccess: () => {
@@ -449,6 +473,38 @@ export function CheckoutSheet({
                     ) : null}
                   </div>
                 </Card>
+
+                {detectedStatus === 'Overdue' && (
+                  <div className="mt-4 space-y-2">
+                    <Label htmlFor="delayReason" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Pilih Alasan Keterlambatan <span className="text-rose-500">*</span>
+                    </Label>
+                    <Select
+                      value={delayReasonId}
+                      onValueChange={setDelayReasonId}
+                    >
+                      <SelectTrigger id="delayReason" className="w-full">
+                        <SelectValue placeholder="--- Pilih Alasan ---" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {delayReasons?.data?.map((reason: any) => (
+                          <SelectItem
+                            key={reason.delay_reason_id}
+                            value={reason.delay_reason_id.toString()}
+                          >
+                            {reason.reason_text}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {detailData.arrival_status === 'Late' && (
+                      <p className="text-[10px] text-amber-600 font-medium bg-amber-50 p-2 rounded border border-amber-100 flex items-center gap-1.5 mt-2 animate-in fade-in slide-in-from-top-1">
+                        <AlertTriangle className="h-3 w-3" />
+                        Saran: Vendor ini tercatat datang terlambat, Anda dapat memilih alasan "Akumulasi Keterlambatan Kedatangan".
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Log Waktu Section */}
