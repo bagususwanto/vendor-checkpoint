@@ -394,6 +394,31 @@ export function VerificationSheet({
                       <Card className="p-4 shadow-sm h-full">
                         <div className="space-y-1">
                           <p className="text-xs font-medium text-muted-foreground">
+                            Departure Status
+                          </p>
+                          {detailData.ops_timelog?.departure_status ? (
+                            <Badge
+                              variant={
+                                detailData.ops_timelog.departure_status ===
+                                'Overdue'
+                                  ? 'destructive'
+                                  : 'default'
+                              }
+                              className="mt-1"
+                            >
+                              {detailData.ops_timelog.departure_status}
+                            </Badge>
+                          ) : (
+                            <p className="text-xs text-muted-foreground italic mt-1">
+                              Belum Check-out
+                            </p>
+                          )}
+                        </div>
+                      </Card>
+
+                      <Card className="p-4 shadow-sm h-full col-span-2">
+                        <div className="space-y-1">
+                          <p className="text-xs font-medium text-muted-foreground">
                             AI Verification
                           </p>
                           {detailData.ai_safety_status ? (
