@@ -284,8 +284,11 @@ export function VerificationSheet({
                           <p className="text-xs font-medium text-muted-foreground">
                             Perusahaan
                           </p>
-                          <p className="font-semibold text-base">
+                          <p className="font-semibold text-base leading-tight">
                             {detailData.snapshot_company_name}
+                          </p>
+                          <p className="text-[10px] font-mono text-muted-foreground bg-muted/50 w-fit px-1 rounded">
+                            {detailData.mst_vendor?.vendor_code || '-'}
                           </p>
                         </div>
                       </div>

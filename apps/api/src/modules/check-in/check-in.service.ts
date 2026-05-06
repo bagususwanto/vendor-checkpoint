@@ -626,6 +626,11 @@ export class CheckInService {
         current_status: true,
         has_non_compliant_items: true,
         non_compliant_count: true,
+        mst_vendor: {
+          select: {
+            vendor_code: true,
+          },
+        },
         delay_arrival_reason: {
           select: {
             reason_text: true,
