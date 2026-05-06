@@ -5,6 +5,7 @@ import { formatDateTime } from '@/lib/utils';
 import { Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useDashboardStats } from '@/hooks/api/use-dashboard';
+import { StatsCard } from '../components/stats-card';
 
 export default function StaffDashboardPage() {
   const today = new Date();
@@ -32,6 +33,7 @@ export default function StaffDashboardPage() {
           )}
         </div>
         {/* <Separator /> */}
+        <StatsCard />
         <RecentCheckinsTable />
       </div>
     </div>
