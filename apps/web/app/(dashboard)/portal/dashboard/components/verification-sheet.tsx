@@ -400,7 +400,7 @@ export function VerificationSheet({
                             <Badge
                               variant={
                                 detailData.ops_timelog.departure_status ===
-                                'Overdue'
+                                'Late'
                                   ? 'destructive'
                                   : detailData.ops_timelog.departure_status ===
                                       'Unscheduled'

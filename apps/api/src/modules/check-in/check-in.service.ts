@@ -1485,6 +1485,6 @@ export class CheckInService {
     const diffMs = dateNow.getTime() - plannedDate.getTime();
     const diffMinutes = Math.floor(diffMs / 60000);
 
-    return diffMinutes > bufferMinutes ? 'Overdue' : 'On-Time';
+    return diffMinutes > bufferMinutes ? 'Late' : 'On-Time';
   }
 }

@@ -80,7 +80,7 @@ export function CheckoutSheet({
   const [open, setOpen] = useState(false);
   const checkoutMutation = useCheckoutCheckIn();
   const departureCheckMutation = useDepartureCheck();
-  const [detectedStatus, setDetectedStatus] = useState<'On-Time' | 'Overdue' | 'Unscheduled' | null>(null);
+  const [detectedStatus, setDetectedStatus] = useState<'On-Time' | 'Late' | 'Unscheduled' | null>(null);
   const [delayReasonId, setDelayReasonId] = useState<string>('');
 
   const { data: delayReasons } = useDelayReasons({
@@ -107,7 +107,7 @@ export function CheckoutSheet({
   }, [open, checkin.id]);
 
   const handleCheckout = () => {
-    if (detectedStatus === 'Overdue' && !delayReasonId) {
+    if (detectedStatus === 'Late' && !delayReasonId) {
       toast.error('Alasan Diperlukan', {
         description: 'Mohon pilih alasan keterlambatan keberangkatan.',
       });
@@ -430,7 +430,7 @@ export function CheckoutSheet({
                   "border-2 transition-all overflow-hidden",
                   departureCheckMutation.isPending ? "bg-muted/30 animate-pulse border-muted" : 
                   detectedStatus === 'On-Time' ? "border-emerald-100 bg-emerald-50/30" : 
-                  detectedStatus === 'Overdue' ? "border-rose-100 bg-rose-50/30" : "border-muted bg-muted/10"
+                  detectedStatus === 'Late' ? "border-rose-100 bg-rose-50/30" : "border-muted bg-muted/10"
                 )}>
                   <div className="p-4">
                     <div className="flex items-center justify-between">
@@ -439,15 +439,15 @@ export function CheckoutSheet({
                           "p-2 rounded-full",
                           departureCheckMutation.isPending ? "bg-muted text-muted-foreground" :
                           detectedStatus === 'On-Time' ? "bg-emerald-100 text-emerald-600" : 
-                          detectedStatus === 'Overdue' ? "bg-rose-100 text-rose-600" : "bg-muted text-muted-foreground"
+                          detectedStatus === 'Late' ? "bg-rose-100 text-rose-600" : "bg-muted text-muted-foreground"
                         )}>
-                          {detectedStatus === 'Overdue' ? <AlertTriangle className="h-5 w-5" /> : <Clock className="h-5 w-5" />}
+                          {detectedStatus === 'Late' ? <AlertTriangle className="h-5 w-5" /> : <Clock className="h-5 w-5" />}
                         </div>
                         <div>
                           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider text-[10px]">Departure Status</p>
                           <p className={cn("text-lg font-bold leading-tight", 
                             detectedStatus === 'On-Time' ? "text-emerald-700" : 
-                            detectedStatus === 'Overdue' ? "text-rose-700" : "text-muted-foreground"
+                            detectedStatus === 'Late' ? "text-rose-700" : "text-muted-foreground"
                           )}>
                             {departureCheckMutation.isPending ? 'Memeriksa...' : (detectedStatus || '-')}
                           </p>
@@ -465,16 +465,12 @@ export function CheckoutSheet({
                                 : 'destructive'
                           }
                         >
-                          {detectedStatus === 'On-Time'
-                            ? 'Sesuai Jadwal'
-                            : detectedStatus === 'Unscheduled'
-                              ? 'Tanpa Jadwal'
-                              : 'Terlambat Keluar'}
+                          {detectedStatus}
                         </Badge>
                       ) : null}
                     </div>
 
-                    {detectedStatus === 'Overdue' && (
+                    {detectedStatus === 'Late' && (
                       <div className="mt-4 pt-4 border-t border-rose-200/50 space-y-3">
                         <div className="space-y-2">
                           <Label htmlFor="delayReason" className="text-[10px] font-bold uppercase tracking-wider text-rose-800">
