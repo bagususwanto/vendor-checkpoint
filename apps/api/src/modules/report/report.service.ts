@@ -689,6 +689,28 @@ export class ReportService {
           this.formatDateTime(entry.submission_time),
         ]);
       });
+
+      // AI PPE Non-Compliance
+      if (entry.ops_ppe_scan && !entry.ops_ppe_scan.is_compliant) {
+        const details = [];
+        if (!entry.ops_ppe_scan.has_hardhat) details.push('Helm');
+        if (!entry.ops_ppe_scan.has_safety_vest) details.push('Rompi');
+        const ppeDetail = `Tidak menggunakan: ${details.join(' & ')}`;
+
+        rowNum++;
+        sheet.addRow([
+          rowNum,
+          entry.queue_number,
+          entry.snapshot_company_name,
+          entry.driver_name,
+          entry.snapshot_category_name,
+          'AI Safety Scan',
+          'Kelengkapan APD (AI Scan)',
+          ppeDetail,
+          'System AI',
+          this.formatDateTime(entry.submission_time),
+        ]);
+      }
     });
 
     // If no non-compliant items
