@@ -102,7 +102,10 @@ export class VendorPerformanceService {
       }
 
       if (entry.ops_timelog) {
-        if (entry.ops_timelog.is_checked_out) {
+        if (
+          entry.ops_timelog.is_checked_out &&
+          entry.ops_timelog.departure_status !== 'Unscheduled'
+        ) {
           stats.total_checkouts++;
           if (entry.ops_timelog.departure_status === 'On-Time') {
             stats.on_time_departures++;
@@ -275,9 +278,14 @@ export class VendorPerformanceService {
       if (!entry.has_non_compliant_items) compliantCheckins++;
       
       if (entry.ops_timelog) {
-        if (entry.ops_timelog.is_checked_out) {
+        if (
+          entry.ops_timelog.is_checked_out &&
+          entry.ops_timelog.departure_status !== 'Unscheduled'
+        ) {
           totalCheckouts++;
-          if (entry.ops_timelog.departure_status === 'On-Time') onTimeDepartures++;
+          if (entry.ops_timelog.departure_status === 'On-Time') {
+            onTimeDepartures++;
+          }
         }
         if (entry.ops_timelog.duration_minutes !== null) {
           totalLeadTime += entry.ops_timelog.duration_minutes;

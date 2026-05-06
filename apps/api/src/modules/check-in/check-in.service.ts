@@ -1473,7 +1473,7 @@ export class CheckInService {
       : 30;
 
     if (!entry.delivery_slot) {
-      return 'On-Time';
+      return 'Unscheduled';
     }
 
     const plannedDepartureStr = entry.delivery_slot.schedule.departure_time; // HH:mm

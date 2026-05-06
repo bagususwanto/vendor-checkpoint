@@ -402,7 +402,10 @@ export function VerificationSheet({
                                 detailData.ops_timelog.departure_status ===
                                 'Overdue'
                                   ? 'destructive'
-                                  : 'default'
+                                  : detailData.ops_timelog.departure_status ===
+                                      'Unscheduled'
+                                    ? 'outline'
+                                    : 'default'
                               }
                               className="mt-1"
                             >

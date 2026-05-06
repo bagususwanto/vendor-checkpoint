@@ -71,7 +71,7 @@ export function CheckoutSheet({
   const [open, setOpen] = useState(false);
   const checkoutMutation = useCheckoutCheckIn();
   const departureCheckMutation = useDepartureCheck();
-  const [detectedStatus, setDetectedStatus] = useState<'On-Time' | 'Overdue' | null>(null);
+  const [detectedStatus, setDetectedStatus] = useState<'On-Time' | 'Overdue' | 'Unscheduled' | null>(null);
 
   // Fetch detail data
   const { data: detailData, isLoading } = useVerificationDetail(
@@ -431,8 +431,20 @@ export function CheckoutSheet({
                     {departureCheckMutation.isPending ? (
                       <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                     ) : detectedStatus ? (
-                      <Badge variant={detectedStatus === 'On-Time' ? 'default' : 'destructive'}>
-                        {detectedStatus === 'On-Time' ? 'Sesuai Jadwal' : 'Terlambat Keluar'}
+                      <Badge
+                        variant={
+                          detectedStatus === 'On-Time'
+                            ? 'default'
+                            : detectedStatus === 'Unscheduled'
+                              ? 'outline'
+                              : 'destructive'
+                        }
+                      >
+                        {detectedStatus === 'On-Time'
+                          ? 'Sesuai Jadwal'
+                          : detectedStatus === 'Unscheduled'
+                            ? 'Tanpa Jadwal'
+                            : 'Terlambat Keluar'}
                       </Badge>
                     ) : null}
                   </div>
