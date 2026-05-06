@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Users } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatDateTime } from '@/lib/utils';
 
 interface UnscheduledSheetProps {
   open: boolean;
@@ -142,16 +142,14 @@ export function UnscheduledSheet({
                         </div>
                       </TableCell>
                       <TableCell className="py-4 text-center">
-                        <div className="flex items-center justify-center gap-1 font-mono text-xs font-bold text-primary">
-                          <Clock className="w-3 h-3 opacity-40" />
-                          {new Date(item.submission_time).toLocaleTimeString(
-                            'id-ID',
-                            {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: false,
-                            },
-                          )}
+                        <div className="flex flex-col items-center justify-center gap-0.5 font-mono">
+                          <div className="flex items-center gap-1 text-xs font-bold text-primary">
+                            <Clock className="w-3 h-3 opacity-40" />
+                            {formatDateTime(item.submission_time, 'HH:mm')}
+                          </div>
+                          <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-tight">
+                            {formatDateTime(item.submission_time, 'dd MMM yyyy')}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell className="py-4 text-right">
