@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -32,8 +33,12 @@ interface CheckinListProps {
   status: string;
 }
 
+import { RecentCheckinsPagination } from './recent-checkins-pagination';
+
 export function CheckinList({ status }: CheckinListProps) {
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(5);
 
   // Fetch refresh interval from system config
   const { data: refreshConfig } = useSystemConfigByKey('REFRESH_INTERVAL_MS');
@@ -42,8 +47,8 @@ export function CheckinList({ status }: CheckinListProps) {
     : 10000; // Default 10 seconds
 
   const { data, isLoading } = useVerificationList(
-    1,
-    5,
+    page,
+    limit,
     undefined,
     {
       start_date: format(new Date(), 'yyyy-MM-dd'),
@@ -60,7 +65,8 @@ export function CheckinList({ status }: CheckinListProps) {
   };
 
   return (
-    <Table>
+    <>
+      <Table>
       <TableHeader>
         <TableRow>
           <TableHead>No. Antrean</TableHead>
@@ -194,5 +200,13 @@ export function CheckinList({ status }: CheckinListProps) {
         )}
       </TableBody>
     </Table>
-  );
+    <RecentCheckinsPagination
+      total={data?.meta?.total || 0}
+      page={page}
+      limit={limit}
+      onPageChange={setPage}
+      onLimitChange={setLimit}
+    />
+  </>
+);
 }
