@@ -46,6 +46,10 @@ export class VendorPerformanceService {
             is_checked_out: true,
           },
         },
+        ops_performance_adjustment: {
+          orderBy: { created_at: 'desc' },
+          take: 1,
+        },
       },
     });
 
@@ -93,11 +97,15 @@ export class VendorPerformanceService {
       const stats = vendorStats.get(entry.vendor_id);
       stats.total_checkins++;
       
-      if (entry.arrival_status === 'On-Time') {
+      const adjustment = entry.ops_performance_adjustment?.[0];
+      const arrivalStatus = adjustment?.adjusted_arrival_status ?? entry.arrival_status;
+      const hasNonCompliant = adjustment?.override_has_non_compliant ?? entry.has_non_compliant_items;
+      
+      if (arrivalStatus === 'On-Time') {
         stats.on_time_arrivals++;
       }
 
-      if (!entry.has_non_compliant_items) {
+      if (!hasNonCompliant) {
         stats.compliant_checkins++;
       }
 
@@ -107,7 +115,8 @@ export class VendorPerformanceService {
           entry.ops_timelog.departure_status !== 'Unscheduled'
         ) {
           stats.total_checkouts++;
-          if (entry.ops_timelog.departure_status === 'On-Time') {
+          const departureStatus = adjustment?.adjusted_departure_status ?? entry.ops_timelog.departure_status;
+          if (departureStatus === 'On-Time') {
             stats.on_time_departures++;
           }
         }
@@ -171,6 +180,10 @@ export class VendorPerformanceService {
             is_checked_out: true,
           },
         },
+        ops_performance_adjustment: {
+          orderBy: { created_at: 'desc' },
+          take: 1,
+        },
       },
     });
 
@@ -204,18 +217,23 @@ export class VendorPerformanceService {
       const stats = trendMap.get(key);
       stats.total_checkins++;
       
-      if (entry.arrival_status === 'On-Time') {
+      const adjustment = entry.ops_performance_adjustment?.[0];
+      const arrivalStatus = adjustment?.adjusted_arrival_status ?? entry.arrival_status;
+      const hasNonCompliant = adjustment?.override_has_non_compliant ?? entry.has_non_compliant_items;
+
+      if (arrivalStatus === 'On-Time') {
         stats.on_time_arrivals++;
       }
 
-      if (!entry.has_non_compliant_items) {
+      if (!hasNonCompliant) {
         stats.compliant_checkins++;
       }
 
       if (entry.ops_timelog) {
         if (entry.ops_timelog.is_checked_out) {
           stats.total_checkouts++;
-          if (entry.ops_timelog.departure_status === 'On-Time') {
+          const departureStatus = adjustment?.adjusted_departure_status ?? entry.ops_timelog.departure_status;
+          if (departureStatus === 'On-Time') {
             stats.on_time_departures++;
           }
         }
@@ -244,6 +262,10 @@ export class VendorPerformanceService {
         where: whereClause,
         include: {
           ops_timelog: true,
+          ops_performance_adjustment: {
+            orderBy: { created_at: 'desc' },
+            take: 1,
+          },
         },
       }),
       this.prisma.ops_delivery_slot.count({
@@ -274,8 +296,12 @@ export class VendorPerformanceService {
     let leadTimeCount = 0;
 
     entries.forEach((entry) => {
-      if (entry.arrival_status === 'On-Time') onTimeArrivals++;
-      if (!entry.has_non_compliant_items) compliantCheckins++;
+      const adjustment = (entry as any).ops_performance_adjustment?.[0];
+      const arrivalStatus = adjustment?.adjusted_arrival_status ?? entry.arrival_status;
+      const hasNonCompliant = adjustment?.override_has_non_compliant ?? entry.has_non_compliant_items;
+
+      if (arrivalStatus === 'On-Time') onTimeArrivals++;
+      if (!hasNonCompliant) compliantCheckins++;
       
       if (entry.ops_timelog) {
         if (
@@ -283,7 +309,8 @@ export class VendorPerformanceService {
           entry.ops_timelog.departure_status !== 'Unscheduled'
         ) {
           totalCheckouts++;
-          if (entry.ops_timelog.departure_status === 'On-Time') {
+          const departureStatus = adjustment?.adjusted_departure_status ?? entry.ops_timelog.departure_status;
+          if (departureStatus === 'On-Time') {
             onTimeDepartures++;
           }
         }

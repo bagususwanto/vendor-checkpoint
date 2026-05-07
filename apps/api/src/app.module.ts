@@ -19,6 +19,7 @@ import { VendorScheduleModule } from './modules/vendor-schedule/vendor-schedule.
 import { DeliverySlotModule } from './modules/delivery-slot/delivery-slot.module';
 import { SchedulerModule } from './modules/scheduler/scheduler.module';
 import { VendorPerformanceModule } from './modules/vendor-performance/vendor-performance.module';
+import { PerformanceAdjustmentModule } from './modules/performance-adjustment/performance-adjustment.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { VendorPerformanceModule } from './modules/vendor-performance/vendor-per
     DeliverySlotModule,
     SchedulerModule,
     VendorPerformanceModule,
+    PerformanceAdjustmentModule,
   ],
   controllers: [AppController],
   providers: [
