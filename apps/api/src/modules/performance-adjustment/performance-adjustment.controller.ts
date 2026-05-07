@@ -30,7 +30,7 @@ export class PerformanceAdjustmentController {
     @Body(new ZodValidationPipe(CreateAdjustmentDto)) dto: CreateAdjustmentDto,
     @Req() req: any,
   ) {
-    return this.service.create(dto, req.user.sub || req.user.user_id);
+    return this.service.create(dto, req.user.userId);
   }
 
   @Get()
@@ -56,6 +56,6 @@ export class PerformanceAdjustmentController {
   @Delete(':id')
   @Roles(UserRole.SUPER_ADMIN, UserRole.SECTION_HEAD)
   async remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
-    return this.service.remove(id, req.user.sub || req.user.user_id);
+    return this.service.remove(id, req.user.userId);
   }
 }

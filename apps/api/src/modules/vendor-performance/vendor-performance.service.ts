@@ -100,6 +100,8 @@ export class VendorPerformanceService {
       const adjustment = entry.ops_performance_adjustment?.[0];
       const arrivalStatus = adjustment?.adjusted_arrival_status ?? entry.arrival_status;
       const hasNonCompliant = adjustment?.override_has_non_compliant ?? entry.has_non_compliant_items;
+      const departureStatus = adjustment?.adjusted_departure_status ?? entry.ops_timelog?.departure_status;
+      const isCheckedOut = !!adjustment?.adjusted_departure_status || entry.ops_timelog?.is_checked_out;
       
       if (arrivalStatus === 'On-Time') {
         stats.on_time_arrivals++;
@@ -109,21 +111,16 @@ export class VendorPerformanceService {
         stats.compliant_checkins++;
       }
 
-      if (entry.ops_timelog) {
-        if (
-          entry.ops_timelog.is_checked_out &&
-          entry.ops_timelog.departure_status !== 'Unscheduled'
-        ) {
-          stats.total_checkouts++;
-          const departureStatus = adjustment?.adjusted_departure_status ?? entry.ops_timelog.departure_status;
-          if (departureStatus === 'On-Time') {
-            stats.on_time_departures++;
-          }
+      if (isCheckedOut && departureStatus && departureStatus !== 'Unscheduled') {
+        stats.total_checkouts++;
+        if (departureStatus === 'On-Time') {
+          stats.on_time_departures++;
         }
-        if (entry.ops_timelog.duration_minutes !== null) {
-          stats.total_lead_time += entry.ops_timelog.duration_minutes;
-          stats.lead_time_count++;
-        }
+      }
+
+      if (entry.ops_timelog?.duration_minutes !== null && entry.ops_timelog?.duration_minutes !== undefined) {
+        stats.total_lead_time += entry.ops_timelog.duration_minutes;
+        stats.lead_time_count++;
       }
     });
 
@@ -220,6 +217,8 @@ export class VendorPerformanceService {
       const adjustment = entry.ops_performance_adjustment?.[0];
       const arrivalStatus = adjustment?.adjusted_arrival_status ?? entry.arrival_status;
       const hasNonCompliant = adjustment?.override_has_non_compliant ?? entry.has_non_compliant_items;
+      const departureStatus = adjustment?.adjusted_departure_status ?? entry.ops_timelog?.departure_status;
+      const isCheckedOut = !!adjustment?.adjusted_departure_status || entry.ops_timelog?.is_checked_out;
 
       if (arrivalStatus === 'On-Time') {
         stats.on_time_arrivals++;
@@ -229,18 +228,16 @@ export class VendorPerformanceService {
         stats.compliant_checkins++;
       }
 
-      if (entry.ops_timelog) {
-        if (entry.ops_timelog.is_checked_out) {
-          stats.total_checkouts++;
-          const departureStatus = adjustment?.adjusted_departure_status ?? entry.ops_timelog.departure_status;
-          if (departureStatus === 'On-Time') {
-            stats.on_time_departures++;
-          }
+      if (isCheckedOut && departureStatus && departureStatus !== 'Unscheduled') {
+        stats.total_checkouts++;
+        if (departureStatus === 'On-Time') {
+          stats.on_time_departures++;
         }
-        if (entry.ops_timelog.duration_minutes !== null) {
-          stats.total_lead_time += entry.ops_timelog.duration_minutes;
-          stats.lead_time_count++;
-        }
+      }
+
+      if (entry.ops_timelog?.duration_minutes !== null && entry.ops_timelog?.duration_minutes !== undefined) {
+        stats.total_lead_time += entry.ops_timelog.duration_minutes;
+        stats.lead_time_count++;
       }
     });
 
@@ -299,25 +296,22 @@ export class VendorPerformanceService {
       const adjustment = (entry as any).ops_performance_adjustment?.[0];
       const arrivalStatus = adjustment?.adjusted_arrival_status ?? entry.arrival_status;
       const hasNonCompliant = adjustment?.override_has_non_compliant ?? entry.has_non_compliant_items;
+      const departureStatus = adjustment?.adjusted_departure_status ?? entry.ops_timelog?.departure_status;
+      const isCheckedOut = !!adjustment?.adjusted_departure_status || entry.ops_timelog?.is_checked_out;
 
       if (arrivalStatus === 'On-Time') onTimeArrivals++;
       if (!hasNonCompliant) compliantCheckins++;
       
-      if (entry.ops_timelog) {
-        if (
-          entry.ops_timelog.is_checked_out &&
-          entry.ops_timelog.departure_status !== 'Unscheduled'
-        ) {
-          totalCheckouts++;
-          const departureStatus = adjustment?.adjusted_departure_status ?? entry.ops_timelog.departure_status;
-          if (departureStatus === 'On-Time') {
-            onTimeDepartures++;
-          }
+      if (isCheckedOut && departureStatus && departureStatus !== 'Unscheduled') {
+        totalCheckouts++;
+        if (departureStatus === 'On-Time') {
+          onTimeDepartures++;
         }
-        if (entry.ops_timelog.duration_minutes !== null) {
-          totalLeadTime += entry.ops_timelog.duration_minutes;
-          leadTimeCount++;
-        }
+      }
+
+      if (entry.ops_timelog?.duration_minutes !== null && entry.ops_timelog?.duration_minutes !== undefined) {
+        totalLeadTime += entry.ops_timelog.duration_minutes;
+        leadTimeCount++;
       }
     });
 
