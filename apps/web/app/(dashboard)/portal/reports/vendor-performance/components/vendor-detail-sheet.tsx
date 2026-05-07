@@ -76,7 +76,7 @@ export function VendorDetailSheet({
   return (
     <>
       <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <SheetContent className="sm:max-w-[600px] overflow-y-auto p-0">
+        <SheetContent className="sm:max-w-[800px] overflow-y-auto p-0">
           <div className="p-6">
             <SheetHeader className="pb-6 p-0">
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
