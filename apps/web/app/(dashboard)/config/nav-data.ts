@@ -122,7 +122,6 @@ export const navData: NavData = {
             UserRole.SUPER_ADMIN,
             UserRole.GROUP_HEAD,
             UserRole.LINE_HEAD,
-            UserRole.SECTION_HEAD,
           ],
         },
         {
