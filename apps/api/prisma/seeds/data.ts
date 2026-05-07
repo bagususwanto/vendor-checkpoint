@@ -134,7 +134,7 @@ export const GENERAL_CHECKLIST_ITEMS = [
   {
     category_code: 'ENVI',
     item_code: 'ENVI-GEN-001',
-    item_text: 'Apakah kendaraan tidak menghasilkan asap berlebih?',
+    item_text: 'Apakah emisi gas buang kendaraan dalam kondisi normal (bebas asap pekat)?',
     item_type: 'UMUM',
     display_order: 1,
   },
@@ -158,7 +158,7 @@ export const SPECIFIC_CHECKLIST_ITEMS = [
   {
     category_code: 'SAFE',
     item_code: 'SAFE-CHEM-001',
-    item_text: 'Apakah drum dalam kondisi tidak penyok atau bocor?',
+    item_text: 'Apakah drum dalam kondisi baik (tidak penyok atau bocor)?',
     item_type: 'KHUSUS',
     material_category_code: 'CHEM',
     display_order: 1,
@@ -230,7 +230,8 @@ export const SPECIFIC_CHECKLIST_ITEMS = [
   {
     category_code: 'QUAL',
     item_code: 'QUAL-SPT-001',
-    item_text: 'Apakah komponen tidak berkarat atau rusak?',
+    item_text:
+      'Apakah komponen dalam kondisi baik (tidak berkarat atau rusak)?',
     item_type: 'KHUSUS',
     material_category_code: 'SPT',
     display_order: 1,
