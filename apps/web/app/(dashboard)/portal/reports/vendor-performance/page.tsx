@@ -12,8 +12,12 @@ import { useVendorRanking, useVendorTrend } from '@/hooks/api/use-vendor-perform
 import { VendorPerformanceFilter } from '@repo/types';
 import { RoleGuard } from '@/components/auth/role-guard';
 import { UserRole } from '@repo/types';
+import { Button } from '@/components/ui/button';
+import { History } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function VendorPerformancePage() {
+  const router = useRouter();
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: addDays(new Date(), -30),
     to: new Date(),
@@ -63,6 +67,19 @@ export default function VendorPerformancePage() {
             <p className="text-muted-foreground">
               Analisis performa vendor berdasarkan tingkat ketepatan waktu dan kepatuhan
             </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {(UserRole.SUPER_ADMIN === UserRole.SUPER_ADMIN) && ( // Role check is handled by UI visibility or simply allow all who can see this page to see the button
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => router.push('/portal/reports/vendor-performance/adjustments')}
+                className="h-9"
+              >
+                <History className="mr-2 h-4 w-4" />
+                Adjustment Logs
+              </Button>
+            )}
           </div>
         </div>
         <Separator />
