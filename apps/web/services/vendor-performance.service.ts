@@ -40,6 +40,7 @@ export interface VendorDetailData {
     avg_lead_time: number;
     missed_cycles: number;
   };
+  entries: any[];
 }
 
 export const vendorPerformanceService = {
