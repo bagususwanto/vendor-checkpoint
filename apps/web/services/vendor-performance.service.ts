@@ -1,5 +1,11 @@
 import { axiosInstance } from '@/lib/axios';
-import { VendorPerformanceFilter, PaginatedResponse } from '@repo/types';
+import { 
+  VendorPerformanceFilter, 
+  PaginatedResponse, 
+  CreateAdjustmentPayload,
+  PerformanceAdjustment,
+  AdjustmentFilter
+} from '@repo/types';
 
 export interface VendorRankingData {
   vendor_id: number;
@@ -59,5 +65,32 @@ export const vendorPerformanceService = {
       { params },
     );
     return response.data.data;
+  },
+
+  createAdjustment: async (payload: CreateAdjustmentPayload) => {
+    const response = await axiosInstance.post<PerformanceAdjustment>(
+      '/performance-adjustment',
+      payload,
+    );
+    return response.data;
+  },
+
+  getAdjustments: async (params: AdjustmentFilter) => {
+    const response = await axiosInstance.get<PaginatedResponse<PerformanceAdjustment>>(
+      '/performance-adjustment',
+      { params },
+    );
+    return response.data;
+  },
+
+  getAdjustmentByEntryId: async (entryId: number) => {
+    const response = await axiosInstance.get<PerformanceAdjustment | null>(
+      `/performance-adjustment/entry/${entryId}`,
+    );
+    return response.data;
+  },
+
+  deleteAdjustment: async (id: number) => {
+    await axiosInstance.delete(`/performance-adjustment/${id}`);
   },
 };
