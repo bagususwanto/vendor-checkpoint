@@ -25,10 +25,8 @@ export default function CheckInStep4() {
     step1Data,
     ppeData,
     step2Data,
-    successData,
     checklistCategories,
     setSuccessData,
-    resetFormData,
   } = useChecklistStore();
   const router = useRouter();
   const { mutateAsync: submitCheckIn } = useSubmitCheckIn();
@@ -38,13 +36,6 @@ export default function CheckInStep4() {
   const isApdEnabled = apdConfig?.config_value !== 'false';
 
   useEffect(() => {
-    // If successData exists, it means we just submitted successfully.
-    // Redirect to success page immediately to avoid race conditions.
-    if (successData) {
-      router.replace('/check-in/success');
-      return;
-    }
-
     if (!step1Data || !checklistCategories) {
       router.replace('/check-in/step-1');
       return;
@@ -58,7 +49,7 @@ export default function CheckInStep4() {
     if (!step2Data) {
       router.replace('/check-in/step-3');
     }
-  }, [step1Data, ppeData, step2Data, successData, router, checklistCategories]);
+  }, [step1Data, ppeData, step2Data, router, checklistCategories]);
 
   const handleSubmit = async () => {
     if (!step1Data || !step2Data) {
@@ -134,13 +125,13 @@ export default function CheckInStep4() {
       toast.success('Check-in Berhasil', {
         description: 'Data Anda telah berhasil dikirim.',
       });
-      resetFormData();
       router.replace('/check-in/success');
     } catch (error) {
       console.error('Error submitting check-in:', error);
       toast.error('Gagal mengirim data', {
         description: 'Terjadi kesalahan saat mengirim data. Silakan coba lagi.',
       });
+    } finally {
       setIsProcessing(false);
     }
   };

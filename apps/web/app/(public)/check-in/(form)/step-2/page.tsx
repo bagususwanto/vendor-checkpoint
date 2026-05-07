@@ -118,6 +118,7 @@ export default function CheckInStep2() {
         });
       }
     } catch (error) {
+      setCapturedImage(null);
       toast.error('Gagal Melakukan Scan', {
         description:
           'Terjadi kesalahan saat memindai. Pastikan APD API sudah berjalan.',
@@ -220,7 +221,7 @@ export default function CheckInStep2() {
             type="button"
             className="w-1/2 h-12 sm:h-14 text-sm sm:text-base"
             onClick={handleContinue}
-            disabled={!complianceResult}
+            disabled={!complianceResult || isDetecting}
           >
             Lanjut
             <CircleArrowRight className="ml-1 sm:ml-2 h-5 w-5 sm:h-6 sm:w-6" />
