@@ -217,12 +217,12 @@ export function VendorDetailSheet({
                       History Check-in
                     </h3>
                     <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase font-bold tracking-tighter">
-                      Last {detail.entries.length} Entries
+                      Last {detail.entries?.length || 0} Entries
                     </span>
                   </div>
 
                   <div className="space-y-3">
-                    {detail.entries.length === 0 ? (
+                    {!detail.entries || detail.entries.length === 0 ? (
                       <div className="text-center py-6 text-xs text-muted-foreground border rounded-lg border-dashed">
                         Belum ada riwayat check-in untuk periode ini.
                       </div>
