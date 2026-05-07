@@ -43,15 +43,7 @@ export class ChecklistController {
     return this.checklistService.createCategory(dto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(
-    UserRole.SUPER_ADMIN,
-    UserRole.GROUP_HEAD,
-    UserRole.LINE_HEAD,
-    UserRole.SECTION_HEAD,
-    UserRole.WAREHOUSE_STAFF,
-    UserRole.WAREHOUSE_MEMBER,
-  )
+  // PUBLIC - Bisa diakses tanpa autentikasi (digunakan di form check-in)
   @Get('categories')
   findAllCategories() {
     return this.checklistService.findAllCategories();

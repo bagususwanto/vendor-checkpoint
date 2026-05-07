@@ -51,15 +51,7 @@ export class VendorCategoryController {
     return this.vendorCategoryService.getSelection();
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(
-    UserRole.SUPER_ADMIN,
-    UserRole.GROUP_HEAD,
-    UserRole.LINE_HEAD,
-    UserRole.SECTION_HEAD,
-    UserRole.WAREHOUSE_STAFF,
-    UserRole.WAREHOUSE_MEMBER,
-  )
+  // PUBLIC - Digunakan oleh form check-in publik (tanpa autentikasi)
   @Get()
   findAll(@Query() query: PaginatedParamsDto) {
     return this.vendorCategoryService.findAll(query);
