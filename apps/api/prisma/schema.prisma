@@ -155,6 +155,7 @@ model mst_user {
   log_audit         log_audit[]
   log_report_export log_report_export[]
   ops_officer_discrepancy ops_officer_discrepancy[]
+  ops_performance_adjustment ops_performance_adjustment[]
 
   @@index([external_user_id], name: "idx_mst_user_external_user_id")
 }
@@ -194,6 +195,7 @@ model ops_checkin_entry {
   ops_ppe_scan         ops_ppe_scan?
   log_audit            log_audit[]
   ops_officer_discrepancy ops_officer_discrepancy[]
+  ops_performance_adjustment ops_performance_adjustment[]
 
   @@index([queue_number], name: "idx_ops_checkin_entry_queue_number")
   @@index([current_status, submission_time], name: "idx_ops_checkin_entry_status_time")
@@ -359,4 +361,34 @@ model ops_officer_discrepancy {
   user  mst_user          @relation(fields: [marked_by_user_id], references: [user_id])
 
   @@index([entry_id], name: "idx_ops_officer_discrepancy_entry_id")
+}
+
+model ops_performance_adjustment {
+  adjustment_id       Int      @id @default(autoincrement())
+  entry_id            Int
+  adjusted_by_user_id Int
+  
+  original_arrival_status    String?  @db.VarChar(50)
+  adjusted_arrival_status    String?  @db.VarChar(50)
+  
+  original_ai_safety_status  String?  @db.VarChar(50)
+  adjusted_ai_safety_status  String?  @db.VarChar(50)
+  
+  original_ppe_compliant     Boolean?
+  adjusted_ppe_compliant     Boolean?
+  
+  original_departure_status  String?  @db.VarChar(50)
+  adjusted_departure_status   String?  @db.VarChar(50)
+  
+  override_has_non_compliant Boolean?
+  
+  adjustment_reason   String   @db.Text
+  created_at          DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+  updated_at          DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
+
+  entry              ops_checkin_entry @relation(fields: [entry_id], references: [entry_id], onDelete: NoAction, onUpdate: NoAction)
+  adjusted_by_user   mst_user          @relation(fields: [adjusted_by_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([entry_id], name: "idx_ops_performance_adjustment_entry_id")
+  @@index([adjusted_by_user_id], name: "idx_ops_performance_adjustment_user_id")
 }
