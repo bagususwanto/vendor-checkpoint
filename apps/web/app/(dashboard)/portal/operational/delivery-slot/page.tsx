@@ -11,6 +11,8 @@ import { DateRange } from 'react-day-picker';
 import { RefreshCw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTriggerSlotGenerator } from '@/hooks/api/use-scheduler';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@repo/types';
 import {
   Card,
   CardContent,
@@ -68,7 +70,7 @@ export default function DeliverySlotPage() {
       from: new Date(),
       to: new Date(),
     });
-    setStatus('all');
+    status === 'all' ? null : setStatus('all');
     setPage(1);
   };
 
@@ -82,72 +84,83 @@ export default function DeliverySlotPage() {
   };
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">
-            Monitoring Pengiriman
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            Pantau status kedatangan seluruh vendor.
-          </p>
+    <RoleGuard
+      allowedRoles={[
+        UserRole.SUPER_ADMIN,
+        UserRole.GROUP_HEAD,
+        UserRole.LINE_HEAD,
+        UserRole.SECTION_HEAD,
+        UserRole.WAREHOUSE_STAFF,
+        UserRole.WAREHOUSE_MEMBER,
+      ]}
+    >
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        <div className="flex items-center justify-between space-y-2">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">
+              Monitoring Pengiriman
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Pantau status kedatangan seluruh vendor.
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="secondary"
+              onClick={() => triggerGenerator()}
+              disabled={isTriggering}
+            >
+              {isTriggering ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-2 h-4 w-4" />
+              )}
+              Generate Slot Hari Ini
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="secondary"
-            onClick={() => triggerGenerator()}
-            disabled={isTriggering}
-          >
-            {isTriggering ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="mr-2 h-4 w-4" />
-            )}
-            Generate Slot Hari Ini
-          </Button>
-        </div>
-      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Daftar Slot Pengiriman (Delivery Slots)</CardTitle>
-          <CardDescription>
-            Menampilkan seluruh vendor yang telah dijadwalkan oleh sistem untuk
-            datang mengirimkan barang.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <SlotToolbar
-            searchTerm={searchTerm}
-            onSearchChange={handleSearch}
-            date={date}
-            setDate={setDate}
-            status={status}
-            setStatus={(s) => {
-              setStatus(s);
-              setPage(1);
-            }}
-            onReset={handleReset}
-          />
-
-          <SlotTable
-            data={filteredSlots}
-            isLoading={isLoading}
-            page={page}
-            limit={limit}
-          />
-
-          {meta && (
-            <SlotPagination
-              total={meta.total}
-              page={meta.page}
-              limit={meta.limit}
-              onPageChange={handlePageChange}
-              onLimitChange={handleLimitChange}
+        <Card>
+          <CardHeader>
+            <CardTitle>Daftar Slot Pengiriman (Delivery Slots)</CardTitle>
+            <CardDescription>
+              Menampilkan seluruh vendor yang telah dijadwalkan oleh sistem untuk
+              datang mengirimkan barang.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <SlotToolbar
+              searchTerm={searchTerm}
+              onSearchChange={handleSearch}
+              date={date}
+              setDate={setDate}
+              status={status}
+              setStatus={(s) => {
+                setStatus(s);
+                setPage(1);
+              }}
+              onReset={handleReset}
             />
-          )}
-        </CardContent>
-      </Card>
-    </div>
+
+            <SlotTable
+              data={filteredSlots}
+              isLoading={isLoading}
+              page={page}
+              limit={limit}
+            />
+
+            {meta && (
+              <SlotPagination
+                total={meta.total}
+                page={meta.page}
+                limit={meta.limit}
+                onPageChange={handlePageChange}
+                onLimitChange={handleLimitChange}
+              />
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </RoleGuard>
   );
 }

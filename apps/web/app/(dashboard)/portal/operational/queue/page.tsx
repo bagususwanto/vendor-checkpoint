@@ -10,6 +10,8 @@ import { QueueHeader } from './components/queue-header';
 import { QueueToolbar } from './components/queue-toolbar';
 import { QueueTable } from './components/queue-table';
 import { useSystemConfigByKey } from '@/hooks/api/use-system-config';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@repo/types';
 import {
   Card,
   CardContent,
@@ -70,53 +72,64 @@ export default function QueuePage() {
     1;
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <QueueHeader />
+    <RoleGuard
+      allowedRoles={[
+        UserRole.SUPER_ADMIN,
+        UserRole.GROUP_HEAD,
+        UserRole.LINE_HEAD,
+        UserRole.SECTION_HEAD,
+        UserRole.WAREHOUSE_STAFF,
+        UserRole.WAREHOUSE_MEMBER,
+      ]}
+    >
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        <QueueHeader />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Daftar Antrean</CardTitle>
-          <CardDescription>
-            Kelola dan pantau antrean vendor, verifikasi dokumen, dan proses
-            check-out.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <QueueToolbar
-            searchTerm={searchTerm}
-            onSearchChange={handleSearch}
-            date={date}
-            setDate={(d) => {
-              setDate(d);
-              setPage(1);
-            }}
-            status={status}
-            setStatus={(s) => {
-              setStatus(s);
-              setPage(1);
-            }}
-            categoryId={categoryId}
-            setCategoryId={(c) => {
-              setCategoryId(c);
-              setPage(1);
-            }}
-            categories={categories}
-            onReset={handleReset}
-          />
+        <Card>
+          <CardHeader>
+            <CardTitle>Daftar Antrean</CardTitle>
+            <CardDescription>
+              Kelola dan pantau antrean vendor, verifikasi dokumen, dan proses
+              check-out.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <QueueToolbar
+              searchTerm={searchTerm}
+              onSearchChange={handleSearch}
+              date={date}
+              setDate={(d) => {
+                setDate(d);
+                setPage(1);
+              }}
+              status={status}
+              setStatus={(s) => {
+                setStatus(s);
+                setPage(1);
+              }}
+              categoryId={categoryId}
+              setCategoryId={(c) => {
+                setCategoryId(c);
+                setPage(1);
+              }}
+              categories={categories}
+              onReset={handleReset}
+            />
 
-          <QueueTable
-            checkins={checkins}
-            isLoading={isLoading}
-            page={page}
-            totalPages={totalPages}
-            totalRecords={meta?.total || 0}
-            setPage={setPage}
-            limit={limit}
-            setLimit={setLimit}
-            verificationMode={verificationMode}
-          />
-        </CardContent>
-      </Card>
-    </div>
+            <QueueTable
+              checkins={checkins}
+              isLoading={isLoading}
+              page={page}
+              totalPages={totalPages}
+              totalRecords={meta?.total || 0}
+              setPage={setPage}
+              limit={limit}
+              setLimit={setLimit}
+              verificationMode={verificationMode}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </RoleGuard>
   );
 }
