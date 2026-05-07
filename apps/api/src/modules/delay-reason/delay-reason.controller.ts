@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { DelayReasonService } from './delay-reason.service';
 import { CreateDelayReasonDto } from './dto/create-delay-reason.dto';
@@ -15,14 +16,17 @@ import { UpdateDelayReasonDto } from './dto/update-delay-reason.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AuditLog } from 'src/common/decorators/audit.decorator';
 import { AuditLogInterceptor } from 'src/common/interceptors/audit.interceptor';
-import { UseInterceptors } from '@nestjs/common';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { UserRole } from '@repo/types';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('delay-reasons')
 @UseInterceptors(AuditLogInterceptor)
 export class DelayReasonController {
   constructor(private readonly delayReasonService: DelayReasonService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Post()
   @AuditLog({
     actionType: 'DELAY_REASON_CREATE',
@@ -36,6 +40,15 @@ export class DelayReasonController {
     return this.delayReasonService.create(createDelayReasonDto);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
+  )
   @Get()
   findAll(
     @Query() query: import('src/common/dto/paginated-params.dto').PaginatedParamsDto,
@@ -49,7 +62,8 @@ export class DelayReasonController {
     return this.delayReasonService.findOne(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Patch(':id')
   @AuditLog({
     actionType: 'DELAY_REASON_UPDATE',
@@ -66,7 +80,8 @@ export class DelayReasonController {
     return this.delayReasonService.update(+id, updateDelayReasonDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Delete(':id')
   @AuditLog({
     actionType: 'DELAY_REASON_DELETE',

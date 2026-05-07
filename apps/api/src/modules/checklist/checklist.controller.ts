@@ -18,6 +18,9 @@ import { ReorderDto } from './dto/reorder.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AuditLog } from 'src/common/decorators/audit.decorator';
 import { AuditLogInterceptor } from 'src/common/interceptors/audit.interceptor';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { UserRole } from '@repo/types';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('checklist')
 @UseInterceptors(AuditLogInterceptor)
@@ -26,7 +29,8 @@ export class ChecklistController {
 
   // --- Category Endpoints ---
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Post('category')
   @AuditLog({
     actionType: 'CHECKLIST_CATEGORY_CREATE',
@@ -39,13 +43,22 @@ export class ChecklistController {
     return this.checklistService.createCategory(dto);
   }
 
-  // PUBLIC (Management? Or Protected?) -> Let's make it protected for management
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
+  )
   @Get('categories')
   findAllCategories() {
     return this.checklistService.findAllCategories();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Patch('category/:id')
   @AuditLog({
     actionType: 'CHECKLIST_CATEGORY_UPDATE',
@@ -61,7 +74,8 @@ export class ChecklistController {
     return this.checklistService.updateCategory(+id, dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Delete('category/:id')
   @AuditLog({
     actionType: 'CHECKLIST_CATEGORY_DELETE',
@@ -74,7 +88,8 @@ export class ChecklistController {
     return this.checklistService.deleteCategory(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Post('category/reorder')
   reorderCategories(@Body() dto: ReorderDto) {
     return this.checklistService.reorderCategories(dto);
@@ -82,7 +97,8 @@ export class ChecklistController {
 
   // --- Item Endpoints ---
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Post('item')
   @AuditLog({
     actionType: 'CHECKLIST_ITEM_CREATE',
@@ -95,7 +111,8 @@ export class ChecklistController {
     return this.checklistService.createItem(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Patch('item/:id')
   @AuditLog({
     actionType: 'CHECKLIST_ITEM_UPDATE',
@@ -108,7 +125,8 @@ export class ChecklistController {
     return this.checklistService.updateItem(+id, dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Delete('item/:id')
   @AuditLog({
     actionType: 'CHECKLIST_ITEM_DELETE',
@@ -121,7 +139,8 @@ export class ChecklistController {
     return this.checklistService.deleteItem(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Post('item/reorder')
   reorderItems(@Body() dto: ReorderDto) {
     return this.checklistService.reorderItems(dto);

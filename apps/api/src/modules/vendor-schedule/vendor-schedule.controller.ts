@@ -21,13 +21,17 @@ import { UpdateVendorScheduleDto } from './dto/update-vendor-schedule.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AuditLog } from 'src/common/decorators/audit.decorator';
 import { AuditLogInterceptor } from 'src/common/interceptors/audit.interceptor';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { UserRole } from '@repo/types';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('vendor-schedules')
 @UseInterceptors(AuditLogInterceptor)
 export class VendorScheduleController {
   constructor(private readonly vendorScheduleService: VendorScheduleService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Post()
   @AuditLog({
     actionType: 'VENDOR_SCHEDULE_CREATE',
@@ -41,7 +45,8 @@ export class VendorScheduleController {
     return this.vendorScheduleService.create(createVendorScheduleDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   @AuditLog({
@@ -56,6 +61,8 @@ export class VendorScheduleController {
     return this.vendorScheduleService.uploadExcel(file.buffer);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Get('template')
   @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   @Header('Content-Disposition', 'attachment; filename=template_jadwal_vendor.xlsx')
@@ -64,6 +71,15 @@ export class VendorScheduleController {
     res.send(buffer);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
+  )
   @Get('export')
   @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   @Header('Content-Disposition', 'attachment; filename=data_jadwal_vendor.xlsx')
@@ -81,6 +97,15 @@ export class VendorScheduleController {
     res.send(buffer);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
+  )
   @Get()
   findAll(
     @Query() query: import('src/common/dto/paginated-params.dto').PaginatedParamsDto,
@@ -99,7 +124,8 @@ export class VendorScheduleController {
     return this.vendorScheduleService.findOne(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Patch(':id')
   @AuditLog({
     actionType: 'VENDOR_SCHEDULE_UPDATE',
@@ -116,7 +142,8 @@ export class VendorScheduleController {
     return this.vendorScheduleService.update(+id, updateVendorScheduleDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Delete(':id')
   @AuditLog({
     actionType: 'VENDOR_SCHEDULE_DELETE',

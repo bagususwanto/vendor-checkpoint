@@ -14,6 +14,8 @@ import {
 import { VendorCategoryResponse } from '@repo/types';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@repo/types';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -118,111 +120,119 @@ export default function VendorCategoryPage() {
   };
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Kategori Vendor</h2>
-          <p className="text-muted-foreground text-sm">
-            Kelola data master kategori vendor untuk keperluan operasional.
-          </p>
+    <RoleGuard
+      allowedRoles={[
+        UserRole.SUPER_ADMIN,
+        UserRole.GROUP_HEAD,
+        UserRole.LINE_HEAD,
+      ]}
+    >
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        <div className="flex items-center justify-between space-y-2">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Kategori Vendor</h2>
+            <p className="text-muted-foreground text-sm">
+              Kelola data master kategori vendor untuk keperluan operasional.
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button onClick={handleAdd}>
+              <Plus className="mr-2 h-4 w-4" /> Tambah Kategori
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button onClick={handleAdd}>
-            <Plus className="mr-2 h-4 w-4" /> Tambah Kategori
-          </Button>
-        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Daftar Kategori Vendor</CardTitle>
+            <CardDescription>
+              Tabel berikut menampilkan semua kategori vendor yang tersedia dalam
+              sistem.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <VendorCategoriesTable
+              columns={columns(handleEdit, handleDelete)}
+              data={categoriesData?.data || []}
+              total={categoriesData?.meta.total || 0}
+              page={page}
+              limit={limit}
+              onPageChange={setPage}
+              onLimitChange={setLimit}
+              onBulkDelete={handleBulkDelete}
+              statusFilter={status}
+              onStatusFilterChange={setStatus}
+              globalFilter={search}
+              onGlobalFilterChange={setSearch}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Dialog Create/Edit */}
+        <VendorCategoryDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          category={selectedCategory}
+          onSubmit={handleSubmit}
+          isLoading={createMutation.isPending || updateMutation.isPending}
+        />
+
+        {/* Alert Dialog Delete Single */}
+        <AlertDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Tindakan ini akan menghapus kategori{' '}
+                <span className="font-semibold">
+                  {selectedCategory?.category_name}
+                </span>
+                . Jika kategori sudah memiliki data terkait, kategori akan
+                dinonaktifkan alih-alih dihapus permanen.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Batal</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirmDelete}
+                className="bg-destructive focus:ring-destructive"
+              >
+                {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Alert Dialog Bulk Delete */}
+        <AlertDialog
+          open={isBulkDeleteDialogOpen}
+          onOpenChange={setIsBulkDeleteDialogOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Tindakan ini akan menghapus {rowsToDelete.length} kategori yang
+                dipilih. Kategori yang sudah memiliki data terkait akan
+                dinonaktifkan alih-alih dihapus permanen.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Batal</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirmBulkDelete}
+                className="bg-destructive focus:ring-destructive"
+              >
+                {bulkDeleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Daftar Kategori Vendor</CardTitle>
-          <CardDescription>
-            Tabel berikut menampilkan semua kategori vendor yang tersedia dalam
-            sistem.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <VendorCategoriesTable
-            columns={columns(handleEdit, handleDelete)}
-            data={categoriesData?.data || []}
-            total={categoriesData?.meta.total || 0}
-            page={page}
-            limit={limit}
-            onPageChange={setPage}
-            onLimitChange={setLimit}
-            onBulkDelete={handleBulkDelete}
-            statusFilter={status}
-            onStatusFilterChange={setStatus}
-            globalFilter={search}
-            onGlobalFilterChange={setSearch}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Dialog Create/Edit */}
-      <VendorCategoryDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        category={selectedCategory}
-        onSubmit={handleSubmit}
-        isLoading={createMutation.isPending || updateMutation.isPending}
-      />
-
-      {/* Alert Dialog Delete Single */}
-      <AlertDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tindakan ini akan menghapus kategori{' '}
-              <span className="font-semibold">
-                {selectedCategory?.category_name}
-              </span>
-              . Jika kategori sudah memiliki data terkait, kategori akan
-              dinonaktifkan alih-alih dihapus permanen.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              className="bg-destructive focus:ring-destructive"
-            >
-              {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Alert Dialog Bulk Delete */}
-      <AlertDialog
-        open={isBulkDeleteDialogOpen}
-        onOpenChange={setIsBulkDeleteDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tindakan ini akan menghapus {rowsToDelete.length} kategori yang
-              dipilih. Kategori yang sudah memiliki data terkait akan
-              dinonaktifkan alih-alih dihapus permanen.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmBulkDelete}
-              className="bg-destructive focus:ring-destructive"
-            >
-              {bulkDeleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+    </RoleGuard>
   );
 }
 

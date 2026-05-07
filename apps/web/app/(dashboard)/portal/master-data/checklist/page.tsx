@@ -15,6 +15,8 @@ import { ChecklistCategoryDialog } from './components/checklist-category-dialog'
 import { useQuery } from '@tanstack/react-query';
 import { checklistService } from '@/services/checklist.service';
 import { ChecklistCategoryResponse } from '@/types/checklist';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@repo/types';
 
 export default function ChecklistPage() {
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
@@ -46,49 +48,57 @@ export default function ChecklistPage() {
   };
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">
-            Daftar Pemeriksaan
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            Kelola data master pemeriksaan (kategori dan item).
-          </p>
+    <RoleGuard
+      allowedRoles={[
+        UserRole.SUPER_ADMIN,
+        UserRole.GROUP_HEAD,
+        UserRole.LINE_HEAD,
+      ]}
+    >
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        <div className="flex items-center justify-between space-y-2">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">
+              Daftar Pemeriksaan
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Kelola data master pemeriksaan (kategori dan item).
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button onClick={handleAddCategory}>
+              <Plus className="mr-2 h-4 w-4" /> Tambah Kategori
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button onClick={handleAddCategory}>
-            <Plus className="mr-2 h-4 w-4" /> Tambah Kategori
-          </Button>
-        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Daftar Pemeriksaan</CardTitle>
+            <CardDescription>
+              Atur kategori dan item pemeriksaan. Geser untuk mengubah urutan.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div>Loading...</div>
+            ) : (
+              <ChecklistCategoryList
+                categories={categories || []}
+                onEdit={handleEditCategory}
+                onRefetch={refetch}
+              />
+            )}
+          </CardContent>
+        </Card>
+
+        <ChecklistCategoryDialog
+          open={isCategoryDialogOpen}
+          onOpenChange={setIsCategoryDialogOpen}
+          category={selectedCategory}
+          onSuccess={handleSuccess}
+        />
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Daftar Pemeriksaan</CardTitle>
-          <CardDescription>
-            Atur kategori dan item pemeriksaan. Geser untuk mengubah urutan.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div>Loading...</div>
-          ) : (
-            <ChecklistCategoryList
-              categories={categories || []}
-              onEdit={handleEditCategory}
-              onRefetch={refetch}
-            />
-          )}
-        </CardContent>
-      </Card>
-
-      <ChecklistCategoryDialog
-        open={isCategoryDialogOpen}
-        onOpenChange={setIsCategoryDialogOpen}
-        category={selectedCategory}
-        onSuccess={handleSuccess}
-      />
-    </div>
+    </RoleGuard>
   );
 }

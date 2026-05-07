@@ -20,6 +20,9 @@ import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AuditLog } from 'src/common/decorators/audit.decorator';
 import { AuditLogInterceptor } from 'src/common/interceptors/audit.interceptor';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { UserRole } from '@repo/types';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('vendor-categories')
 @UseInterceptors(AuditLogInterceptor)
@@ -28,8 +31,8 @@ export class VendorCategoryController {
     private readonly vendorCategoryService: VendorCategoryService,
   ) {}
 
-  // PROTECTED - Admin only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Post()
   @AuditLog({
     actionType: 'VENDOR_CATEGORY_CREATE',
@@ -48,20 +51,27 @@ export class VendorCategoryController {
     return this.vendorCategoryService.getSelection();
   }
 
-  // PUBLIC - Dropdown di form check-in
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
+  )
   @Get()
   findAll(@Query() query: PaginatedParamsDto) {
     return this.vendorCategoryService.findAll(query);
   }
 
-  // PUBLIC - Detail category
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.vendorCategoryService.findOne(+id);
   }
 
-  // PROTECTED - Admin only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Patch(':id')
   @AuditLog({
     actionType: 'VENDOR_CATEGORY_UPDATE',
@@ -79,8 +89,8 @@ export class VendorCategoryController {
     return this.vendorCategoryService.update(+id, updateVendorCategoryDto);
   }
 
-  // PROTECTED - Admin only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Delete(':id')
   @AuditLog({
     actionType: 'VENDOR_CATEGORY_DELETE',
@@ -94,8 +104,8 @@ export class VendorCategoryController {
     return this.vendorCategoryService.remove(+id);
   }
 
-  // PROTECTED - Admin only - Bulk delete
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Delete()
   @HttpCode(HttpStatus.OK)
   @AuditLog({
@@ -110,8 +120,8 @@ export class VendorCategoryController {
     return this.vendorCategoryService.bulkDelete(bulkDeleteDto);
   }
 
-  // PROTECTED - Admin only - Toggle status
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Patch(':id/toggle-status')
   @AuditLog({
     actionType: 'VENDOR_CATEGORY_TOGGLE_STATUS',
