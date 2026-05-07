@@ -11,6 +11,8 @@ import { Roles } from 'src/common/decorators/roles.decorator';
   UserRole.GROUP_HEAD,
   UserRole.LINE_HEAD,
   UserRole.SECTION_HEAD,
+  UserRole.WAREHOUSE_STAFF,
+  UserRole.WAREHOUSE_MEMBER,
 )
 @Controller('dashboard')
 export class DashboardController {
