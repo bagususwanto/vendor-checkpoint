@@ -30,7 +30,9 @@ import { PaginatedParamsDto } from 'src/common/dto/paginated-params.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AuditLog } from 'src/common/decorators/audit.decorator';
 import { AuditLogInterceptor } from 'src/common/interceptors/audit.interceptor';
-import { QueueStatus } from '@repo/types';
+import { QueueStatus, UserRole } from '@repo/types';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('check-in')
 @UseInterceptors(AuditLogInterceptor)
@@ -147,7 +149,15 @@ export class CheckInController {
   }
 
   // PROTECTED - Staff only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+  )
   @Get()
   findAll() {
     return this.checkInService.findAll();
@@ -159,7 +169,6 @@ export class CheckInController {
     return this.checkInService.findByQueue(queueNumber);
   }
 
-  // PROTECTED - Staff only
   // PUBLIC - Display screen (no auth required)
   @Get('/active')
   findActiveQueue(@Query() query: PaginatedParamsDto) {
@@ -173,21 +182,45 @@ export class CheckInController {
   }
 
   // PROTECTED - Staff only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+  )
   @Get('/verification-list')
   findVerificationList(@Query() query: PaginatedParamsDto) {
     return this.checkInService.findVerificationList(query);
   }
 
   // PROTECTED - Staff only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+  )
   @Get('/verification-list/:queueNumber')
   findVerificationListById(@Param('queueNumber') queueNumber: string) {
     return this.checkInService.findVerificationListById(queueNumber);
   }
 
   // PROTECTED - Staff only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+  )
   @Patch('/verify')
   @AuditLog({
     actionType: (req) =>
@@ -218,7 +251,15 @@ export class CheckInController {
   }
 
   // PROTECTED - Staff only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+  )
   @Post('/discrepancy')
   @AuditLog({
     actionType: 'CHECKIN_DISCREPANCY',
@@ -238,7 +279,15 @@ export class CheckInController {
   }
 
   // PROTECTED - Staff only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+  )
   @Patch('/checkout')
   @AuditLog({
     actionType: 'CHECKIN_CHECKOUT',
@@ -279,7 +328,15 @@ export class CheckInController {
   }
 
   // PROTECTED - Staff only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+  )
   @Patch('/hold')
   @AuditLog({
     actionType: 'CHECKIN_HOLD',
@@ -302,7 +359,15 @@ export class CheckInController {
   }
 
   // PROTECTED - Staff only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.WAREHOUSE_STAFF,
+    UserRole.WAREHOUSE_MEMBER,
+    UserRole.GROUP_HEAD,
+    UserRole.LINE_HEAD,
+    UserRole.SECTION_HEAD,
+  )
   @Patch('/resume')
   @AuditLog({
     actionType: 'CHECKIN_RESUME',
@@ -324,21 +389,24 @@ export class CheckInController {
   }
 
   // PROTECTED - Staff only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.checkInService.findOne(+id);
   }
 
   // PROTECTED - Staff only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCheckInDto: UpdateCheckInDto) {
     return this.checkInService.update(+id, updateCheckInDto);
   }
 
   // PROTECTED - Staff only
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.checkInService.remove(+id);
