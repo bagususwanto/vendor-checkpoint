@@ -5,9 +5,18 @@ import { ReportService } from './report.service';
 import { ReportFilterDto } from './dto/report-filter.dto';
 import { ReportExportLogFilterDto } from './dto/report-export-log-filter.dto';
 import { ZodValidationPipe } from 'nestjs-zod';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { UserRole } from '@repo/types';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('reports')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(
+  UserRole.SUPER_ADMIN,
+  UserRole.GROUP_HEAD,
+  UserRole.LINE_HEAD,
+  UserRole.SECTION_HEAD,
+)
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
 

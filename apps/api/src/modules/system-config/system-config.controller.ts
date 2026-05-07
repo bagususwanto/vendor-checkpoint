@@ -16,6 +16,9 @@ import { FindSystemConfigParamsDto } from './dto/find-system-config-params.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AuditLog } from 'src/common/decorators/audit.decorator';
 import { AuditLogInterceptor } from 'src/common/interceptors/audit.interceptor';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { UserRole } from '@repo/types';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 // All system-config routes are protected - system settings
 @Controller('system-config')
@@ -23,7 +26,8 @@ import { AuditLogInterceptor } from 'src/common/interceptors/audit.interceptor';
 export class SystemConfigController {
   constructor(private readonly systemConfigService: SystemConfigService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Get()
   findAll(@Query() query: FindSystemConfigParamsDto) {
     return this.systemConfigService.findAll(query);
@@ -34,13 +38,15 @@ export class SystemConfigController {
     return this.systemConfigService.findByConfigKey(key);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.systemConfigService.findOne(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.GROUP_HEAD, UserRole.LINE_HEAD)
   @Patch(':id')
   @AuditLog({
     actionType: 'SYSTEM_CONFIG_UPDATE',

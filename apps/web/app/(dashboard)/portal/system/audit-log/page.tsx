@@ -16,6 +16,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@repo/types';
 
 export default function AuditLogPage() {
   const [date, setDate] = React.useState<DateRange | undefined>({
@@ -67,60 +69,68 @@ export default function AuditLogPage() {
   };
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Audit Log</h2>
-          <p className="text-muted-foreground text-sm">
-            Monitor aktivitas dan perubahan data dalam sistem.
-          </p>
+    <RoleGuard
+      allowedRoles={[
+        UserRole.SUPER_ADMIN,
+        UserRole.GROUP_HEAD,
+        UserRole.LINE_HEAD,
+      ]}
+    >
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        <div className="flex items-center justify-between space-y-2">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Audit Log</h2>
+            <p className="text-muted-foreground text-sm">
+              Monitor aktivitas dan perubahan data dalam sistem.
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={handleExport}
+              disabled={isExporting || isLoading || !auditLogsData?.data.length}
+            >
+              {isExporting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <DownloadIcon className="mr-2 h-4 w-4" />
+              )}
+              Download Excel
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            onClick={handleExport}
-            disabled={isExporting || isLoading || !auditLogsData?.data.length}
-          >
-            {isExporting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <DownloadIcon className="mr-2 h-4 w-4" />
-            )}
-            Download Excel
-          </Button>
-        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Daftar Audit Log</CardTitle>
+            <CardDescription>
+              Tabel berikut menampilkan riwayat aktivitas pengguna dalam sistem.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <AuditLogFilterForm
+              date={date}
+              setDate={setDate}
+              actionType={actionType}
+              setActionType={(val) => {
+                setActionType(val);
+                setPage(1);
+              }}
+              onReset={handleReset}
+            />
+
+            <AuditLogTable
+              data={auditLogsData?.data || []}
+              isLoading={isLoading}
+              page={auditLogsData?.meta.page || 1}
+              limit={limit}
+              total={auditLogsData?.meta.total || 0}
+              totalPages={auditLogsData?.meta.totalPages || 0}
+              onPageChange={setPage}
+              onLimitChange={setLimit}
+            />
+          </CardContent>
+        </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Daftar Audit Log</CardTitle>
-          <CardDescription>
-            Tabel berikut menampilkan riwayat aktivitas pengguna dalam sistem.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <AuditLogFilterForm
-            date={date}
-            setDate={setDate}
-            actionType={actionType}
-            setActionType={(val) => {
-              setActionType(val);
-              setPage(1);
-            }}
-            onReset={handleReset}
-          />
-
-          <AuditLogTable
-            data={auditLogsData?.data || []}
-            isLoading={isLoading}
-            page={auditLogsData?.meta.page || 1}
-            limit={limit}
-            total={auditLogsData?.meta.total || 0}
-            totalPages={auditLogsData?.meta.totalPages || 0}
-            onPageChange={setPage}
-            onLimitChange={setLimit}
-          />
-        </CardContent>
-      </Card>
-    </div>
+    </RoleGuard>
   );
 }

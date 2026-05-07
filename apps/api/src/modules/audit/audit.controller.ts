@@ -18,9 +18,18 @@ import { UpdateAuditDto } from './dto/update-audit.dto';
 import { AuditLogFilterDto } from './dto/audit-log-filter.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ZodValidationPipe } from 'nestjs-zod';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { UserRole } from '@repo/types';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 // All audit routes are protected - sensitive data
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(
+  UserRole.SUPER_ADMIN,
+  UserRole.GROUP_HEAD,
+  UserRole.LINE_HEAD,
+  UserRole.SECTION_HEAD,
+)
 @Controller('audit')
 export class AuditController {
   constructor(private readonly auditService: AuditService) {}

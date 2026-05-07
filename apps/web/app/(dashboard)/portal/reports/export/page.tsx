@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { DownloadIcon, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@repo/types';
 
 export default function ReportsPage() {
   const [date, setDate] = React.useState<DateRange | undefined>({
@@ -73,42 +75,51 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Export Laporan</h2>
-          <p className="text-muted-foreground">
-            Download laporan kinerja vendor dalam format Excel
-          </p>
+    <RoleGuard
+      allowedRoles={[
+        UserRole.SUPER_ADMIN,
+        UserRole.GROUP_HEAD,
+        UserRole.LINE_HEAD,
+        UserRole.SECTION_HEAD,
+      ]}
+    >
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        <div className="flex items-center justify-between space-y-2">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Export Laporan</h2>
+            <p className="text-muted-foreground">
+              Download laporan kinerja vendor dalam format Excel
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button onClick={handleExport} disabled={isExporting || !previewData}>
+              {isExporting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <DownloadIcon className="mr-2 h-4 w-4" />
+              )}
+              Download Excel
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button onClick={handleExport} disabled={isExporting || !previewData}>
-            {isExporting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <DownloadIcon className="mr-2 h-4 w-4" />
-            )}
-            Download Excel
-          </Button>
-        </div>
+        <Separator />
+
+        <ReportFilterForm
+          date={date}
+          setDate={setDate}
+          status={status}
+          setStatus={setStatus}
+          arrivalStatus={arrivalStatus}
+          setArrivalStatus={setArrivalStatus}
+          departureStatus={departureStatus}
+          setDepartureStatus={setDepartureStatus}
+          vendorCategoryId={vendorCategoryId}
+          setVendorCategoryId={setVendorCategoryId}
+          onReset={handleReset}
+        />
+
+        <ReportPreview data={previewData} isLoading={isPreviewLoading} />
       </div>
-      <Separator />
-
-      <ReportFilterForm
-        date={date}
-        setDate={setDate}
-        status={status}
-        setStatus={setStatus}
-        arrivalStatus={arrivalStatus}
-        setArrivalStatus={setArrivalStatus}
-        departureStatus={departureStatus}
-        setDepartureStatus={setDepartureStatus}
-        vendorCategoryId={vendorCategoryId}
-        setVendorCategoryId={setVendorCategoryId}
-        onReset={handleReset}
-      />
-
-      <ReportPreview data={previewData} isLoading={isPreviewLoading} />
-    </div>
+    </RoleGuard>
   );
 }
