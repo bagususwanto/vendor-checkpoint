@@ -55,7 +55,7 @@ export function AuditLogFilterForm({
                 <SelectValue placeholder="Action Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">Semua Action</SelectItem>
+                <SelectItem value="ALL">All Actions</SelectItem>
                 {Object.values(AuditLogAction).map((action) => (
                   <SelectItem key={action} value={action}>
                     {action.charAt(0) + action.slice(1).toLowerCase()}

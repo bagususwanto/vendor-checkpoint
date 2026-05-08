@@ -70,9 +70,7 @@ export function AuditLogTable({
   if (data.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center rounded-md border border-dashed">
-        <p className="text-muted-foreground">
-          Tidak ada data audit log ditemukan
-        </p>
+        <p className="text-muted-foreground">No audit log data found</p>
       </div>
     );
   }
@@ -84,10 +82,10 @@ export function AuditLogTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[180px]">Waktu</TableHead>
+                <TableHead className="w-[180px]">Time</TableHead>
                 <TableHead className="w-[150px]">User</TableHead>
                 <TableHead className="w-[120px]">Action</TableHead>
-                <TableHead>Deskripsi</TableHead>
+                <TableHead>Description</TableHead>
                 <TableHead className="w-[100px]">Ref ID</TableHead>
                 <TableHead className="w-[70px]"></TableHead>
               </TableRow>
@@ -128,7 +126,7 @@ export function AuditLogTable({
                       }}
                     >
                       <Eye className="h-4 w-4" />
-                      <span className="sr-only">Lihat Detail</span>
+                      <span className="sr-only">View Detail</span>
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -140,11 +138,11 @@ export function AuditLogTable({
         {/* Pagination controls */}
         <div className="flex items-center justify-between px-2">
           <div className="flex-1 text-sm text-muted-foreground">
-            Total {total} data
+            Total {total} records
           </div>
           <div className="flex items-center space-x-6 lg:space-x-8">
             <div className="flex items-center space-x-2">
-              <p className="text-sm font-medium">Baris per halaman</p>
+              <p className="text-sm font-medium">Rows per page</p>
               <Select
                 value={`${limit}`}
                 onValueChange={(value) => {
@@ -164,7 +162,7 @@ export function AuditLogTable({
               </Select>
             </div>
             <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-              Halaman {page} dari {totalPages}
+              Page {page} of {totalPages}
             </div>
             <div className="flex items-center space-x-2">
               <Button

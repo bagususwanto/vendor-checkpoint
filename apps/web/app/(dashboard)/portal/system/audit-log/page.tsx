@@ -44,16 +44,16 @@ export default function AuditLogPage() {
 
   const handleExport = () => {
     if (!date?.from || !date?.to) {
-      toast.error('Silakan pilih periode tanggal terlebih dahulu');
+      toast.error('Please select a date range first');
       return;
     }
 
     exportAuditLogs(filter, {
       onSuccess: () => {
-        toast.success('Audit Log berhasil di-download');
+        toast.success('Audit Log downloaded successfully');
       },
       onError: () => {
-        toast.error('Gagal download audit log');
+        toast.error('Failed to download audit log');
       },
     });
   };
@@ -81,7 +81,7 @@ export default function AuditLogPage() {
           <div>
             <h2 className="text-3xl font-bold tracking-tight">Audit Log</h2>
             <p className="text-muted-foreground text-sm">
-              Monitor aktivitas dan perubahan data dalam sistem.
+              Monitor activity and data changes within the system.
             </p>
           </div>
           <div className="flex items-center space-x-2">
@@ -101,9 +101,10 @@ export default function AuditLogPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Daftar Audit Log</CardTitle>
+            <CardTitle>Audit Log List</CardTitle>
             <CardDescription>
-              Tabel berikut menampilkan riwayat aktivitas pengguna dalam sistem.
+              The following table displays the history of user activity within the
+              system.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">

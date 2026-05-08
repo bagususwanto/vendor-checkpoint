@@ -71,13 +71,13 @@ export function AuditLogDetailSheet({
       <SheetContent className="sm:max-w-xl w-full flex flex-col h-full ring-offset-0 focus-visible:outline-none [&>button]:hidden">
         <SheetHeader>
           <div className="flex items-center justify-between">
-            <SheetTitle>Detail Audit Log</SheetTitle>
+            <SheetTitle>Audit Log Details</SheetTitle>
             <Badge variant="outline" className="text-xs">
               ID: {log.audit_id}
             </Badge>
           </div>
           <SheetDescription>
-            Detail aktivitas dan perubahan data yang tercatat.
+            Details of activity and recorded data changes.
           </SheetDescription>
         </SheetHeader>
 
@@ -112,7 +112,7 @@ export function AuditLogDetailSheet({
                     </div>
                     <div className="space-y-1">
                       <p className="text-xs font-medium text-muted-foreground">
-                        Waktu
+                        Time
                       </p>
                       <p className="font-semibold text-base">
                         {formatDateTime(
@@ -132,7 +132,7 @@ export function AuditLogDetailSheet({
                     <div className="space-y-1 w-full">
                       <div className="flex justify-between items-start">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Aktivitas
+                          Activity
                         </p>
                         <Badge
                           variant="secondary"
@@ -162,19 +162,19 @@ export function AuditLogDetailSheet({
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   <FileText className="h-4 w-4 text-muted-foreground" />
-                  Rincian Perubahan Data
+                  Data Change Details
                 </div>
 
                 <div className="grid grid-cols-1 gap-6">
                   {log.old_value &&
                     renderValue(
-                      'Data Sebelum (Old Value)',
+                      'Previous Data (Old Value)',
                       log.old_value,
                       'bg-status-error-bg border-status-error-border text-status-error-text',
                     )}
                   {log.new_value &&
                     renderValue(
-                      'Data Sesudah (New Value)',
+                      'Updated Data (New Value)',
                       log.new_value,
                       'bg-status-success-bg border-status-success-border text-status-success-text',
                     )}
