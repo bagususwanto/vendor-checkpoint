@@ -371,16 +371,16 @@ export function CheckoutSheet({
                                   detailData.ops_ppe_scan.is_compliant ? 'text-emerald-700' : 'text-rose-700'
                                 }`}>
                                   {detailData.ops_ppe_scan.is_compliant 
-                                    ? 'APD Lengkap' 
-                                    : 'Atribut Tidak Lengkap'}
+                                    ? 'PPE Complete' 
+                                    : 'Incomplete Attributes'}
                                 </span>
                               </div>
 
                               {!detailData.ops_ppe_scan.is_compliant && (
                                 <div className="flex flex-wrap gap-1.5 pt-1">
                                   {[
-                                    { key: 'has_hardhat', label: 'Helm Safety' },
-                                    { key: 'has_safety_vest', label: 'Rompi Safety' }
+                                    { key: 'has_hardhat', label: 'Safety Helmet' },
+                                    { key: 'has_safety_vest', label: 'Safety Vest' }
                                   ].map((item) => (
                                     <Badge
                                       key={item.key}
@@ -525,7 +525,7 @@ export function CheckoutSheet({
                   <Card className="p-4 shadow-sm">
                     <div className="space-y-1">
                       <p className="text-xs font-medium text-muted-foreground">
-                        Waktu Submit
+                        Submit Time
                       </p>
                       <p className="font-semibold text-sm">
                         {detailData.submission_time
@@ -559,7 +559,7 @@ export function CheckoutSheet({
               {detailData.ops_verification && (
                 <div>
                   <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
-                    Informasi Verifikasi
+                    Verification Information
                   </h4>
                   <div className="grid grid-cols-2 gap-4">
                     <Card className="p-4 shadow-sm">
@@ -658,7 +658,7 @@ export function CheckoutSheet({
                                   variant="destructive"
                                   className="rounded-sm"
                                 >
-                                  {categoryNonCompliantCount} Tidak
+                                  {categoryNonCompliantCount} Fail
                                 </Badge>
                               )}
                             </div>
@@ -705,7 +705,7 @@ export function CheckoutSheet({
                                             variant="destructive"
                                             className="text-[10px] px-1.5 py-0 h-5 font-bold uppercase animate-pulse"
                                           >
-                                            Temuan Petugas
+                                            Officer Finding
                                           </Badge>
                                         )}
                                       </div>
@@ -728,7 +728,7 @@ export function CheckoutSheet({
                                         ) : (
                                           <XCircle className="mr-1 h-3 w-3" />
                                         )}
-                                        {item.response_value ? 'Ya' : 'Tidak'}
+                                        {item.response_value ? 'Yes' : 'No'}
                                       </Badge>
                                     </div>
                                   </div>

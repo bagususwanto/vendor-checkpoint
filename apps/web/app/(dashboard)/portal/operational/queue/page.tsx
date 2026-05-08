@@ -87,10 +87,10 @@ export default function QueuePage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Daftar Antrean</CardTitle>
+            <CardTitle>Queue List</CardTitle>
             <CardDescription>
-              Kelola dan pantau antrean vendor, verifikasi dokumen, dan proses
-              check-out.
+              Manage and monitor vendor queues, document verification, and
+              check-out process.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
