@@ -50,7 +50,7 @@ export const columns = (
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Kode
+          Code
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -64,7 +64,7 @@ export const columns = (
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Nama Kategori
+          Category Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -72,7 +72,7 @@ export const columns = (
   },
   {
     accessorKey: 'description',
-    header: 'Deskripsi',
+    header: 'Description',
     cell: ({ row }: { row: Row<VendorCategoryResponse> }) => {
       return (
         <div
@@ -96,7 +96,7 @@ export const columns = (
             isActive ? 'bg-status-success-fg hover:bg-status-success-fg/90' : ''
           }
         >
-          {isActive ? 'Aktif' : 'Nonaktif'}
+          {isActive ? 'Active' : 'Inactive'}
         </Badge>
       );
     },
@@ -115,7 +115,7 @@ export const columns = (
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+            <DropdownMenuLabel>Action</DropdownMenuLabel>
             <DropdownMenuItem onClick={() => onEdit(category)}>
               <Pencil className="mr-2 h-4 w-4" />
               Edit
@@ -125,7 +125,7 @@ export const columns = (
               className="text-destructive focus:text-destructive"
             >
               <Trash className="mr-2 h-4 w-4 text-destructive" />
-              Hapus
+              Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -69,11 +69,11 @@ export function VendorCategoryForm({
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor="category_code" required>
-                  Kode Kategori
+                  Category Code
                 </FieldLabel>
                 <Input
                   id="category_code"
-                  placeholder="Contoh: VC-001"
+                  placeholder="Example: VC-001"
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -94,11 +94,11 @@ export function VendorCategoryForm({
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor="category_name" required>
-                  Nama Kategori
+                  Category Name
                 </FieldLabel>
                 <Input
                   id="category_name"
-                  placeholder="Contoh: Vendor Logistik"
+                  placeholder="Example: Logistics Vendor"
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -119,11 +119,11 @@ export function VendorCategoryForm({
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor="description" optional>
-                  Deskripsi
+                  Description
                 </FieldLabel>
                 <Textarea
                   id="description"
-                  placeholder="Deskripsi kategori vendor..."
+                  placeholder="Vendor category description..."
                   className="resize-none"
                   name={field.name}
                   value={field.state.value}
@@ -145,9 +145,9 @@ export function VendorCategoryForm({
                 className="justify-between space-x-2"
               >
                 <div className="flex-1 space-y-0.5">
-                  <FieldLabel htmlFor="is_active">Status Aktif</FieldLabel>
+                  <FieldLabel htmlFor="is_active">Active Status</FieldLabel>
                   <p className="text-[0.8rem] text-muted-foreground">
-                    Nonaktifkan jika kategori tidak ingin ditampilkan di opsi.
+                    Deactivate if the category should not be displayed in options.
                   </p>
                 </div>
                 <Switch
@@ -166,11 +166,11 @@ export function VendorCategoryForm({
             onClick={onCancel}
             disabled={isLoading}
           >
-            Batal
+            Cancel
           </Button>
           <Button type="submit" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLoading ? 'Menyimpan...' : 'Simpan'}
+            {isLoading ? 'Saving...' : 'Save'}
           </Button>
         </div>
       </FieldGroup>

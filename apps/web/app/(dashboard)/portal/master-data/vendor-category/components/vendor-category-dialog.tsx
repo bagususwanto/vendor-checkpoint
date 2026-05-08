@@ -38,12 +38,12 @@ export function VendorCategoryDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? 'Edit Kategori Vendor' : 'Tambah Kategori Vendor'}
+            {isEdit ? 'Edit Vendor Category' : 'Add Vendor Category'}
           </DialogTitle>
           <DialogDescription>
             {isEdit
-              ? 'Ubah informasi kategori vendor di sini.'
-              : 'Tambahkan kategori vendor baru ke dalam sistem.'}
+              ? 'Change vendor category information here.'
+              : 'Add a new vendor category to the system.'}
           </DialogDescription>
         </DialogHeader>
         <VendorCategoryForm

@@ -130,24 +130,24 @@ export default function VendorCategoryPage() {
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="flex items-center justify-between space-y-2">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Kategori Vendor</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Vendor Categories</h2>
             <p className="text-muted-foreground text-sm">
-              Kelola data master kategori vendor untuk keperluan operasional.
+              Manage master data for vendor categories for operational purposes.
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <Button onClick={handleAdd}>
-              <Plus className="mr-2 h-4 w-4" /> Tambah Kategori
+              <Plus className="mr-2 h-4 w-4" /> Add Category
             </Button>
           </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Daftar Kategori Vendor</CardTitle>
+            <CardTitle>Vendor Category List</CardTitle>
             <CardDescription>
-              Tabel berikut menampilkan semua kategori vendor yang tersedia dalam
-              sistem.
+              The following table displays all vendor categories available in
+              the system.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -184,23 +184,23 @@ export default function VendorCategoryPage() {
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                Tindakan ini akan menghapus kategori{' '}
+                This action will delete category{' '}
                 <span className="font-semibold">
                   {selectedCategory?.category_name}
                 </span>
-                . Jika kategori sudah memiliki data terkait, kategori akan
-                dinonaktifkan alih-alih dihapus permanen.
+                . If the category already has related data, it will be
+                deactivated instead of permanently deleted.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Batal</AlertDialogCancel>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleConfirmDelete}
                 className="bg-destructive focus:ring-destructive"
               >
-                {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
+                {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -213,20 +213,20 @@ export default function VendorCategoryPage() {
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                Tindakan ini akan menghapus {rowsToDelete.length} kategori yang
-                dipilih. Kategori yang sudah memiliki data terkait akan
-                dinonaktifkan alih-alih dihapus permanen.
+                This action will delete {rowsToDelete.length} selected
+                categories. Categories that already have related data will be
+                deactivated instead of permanently deleted.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Batal</AlertDialogCancel>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleConfirmBulkDelete}
                 className="bg-destructive focus:ring-destructive"
               >
-                {bulkDeleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
+                {bulkDeleteMutation.isPending ? 'Deleting...' : 'Delete'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

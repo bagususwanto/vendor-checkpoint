@@ -37,12 +37,12 @@ export function VendorCategoriesPagination<TData>({
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
-        {table.getFilteredSelectedRowModel().rows.length} dari {total} baris
-        dipilih.
+        {table.getFilteredSelectedRowModel().rows.length} of {total} row(s)
+        selected.
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Baris per halaman</p>
+          <p className="text-sm font-medium">Rows per page</p>
           <Select
             value={`${limit}`}
             onValueChange={(value) => {
@@ -62,7 +62,7 @@ export function VendorCategoriesPagination<TData>({
           </Select>
         </div>
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Halaman {page} dari {totalPages}
+          Page {page} of {totalPages}
         </div>
         <div className="flex items-center space-x-2">
           <Button

@@ -36,7 +36,7 @@ export function VendorCategoriesToolbar<TData>({
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
-          placeholder="Cari kategori..."
+          placeholder="Search category..."
           value={globalFilter ?? ''}
           onChange={(event) => onGlobalFilterChange(event.target.value)}
           className="h-8 w-[150px] lg:w-[250px]"
@@ -46,9 +46,9 @@ export function VendorCategoriesToolbar<TData>({
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
-            <SelectItem value="active">Aktif</SelectItem>
-            <SelectItem value="inactive">Nonaktif</SelectItem>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
           </SelectContent>
         </Select>
         {isFiltered && (
@@ -77,7 +77,7 @@ export function VendorCategoriesToolbar<TData>({
               onBulkDelete(ids);
             }}
           >
-            Hapus ({selectedRows.length})
+            Delete ({selectedRows.length})
           </Button>
         )}
       </div>
