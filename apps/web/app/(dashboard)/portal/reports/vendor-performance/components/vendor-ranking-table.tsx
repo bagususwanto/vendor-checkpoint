@@ -58,8 +58,8 @@ export function VendorRankingTable({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Ranking Performa Vendor</CardTitle>
-          <CardDescription>Berdasarkan tingkat ketepatan waktu kedatangan</CardDescription>
+          <CardTitle>Vendor Performance Ranking</CardTitle>
+          <CardDescription>Based on arrival timeliness</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -81,9 +81,9 @@ export function VendorRankingTable({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Ranking Performa Vendor</CardTitle>
+        <CardTitle>Vendor Performance Ranking</CardTitle>
         <CardDescription>
-          Berdasarkan tingkat ketepatan waktu kedatangan (On-Time Arrival)
+          Based on arrival timeliness (On-Time Arrival)
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -192,7 +192,7 @@ export function VendorRankingTable({
               ) : (
                 <TableRow>
                   <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
-                    Tidak ada data vendor ditemukan.
+                    No vendor data found.
                   </TableCell>
                 </TableRow>
               )}
@@ -202,10 +202,10 @@ export function VendorRankingTable({
 
         {/* Pagination controls */}
         <div className="flex items-center justify-between px-2 py-1">
-          <div className="flex-1 text-sm text-muted-foreground">Total {total} data vendor</div>
+          <div className="flex-1 text-sm text-muted-foreground">Total {total} vendor records</div>
           <div className="flex items-center space-x-6 lg:space-x-8">
             <div className="flex items-center space-x-2">
-              <p className="text-sm font-medium">Baris per halaman</p>
+              <p className="text-sm font-medium">Rows per page</p>
               <Select
                 value={`${limit}`}
                 onValueChange={(value) => {
@@ -226,7 +226,7 @@ export function VendorRankingTable({
               </Select>
             </div>
             <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-              Halaman {page} dari {totalPages || 1}
+              Page {page} of {totalPages || 1}
             </div>
             <div className="flex items-center space-x-2">
               <Button
@@ -235,7 +235,7 @@ export function VendorRankingTable({
                 onClick={() => onPageChange(1)}
                 disabled={page === 1}
               >
-                <span className="sr-only">Halaman pertama</span>
+                <span className="sr-only">First page</span>
                 <ChevronsLeft className="h-4 w-4" />
               </Button>
               <Button
@@ -244,7 +244,7 @@ export function VendorRankingTable({
                 onClick={() => onPageChange(page - 1)}
                 disabled={page === 1}
               >
-                <span className="sr-only">Halaman sebelumnya</span>
+                <span className="sr-only">Previous page</span>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <Button
@@ -253,7 +253,7 @@ export function VendorRankingTable({
                 onClick={() => onPageChange(page + 1)}
                 disabled={page >= totalPages}
               >
-                <span className="sr-only">Halaman berikutnya</span>
+                <span className="sr-only">Next page</span>
                 <ChevronRight className="h-4 w-4" />
               </Button>
               <Button
@@ -262,7 +262,7 @@ export function VendorRankingTable({
                 onClick={() => onPageChange(totalPages)}
                 disabled={page === totalPages || totalPages === 0}
               >
-                <span className="sr-only">Halaman terakhir</span>
+                <span className="sr-only">Last page</span>
                 <ChevronsRight className="h-4 w-4" />
               </Button>
             </div>

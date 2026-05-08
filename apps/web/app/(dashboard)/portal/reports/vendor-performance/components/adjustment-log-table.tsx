@@ -90,7 +90,7 @@ export function AdjustmentLogTable({
   if (data.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center rounded-md border border-dashed">
-        <p className="text-muted-foreground">Belum ada data log adjustment ditemukan</p>
+        <p className="text-muted-foreground">No adjustment log data found</p>
       </div>
     );
   }
@@ -101,11 +101,11 @@ export function AdjustmentLogTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="w-[180px]">Waktu & No. Queue</TableHead>
+              <TableHead className="w-[180px]">Time & Queue No.</TableHead>
               <TableHead>Vendor</TableHead>
-              <TableHead>Penyesuaian</TableHead>
-              <TableHead>Alasan</TableHead>
-              <TableHead className="w-[150px]">Oleh</TableHead>
+              <TableHead>Adjustment</TableHead>
+              <TableHead>Reason</TableHead>
+              <TableHead className="w-[150px]">By</TableHead>
               <TableHead className="w-[60px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -183,7 +183,7 @@ export function AdjustmentLogTable({
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                            title="Hapus Adjustment"
+                            title="Delete Adjustment"
                             disabled={deleteMutation.isPending}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -191,20 +191,25 @@ export function AdjustmentLogTable({
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Hapus Adjustment?</AlertDialogTitle>
+                            <AlertDialogTitle>Delete Adjustment?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Menghapus data ini akan mengembalikan metrik performa vendor pada Queue 
-                              <span className="font-bold"> #{item.entry?.queue_number} </span> 
-                              ke nilai aslinya.
+                              Deleting this data will revert the vendor performance
+                              metrics for Queue
+                              <span className="font-bold"> #{item.entry?.queue_number} </span>
+                              to their original values.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Batal</AlertDialogCancel>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => deleteMutation.mutate(item.adjustment_id)}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Hapus'}
+                              {deleteMutation.isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                'Delete'
+                              )}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -220,10 +225,10 @@ export function AdjustmentLogTable({
 
       {/* Pagination */}
       <div className="flex items-center justify-between px-2">
-        <div className="flex-1 text-xs text-muted-foreground">Total {total} adjustment</div>
+        <div className="flex-1 text-xs text-muted-foreground">Total {total} adjustments</div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
-            <p className="text-xs font-medium">Baris per halaman</p>
+            <p className="text-xs font-medium">Rows per page</p>
             <Select
               value={`${limit}`}
               onValueChange={(value) => onLimitChange(Number(value))}
@@ -241,7 +246,7 @@ export function AdjustmentLogTable({
             </Select>
           </div>
           <div className="flex w-[100px] items-center justify-center text-xs font-medium">
-            Hal {page} dari {totalPages}
+            Page {page} of {totalPages}
           </div>
           <div className="flex items-center space-x-2">
             <Button

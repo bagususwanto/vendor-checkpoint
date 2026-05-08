@@ -65,7 +65,8 @@ export default function VendorPerformancePage() {
           <div>
             <h2 className="text-3xl font-bold tracking-tight">Vendor Performance</h2>
             <p className="text-muted-foreground">
-              Analisis performa vendor berdasarkan tingkat ketepatan waktu dan kepatuhan
+              Analyze vendor performance based on timeliness and compliance
+              levels.
             </p>
           </div>
           <div className="flex items-center gap-2">

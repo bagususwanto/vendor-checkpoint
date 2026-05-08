@@ -44,7 +44,8 @@ export default function PerformanceAdjustmentsPage() {
                 Adjustment Logs
               </h2>
               <p className="text-muted-foreground">
-                Daftar riwayat penyesuaian performa vendor yang dilakukan oleh Admin/Section Head
+                List of vendor performance adjustment history performed by
+                Admin/Section Head
               </p>
             </div>
           </div>

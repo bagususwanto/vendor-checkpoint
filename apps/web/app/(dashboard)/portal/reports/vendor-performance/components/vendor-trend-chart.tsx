@@ -24,8 +24,8 @@ export function VendorTrendChart({ data, isLoading }: VendorTrendChartProps) {
     return (
       <Card className="col-span-full">
         <CardHeader>
-          <CardTitle>Trend Performa</CardTitle>
-          <CardDescription>Analisis ketepatan waktu dan kepatuhan</CardDescription>
+          <CardTitle>Performance Trend</CardTitle>
+          <CardDescription>Timeliness and compliance analysis</CardDescription>
         </CardHeader>
         <CardContent className="h-[350px] flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -38,11 +38,11 @@ export function VendorTrendChart({ data, isLoading }: VendorTrendChartProps) {
     return (
       <Card className="col-span-full">
         <CardHeader>
-          <CardTitle>Trend Performa</CardTitle>
-          <CardDescription>Analisis ketepatan waktu dan kepatuhan</CardDescription>
+          <CardTitle>Performance Trend</CardTitle>
+          <CardDescription>Timeliness and compliance analysis</CardDescription>
         </CardHeader>
         <CardContent className="h-[350px] flex items-center justify-center">
-          <span className="text-muted-foreground text-sm">Tidak ada data untuk periode ini</span>
+          <span className="text-muted-foreground text-sm">No data available for this period</span>
         </CardContent>
       </Card>
     );
@@ -52,8 +52,8 @@ export function VendorTrendChart({ data, isLoading }: VendorTrendChartProps) {
     <Card className="col-span-full">
       <CardHeader className="flex flex-row items-center justify-between pb-8">
         <div className="grid gap-1">
-          <CardTitle>Trend Performa</CardTitle>
-          <CardDescription>Analisis ketepatan waktu dan kepatuhan (%)</CardDescription>
+          <CardTitle>Performance Trend</CardTitle>
+          <CardDescription>Timeliness and compliance analysis (%)</CardDescription>
         </div>
       </CardHeader>
       <CardContent>

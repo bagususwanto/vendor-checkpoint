@@ -83,11 +83,11 @@ export function AdjustmentDialog({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Sesuaikan Performa Vendor</DialogTitle>
+          <DialogTitle>Adjust Vendor Performance</DialogTitle>
           <DialogDescription>
-            Lakukan penyesuaian metrik performa untuk Queue{' '}
-            <strong>#{entry.queue_number}</strong>. Data asli tidak akan diubah,
-            hanya ditimpa pada laporan.
+            Adjust performance metrics for Queue{' '}
+            <strong>#{entry.queue_number}</strong>. Original data will not be
+            changed, only overridden in reports.
           </DialogDescription>
         </DialogHeader>
 
@@ -104,7 +104,7 @@ export function AdjustmentDialog({
                   value={form.watch('adjusted_arrival_status')}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih status" />
+                    <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={ArrivalStatus.ON_TIME}>
@@ -130,7 +130,7 @@ export function AdjustmentDialog({
                   disabled={!entry.ops_timelog?.is_checked_out}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih status" />
+                    <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={DepartureStatus.ON_TIME}>
@@ -144,7 +144,7 @@ export function AdjustmentDialog({
                 </Select>
                 {!entry.ops_timelog?.is_checked_out && (
                   <p className="text-[10px] text-muted-foreground mt-1">
-                    Belum check-out
+                    Not checked out yet
                   </p>
                 )}
               </FieldContent>
@@ -161,12 +161,12 @@ export function AdjustmentDialog({
                   value={form.watch('adjusted_ppe_compliant')?.toString()}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih status" />
+                    <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="true">Compliant (Patuh)</SelectItem>
+                    <SelectItem value="true">Compliant</SelectItem>
                     <SelectItem value="false">
-                      Non-Compliant (Melanggar)
+                      Non-Compliant
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -182,11 +182,11 @@ export function AdjustmentDialog({
                   value={form.watch('override_has_non_compliant')?.toString()}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih status" />
+                    <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="false">Safe (Lolos)</SelectItem>
-                    <SelectItem value="true">Unsafe (Temuan)</SelectItem>
+                    <SelectItem value="false">Safe</SelectItem>
+                    <SelectItem value="true">Unsafe (Finding)</SelectItem>
                   </SelectContent>
                 </Select>
               </FieldContent>
@@ -198,11 +198,11 @@ export function AdjustmentDialog({
 
           <Field>
             <FieldLabel required>
-              Alasan Penyesuaian
+              Adjustment Reason
             </FieldLabel>
             <FieldContent>
               <Textarea
-                placeholder="Contoh: Koreksi hasil scan AI yang salah karena pencahayaan, atau keterlambatan input manual oleh staff."
+                placeholder="Example: Correction of incorrect AI scan results due to lighting, or manual input delay by staff."
                 className="resize-none"
                 {...form.register('adjustment_reason')}
               />
@@ -213,8 +213,8 @@ export function AdjustmentDialog({
           <div className="bg-amber-50 border border-amber-200 rounded-md p-3 flex gap-2">
             <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
             <p className="text-[11px] text-amber-800">
-              Setiap penyesuaian akan dicatat dalam log audit. Pastikan alasan
-              yang diberikan jelas dan dapat dipertanggungjawabkan.
+              Every adjustment will be recorded in the audit log. Ensure the
+              reason provided is clear and accountable.
             </p>
           </div>
 
@@ -225,13 +225,13 @@ export function AdjustmentDialog({
               onClick={onClose}
               disabled={createAdjustment.isPending}
             >
-              Batal
+              Cancel
             </Button>
             <Button type="submit" disabled={createAdjustment.isPending}>
               {createAdjustment.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Simpan Penyesuaian
+              Save Adjustment
             </Button>
           </DialogFooter>
         </form>

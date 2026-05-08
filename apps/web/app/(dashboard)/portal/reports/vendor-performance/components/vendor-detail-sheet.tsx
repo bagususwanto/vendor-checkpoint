@@ -152,7 +152,7 @@ export function VendorDetailSheet({
 
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold px-1">
-                    Tingkat Keberhasilan
+                    Success Rates
                   </h3>
 
                   <div className="space-y-2">
@@ -229,7 +229,7 @@ export function VendorDetailSheet({
                   <div className="space-y-3">
                     {!detail.entries || detail.entries.length === 0 ? (
                       <div className="text-center py-6 text-xs text-muted-foreground border rounded-lg border-dashed">
-                        Belum ada riwayat check-in untuk periode ini.
+                        No check-in history for this period.
                       </div>
                     ) : (
                       detail.entries.map((entry: any) => (
@@ -332,11 +332,11 @@ export function VendorDetailSheet({
                     <AlertTriangle className="h-5 w-5 text-rose-600 shrink-0 mt-0.5" />
                     <div>
                       <h4 className="text-sm font-bold text-rose-900">
-                        Peringatan: Missed Cycle
+                        Warning: Missed Cycle
                       </h4>
                       <p className="text-xs text-rose-700 mt-1">
-                        Vendor ini telah melewatkan {detail.stats.missed_cycles}{' '}
-                        jadwal pengiriman pada periode ini.
+                        This vendor has missed {detail.stats.missed_cycles} delivery
+                        schedules in this period.
                       </p>
                     </div>
                   </div>
@@ -344,7 +344,7 @@ export function VendorDetailSheet({
               </div>
             ) : (
               <div className="text-center py-10 text-muted-foreground">
-                Gagal memuat detail vendor.
+                Failed to load vendor details.
               </div>
             )}
           </div>

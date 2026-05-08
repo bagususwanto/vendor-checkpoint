@@ -55,7 +55,7 @@ export function PerformanceFilterBar({
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-wrap">
           <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-medium uppercase text-muted-foreground ml-1">Periode</span>
+            <span className="text-[10px] font-medium uppercase text-muted-foreground ml-1">Period</span>
             <DatePickerWithRange
               date={date}
               setDate={setDate}
@@ -64,22 +64,22 @@ export function PerformanceFilterBar({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-medium uppercase text-muted-foreground ml-1">Granularitas</span>
+            <span className="text-[10px] font-medium uppercase text-muted-foreground ml-1">Granularity</span>
             <Tabs 
               value={granularity} 
               onValueChange={(val) => setGranularity(val as any)}
               className="h-9"
             >
               <TabsList className="h-9">
-                <TabsTrigger value="daily" className="text-xs h-7 px-3">Harian</TabsTrigger>
-                <TabsTrigger value="monthly" className="text-xs h-7 px-3">Bulanan</TabsTrigger>
-                <TabsTrigger value="yearly" className="text-xs h-7 px-3">Tahunan</TabsTrigger>
+                <TabsTrigger value="daily" className="text-xs h-7 px-3">Daily</TabsTrigger>
+                <TabsTrigger value="monthly" className="text-xs h-7 px-3">Monthly</TabsTrigger>
+                <TabsTrigger value="yearly" className="text-xs h-7 px-3">Yearly</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-medium uppercase text-muted-foreground ml-1">Filter Kategori</span>
+            <span className="text-[10px] font-medium uppercase text-muted-foreground ml-1">Filter Category</span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -90,19 +90,19 @@ export function PerformanceFilterBar({
                   {vendorCategoryId
                     ? vendorCategoryOptions.find(
                         (opt) => opt.value === vendorCategoryId,
-                      )?.label || 'Semua Kategori'
-                    : 'Semua Kategori'}
+                      )?.label || 'All Categories'
+                    : 'All Categories'}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-[200px]">
-                <DropdownMenuLabel className="text-xs">Filter Kategori</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-xs">Filter Category</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup
                   value={vendorCategoryId || ''}
                   onValueChange={(val) => setVendorCategoryId(val || undefined)}
                 >
                   <DropdownMenuRadioItem value="" className="text-xs">
-                    Semua Kategori
+                    All Categories
                   </DropdownMenuRadioItem>
                   {vendorCategoryOptions.map((option) => (
                     <DropdownMenuRadioItem
