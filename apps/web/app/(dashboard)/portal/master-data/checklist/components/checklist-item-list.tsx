@@ -166,7 +166,7 @@ function ChecklistItem({
           {item.item_type}
         </Badge>
 
-        {item.item_type === ChecklistItemType.KHUSUS &&
+        {item.item_type === ChecklistItemType.SPECIFIC &&
           item.material_category && (
             <Badge variant="secondary" className="text-xs bg-muted">
               {item.material_category.category_name}

@@ -227,12 +227,12 @@ export default function DeparturePage() {
                 </CardContent>
 
                 <CardFooter className="pb-6 pt-0">
-                  {queueData.current_status === QueueStatus.SELESAI ? (
+                  {queueData.current_status === QueueStatus.COMPLETED ? (
                     <div className="w-full p-3 bg-blue-50 text-blue-700 rounded-lg text-center text-sm font-medium border border-blue-100">
                       Antrean ini sudah berhasil Check-Out (SELESAI).
                     </div>
-                  ) : queueData.current_status !== QueueStatus.AKTIF &&
-                    queueData.current_status !== QueueStatus.DISETUJUI ? (
+                  ) : queueData.current_status !== QueueStatus.ACTIVE &&
+                    queueData.current_status !== QueueStatus.APPROVED ? (
                     <div className="w-full p-3 bg-amber-50 text-amber-700 rounded-lg text-center text-sm font-bold border border-amber-100">
                       Antrean ini masih{' '}
                       {queueData.ops_queue_status?.status_display_text ||

@@ -31,10 +31,10 @@ export function ChecklistCategory({
 
   // Filter items
   const generalItems = category.items.filter(
-    (item) => item.item_type === ChecklistItemType.UMUM,
+    (item) => item.item_type === ChecklistItemType.GENERAL,
   );
   const specificItems = category.items.filter(
-    (item) => item.item_type === ChecklistItemType.KHUSUS,
+    (item) => item.item_type === ChecklistItemType.SPECIFIC,
   );
 
   // Calculate category progress

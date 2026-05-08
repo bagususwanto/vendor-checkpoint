@@ -47,12 +47,12 @@ const checklistItemBaseSchema = z.object({
 export const createChecklistItemSchema = checklistItemBaseSchema.superRefine(
   (data, ctx) => {
     if (
-      data.item_type === ChecklistItemType.KHUSUS &&
+      data.item_type === ChecklistItemType.SPECIFIC &&
       !data.vendor_category_id
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Kategori vendor harus dipilih untuk item khusus',
+        message: 'Vendor category must be selected for specific items',
         path: ['vendor_category_id'],
       });
     }

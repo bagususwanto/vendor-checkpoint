@@ -48,14 +48,14 @@ export class ChecklistService {
 
         // Primary sort: item_type ('GENERAL' first, 'SPECIFIC' last)
         if (
-          typeA === ChecklistItemType.UMUM &&
-          typeB !== ChecklistItemType.UMUM
+          typeA === ChecklistItemType.GENERAL &&
+          typeB !== ChecklistItemType.GENERAL
         ) {
           return -1;
         }
         if (
-          typeA !== ChecklistItemType.UMUM &&
-          typeB === ChecklistItemType.UMUM
+          typeA !== ChecklistItemType.GENERAL &&
+          typeB === ChecklistItemType.GENERAL
         ) {
           return 1;
         }

@@ -99,7 +99,7 @@ export class DashboardService {
             gte: startDate,
             lt: endDate,
           },
-          current_status: { in: [QueueStatus.DISETUJUI, QueueStatus.SELESAI] },
+          current_status: { in: [QueueStatus.APPROVED, QueueStatus.COMPLETED] },
         },
       }),
       this.prisma.ops_checkin_entry.count({
@@ -108,7 +108,7 @@ export class DashboardService {
             gte: startDate,
             lt: endDate,
           },
-          current_status: QueueStatus.DITOLAK,
+          current_status: QueueStatus.REJECTED,
         },
       }),
       this.prisma.ops_checkin_entry.count({
@@ -117,7 +117,7 @@ export class DashboardService {
             gte: startDate,
             lt: endDate,
           },
-          current_status: QueueStatus.MENUNGGU,
+          current_status: QueueStatus.WAITING,
         },
       }),
       this.prisma.ops_timelog.aggregate({

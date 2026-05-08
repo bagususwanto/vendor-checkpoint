@@ -8,17 +8,17 @@ export enum UserRole {
 }
 
 export enum QueueStatus {
-  MENUNGGU = 'WAITING',
-  DISETUJUI = 'APPROVED',
-  AKTIF = 'ACTIVE',
-  TERTAHAN = 'ON_HOLD',
-  DITOLAK = 'REJECTED',
-  SELESAI = 'COMPLETED',
+  WAITING = 'WAITING',
+  APPROVED = 'APPROVED',
+  ACTIVE = 'ACTIVE',
+  ON_HOLD = 'ON_HOLD',
+  REJECTED = 'REJECTED',
+  COMPLETED = 'COMPLETED',
 }
 
 export enum ChecklistItemType {
-  UMUM = 'GENERAL',
-  KHUSUS = 'SPECIFIC',
+  GENERAL = 'GENERAL',
+  SPECIFIC = 'SPECIFIC',
 }
 
 export enum AuditLogAction {

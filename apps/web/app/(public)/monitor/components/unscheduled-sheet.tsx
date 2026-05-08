@@ -35,7 +35,7 @@ export function UnscheduledSheet({
       'px-2 py-0.5 text-[9px] font-black uppercase tracking-widest';
 
     switch (status) {
-      case QueueStatus.MENUNGGU:
+      case QueueStatus.WAITING:
         return (
           <Badge
             variant="outline"
@@ -47,7 +47,7 @@ export function UnscheduledSheet({
             Waiting
           </Badge>
         );
-      case QueueStatus.DISETUJUI:
+      case QueueStatus.APPROVED:
         return (
           <Badge
             variant="outline"
@@ -59,7 +59,7 @@ export function UnscheduledSheet({
             Approved
           </Badge>
         );
-      case QueueStatus.AKTIF:
+      case QueueStatus.ACTIVE:
         return (
           <Badge
             variant="outline"
@@ -71,7 +71,7 @@ export function UnscheduledSheet({
             Active
           </Badge>
         );
-      case QueueStatus.SELESAI:
+      case QueueStatus.COMPLETED:
         return (
           <Badge
             variant="outline"

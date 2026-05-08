@@ -232,7 +232,7 @@ export class CheckInController {
     buildDetails: (req, res) => ({
       entry_id: res.entry_id,
       user_id: res.user_id,
-      old_value: { status: QueueStatus.MENUNGGU },
+      old_value: { status: QueueStatus.WAITING },
       new_value: {
         status: res.status,
         rejection_reason:
@@ -295,9 +295,9 @@ export class CheckInController {
     buildDetails: (req, res) => ({
       entry_id: res.entry_id,
       user_id: res.user_id,
-      old_value: { status: res?.previous_status || QueueStatus.DISETUJUI },
+      old_value: { status: res?.previous_status || QueueStatus.APPROVED },
       new_value: {
-        status: QueueStatus.SELESAI,
+        status: QueueStatus.COMPLETED,
         checkout_time: res.checkout_time,
         duration_minutes: res.duration_minutes,
       },
@@ -344,9 +344,9 @@ export class CheckInController {
     buildDetails: (req, res) => ({
       entry_id: res.entry_id,
       user_id: res.user_id,
-      old_value: { status: QueueStatus.DISETUJUI },
+      old_value: { status: QueueStatus.APPROVED },
       new_value: {
-        status: QueueStatus.TERTAHAN,
+        status: QueueStatus.ON_HOLD,
         hold_time: res.hold_time,
         reason: res.reason,
       },
@@ -375,9 +375,9 @@ export class CheckInController {
     buildDetails: (req, res) => ({
       entry_id: res.entry_id,
       user_id: res.user_id,
-      old_value: { status: QueueStatus.TERTAHAN },
+      old_value: { status: QueueStatus.ON_HOLD },
       new_value: {
-        status: QueueStatus.DISETUJUI,
+        status: QueueStatus.APPROVED,
         resume_time: res.resume_time,
       },
     }),

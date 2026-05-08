@@ -38,8 +38,8 @@ export function ReviewChecklist({ step2Data }: ReviewChecklistProps) {
             )
             .sort((a, b) => {
               // Primary sort: item_type (GENERAL before SPECIFIC)
-              if (a.item_type === ChecklistItemType.UMUM && b.item_type !== ChecklistItemType.UMUM) return -1;
-              if (a.item_type !== ChecklistItemType.UMUM && b.item_type === ChecklistItemType.UMUM) return 1;
+              if (a.item_type === ChecklistItemType.GENERAL && b.item_type !== ChecklistItemType.GENERAL) return -1;
+              if (a.item_type !== ChecklistItemType.GENERAL && b.item_type === ChecklistItemType.GENERAL) return 1;
 
               // Secondary sort: display_order
               return (a.display_order || 0) - (b.display_order || 0);

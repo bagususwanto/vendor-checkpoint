@@ -81,15 +81,15 @@ export function ReportFilterForm({
               >
                 <Filter className="mr-2 h-4 w-4" />
                 {status
-                  ? status === QueueStatus.MENUNGGU
+                  ? status === QueueStatus.WAITING
                     ? 'Waiting'
-                    : status === QueueStatus.DISETUJUI
+                    : status === QueueStatus.APPROVED
                       ? 'Approved'
-                      : status === QueueStatus.AKTIF
+                      : status === QueueStatus.ACTIVE
                         ? 'Active'
-                        : status === QueueStatus.SELESAI
+                        : status === QueueStatus.COMPLETED
                           ? 'Completed'
-                          : status === QueueStatus.DITOLAK
+                          : status === QueueStatus.REJECTED
                             ? 'Rejected'
                             : 'Status'
                   : 'Status'}
@@ -105,19 +105,19 @@ export function ReportFilterForm({
                 <DropdownMenuRadioItem value="">
                   All Statuses
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value={QueueStatus.MENUNGGU}>
+                <DropdownMenuRadioItem value={QueueStatus.WAITING}>
                   Waiting
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value={QueueStatus.DISETUJUI}>
+                <DropdownMenuRadioItem value={QueueStatus.APPROVED}>
                   Approved
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value={QueueStatus.AKTIF}>
+                <DropdownMenuRadioItem value={QueueStatus.ACTIVE}>
                   Active
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value={QueueStatus.SELESAI}>
+                <DropdownMenuRadioItem value={QueueStatus.COMPLETED}>
                   Completed
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value={QueueStatus.DITOLAK}>
+                <DropdownMenuRadioItem value={QueueStatus.REJECTED}>
                   Rejected
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>

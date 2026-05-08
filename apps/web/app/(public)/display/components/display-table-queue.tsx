@@ -109,14 +109,14 @@ export function DisplayTableQueue({
                 <div className="col-span-2 text-right">
                   <Badge
                     variant={
-                      queue.status === QueueStatus.MENUNGGU || queue.status === QueueStatus.AKTIF
+                      queue.status === QueueStatus.WAITING || queue.status === QueueStatus.ACTIVE
                         ? 'outline'
                         : 'secondary'
                     }
                     className={`gap-1.5 ${
-                      queue.status === QueueStatus.MENUNGGU
+                      queue.status === QueueStatus.WAITING
                         ? 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30'
-                        : queue.status === QueueStatus.AKTIF
+                        : queue.status === QueueStatus.ACTIVE
                         ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
                         : ''
                     }`}

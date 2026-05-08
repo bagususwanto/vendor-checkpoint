@@ -67,7 +67,7 @@ export function ChecklistItemDialog({
       checklist_category_id: categoryId || 0,
       item_text: '',
       item_code: '',
-      item_type: ChecklistItemType.UMUM,
+      item_type: ChecklistItemType.GENERAL,
       display_order: 0,
       is_required: true,
       is_active: true,
@@ -93,7 +93,7 @@ export function ChecklistItemDialog({
         checklist_category_id: categoryId,
         item_text: '',
         item_code: '',
-        item_type: ChecklistItemType.UMUM,
+        item_type: ChecklistItemType.GENERAL,
         display_order: 0,
         is_required: true,
         is_active: true,
@@ -161,14 +161,14 @@ export function ChecklistItemDialog({
                 className="flex gap-4 pt-2"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value={ChecklistItemType.UMUM} id="general" />
+                  <RadioGroupItem value={ChecklistItemType.GENERAL} id="general" />
                   <Label htmlFor="general" className="font-normal cursor-pointer">
                     General
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem
-                    value={ChecklistItemType.KHUSUS}
+                    value={ChecklistItemType.SPECIFIC}
                     id="specific"
                   />
                   <Label
@@ -183,7 +183,7 @@ export function ChecklistItemDialog({
             <FieldError errors={[form.formState.errors.item_type]} />
           </Field>
 
-          {form.watch('item_type') === ChecklistItemType.KHUSUS && (
+          {form.watch('item_type') === ChecklistItemType.SPECIFIC && (
             <div className="py-2">
               <Field>
                 <FieldLabel required>Vendor Category</FieldLabel>

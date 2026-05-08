@@ -105,8 +105,8 @@ export class CheckInService {
           const isVerificationEnabled =
             verificationModeConfig?.config_value === 'true';
           const initialStatus = isVerificationEnabled
-            ? QueueStatus.MENUNGGU
-            : QueueStatus.AKTIF;
+            ? QueueStatus.WAITING
+            : QueueStatus.ACTIVE;
 
           let slotId = null;
           const operationalDate = getOperationalDate(dateNow);
@@ -219,7 +219,7 @@ export class CheckInService {
             );
 
           const statusDisplayTextKey =
-            initialStatus === QueueStatus.AKTIF
+            initialStatus === QueueStatus.ACTIVE
               ? 'DEFAULT_STATUS_AKTIF_DISPLAY_TEXT'
               : 'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT';
 
@@ -236,7 +236,7 @@ export class CheckInService {
             driver_name: createCheckInDto.driver_name,
             status_display_text:
               statusDisplayText?.config_value ||
-              (initialStatus === QueueStatus.AKTIF ? 'Accepted' : 'Waiting'),
+              (initialStatus === QueueStatus.ACTIVE ? 'Accepted' : 'Waiting'),
             estimated_wait_minutes: estimatedWaitMinutes?.config_value
               ? toInt(estimatedWaitMinutes.config_value)
               : 0,
@@ -427,10 +427,10 @@ export class CheckInService {
         where: {
           current_status: {
             in: [
-              QueueStatus.MENUNGGU,
-              QueueStatus.DISETUJUI,
-              QueueStatus.TERTAHAN,
-              QueueStatus.AKTIF,
+              QueueStatus.WAITING,
+              QueueStatus.APPROVED,
+              QueueStatus.ON_HOLD,
+              QueueStatus.ACTIVE,
             ],
           },
           submission_time: {
@@ -800,7 +800,7 @@ export class CheckInService {
         throw new BadRequestException('Queue number not found');
       }
 
-      if (entry.current_status !== QueueStatus.MENUNGGU) {
+      if (entry.current_status !== QueueStatus.WAITING) {
         throw new BadRequestException(
           `Check-in has already been verified with status: ${entry.current_status}`,
         );
@@ -808,7 +808,7 @@ export class CheckInService {
 
       // 2. Determine new status
       const newStatus =
-        action === 'APPROVE' ? QueueStatus.DISETUJUI : QueueStatus.DITOLAK;
+        action === 'APPROVE' ? QueueStatus.APPROVED : QueueStatus.REJECTED;
 
       // 3. Get display text from config
       const statusConfigKey =
@@ -905,8 +905,8 @@ export class CheckInService {
       }
 
       if (
-        entry.current_status !== QueueStatus.DISETUJUI &&
-        entry.current_status !== QueueStatus.AKTIF
+        entry.current_status !== QueueStatus.APPROVED &&
+        entry.current_status !== QueueStatus.ACTIVE
       ) {
         throw new BadRequestException(
           `Checkout can only be performed for APPROVED or ACTIVE status. Current status: ${entry.current_status}`,
@@ -958,7 +958,7 @@ export class CheckInService {
       await tx.ops_checkin_entry.update({
         where: { queue_number },
         data: {
-          current_status: QueueStatus.SELESAI,
+          current_status: QueueStatus.COMPLETED,
           updated_at: checkoutTime,
         },
       });
@@ -967,7 +967,7 @@ export class CheckInService {
       await tx.ops_queue_status.update({
         where: { entry_id: entry.entry_id },
         data: {
-          current_status: QueueStatus.SELESAI,
+          current_status: QueueStatus.COMPLETED,
           status_display_text: statusDisplayText.config_value,
           last_updated: checkoutTime,
         },
@@ -981,7 +981,7 @@ export class CheckInService {
         user_id: localUserId,
         queue_number,
         previous_status: entry.current_status,
-        status: QueueStatus.SELESAI,
+        status: QueueStatus.COMPLETED,
         status_display_text: statusDisplayText.config_value,
         driver_name: entry.driver_name,
         company_name: entry.snapshot_company_name,
@@ -1028,7 +1028,7 @@ export class CheckInService {
         throw new BadRequestException('Queue number not found');
       }
 
-      if (entry.current_status !== QueueStatus.DISETUJUI) {
+      if (entry.current_status !== QueueStatus.APPROVED) {
         throw new BadRequestException(
           `Only queues with APPROVED status can be held. Current status: ${entry.current_status}`,
         );
@@ -1043,7 +1043,7 @@ export class CheckInService {
       await tx.ops_checkin_entry.update({
         where: { queue_number },
         data: {
-          current_status: QueueStatus.TERTAHAN,
+          current_status: QueueStatus.ON_HOLD,
           updated_at: updateTime,
         },
       });
@@ -1051,7 +1051,7 @@ export class CheckInService {
       await tx.ops_queue_status.update({
         where: { entry_id: entry.entry_id },
         data: {
-          current_status: QueueStatus.TERTAHAN,
+          current_status: QueueStatus.ON_HOLD,
           status_display_text: statusDisplayText?.config_value || 'On Hold',
           last_updated: updateTime,
         },
@@ -1063,13 +1063,13 @@ export class CheckInService {
         create: {
           entry_id: entry.entry_id,
           verified_by_user_id: localUserId,
-          verification_status: QueueStatus.TERTAHAN,
+          verification_status: QueueStatus.ON_HOLD,
           rejection_reason: reason,
           verification_time: updateTime,
         },
         update: {
           verified_by_user_id: localUserId,
-          verification_status: QueueStatus.TERTAHAN,
+          verification_status: QueueStatus.ON_HOLD,
           rejection_reason: reason,
           verification_time: updateTime,
         },
@@ -1079,7 +1079,7 @@ export class CheckInService {
         entry_id: entry.entry_id,
         user_id: localUserId,
         queue_number,
-        status: QueueStatus.TERTAHAN,
+        status: QueueStatus.ON_HOLD,
         status_display_text: statusDisplayText?.config_value || 'On Hold',
         driver_name: entry.driver_name,
         company_name: entry.snapshot_company_name,
@@ -1112,7 +1112,7 @@ export class CheckInService {
         throw new BadRequestException('Queue number not found');
       }
 
-      if (entry.current_status !== QueueStatus.TERTAHAN) {
+      if (entry.current_status !== QueueStatus.ON_HOLD) {
         throw new BadRequestException(
           `Only queues with ON_HOLD status can be resumed. Current status: ${entry.current_status}`,
         );
@@ -1127,7 +1127,7 @@ export class CheckInService {
       await tx.ops_checkin_entry.update({
         where: { queue_number },
         data: {
-          current_status: QueueStatus.DISETUJUI,
+          current_status: QueueStatus.APPROVED,
           updated_at: updateTime,
         },
       });
@@ -1135,7 +1135,7 @@ export class CheckInService {
       await tx.ops_queue_status.update({
         where: { entry_id: entry.entry_id },
         data: {
-          current_status: QueueStatus.DISETUJUI,
+          current_status: QueueStatus.APPROVED,
           status_display_text: statusDisplayText?.config_value || 'Processing',
           last_updated: updateTime,
         },
@@ -1146,7 +1146,7 @@ export class CheckInService {
         where: { entry_id: entry.entry_id },
         data: {
           verified_by_user_id: localUserId,
-          verification_status: QueueStatus.DISETUJUI,
+          verification_status: QueueStatus.APPROVED,
           rejection_reason: null, // Clear the hold reason
           verification_time: updateTime,
         },
@@ -1156,7 +1156,7 @@ export class CheckInService {
         entry_id: entry.entry_id,
         user_id: localUserId,
         queue_number,
-        status: QueueStatus.DISETUJUI,
+        status: QueueStatus.APPROVED,
         status_display_text: statusDisplayText?.config_value || 'Processing',
         driver_name: entry.driver_name,
         company_name: entry.snapshot_company_name,
@@ -1311,14 +1311,14 @@ export class CheckInService {
 
           // Primary sort: item_type ('general' first, 'specific' last)
           if (
-            typeA === ChecklistItemType.UMUM.toLowerCase() &&
-            typeB !== ChecklistItemType.UMUM.toLowerCase()
+            typeA === ChecklistItemType.GENERAL.toLowerCase() &&
+            typeB !== ChecklistItemType.GENERAL.toLowerCase()
           ) {
             return -1;
           }
           if (
-            typeA !== ChecklistItemType.UMUM.toLowerCase() &&
-            typeB === ChecklistItemType.UMUM.toLowerCase()
+            typeA !== ChecklistItemType.GENERAL.toLowerCase() &&
+            typeB === ChecklistItemType.GENERAL.toLowerCase()
           ) {
             return 1;
           }
@@ -1471,7 +1471,7 @@ export class CheckInService {
       'ESTIMATED_WAIT_MINUTES',
     );
     const statusDisplayTextKey =
-      initialStatus === QueueStatus.AKTIF
+      initialStatus === QueueStatus.ACTIVE
         ? 'DEFAULT_STATUS_DISETUJUI_DISPLAY_TEXT'
         : 'DEFAULT_STATUS_MENUNGGU_DISPLAY_TEXT';
 

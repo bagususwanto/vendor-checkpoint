@@ -29,16 +29,16 @@ export function RecentCheckinsTable() {
             <TabsTrigger value="rejected">Ditolak</TabsTrigger>
           </TabsList>
           <TabsContent value="waiting" className="space-y-4">
-            <CheckinList status={QueueStatus.MENUNGGU} />
+            <CheckinList status={QueueStatus.WAITING} />
           </TabsContent>
           <TabsContent value="approved" className="space-y-4">
-            <CheckinList status={`${QueueStatus.DISETUJUI},${QueueStatus.AKTIF}`} />
+            <CheckinList status={`${QueueStatus.APPROVED},${QueueStatus.ACTIVE}`} />
           </TabsContent>
           <TabsContent value="held" className="space-y-4">
-            <CheckinList status={QueueStatus.TERTAHAN} />
+            <CheckinList status={QueueStatus.ON_HOLD} />
           </TabsContent>
           <TabsContent value="rejected" className="space-y-4">
-            <CheckinList status={QueueStatus.DITOLAK} />
+            <CheckinList status={QueueStatus.REJECTED} />
           </TabsContent>
         </Tabs>
       </CardContent>

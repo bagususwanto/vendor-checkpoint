@@ -143,8 +143,8 @@ export function QueueTable({
                   <StatusBadge status={checkin.current_status} />
                 </TableCell>
                 <TableCell className="text-right">
-                  {checkin.current_status === QueueStatus.SELESAI ||
-                  checkin.current_status === QueueStatus.DITOLAK ? (
+                  {checkin.current_status === QueueStatus.COMPLETED ||
+                  checkin.current_status === QueueStatus.REJECTED ? (
                     <VerificationSheet
                       checkin={{
                         id: checkin.queue_number,
@@ -163,7 +163,7 @@ export function QueueTable({
                     />
                   ) : (
                     <div className="flex justify-end gap-2">
-                      {checkin.current_status === QueueStatus.MENUNGGU && (
+                      {checkin.current_status === QueueStatus.WAITING && (
                         <VerificationSheet
                           checkin={{
                             id: checkin.queue_number,
@@ -178,8 +178,8 @@ export function QueueTable({
                         />
                       )}
 
-                      {(checkin.current_status === QueueStatus.DISETUJUI ||
-                        checkin.current_status === QueueStatus.AKTIF) && (
+                      {(checkin.current_status === QueueStatus.APPROVED ||
+                        checkin.current_status === QueueStatus.ACTIVE) && (
                         <CheckoutSheet
                           checkin={{
                             id: checkin.queue_number,
@@ -198,7 +198,7 @@ export function QueueTable({
                         />
                       )}
 
-                      {checkin.current_status === QueueStatus.TERTAHAN && (
+                      {checkin.current_status === QueueStatus.ON_HOLD && (
                          <VerificationSheet
                             checkin={{
                               id: checkin.queue_number,

@@ -109,7 +109,7 @@ export function CheckinList({ status }: CheckinListProps) {
                 <StatusBadge status={checkin.current_status} />
               </TableCell>
               <TableCell className="text-right">
-                {checkin.current_status === QueueStatus.MENUNGGU && (
+                {checkin.current_status === QueueStatus.WAITING && (
                   <VerificationSheet
                     checkin={{
                       id: checkin.queue_number,
@@ -124,10 +124,10 @@ export function CheckinList({ status }: CheckinListProps) {
                   />
                 )}
 
-                {(checkin.current_status === QueueStatus.DISETUJUI ||
-                  checkin.current_status === QueueStatus.AKTIF) && (
+                {(checkin.current_status === QueueStatus.APPROVED ||
+                  checkin.current_status === QueueStatus.ACTIVE) && (
                   <div className="flex justify-end gap-2">
-                    {checkin.current_status === QueueStatus.DISETUJUI && (
+                    {checkin.current_status === QueueStatus.APPROVED && (
                       <HoldDialog
                         queueNumber={checkin.queue_number}
                         trigger={
@@ -161,7 +161,7 @@ export function CheckinList({ status }: CheckinListProps) {
                   </div>
                 )}
 
-                {checkin.current_status === QueueStatus.TERTAHAN && (
+                {checkin.current_status === QueueStatus.ON_HOLD && (
                   <div className="flex justify-end gap-2">
                     <ResumeDialog
                       queueNumber={checkin.queue_number}
@@ -175,8 +175,8 @@ export function CheckinList({ status }: CheckinListProps) {
                   </div>
                 )}
 
-                {(checkin.current_status === QueueStatus.SELESAI ||
-                  checkin.current_status === QueueStatus.DITOLAK) && (
+                {(checkin.current_status === QueueStatus.COMPLETED ||
+                  checkin.current_status === QueueStatus.REJECTED) && (
                   <VerificationSheet
                     checkin={{
                       id: checkin.queue_number,
