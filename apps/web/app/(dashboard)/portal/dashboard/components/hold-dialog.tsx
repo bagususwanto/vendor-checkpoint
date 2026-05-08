@@ -33,8 +33,8 @@ export function HoldDialog({
 
   const handleHold = () => {
     if (!reason.trim()) {
-      toast.error('Alasan Diperlukan', {
-        description: 'Mohon isi alasan untuk menahan check-in ini.',
+      toast.error('Reason Required', {
+        description: 'Please provide a reason to hold this check-in.',
       });
       return;
     }
@@ -43,16 +43,16 @@ export function HoldDialog({
       { queue_number: queueNumber, reason },
       {
         onSuccess: () => {
-          toast.success('Berhasil ditahan', {
-            description: `Antrean ${queueNumber} sementara ditahan.`,
+          toast.success('Successfully held', {
+            description: `Queue ${queueNumber} is temporarily on hold.`,
           });
           setOpen(false);
           setReason('');
           onSuccess?.();
         },
         onError: (error) => {
-          toast.error('Gagal', {
-            description: error.message || 'Terjadi kesalahan.',
+          toast.error('Failed', {
+            description: error.message || 'An error occurred.',
           });
         },
       }
@@ -64,17 +64,17 @@ export function HoldDialog({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Tahan Antrean (Hold)</DialogTitle>
+          <DialogTitle>Hold Queue</DialogTitle>
           <DialogDescription>
-            Masukkan alasan penahanan antrean ini. Antrean akan dipindahkan ke tab Tertahan.
+            Enter the reason for holding this queue. The queue will be moved to the On Hold tab.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="reason">Alasan Penahanan</Label>
+            <Label htmlFor="reason">Holding Reason</Label>
             <Textarea
               id="reason"
-              placeholder="Tuliskan kendala atau alasan mengapa antrean ditahan..."
+              placeholder="Write down the constraints or reasons why the queue is on hold..."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               className="resize-none"
@@ -84,10 +84,10 @@ export function HoldDialog({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
-            Batal
+            Cancel
           </Button>
           <Button onClick={handleHold} disabled={holdMutation.isPending || !reason.trim()}>
-            {holdMutation.isPending ? 'Menyimpan...' : 'Tahan Antrean'}
+            {holdMutation.isPending ? 'Saving...' : 'Hold Queue'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -37,7 +37,7 @@ export function ChecklistBreakdown() {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-sm">
-            Tidak ada data checklist hari ini.
+            No checklist data today.
           </p>
         </CardContent>
       </Card>
@@ -65,7 +65,7 @@ export function ChecklistBreakdown() {
                     <span className="font-medium">{category.name}</span>
                   </div>
                   <span className="text-muted-foreground">
-                    {category.compliant_items} / {category.total_items} Item Ok
+                    {category.compliant_items} / {category.total_items} Items OK
                   </span>
                 </div>
                 <Progress

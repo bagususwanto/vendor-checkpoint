@@ -34,7 +34,7 @@ function TrendIndicator({ trend, inverse = false }: TrendIndicatorProps) {
     return (
       <div className="flex items-center text-xs text-muted-foreground mt-1">
         <Minus className="h-3 w-3 mr-1" />
-        <span>0% dari kemarin</span>
+        <span>0% from yesterday</span>
       </div>
     );
   }
@@ -55,7 +55,7 @@ function TrendIndicator({ trend, inverse = false }: TrendIndicatorProps) {
   return (
     <div className={cn('flex items-center text-xs mt-1', colorClass)}>
       <Icon className="h-3 w-3 mr-1" />
-      <span>{percentage}% dari kemarin</span>
+      <span>{percentage}% from yesterday</span>
     </div>
   );
 }
@@ -81,7 +81,7 @@ export function StatsCard() {
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <Badge variant={stats.verification_mode ? 'default' : 'secondary'}>
-          {stats.verification_mode ? 'Mode Verifikasi Staff' : 'Mode Self-Service'}
+          {stats.verification_mode ? 'Staff Verification Mode' : 'Self-Service Mode'}
         </Badge>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
@@ -100,7 +100,7 @@ export function StatsCard() {
           <>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Disetujui</CardTitle>
+                <CardTitle className="text-sm font-medium">Approved</CardTitle>
                 <CheckCircle className="h-4 w-4 text-emerald-500" />
               </CardHeader>
               <CardContent>
@@ -110,7 +110,7 @@ export function StatsCard() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Ditolak</CardTitle>
+                <CardTitle className="text-sm font-medium">Rejected</CardTitle>
                 <XCircle className="h-4 w-4 text-rose-500" />
               </CardHeader>
               <CardContent>
@@ -120,12 +120,12 @@ export function StatsCard() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Menunggu</CardTitle>
+                <CardTitle className="text-sm font-medium">Waiting</CardTitle>
                 <Clock className="h-4 w-4 text-orange-500" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.current_waiting}</div>
-                <p className="text-xs text-muted-foreground mt-1">Antrian saat ini</p>
+                <p className="text-xs text-muted-foreground mt-1">Current queue</p>
               </CardContent>
             </Card>
           </>
@@ -138,7 +138,7 @@ export function StatsCard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.missed_cycle_count}</div>
-                <p className="text-xs text-muted-foreground mt-1">Siklus terlewat hari ini</p>
+                <p className="text-xs text-muted-foreground mt-1">Missed cycles today</p>
               </CardContent>
             </Card>
             <Card>
@@ -148,7 +148,7 @@ export function StatsCard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.on_time_arrival_pct}</div>
-                <p className="text-xs text-muted-foreground mt-1">Tingkat ketepatan kedatangan</p>
+                <p className="text-xs text-muted-foreground mt-1">Arrival punctuality rate</p>
               </CardContent>
             </Card>
             <Card>
@@ -158,7 +158,7 @@ export function StatsCard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.on_time_departure_pct}</div>
-                <p className="text-xs text-muted-foreground mt-1">Tingkat ketepatan keberangkatan</p>
+                <p className="text-xs text-muted-foreground mt-1">Departure punctuality rate</p>
               </CardContent>
             </Card>
           </>
@@ -166,7 +166,7 @@ export function StatsCard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Rata-rata Waktu</CardTitle>
+            <CardTitle className="text-sm font-medium">Average Lead Time</CardTitle>
             <Timer className="h-4 w-4 text-sky-500" />
           </CardHeader>
           <CardContent>

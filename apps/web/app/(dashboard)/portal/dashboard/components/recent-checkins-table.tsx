@@ -15,18 +15,18 @@ export function RecentCheckinsTable() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Check-in Terbaru</CardTitle>
+        <CardTitle>Recent Check-ins</CardTitle>
         <CardDescription>
-          Kelola check-in yang perlu diverifikasi atau di-checkout.
+          Manage check-ins that need to be verified or checked out.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="waiting" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="waiting">Menunggu Verifikasi</TabsTrigger>
-            <TabsTrigger value="approved">Siap Check-Out</TabsTrigger>
-            <TabsTrigger value="held">Tertahan</TabsTrigger>
-            <TabsTrigger value="rejected">Ditolak</TabsTrigger>
+            <TabsTrigger value="waiting">Waiting Verification</TabsTrigger>
+            <TabsTrigger value="approved">Ready for Check-Out</TabsTrigger>
+            <TabsTrigger value="held">On Hold</TabsTrigger>
+            <TabsTrigger value="rejected">Rejected</TabsTrigger>
           </TabsList>
           <TabsContent value="waiting" className="space-y-4">
             <CheckinList status={QueueStatus.WAITING} />

@@ -513,11 +513,11 @@ export function VerificationSheet({
                                   {[
                                     {
                                       key: 'has_hardhat',
-                                      label: 'Helm Safety',
+                                      label: 'Safety Helmet',
                                     },
                                     {
                                       key: 'has_safety_vest',
-                                      label: 'Rompi Safety',
+                                      label: 'Safety Vest',
                                     },
                                   ].map((item) => (
                                     <Badge
@@ -750,7 +750,7 @@ export function VerificationSheet({
                                     variant="destructive"
                                     className="rounded-sm"
                                   >
-                                    {categoryNonCompliantCount} Tidak
+                                    {categoryNonCompliantCount} Fail
                                   </Badge>
                                 )}
                               </div>

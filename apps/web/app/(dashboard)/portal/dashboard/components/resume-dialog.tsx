@@ -32,15 +32,15 @@ export function ResumeDialog({
   const handleResume = () => {
     resumeMutation.mutate(queueNumber, {
       onSuccess: () => {
-        toast.success('Antrean Dilanjutkan', {
-          description: `Antrean ${queueNumber} berhasil dilanjutkan dan Siap Check-Out.`,
+        toast.success('Queue Resumed', {
+          description: `Queue ${queueNumber} successfully resumed and is Ready for Check-Out.`,
         });
         setOpen(false);
         onSuccess?.();
       },
       onError: (error) => {
-        toast.error('Gagal', {
-          description: error.message || 'Terjadi kesalahan.',
+        toast.error('Failed', {
+          description: error.message || 'An error occurred.',
         });
       },
     });
@@ -51,14 +51,14 @@ export function ResumeDialog({
       {trigger && <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>}
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Lanjutkan Antrean?</AlertDialogTitle>
+          <AlertDialogTitle>Resume Queue?</AlertDialogTitle>
           <AlertDialogDescription>
-            Tindakan ini akan mengembalikan status antrean {queueNumber} menjadi
-            Siap Check-Out. Pastikan semua kendala sudah diatasi.
+            This action will return queue {queueNumber} to Ready for Check-Out
+            status. Ensure all issues are resolved.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Batal</AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
@@ -66,7 +66,7 @@ export function ResumeDialog({
             }}
             disabled={resumeMutation.isPending}
           >
-            {resumeMutation.isPending ? 'Memproses...' : 'Lanjutkan'}
+            {resumeMutation.isPending ? 'Processing...' : 'Resume'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

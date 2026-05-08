@@ -24,7 +24,7 @@ export default function LeaderDashboardPage() {
         <div className="space-y-4 p-4 md:p-8 pt-6">
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-bold tracking-tight">
-              Dashboard Leader
+              Leader Dashboard
             </h2>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4" />

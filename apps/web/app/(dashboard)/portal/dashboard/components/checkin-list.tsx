@@ -69,13 +69,13 @@ export function CheckinList({ status }: CheckinListProps) {
       <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>No. Antrean</TableHead>
-          <TableHead>Perusahaan</TableHead>
+          <TableHead>Queue No.</TableHead>
+          <TableHead>Company</TableHead>
           <TableHead>Driver</TableHead>
-          <TableHead>Kategori</TableHead>
-          <TableHead>Waktu</TableHead>
+          <TableHead>Category</TableHead>
+          <TableHead>Time</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead className="text-right">Aksi</TableHead>
+          <TableHead className="text-right">Action</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -88,7 +88,7 @@ export function CheckinList({ status }: CheckinListProps) {
         ) : checkins.length === 0 ? (
           <TableRow>
             <TableCell colSpan={7} className="text-center py-4">
-              Tidak ada data ditemukan
+              No data found
             </TableCell>
           </TableRow>
         ) : (
@@ -119,7 +119,7 @@ export function CheckinList({ status }: CheckinListProps) {
                       time: checkin.submission_time,
                       status: checkin.current_status.toLowerCase(),
                     }}
-                    trigger={<Button size="sm">Verifikasi</Button>}
+                    trigger={<Button size="sm">Verify</Button>}
                     onSuccess={handleSuccess}
                   />
                 )}
@@ -136,7 +136,7 @@ export function CheckinList({ status }: CheckinListProps) {
                             variant="outline"
                             className="border-orange-200 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
                           >
-                            Tahan
+                            Hold
                           </Button>
                         }
                         onSuccess={handleSuccess}
@@ -167,7 +167,7 @@ export function CheckinList({ status }: CheckinListProps) {
                       queueNumber={checkin.queue_number}
                       trigger={
                         <Button size="sm" variant="default" className="bg-orange-500 hover:bg-orange-600">
-                          Lanjutkan
+                          Resume
                         </Button>
                       }
                       onSuccess={handleSuccess}
@@ -188,7 +188,7 @@ export function CheckinList({ status }: CheckinListProps) {
                     }}
                     trigger={
                       <Button size="sm" variant="outline">
-                        Detail
+                        Details
                       </Button>
                     }
                     readonly={true}
