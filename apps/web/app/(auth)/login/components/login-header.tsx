@@ -19,7 +19,7 @@ export function LoginHeader() {
         onClick={() => router.push('/')}
       >
         <ArrowLeft className="mr-2 size-4" />
-        Kembali ke halaman utama
+        Back to home
       </Button>
 
       <ThemeToggleButton
