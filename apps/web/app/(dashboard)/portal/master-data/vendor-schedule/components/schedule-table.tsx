@@ -70,10 +70,10 @@ export function ScheduleTable({
 
   const handleDelete = (id: number) => {
     deleteMutation.mutate(id, {
-      onSuccess: () => toast.success('Jadwal berhasil dihapus'),
+      onSuccess: () => toast.success('Schedule deleted successfully'),
       onError: (error) =>
-        toast.error('Gagal menghapus jadwal', {
-          description: error.message || 'Terjadi kesalahan sistem',
+        toast.error('Failed to delete schedule', {
+          description: error.message || 'A system error occurred',
         }),
     });
   };
@@ -89,7 +89,7 @@ export function ScheduleTable({
   if (data.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center rounded-md border border-dashed">
-        <p className="text-muted-foreground">Belum ada data jadwal vendor ditemukan</p>
+        <p className="text-muted-foreground">No vendor schedule data found</p>
       </div>
     );
   }
@@ -102,10 +102,10 @@ export function ScheduleTable({
             <TableRow>
               <TableHead className="w-[50px] text-center">No</TableHead>
               <TableHead>Vendor</TableHead>
-              <TableHead className="w-[100px]">Hari</TableHead>
-              <TableHead className="w-[80px] text-center">Rit</TableHead>
-              <TableHead className="w-[130px]">Waktu Tiba</TableHead>
-              <TableHead className="w-[150px]">Waktu Pulang</TableHead>
+              <TableHead className="w-[100px]">Day</TableHead>
+              <TableHead className="w-[80px] text-center">Cycle</TableHead>
+              <TableHead className="w-[130px]">Arrival Time</TableHead>
+              <TableHead className="w-[150px]">Departure Time</TableHead>
               <TableHead className="w-[150px]">Truck Station</TableHead>
               <TableHead className="w-[100px] text-center">Status</TableHead>
               <TableHead className="w-[80px]"></TableHead>
@@ -130,7 +130,7 @@ export function ScheduleTable({
                 <TableCell>{schedule.truck_station || '-'}</TableCell>
                 <TableCell className="text-center">
                   <Badge variant={schedule.is_active ? 'default' : 'secondary'}>
-                    {schedule.is_active ? 'Aktif' : 'Non-Aktif'}
+                    {schedule.is_active ? 'Active' : 'Inactive'}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -140,7 +140,7 @@ export function ScheduleTable({
                       size="icon"
                       className="h-8 w-8 text-muted-foreground"
                       onClick={() => onEdit(schedule)}
-                      title="Edit Jadwal"
+                      title="Edit Schedule"
                     >
                       <Edit2 className="h-4 w-4" />
                       <span className="sr-only">Edit</span>
@@ -151,32 +151,32 @@ export function ScheduleTable({
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                          title="Hapus Jadwal"
+                          title="Delete Schedule"
                           disabled={deleteMutation.isPending}
                         >
                           <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Hapus</span>
+                          <span className="sr-only">Delete</span>
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Hapus Jadwal Vendor</AlertDialogTitle>
+                          <AlertDialogTitle>Delete Vendor Schedule</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Apakah Anda yakin ingin menghapus jadwal untuk vendor{' '}
+                            Are you sure you want to delete the schedule for vendor{' '}
                             <span className="font-semibold text-foreground">
                               {schedule.vendor?.company_name || schedule.vendor?.vendor_code}
                             </span>{' '}
-                            pada hari {DAY_NAMES[schedule.day_of_week]}? Tindakan ini tidak dapat
-                            dibatalkan.
+                            on {DAY_NAMES[schedule.day_of_week]}? This action cannot be
+                            undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Batal</AlertDialogCancel>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => handleDelete(schedule.schedule_id)}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           >
-                            Hapus
+                            Delete
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -191,10 +191,10 @@ export function ScheduleTable({
 
       {/* Pagination controls */}
       <div className="flex items-center justify-between px-2">
-        <div className="flex-1 text-sm text-muted-foreground">Total {total} data</div>
+        <div className="flex-1 text-sm text-muted-foreground">Total {total} records</div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Baris per halaman</p>
+            <p className="text-sm font-medium">Rows per page</p>
             <Select
               value={`${limit}`}
               onValueChange={(value) => {
@@ -214,7 +214,7 @@ export function ScheduleTable({
             </Select>
           </div>
           <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Halaman {page} dari {totalPages}
+            Page {page} of {totalPages}
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -223,7 +223,7 @@ export function ScheduleTable({
               onClick={() => onPageChange(1)}
               disabled={page === 1}
             >
-              <span className="sr-only">Halaman pertama</span>
+              <span className="sr-only">First page</span>
               <ChevronsLeft className="h-4 w-4" />
             </Button>
             <Button
@@ -232,7 +232,7 @@ export function ScheduleTable({
               onClick={() => onPageChange(page - 1)}
               disabled={page === 1}
             >
-              <span className="sr-only">Halaman sebelumnya</span>
+              <span className="sr-only">Previous page</span>
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <Button
@@ -241,7 +241,7 @@ export function ScheduleTable({
               onClick={() => onPageChange(page + 1)}
               disabled={page >= totalPages}
             >
-              <span className="sr-only">Halaman berikutnya</span>
+              <span className="sr-only">Next page</span>
               <ChevronRight className="h-4 w-4" />
             </Button>
             <Button
@@ -250,7 +250,7 @@ export function ScheduleTable({
               onClick={() => onPageChange(totalPages)}
               disabled={page === totalPages}
             >
-              <span className="sr-only">Halaman terakhir</span>
+              <span className="sr-only">Last page</span>
               <ChevronsRight className="h-4 w-4" />
             </Button>
           </div>

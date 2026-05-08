@@ -36,7 +36,7 @@ export function ScheduleToolbar({
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari nama vendor..."
+            placeholder="Search vendor name..."
             className="pl-8 h-9"
             value={searchTerm}
             onChange={onSearchChange}
@@ -54,15 +54,15 @@ export function ScheduleToolbar({
               <Filter className="mr-2 h-4 w-4" />
               {dayOfWeek
                 ? DAY_NAMES[Number(dayOfWeek)]
-                : 'Hari'}
+                : 'Day'}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[200px]">
-            <DropdownMenuLabel>Filter Hari</DropdownMenuLabel>
+            <DropdownMenuLabel>Filter Day</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuRadioGroup value={dayOfWeek} onValueChange={setDayOfWeek}>
               <DropdownMenuRadioItem value="">
-                Semua Hari
+                All Days
               </DropdownMenuRadioItem>
               {DAY_OPTIONS.map((option) => (
                 <DropdownMenuRadioItem

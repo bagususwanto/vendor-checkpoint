@@ -38,15 +38,15 @@ import { ComboboxVendor } from '@/components/combobox-vendor';
 import { useDebounce } from '@/hooks/use-debounce';
 
 const formSchema = z.object({
-  vendor_id: z.coerce.number().min(1, 'Pilih vendor terlebih dahulu'),
+  vendor_id: z.coerce.number().min(1, 'Please select a vendor first'),
   day_of_week: z.nativeEnum(DayOfWeek),
-  rit: z.coerce.number().min(1, 'Nit minimal 1'),
+  rit: z.coerce.number().min(1, 'Cycle must be at least 1'),
   arrival_time: z
     .string()
-    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Time format must be HH:mm'),
   departure_time: z
     .string()
-    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format waktu harus HH:mm'),
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Time format must be HH:mm'),
   truck_station: z.string().optional().nullable(),
   is_active: z.boolean().default(true),
 });
@@ -156,12 +156,12 @@ export function ScheduleForm({
         { id: schedule!.schedule_id, data: values },
         {
           onSuccess: () => {
-            toast.success('Jadwal berhasil diperbarui');
+            toast.success('Schedule updated successfully');
             onOpenChange(false);
           },
           onError: (error: any) => {
-            toast.error('Gagal memperbarui jadwal', {
-              description: error.message || 'Terjadi kesalahan sistem',
+            toast.error('Failed to update schedule', {
+              description: error.message || 'A system error occurred',
             });
           },
         },
@@ -169,12 +169,12 @@ export function ScheduleForm({
     } else {
       createMutation.mutate(values, {
         onSuccess: () => {
-          toast.success('Jadwal berhasil ditambahkan');
+          toast.success('Schedule added successfully');
           onOpenChange(false);
         },
         onError: (error: any) => {
-          toast.error('Gagal menambahkan jadwal', {
-            description: error.message || 'Terjadi kesalahan sistem',
+          toast.error('Failed to add schedule', {
+            description: error.message || 'A system error occurred',
           });
         },
       });
@@ -186,18 +186,18 @@ export function ScheduleForm({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? 'Edit Jadwal Vendor' : 'Tambah Jadwal Vendor'}
+            {isEditing ? 'Edit Vendor Schedule' : 'Add Vendor Schedule'}
           </DialogTitle>
           <DialogDescription>
             {isEditing
-              ? 'Pastikan slot waktu yang diperbarui tidak mengganggu jadwal yang sedang berjalan hari ini.'
-              : 'Konfigurasi jadwal kunjungan rutin untuk vendor baru.'}
+              ? 'Ensure the updated time slot does not disrupt the schedules running today.'
+              : 'Configure routine visit schedules for new vendors.'}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Field>
-            <FieldLabel required>Pilih Vendor</FieldLabel>
+            <FieldLabel required>Select Vendor</FieldLabel>
             <FieldContent>
               <Controller
                 control={form.control}
@@ -224,7 +224,7 @@ export function ScheduleForm({
 
           <div className="grid grid-cols-2 gap-4">
             <Field>
-              <FieldLabel required>Hari Kedatangan</FieldLabel>
+              <FieldLabel required>Arrival Day</FieldLabel>
               <FieldContent>
                 <Controller
                   control={form.control}
@@ -236,7 +236,7 @@ export function ScheduleForm({
                       value={field.value?.toString()}
                     >
                       <SelectTrigger className="w-full h-10">
-                        <SelectValue placeholder="Pilih Hari" />
+                        <SelectValue placeholder="Select Day" />
                       </SelectTrigger>
                       <SelectContent>
                         {DAY_OPTIONS.map((day) => (
@@ -256,7 +256,7 @@ export function ScheduleForm({
             </Field>
 
             <Field>
-              <FieldLabel required>Rit (Nomor Trip)</FieldLabel>
+              <FieldLabel required>Cycle (Trip Number)</FieldLabel>
               <FieldContent>
                 <Input
                   type="number"
@@ -272,7 +272,7 @@ export function ScheduleForm({
 
           <div className="grid grid-cols-2 gap-4">
             <Field>
-              <FieldLabel required>Waktu Tiba</FieldLabel>
+              <FieldLabel required>Arrival Time</FieldLabel>
               <FieldContent>
                 <Input
                   type="time"
@@ -285,7 +285,7 @@ export function ScheduleForm({
             </Field>
 
             <Field>
-              <FieldLabel required>Waktu Pulang</FieldLabel>
+              <FieldLabel required>Departure Time</FieldLabel>
               <FieldContent>
                 <Input
                   type="time"
@@ -299,11 +299,11 @@ export function ScheduleForm({
           </div>
 
           <Field>
-            <FieldLabel>Truck Station / Pos</FieldLabel>
+            <FieldLabel>Truck Station / Post</FieldLabel>
             <FieldContent>
               <Input
                 type="text"
-                placeholder="(Opsional) Nama Pos / Dock"
+                placeholder="(Optional) Post / Dock Name"
                 {...form.register('truck_station')}
                 className="h-10"
               />
@@ -312,7 +312,7 @@ export function ScheduleForm({
           </Field>
 
           <Field>
-            <FieldLabel>Status Jadwal</FieldLabel>
+            <FieldLabel>Schedule Status</FieldLabel>
             <FieldContent className="flex items-center gap-2 mt-2">
               <Switch
                 checked={form.watch('is_active')}
@@ -321,7 +321,7 @@ export function ScheduleForm({
                 }
               />
               <span className="text-sm text-muted-foreground">
-                Aktifkan untuk menghasilkan slot harian
+                Activate to generate daily slots
               </span>
             </FieldContent>
           </Field>
@@ -333,10 +333,10 @@ export function ScheduleForm({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Batal
+              Cancel
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? 'Menyimpan...' : 'Simpan'}
+              {isPending ? 'Saving...' : 'Save'}
             </Button>
           </div>
         </form>

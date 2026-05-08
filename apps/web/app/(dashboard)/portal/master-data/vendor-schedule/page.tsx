@@ -97,11 +97,11 @@ export default function VendorSchedulePage() {
         <div className="flex items-center justify-between space-y-2">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">
-              Jadwal Operasional Vendor
+              Vendor Operational Schedules
             </h2>
             <p className="text-muted-foreground text-sm">
-              Tentukan hari operasional serta waktu kedatangan &amp; keberangkatan
-              masing-masing vendor.
+              Define operational days as well as arrival & departure times for
+              each vendor.
             </p>
           </div>
           <div className="flex items-center space-x-2">
@@ -121,17 +121,17 @@ export default function VendorSchedulePage() {
               Download Data
             </Button>
             <Button onClick={handleAddSchedule}>
-              <Plus className="mr-2 h-4 w-4" /> Tambah Jadwal
+              <Plus className="mr-2 h-4 w-4" /> Add Schedule
             </Button>
           </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Daftar Jadwal</CardTitle>
+            <CardTitle>Schedule List</CardTitle>
             <CardDescription>
-              Data ini menjadi acuan slot harian untuk menghitung Missed Cycle dan
-              keterlambatan.
+              This data serves as the daily slot reference for calculating
+              Missed Cycles and delays.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

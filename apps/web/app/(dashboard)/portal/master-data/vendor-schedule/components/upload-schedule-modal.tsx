@@ -37,18 +37,18 @@ export function UploadScheduleModal({ open, onOpenChange }: UploadScheduleModalP
 
   const handleUpload = () => {
     if (!file) {
-      toast.error('Silakan pilih file terlebih dahulu');
+      toast.error('Please select a file first');
       return;
     }
 
     uploadExcel(file, {
       onSuccess: () => {
-        toast.success('Jadwal vendor berhasil diperbarui');
+        toast.success('Vendor schedule updated successfully');
         setFile(null);
         onOpenChange(false);
       },
       onError: (error: any) => {
-        const message = error.response?.data?.message || 'Gagal mengunggah jadwal';
+        const message = error.response?.data?.message || 'Failed to upload schedule';
         toast.error(message);
       },
     });
@@ -58,9 +58,10 @@ export function UploadScheduleModal({ open, onOpenChange }: UploadScheduleModalP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Upload Jadwal Vendor</DialogTitle>
+          <DialogTitle>Upload Vendor Schedule</DialogTitle>
           <DialogDescription>
-            Unggah file Excel untuk memperbarui jadwal vendor sekaligus. Gunakan template yang telah disediakan.
+            Upload an Excel file to update vendor schedules in bulk. Use the
+            provided template.
           </DialogDescription>
         </DialogHeader>
 
@@ -69,8 +70,10 @@ export function UploadScheduleModal({ open, onOpenChange }: UploadScheduleModalP
             <div className="flex items-center gap-3">
               <FileSpreadsheet className="h-8 w-8 text-green-600" />
               <div>
-                <p className="text-sm font-medium">Template Excel</p>
-                <p className="text-xs text-muted-foreground">Unduh format yang didukung</p>
+                <p className="text-sm font-medium">Excel Template</p>
+                <p className="text-xs text-muted-foreground">
+                  Download supported format
+                </p>
               </div>
             </div>
             <Button
@@ -84,12 +87,12 @@ export function UploadScheduleModal({ open, onOpenChange }: UploadScheduleModalP
               ) : (
                 <Download className="h-4 w-4 mr-2" />
               )}
-              Unduh
+              Download
             </Button>
           </div>
 
           <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor="excel-file">Pilih File Excel (.xlsx)</Label>
+            <Label htmlFor="excel-file">Select Excel File (.xlsx)</Label>
             <Input
               id="excel-file"
               type="file"
@@ -99,7 +102,8 @@ export function UploadScheduleModal({ open, onOpenChange }: UploadScheduleModalP
             />
             {file && (
               <p className="text-xs text-muted-foreground">
-                File terpilih: <span className="font-medium text-foreground">{file.name}</span>
+                Selected file:{' '}
+                <span className="font-medium text-foreground">{file.name}</span>
               </p>
             )}
           </div>
@@ -107,7 +111,7 @@ export function UploadScheduleModal({ open, onOpenChange }: UploadScheduleModalP
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isUploading}>
-            Batal
+            Cancel
           </Button>
           <Button onClick={handleUpload} disabled={isUploading || !file}>
             {isUploading ? (
@@ -115,7 +119,7 @@ export function UploadScheduleModal({ open, onOpenChange }: UploadScheduleModalP
             ) : (
               <Upload className="h-4 w-4 mr-2" />
             )}
-            Mulai Upload
+            Start Upload
           </Button>
         </DialogFooter>
       </DialogContent>
