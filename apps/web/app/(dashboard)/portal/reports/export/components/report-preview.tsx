@@ -45,7 +45,7 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
               {data.totalCheckins} records
             </div>
             <p className="text-xs text-muted-foreground">
-              Periode {data.period?.from} - {data.period?.to}
+              Period {data.period?.from} - {data.period?.to}
             </p>
           </CardContent>
         </Card>
@@ -58,7 +58,7 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.onTimeArrivalRate}%</div>
-            <p className="text-xs text-muted-foreground">Rate kedatangan tepat waktu</p>
+            <p className="text-xs text-muted-foreground">On-time arrival rate</p>
           </CardContent>
         </Card>
         <Card>
@@ -70,7 +70,7 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.onTimeDepartureRate}%</div>
-            <p className="text-xs text-muted-foreground">Rate keberangkatan tepat waktu</p>
+            <p className="text-xs text-muted-foreground">On-time departure rate</p>
           </CardContent>
         </Card>
         <Card>
@@ -165,7 +165,7 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
         <Card className="bg-rose-50/50 border-rose-100 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-rose-800">
-              Temuan Petugas
+              Officer Findings
             </CardTitle>
             <ShieldAlert className="h-4 w-4 text-rose-600" />
           </CardHeader>
@@ -173,7 +173,7 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
             <div className="text-2xl font-bold text-rose-900">
               {data.officerDiscrepancyCount} findings
             </div>
-            <p className="text-xs text-rose-700">Temuan fisik oleh petugas</p>
+            <p className="text-xs text-rose-700">Physical findings by officers</p>
           </CardContent>
         </Card>
 
@@ -199,7 +199,7 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
               ))}
               {(!data.ppeStatusBreakdown ||
                 data.ppeStatusBreakdown.length === 0) && (
-                <p className="text-xs text-muted-foreground">Tidak ada data</p>
+                <p className="text-xs text-muted-foreground">No data available</p>
               )}
             </div>
           </CardContent>
@@ -227,7 +227,7 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
               ))}
               {(!data.ppeIncompleteBreakdown ||
                 data.ppeIncompleteBreakdown.length === 0) && (
-                <p className="text-xs text-muted-foreground">Tidak ada data</p>
+                <p className="text-xs text-muted-foreground">No data available</p>
               )}
             </div>
           </CardContent>
@@ -237,7 +237,7 @@ export function ReportPreview({ data, isLoading }: ReportPreviewProps) {
       <Card>
         <CardHeader>
           <CardTitle className="text-sm font-medium">
-            Breakdown Kategori Vendor
+            Vendor Category Breakdown
           </CardTitle>
         </CardHeader>
         <CardContent>

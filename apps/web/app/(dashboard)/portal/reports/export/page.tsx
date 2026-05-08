@@ -45,18 +45,18 @@ export default function ReportsPage() {
 
   const handleExport = () => {
     if (!date?.from || !date?.to) {
-      toast.error('Silakan pilih periode tanggal terlebih dahulu');
+      toast.error('Please select a date range first');
       return;
     }
 
     exportReport(filter, {
       onSuccess: () => {
-        toast.success('Report berhasil di-download');
+        toast.success('Report downloaded successfully');
       },
       onError: (error: any) => {
         const errorMessage =
-          error?.message || 'Gagal download report. Silakan coba lagi.';
-        toast.error('Gagal Export Report', {
+          error?.message || 'Failed to download report. Please try again.';
+        toast.error('Failed to Export Report', {
           description: errorMessage,
         });
       },
@@ -86,9 +86,9 @@ export default function ReportsPage() {
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="flex items-center justify-between space-y-2">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Export Laporan</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Export Report</h2>
             <p className="text-muted-foreground">
-              Download laporan kinerja vendor dalam format Excel
+              Download vendor performance reports in Excel format
             </p>
           </div>
           <div className="flex items-center space-x-2">

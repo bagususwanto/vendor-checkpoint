@@ -216,12 +216,12 @@ export function ReportFilterForm({
                 {vendorCategoryId
                   ? vendorCategoryOptions.find(
                       (opt) => opt.value === vendorCategoryId,
-                    )?.label || 'Kategori'
-                  : 'Kategori'}
+                    )?.label || 'Category'
+                  : 'Category'}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[200px]">
-              <DropdownMenuLabel>Filter Kategori</DropdownMenuLabel>
+              <DropdownMenuLabel>Filter Category</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuRadioGroup
                 value={vendorCategoryId || ''}
