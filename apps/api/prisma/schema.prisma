@@ -175,7 +175,7 @@ model ops_checkin_entry {
   snapshot_company_name       String   @db.VarChar(500)
   snapshot_category_name      String   @db.VarChar(255)
   submission_time             DateTime @default(dbgenerated("CURRENT_TIMESTAMP"))
-  current_status              String   @default("MENUNGGU") @db.VarChar(50)
+  current_status              String   @default("WAITING") @db.VarChar(50)
   device_identifier           String?  @db.VarChar(255)
   ip_address                  String?  @db.VarChar(50)
   has_non_compliant_items     Boolean  @default(false)
