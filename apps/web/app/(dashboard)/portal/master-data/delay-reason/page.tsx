@@ -86,30 +86,31 @@ export default function DelayReasonPage() {
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="flex items-center justify-between space-y-2">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Alasan Keterlambatan</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Delay Reasons</h2>
             <p className="text-muted-foreground text-sm">
-              Kelola master data alasan keterlambatan kedatangan dan keberangkatan vendor.
+              Manage master data for vendor arrival and departure delay reasons.
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <Button onClick={handleAddReason}>
-              <Plus className="mr-2 h-4 w-4" /> Tambah Alasan
+              <Plus className="mr-2 h-4 w-4" /> Add Reason
             </Button>
           </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Daftar Alasan</CardTitle>
+            <CardTitle>Reasons List</CardTitle>
             <CardDescription>
-              Alasan ini akan ditampilkan sebagai pilihan dropdown pada saat proses check-in/check-out vendor.
+              These reasons will be displayed as dropdown options during the
+              vendor check-in/check-out process.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs value={activeCategory} onValueChange={handleTabChange} className="space-y-4">
               <TabsList>
-                <TabsTrigger value="Arrival">Kedatangan (Arrival)</TabsTrigger>
-                <TabsTrigger value="Departure">Keberangkatan (Departure)</TabsTrigger>
+                <TabsTrigger value="Arrival">Arrival</TabsTrigger>
+                <TabsTrigger value="Departure">Departure</TabsTrigger>
               </TabsList>
 
               <TabsContent value="Arrival" className="space-y-4">
@@ -117,13 +118,13 @@ export default function DelayReasonPage() {
                   <div className="relative flex-1">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Cari teks alasan..."
+                      placeholder="Search reason text..."
                       className="pl-8"
                       value={arrivalSearchInput}
                       onChange={(e) => setArrivalSearchInput(e.target.value)}
                     />
                   </div>
-                  <Button type="submit" variant="outline" size="sm">Cari</Button>
+                  <Button type="submit" variant="outline" size="sm">Search</Button>
                   {arrivalSearch && (
                     <Button
                       type="button"
@@ -153,13 +154,13 @@ export default function DelayReasonPage() {
                   <div className="relative flex-1">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Cari teks alasan..."
+                      placeholder="Search reason text..."
                       className="pl-8"
                       value={departureSearchInput}
                       onChange={(e) => setDepartureSearchInput(e.target.value)}
                     />
                   </div>
-                  <Button type="submit" variant="outline" size="sm">Cari</Button>
+                  <Button type="submit" variant="outline" size="sm">Search</Button>
                   {departureSearch && (
                     <Button
                       type="button"

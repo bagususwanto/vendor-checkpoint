@@ -26,7 +26,7 @@ import { DelayReasonResponse } from '@repo/types';
 import { useCreateDelayReason, useUpdateDelayReason } from '@/hooks/api/use-delay-reasons';
 
 const formSchema = z.object({
-  reason_text: z.string().min(1, 'Teks alasan wajib diisi').max(255),
+  reason_text: z.string().min(1, 'Reason text is required').max(255),
   is_active: z.boolean().default(true),
   category: z.enum(['Arrival', 'Departure']),
 });
@@ -85,12 +85,12 @@ export function ReasonForm({
         { id: reason!.delay_reason_id, data: values },
         {
           onSuccess: () => {
-            toast.success('Alasan berhasil diperbarui');
+            toast.success('Reason updated successfully');
             onOpenChange(false);
           },
           onError: (error: any) => {
-            toast.error('Gagal memperbarui alasan', {
-              description: error.message || 'Terjadi kesalahan sistem',
+            toast.error('Failed to update reason', {
+              description: error.message || 'A system error occurred',
             });
           },
         }
@@ -98,12 +98,12 @@ export function ReasonForm({
     } else {
       createMutation.mutate(values, {
         onSuccess: () => {
-          toast.success('Alasan berhasil ditambahkan');
+          toast.success('Reason added successfully');
           onOpenChange(false);
         },
         onError: (error: any) => {
-          toast.error('Gagal menambahkan alasan', {
-            description: error.message || 'Terjadi kesalahan sistem',
+          toast.error('Failed to add reason', {
+            description: error.message || 'A system error occurred',
           });
         },
       });
@@ -115,32 +115,32 @@ export function ReasonForm({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? 'Edit Alasan Keterlambatan' : 'Tambah Alasan Keterlambatan'}
+            {isEditing ? 'Edit Delay Reason' : 'Add Delay Reason'}
           </DialogTitle>
           <DialogDescription>
             {isEditing
-              ? 'Ubah teks alasan atau non-aktifkan agar tidak muncul di pilihan operasional.'
-              : `Buat alasan baru untuk kategori ${defaultCategory}.`}
+              ? 'Change the reason text or deactivate it so it doesn\'t appear in operational choices.'
+              : `Create a new reason for category ${defaultCategory}.`}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Field>
-            <FieldLabel required>Teks Alasan</FieldLabel>
+            <FieldLabel required>Reason Text</FieldLabel>
             <FieldContent>
-              <Input placeholder="Contoh: Macet di tol" {...form.register('reason_text')} />
+              <Input placeholder="Example: Traffic jam on highway" {...form.register('reason_text')} />
             </FieldContent>
             <FieldError errors={[form.formState.errors.reason_text]} />
           </Field>
 
           <Field>
-            <FieldLabel>Status Aktif</FieldLabel>
+            <FieldLabel>Active Status</FieldLabel>
             <FieldContent className="flex items-center gap-2 mt-2">
               <Switch
                 checked={form.watch('is_active')}
                 onCheckedChange={(checked) => form.setValue('is_active', checked)}
               />
-              <span className="text-sm text-muted-foreground">Tampilkan alasan ini pada sistem</span>
+              <span className="text-sm text-muted-foreground">Display this reason in the system</span>
             </FieldContent>
           </Field>
 
@@ -151,10 +151,10 @@ export function ReasonForm({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Batal
+              Cancel
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? 'Menyimpan...' : 'Simpan'}
+              {isPending ? 'Saving...' : 'Save'}
             </Button>
           </div>
         </form>
