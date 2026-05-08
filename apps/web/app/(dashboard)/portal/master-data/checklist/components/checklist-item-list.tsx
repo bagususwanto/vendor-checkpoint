@@ -46,7 +46,7 @@ export function ChecklistItemList({
         })),
       });
     } catch (error) {
-      toast.error('Gagal menyimpan urutan item');
+      toast.error('Failed to save item order');
       onRefetch();
     }
   };
@@ -65,11 +65,11 @@ export function ChecklistItemList({
     try {
       setIsDeleting(true);
       await checklistService.deleteItem(deleteDialogState.id);
-      toast.success('Item berhasil dihapus');
+      toast.success('Item deleted successfully');
       setDeleteDialogState((prev) => ({ ...prev, open: false }));
       onRefetch();
     } catch (error) {
-      toast.error('Gagal menghapus item');
+      toast.error('Failed to delete item');
     } finally {
       setIsDeleting(false);
     }
@@ -93,7 +93,7 @@ export function ChecklistItemList({
         ))}
         {items.length === 0 && (
           <div className="text-sm text-muted-foreground italic py-2">
-            Belum ada item checklist.
+            No checklist items yet.
           </div>
         )}
       </Reorder.Group>
@@ -104,10 +104,10 @@ export function ChecklistItemList({
           setDeleteDialogState((prev) => ({ ...prev, open }))
         }
         onConfirm={handleConfirmDelete}
-        title="Hapus Item Checklist"
+        title="Delete Checklist Item"
         description={
           <span>
-            Apakah Anda yakin ingin menghapus item{' '}
+            Are you sure you want to delete item{' '}
             <span className="font-semibold">"{deleteDialogState.text}"</span>?
           </span>
         }
@@ -159,7 +159,7 @@ function ChecklistItem({
             variant="outline"
             className="text-[10px] h-4 px-1 bg-muted text-muted-foreground border-muted-foreground/20"
           >
-            Nonaktif
+            Inactive
           </Badge>
         )}
         <Badge variant="outline" className="text-xs">
@@ -174,7 +174,7 @@ function ChecklistItem({
           )}
         {item.is_required && (
           <Badge variant="secondary" className="text-xs">
-            Wajib
+            Required
           </Badge>
         )}
       </div>

@@ -72,7 +72,7 @@ export function ChecklistCategoryList({
       });
       // Silent success or toast? Maybe silent for drag and drop
     } catch (error) {
-      toast.error('Gagal menyimpan urutan kategori');
+      toast.error('Failed to save category order');
       // Revert?
       onRefetch();
     }
@@ -96,11 +96,11 @@ export function ChecklistCategoryList({
     try {
       setIsDeleting(true);
       await checklistService.deleteCategory(deleteDialogState.id);
-      toast.success('Kategori berhasil dihapus');
+      toast.success('Category successfully deleted');
       setDeleteDialogState((prev) => ({ ...prev, open: false }));
       onRefetch();
     } catch (error) {
-      toast.error('Gagal menghapus kategori');
+      toast.error('Failed to delete category');
     } finally {
       setIsDeleting(false);
     }
@@ -157,13 +157,12 @@ export function ChecklistCategoryList({
           setDeleteDialogState((prev) => ({ ...prev, open }))
         }
         onConfirm={handleConfirmDelete}
-        title="Hapus Kategori Checklist"
+        title="Delete Checklist Category"
         description={
           <span>
-            Apakah Anda yakin ingin menghapus kategori{' '}
+            Are you sure you want to delete category{' '}
             <span className="font-semibold">"{deleteDialogState.name}"</span>?
-            Aksi ini tidak dapat dibatalkan dan akan menghapus semua item di
-            dalamnya.
+            This action cannot be undone and will delete all items within it.
           </span>
         }
         isDeleting={isDeleting}
@@ -245,11 +244,11 @@ function ChecklistCategoryItem({
                   variant="outline"
                   className="text-[10px] h-4 px-1 bg-muted text-muted-foreground border-muted-foreground/20"
                 >
-                  Nonaktif
+                  Inactive
                 </Badge>
               )}
               <span className="text-xs text-muted-foreground ml-2">
-                ({category.mst_checklist_item?.length || 0} item)
+                ({category.mst_checklist_item?.length || 0} items)
               </span>
 
             </div>

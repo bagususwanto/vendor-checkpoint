@@ -106,7 +106,7 @@ export function ChecklistItemDialog({
     try {
       if (item) {
         await checklistService.updateItem(item.checklist_item_id, data);
-        toast.success('Item berhasil diperbarui');
+        toast.success('Item updated successfully');
       } else {
         await checklistService.createItem(data);
         toast.success('Item created successfully');

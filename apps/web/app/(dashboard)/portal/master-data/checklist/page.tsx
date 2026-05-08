@@ -59,24 +59,24 @@ export default function ChecklistPage() {
         <div className="flex items-center justify-between space-y-2">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">
-              Daftar Pemeriksaan
+              Checklist Management
             </h2>
             <p className="text-muted-foreground text-sm">
-              Kelola data master pemeriksaan (kategori dan item).
+              Manage inspection master data (categories and items).
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <Button onClick={handleAddCategory}>
-              <Plus className="mr-2 h-4 w-4" /> Tambah Kategori
+              <Plus className="mr-2 h-4 w-4" /> Add Category
             </Button>
           </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Daftar Pemeriksaan</CardTitle>
+            <CardTitle>Checklist Categories</CardTitle>
             <CardDescription>
-              Atur kategori dan item pemeriksaan. Geser untuk mengubah urutan.
+              Configure inspection categories and items. Drag to reorder.
             </CardDescription>
           </CardHeader>
           <CardContent>

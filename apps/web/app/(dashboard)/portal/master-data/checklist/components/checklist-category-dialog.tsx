@@ -93,15 +93,15 @@ export function ChecklistCategoryDialog({
           category.checklist_category_id,
           data,
         );
-        toast.success('Kategori berhasil diperbarui');
+        toast.success('Category updated successfully');
       } else {
         await checklistService.createCategory(data);
-        toast.success('Kategori berhasil dibuat');
+        toast.success('Category created successfully');
       }
       onSuccess();
     } catch (error) {
       toast.error(
-        category ? 'Gagal memperbarui kategori' : 'Gagal membuat kategori',
+        category ? 'Failed to update category' : 'Failed to create category',
       );
       console.error(error);
     }
@@ -112,21 +112,21 @@ export function ChecklistCategoryDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            {category ? 'Edit Kategori' : 'Tambah Kategori'}
+            {category ? 'Edit Category' : 'Add Category'}
           </DialogTitle>
           <DialogDescription>
             {category
-              ? 'Ubah informasi kategori checklist.'
-              : 'Buat kategori checklist baru.'}
+              ? 'Change checklist category information.'
+              : 'Create a new checklist category.'}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Field>
-            <FieldLabel required>Nama Kategori</FieldLabel>
+            <FieldLabel required>Category Name</FieldLabel>
             <FieldContent>
               <Input
-                placeholder="Contoh: Dokumen"
+                placeholder="Example: Documents"
                 {...form.register('category_name')}
               />
             </FieldContent>
@@ -134,10 +134,10 @@ export function ChecklistCategoryDialog({
           </Field>
 
           <Field>
-            <FieldLabel required>Kode Kategori</FieldLabel>
+            <FieldLabel required>Category Code</FieldLabel>
             <FieldContent>
               <Input
-                placeholder="Contoh: DOC"
+                placeholder="Example: DOC"
                 {...form.register('category_code')}
               />
             </FieldContent>
@@ -145,10 +145,10 @@ export function ChecklistCategoryDialog({
           </Field>
 
           <Field>
-            <FieldLabel>Deskripsi</FieldLabel>
+            <FieldLabel>Description</FieldLabel>
             <FieldContent>
               <Textarea
-                placeholder="Deskripsi singkat..."
+                placeholder="Short description..."
                 {...form.register('description')}
               />
             </FieldContent>
@@ -202,7 +202,7 @@ export function ChecklistCategoryDialog({
           <div className="py-2">
             <Field orientation="horizontal">
               <FieldContent>
-                <FieldLabel>Status Aktif</FieldLabel>
+                <FieldLabel>Active Status</FieldLabel>
               </FieldContent>
               <FieldContent className="flex flex-1 justify-end">
                 <Switch
@@ -221,10 +221,10 @@ export function ChecklistCategoryDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Batal
+              Cancel
             </Button>
             <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? 'Menyimpan...' : 'Simpan'}
+              {form.formState.isSubmitting ? 'Saving...' : 'Save'}
             </Button>
           </DialogFooter>
         </form>
