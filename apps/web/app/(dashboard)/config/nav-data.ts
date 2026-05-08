@@ -39,12 +39,12 @@ export const navData: NavData = {
   },
   navMain: [
     {
-      title: 'Dasbor',
+      title: 'Dashboard',
       url: '#',
       icon: LayoutDashboard,
       items: [
         {
-          title: 'Dasbor Leader',
+          title: 'Leader Dashboard',
           url: '/portal/dashboard/leader',
           icon: LayoutDashboard,
           roles: [
@@ -55,7 +55,7 @@ export const navData: NavData = {
           ],
         },
         {
-          title: 'Dasbor Petugas',
+          title: 'Staff Dashboard',
           url: '/portal/dashboard/staff',
           icon: LayoutDashboard,
           roles: [
@@ -67,12 +67,12 @@ export const navData: NavData = {
       ],
     },
     {
-      title: 'Operasional',
+      title: 'Operations',
       url: '#',
       icon: SquareChartGantt,
       items: [
         {
-          title: 'Monitoring Pengiriman',
+          title: 'Delivery Monitoring',
           url: '/portal/operational/delivery-slot',
           icon: SquareChartGantt,
           roles: [
@@ -85,7 +85,7 @@ export const navData: NavData = {
           ],
         },
         {
-          title: 'Manajemen Antrean',
+          title: 'Queue Management',
           url: '/portal/operational/queue',
           icon: SquareChartGantt,
           roles: [
@@ -105,7 +105,7 @@ export const navData: NavData = {
       icon: Building2,
       items: [
         {
-          title: 'Kategori Vendor',
+          title: 'Vendor Categories',
           url: '/portal/master-data/vendor-category',
           icon: Tags,
           roles: [
@@ -115,7 +115,7 @@ export const navData: NavData = {
           ],
         },
         {
-          title: 'Jadwal Vendor',
+          title: 'Vendor Schedules',
           url: '/portal/master-data/vendor-schedule',
           icon: Building2,
           roles: [
@@ -125,7 +125,7 @@ export const navData: NavData = {
           ],
         },
         {
-          title: 'Daftar Pemeriksaan',
+          title: 'Checklist List',
           url: '/portal/master-data/checklist',
           icon: ClipboardCheck,
           roles: [
@@ -135,7 +135,7 @@ export const navData: NavData = {
           ],
         },
         {
-          title: 'Alasan Delay',
+          title: 'Delay Reasons',
           url: '/portal/master-data/delay-reason',
           icon: ClipboardCheck,
           roles: [
@@ -147,12 +147,12 @@ export const navData: NavData = {
       ],
     },
     {
-      title: 'Laporan',
+      title: 'Reports',
       url: '#',
       icon: FileText,
       items: [
         {
-          title: 'Export Laporan',
+          title: 'Export Reports',
           url: '/portal/reports/export',
           icon: FileText,
           roles: [
@@ -163,7 +163,7 @@ export const navData: NavData = {
           ],
         },
         {
-          title: 'Export Log',
+          title: 'Export Logs',
           url: '/portal/reports/log-export',
           icon: FileText, // Using same icon for now
           roles: [
@@ -187,7 +187,7 @@ export const navData: NavData = {
       ],
     },
     {
-      title: 'Sistem',
+      title: 'System',
       url: '#',
       icon: Settings,
       items: [
@@ -203,7 +203,7 @@ export const navData: NavData = {
           ],
         },
         {
-          title: 'Pengaturan',
+          title: 'Settings',
           url: '/portal/system/settings',
           icon: Settings,
           roles: [
