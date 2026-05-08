@@ -23,7 +23,7 @@ export default function StaffDashboardPage() {
           <div className="flex flex-row items-center justify-between gap-2">
             <div className="flex flex-col gap-1">
               <h2 className="text-2xl font-bold tracking-tight">
-                Dashboard Petugas
+                Staff Dashboard
               </h2>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="h-4 w-4" />
