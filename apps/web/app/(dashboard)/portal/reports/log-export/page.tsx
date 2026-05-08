@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { addDays, format } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { DateRange } from 'react-day-picker';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { useReportExportLogs } from '@/hooks/api/use-report-export-log';
@@ -82,18 +81,19 @@ export default function LogReportExportPage() {
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="flex items-center justify-between space-y-2">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Log Export</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Export Logs</h2>
             <p className="text-muted-foreground text-sm">
-              Kelola dan lihat riwayat export laporan sistem.
+              Manage and view the system's report export history.
             </p>
           </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Daftar Riwayat Export</CardTitle>
+            <CardTitle>Export History List</CardTitle>
             <CardDescription>
-              Tabel berikut menampilkan riwayat file laporan yang telah di-export.
+              The following table displays the history of report files that have
+              been exported.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -124,9 +124,7 @@ export default function LogReportExportPage() {
               </div>
             ) : exportLogsData?.data.length === 0 ? (
               <div className="flex h-64 items-center justify-center rounded-md border border-dashed">
-                <p className="text-muted-foreground">
-                  Tidak ada riwayat export ditemukan
-                </p>
+                <p className="text-muted-foreground">No export history found</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -134,12 +132,12 @@ export default function LogReportExportPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[180px]">Waktu Export</TableHead>
+                        <TableHead className="w-[180px]">Export Time</TableHead>
                         <TableHead className="w-[150px]">User</TableHead>
-                        <TableHead className="w-[120px]">Tipe Report</TableHead>
-                        <TableHead>Periode</TableHead>
+                        <TableHead className="w-[120px]">Report Type</TableHead>
+                        <TableHead>Period</TableHead>
                         <TableHead className="w-[100px]">Records</TableHead>
-                        <TableHead>Nama File</TableHead>
+                        <TableHead>File Name</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -149,9 +147,6 @@ export default function LogReportExportPage() {
                             {format(
                               new Date(log.export_time),
                               'dd MMM yyyy HH:mm',
-                              {
-                                locale: id,
-                              },
                             )}
                           </TableCell>
                           <TableCell>{log.user?.full_name || '-'}</TableCell>
@@ -179,11 +174,11 @@ export default function LogReportExportPage() {
 
                 <div className="flex items-center justify-between px-2">
                   <div className="flex-1 text-sm text-muted-foreground">
-                    Total {exportLogsData?.meta.total || 0} data
+                    Total {exportLogsData?.meta.total || 0} records
                   </div>
                   <div className="flex items-center space-x-6 lg:space-x-8">
                     <div className="flex items-center space-x-2">
-                      <p className="text-sm font-medium">Baris per halaman</p>
+                      <p className="text-sm font-medium">Rows per page</p>
                       <Select
                         value={`${limit}`}
                         onValueChange={(value) => {
@@ -204,7 +199,7 @@ export default function LogReportExportPage() {
                       </Select>
                     </div>
                     <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                      Halaman {exportLogsData?.meta.page || 1} dari{' '}
+                      Page {exportLogsData?.meta.page || 1} of{' '}
                       {exportLogsData?.meta.totalPages || 0}
                     </div>
                     <div className="flex items-center space-x-2">
