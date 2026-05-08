@@ -40,15 +40,6 @@ export class DelayReasonController {
     return this.delayReasonService.create(createDelayReasonDto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(
-    UserRole.SUPER_ADMIN,
-    UserRole.GROUP_HEAD,
-    UserRole.LINE_HEAD,
-    UserRole.SECTION_HEAD,
-    UserRole.WAREHOUSE_STAFF,
-    UserRole.WAREHOUSE_MEMBER,
-  )
   @Get()
   findAll(
     @Query() query: import('src/common/dto/paginated-params.dto').PaginatedParamsDto,
