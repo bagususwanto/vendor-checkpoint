@@ -9,6 +9,7 @@ import {
 
 export interface VendorRankingData {
   vendor_id: number;
+  vendor_code: string;
   company_name: string;
   category_name: string;
   total_checkins: number;
@@ -30,6 +31,7 @@ export interface VendorTrendData {
 
 export interface VendorDetailData {
   vendor_id: number;
+  vendor_code: string;
   company_name: string;
   category_name: string;
   stats: {

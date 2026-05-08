@@ -39,6 +39,11 @@ export class VendorPerformanceService {
     const entries = await this.prisma.ops_checkin_entry.findMany({
       where: whereClause,
       include: {
+        mst_vendor: {
+          select: {
+            vendor_code: true,
+          },
+        },
         ops_timelog: {
           select: {
             departure_status: true,
@@ -81,6 +86,7 @@ export class VendorPerformanceService {
       if (!vendorStats.has(entry.vendor_id)) {
         vendorStats.set(entry.vendor_id, {
           vendor_id: entry.vendor_id,
+          vendor_code: entry.mst_vendor.vendor_code,
           company_name: entry.snapshot_company_name,
           category_name: entry.snapshot_category_name,
           total_checkins: 0,
@@ -135,6 +141,7 @@ export class VendorPerformanceService {
     // Convert to array and calculate rates
     const result = Array.from(vendorStats.values()).map((s) => ({
       vendor_id: s.vendor_id,
+      vendor_code: s.vendor_code,
       company_name: s.company_name,
       category_name: s.category_name,
       total_checkins: s.total_checkins,
@@ -319,6 +326,7 @@ export class VendorPerformanceService {
 
     return {
       vendor_id: vendor.vendor_id,
+      vendor_code: vendor.vendor_code,
       company_name: vendor.company_name,
       category_name: vendor.vendor_category?.category_name || 'N/A',
       stats: {

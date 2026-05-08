@@ -90,7 +90,7 @@ export function VendorDetailSheet({
                   detail?.company_name
                 )}
               </SheetTitle>
-              <SheetDescription className="flex items-center gap-2">
+              <SheetDescription className="flex items-center gap-2 flex-wrap">
                 {isLoading ? (
                   <Skeleton className="h-4 w-[150px]" />
                 ) : (
@@ -101,7 +101,12 @@ export function VendorDetailSheet({
                     >
                       {detail?.category_name}
                     </Badge>
-                    <span>ID: {detail?.vendor_id}</span>
+                    <Badge
+                      variant="outline"
+                      className="rounded-sm px-1 font-mono text-[10px] bg-muted/30"
+                    >
+                      Code: {detail?.vendor_code}
+                    </Badge>
                   </>
                 )}
               </SheetDescription>
