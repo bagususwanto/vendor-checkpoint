@@ -9,7 +9,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { DeliverySlotResponse } from '@/services/delivery-slot.service';
 import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { Loader2 } from 'lucide-react';
 
 interface SlotTableProps {
@@ -37,7 +37,7 @@ export function SlotTable({
     return (
       <div className="flex h-64 items-center justify-center rounded-md border border-dashed">
         <p className="text-muted-foreground">
-          Belum ada data jadwal pengiriman ditemukan
+          No delivery schedule data found
         </p>
       </div>
     );
@@ -51,10 +51,10 @@ export function SlotTable({
             <TableRow>
               <TableHead className="w-[50px] text-center">No</TableHead>
               <TableHead>Vendor</TableHead>
-              <TableHead className="w-[150px]">Tanggal</TableHead>
+              <TableHead className="w-[150px]">Date</TableHead>
               <TableHead className="w-[80px] text-center">Rit</TableHead>
-              <TableHead className="w-[100px]">Tiba</TableHead>
-              <TableHead className="w-[100px]">Pulang</TableHead>
+              <TableHead className="w-[100px]">Arrival</TableHead>
+              <TableHead className="w-[100px]">Departure</TableHead>
               <TableHead className="w-[150px]">Station</TableHead>
               <TableHead className="w-[130px] text-center">Status</TableHead>
             </TableRow>
@@ -78,7 +78,7 @@ export function SlotTable({
                 <TableCell>
                   {slot.expected_date
                     ? format(new Date(slot.expected_date), 'dd MMM yyyy', {
-                        locale: id,
+                        locale: enUS,
                       })
                     : '-'}
                 </TableCell>

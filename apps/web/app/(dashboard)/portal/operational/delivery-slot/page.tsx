@@ -98,10 +98,10 @@ export default function DeliverySlotPage() {
         <div className="flex items-center justify-between space-y-2">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">
-              Monitoring Pengiriman
+              Delivery Monitoring
             </h2>
             <p className="text-muted-foreground text-sm">
-              Pantau status kedatangan seluruh vendor.
+              Monitor arrival status of all vendors.
             </p>
           </div>
           <div className="flex items-center space-x-2">
@@ -115,17 +115,17 @@ export default function DeliverySlotPage() {
               ) : (
                 <RefreshCw className="mr-2 h-4 w-4" />
               )}
-              Generate Slot Hari Ini
+              Generate Slots for Today
             </Button>
           </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Daftar Slot Pengiriman (Delivery Slots)</CardTitle>
+            <CardTitle>Delivery Slots List</CardTitle>
             <CardDescription>
-              Menampilkan seluruh vendor yang telah dijadwalkan oleh sistem untuk
-              datang mengirimkan barang.
+              Display all vendors that have been scheduled by the system for
+              delivery.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

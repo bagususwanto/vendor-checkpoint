@@ -40,7 +40,7 @@ export function SlotToolbar({
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari vendor..."
+            placeholder="Search vendor..."
             className="pl-8 h-9"
             value={searchTerm}
             onChange={onSearchChange}
@@ -70,7 +70,7 @@ export function SlotToolbar({
             <DropdownMenuSeparator />
             <DropdownMenuRadioGroup value={status} onValueChange={setStatus}>
               <DropdownMenuRadioItem value="all">
-                Semua Status
+                All Statuses
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="Open">Open</DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="Filled">
