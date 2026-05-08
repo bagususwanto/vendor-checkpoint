@@ -114,7 +114,7 @@ export function SystemConfigList() {
                   <TableCell className="text-sm">
                     {(config as any).user?.full_name || '-'}
                     <div className="text-xs text-muted-foreground">
-                      {new Date(config.updated_at).toLocaleString('id-ID')}
+                      {new Date(config.updated_at).toLocaleString('en-US')}
                     </div>
                   </TableCell>
                   <TableCell>

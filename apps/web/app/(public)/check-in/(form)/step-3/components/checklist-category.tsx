@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { ChecklistItem } from './checklist-item';
+import { ChecklistItemType } from '@repo/types';
 
 interface ChecklistCategoryProps {
   category: {
@@ -30,10 +31,10 @@ export function ChecklistCategory({
 
   // Filter items
   const generalItems = category.items.filter(
-    (item) => item.item_type === 'UMUM',
+    (item) => item.item_type === ChecklistItemType.UMUM,
   );
   const specificItems = category.items.filter(
-    (item) => item.item_type === 'KHUSUS',
+    (item) => item.item_type === ChecklistItemType.KHUSUS,
   );
 
   // Calculate category progress
@@ -81,7 +82,7 @@ export function ChecklistCategory({
       <AccordionContent className="space-y-6 px-4 pb-4">
         {/* General Checklist */}
         <div className="space-y-4">
-          <h4 className="font-medium text-base">Checklist Umum</h4>
+          <h4 className="font-medium text-base">General Checklist</h4>
           {generalItems.map((item) => (
             <ChecklistItem
               key={item.checklist_item_id}
@@ -95,7 +96,7 @@ export function ChecklistCategory({
         {specificItems.length > 0 && (
           <div className="space-y-4">
             <h4 className="font-medium text-base">
-              Checklist Khusus - {vendorCategory}
+              Specific Checklist - {vendorCategory}
             </h4>
             {specificItems.map((item) => (
               <ChecklistItem

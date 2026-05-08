@@ -116,9 +116,9 @@ export class ReportService {
     });
 
     const ppeIncompleteBreakdown = [
-      { detail: 'Helm', count: incompleteCounts.hardhat },
-      { detail: 'Rompi', count: incompleteCounts.vest },
-      { detail: 'Helm & Rompi', count: incompleteCounts.both },
+      { detail: 'Hardhat', count: incompleteCounts.hardhat },
+      { detail: 'Safety Vest', count: incompleteCounts.vest },
+      { detail: 'Hardhat & Vest', count: incompleteCounts.both },
     ];
 
     // v2: Calculate On-Time rates
@@ -180,7 +180,7 @@ export class ReportService {
         count: a._count.entry_id,
       })),
       ppeStatusBreakdown: ppeStatusBreakdownRaw.map((p) => ({
-        status: p.is_compliant ? 'Lengkap' : 'Tidak Lengkap',
+        status: p.is_compliant ? 'Complete' : 'Incomplete',
         count: p._count.ppe_scan_id,
       })),
       ppeIncompleteBreakdown,
@@ -212,7 +212,7 @@ export class ReportService {
 
     if (totalRecords > maxLimit) {
       throw new BadRequestException(
-        `Jumlah data melebihi batas maksimal export (${totalRecords} records). Maksimal: ${maxLimit} records. Silakan persempit filter tanggal.`,
+        `Number of records exceeds maximum export limit (${totalRecords} records). Maximum: ${maxLimit} records. Please narrow the date filter.`,
       );
     }
 
@@ -307,7 +307,7 @@ export class ReportService {
     });
     if (userByExternal) return userByExternal.user_id;
 
-    throw new BadRequestException('User tidak ditemukan dalam database lokal');
+    throw new BadRequestException('User not found in local database');
   }
 
   private buildWhereClause(filter: ReportFilterDto) {
@@ -354,13 +354,13 @@ export class ReportService {
 
     // Title
     sheet.mergeCells('A1:B1');
-    sheet.getCell('A1').value = 'LAPORAN KINERJA VENDOR';
+    sheet.getCell('A1').value = 'VENDOR PERFORMANCE REPORT';
     sheet.getCell('A1').font = { bold: true, size: 16 };
     sheet.getCell('A1').alignment = { horizontal: 'center' };
 
     // Period
-    sheet.getCell('A3').value = 'Periode';
-    sheet.getCell('B3').value = `${filter.dateFrom} s/d ${filter.dateTo}`;
+    sheet.getCell('A3').value = 'Period';
+    sheet.getCell('B3').value = `${filter.dateFrom} to ${filter.dateTo}`;
 
     // Stats
     const statsStart = 5;
@@ -444,7 +444,7 @@ export class ReportService {
 
     // Category Breakdown
     const categoryStart = statusStart + preview.statusBreakdown.length + 3;
-    sheet.getCell(`A${categoryStart}`).value = 'Breakdown per Kategori';
+    sheet.getCell(`A${categoryStart}`).value = 'Breakdown per Category';
     sheet.getCell(`A${categoryStart}`).font = { bold: true };
 
     preview.categoryBreakdown.forEach((c: any, index: number) => {
@@ -466,20 +466,20 @@ export class ReportService {
       'Queue Number',
       'Vendor',
       'Driver',
-      'Kategori',
+      'Category',
       'Status',
       'DN Number',
       'PO Number',
       'Arrival Status',
-      'Alasan Terlambat Datang',
+      'Arrival Delay Reason',
       'AI Safety Status',
       'Check-in Time',
       'Checkout Time',
       'Duration (min)',
       'Departure Status',
-      'Alasan Terlambat Keluar',
+      'Departure Delay Reason',
       'Non-Compliant Count',
-      'Officer Findings',
+      'Officer Findings Status',
       'Officer Notes Summary',
       'PPE Status',
       'PPE Incomplete Detail',
@@ -504,12 +504,12 @@ export class ReportService {
       let ppeDetail = '-';
       if (entry.ops_ppe_scan) {
         ppeStatus = entry.ops_ppe_scan.is_compliant
-          ? 'LENGKAP'
-          : 'TIDAK LENGKAP';
+          ? 'COMPLETE'
+          : 'INCOMPLETE';
         if (!entry.ops_ppe_scan.is_compliant) {
           const details = [];
-          if (!entry.ops_ppe_scan.has_hardhat) details.push('Helm');
-          if (!entry.ops_ppe_scan.has_safety_vest) details.push('Rompi');
+          if (!entry.ops_ppe_scan.has_hardhat) details.push('Hardhat');
+          if (!entry.ops_ppe_scan.has_safety_vest) details.push('Safety Vest');
           ppeDetail = details.join(' & ');
         }
       }
@@ -542,9 +542,9 @@ export class ReportService {
         entry.ops_timelog?.duration_minutes || '-',
         entry.ops_timelog?.departure_status || '-',
         entry.ops_timelog?.delay_departure_reason?.reason_text || '-',
-        entry.has_non_compliant_items ? 'TIDAK PATUH' : 'PATUH',
+        entry.has_non_compliant_items ? 'NON-COMPLIANT' : 'COMPLIANT',
         entry.non_compliant_count,
-        hasOfficerFindings ? 'ADA TEMUAN' : 'TIDAK ADA',
+        hasOfficerFindings ? 'FINDINGS FOUND' : 'NO FINDINGS',
         officerNotes,
         ppeStatus,
         ppeDetail,
@@ -600,8 +600,8 @@ export class ReportService {
           entry.snapshot_company_name,
           response.checklist_category?.category_name || '-',
           response.item_text_snapshot,
-          response.response_value ? 'YA' : 'TIDAK',
-          response.is_compliant ? 'YA' : 'TIDAK',
+          response.response_value ? 'YES' : 'NO',
+          response.is_compliant ? 'YES' : 'NO',
           discrepancy?.officer_note || '-',
           discrepancy?.user?.full_name || '-',
         ]);
@@ -637,7 +637,7 @@ export class ReportService {
       'Queue Number',
       'Vendor',
       'Driver',
-      'Kategori Vendor',
+      'Vendor Category',
       'Checklist Category',
       'Item',
       'Officer Note',
@@ -693,9 +693,9 @@ export class ReportService {
       // AI PPE Non-Compliance
       if (entry.ops_ppe_scan && !entry.ops_ppe_scan.is_compliant) {
         const details = [];
-        if (!entry.ops_ppe_scan.has_hardhat) details.push('Helm');
-        if (!entry.ops_ppe_scan.has_safety_vest) details.push('Rompi');
-        const ppeDetail = `Tidak menggunakan: ${details.join(' & ')}`;
+        if (!entry.ops_ppe_scan.has_hardhat) details.push('Hardhat');
+        if (!entry.ops_ppe_scan.has_safety_vest) details.push('Safety Vest');
+        const ppeDetail = `Not using: ${details.join(' & ')}`;
 
         rowNum++;
         sheet.addRow([
@@ -715,7 +715,7 @@ export class ReportService {
 
     // If no non-compliant items
     if (rowNum === 0) {
-      sheet.addRow(['Tidak ada item yang tidak patuh dalam periode ini.']);
+      sheet.addRow(['No non-compliant items found in this period.']);
     }
 
     // Column widths
@@ -730,12 +730,13 @@ export class ReportService {
   }
 
   private formatDateTime(date: Date): string {
-    return new Date(date).toLocaleString('id-ID', {
+    return new Date(date).toLocaleString('en-US', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false,
     });
   }
 

@@ -50,13 +50,13 @@ export function VerificationModeControl() {
       {
         onSuccess: () => {
           toast.success(
-            `Mode Verifikasi Staff berhasil di${pendingValue ? 'aktifkan' : 'nonaktifkan'}.`
+            `Staff Verification Mode successfully ${pendingValue ? 'enabled' : 'disabled'}.`
           );
           setDialogOpen(false);
         },
         onError: (error) => {
-          toast.error('Gagal mengubah mode verifikasi', {
-            description: error.message || 'Terjadi kesalahan sistem',
+          toast.error('Failed to change verification mode', {
+            description: error.message || 'System error occurred',
           });
           setDialogOpen(false);
         },
@@ -90,13 +90,13 @@ export function VerificationModeControl() {
               </div>
               <div>
                 <CardTitle className="text-xl flex items-center gap-3">
-                  Mode Verifikasi Staff
+                  Staff Verification Mode
                   <Badge variant={isEnabled ? 'default' : 'secondary'} className="ml-2">
-                    {isEnabled ? 'AKTIF' : 'NON-AKTIF'}
+                    {isEnabled ? 'ACTIVE' : 'INACTIVE'}
                   </Badge>
                 </CardTitle>
                 <CardDescription className="mt-1 max-w-[600px]">
-                  Saat mode dikonfigurasi sebagai <strong>AKTIF</strong>, semua check-in vendor harus melalui persetujuan manual oleh staff di menu Monitoring Antrean. Jika <strong>NON-AKTIF</strong>, kedatangan vendor akan langsung berstatus AKTIF (Self-Service).
+                  When mode is configured as <strong>ACTIVE</strong>, all vendor check-ins must undergo manual approval by staff in the Queue Monitoring menu. If <strong>INACTIVE</strong>, vendor arrivals will directly become ACTIVE status (Self-Service).
                 </CardDescription>
               </div>
             </div>
@@ -115,21 +115,21 @@ export function VerificationModeControl() {
       <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Ubah Mode Verifikasi?</AlertDialogTitle>
+            <AlertDialogTitle>Change Verification Mode?</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
               <span className="block">
-                Anda akan mengubah Mode Verifikasi Staff menjadi{' '}
+                You are about to change Staff Verification Mode to{' '}
                 <strong className={pendingValue ? 'text-primary' : 'text-muted-foreground'}>
-                  {pendingValue ? 'AKTIF' : 'NON-AKTIF'}
+                  {pendingValue ? 'ACTIVE' : 'INACTIVE'}
                 </strong>.
               </span>
               <span className="block text-destructive font-medium mt-2">
-                Peringatan: Perubahan ini akan langsung berdampak pada alur operasional check-in vendor secara real-time.
+                Warning: This change will immediately impact the operational vendor check-in flow in real-time.
               </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Batal</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -138,7 +138,7 @@ export function VerificationModeControl() {
               disabled={isPending}
             >
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Ya, Ubah Mode
+              Yes, Change Mode
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

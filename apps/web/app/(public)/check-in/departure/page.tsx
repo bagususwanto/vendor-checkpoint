@@ -26,6 +26,7 @@ import {
   useDepartureCheck,
 } from '@/hooks/api/use-check-in';
 import { DepartureReasonDialog } from './components/departure-reason-dialog';
+import { QueueStatus } from '@repo/types';
 
 const SearchSchema = z.object({
   queueNumber: z.string().min(1, 'Masukkan nomor antrean!'),
@@ -226,12 +227,12 @@ export default function DeparturePage() {
                 </CardContent>
 
                 <CardFooter className="pb-6 pt-0">
-                  {queueData.current_status === 'SELESAI' ? (
+                  {queueData.current_status === QueueStatus.SELESAI ? (
                     <div className="w-full p-3 bg-blue-50 text-blue-700 rounded-lg text-center text-sm font-medium border border-blue-100">
                       Antrean ini sudah berhasil Check-Out (SELESAI).
                     </div>
-                  ) : queueData.current_status !== 'AKTIF' &&
-                    queueData.current_status !== 'DISETUJUI' ? (
+                  ) : queueData.current_status !== QueueStatus.AKTIF &&
+                    queueData.current_status !== QueueStatus.DISETUJUI ? (
                     <div className="w-full p-3 bg-amber-50 text-amber-700 rounded-lg text-center text-sm font-bold border border-amber-100">
                       Antrean ini masih{' '}
                       {queueData.ops_queue_status?.status_display_text ||

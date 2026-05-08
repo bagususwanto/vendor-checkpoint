@@ -17,6 +17,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Clock, Users } from 'lucide-react';
 import { cn, formatDateTime } from '@/lib/utils';
+import { QueueStatus } from '@repo/types';
 
 interface UnscheduledSheetProps {
   open: boolean;
@@ -34,7 +35,7 @@ export function UnscheduledSheet({
       'px-2 py-0.5 text-[9px] font-black uppercase tracking-widest';
 
     switch (status) {
-      case 'MENUNGGU':
+      case QueueStatus.MENUNGGU:
         return (
           <Badge
             variant="outline"
@@ -43,10 +44,10 @@ export function UnscheduledSheet({
               'bg-orange-500/10 text-orange-500 border-orange-500/20',
             )}
           >
-            Menunggu
+            Waiting
           </Badge>
         );
-      case 'DISETUJUI':
+      case QueueStatus.DISETUJUI:
         return (
           <Badge
             variant="outline"
@@ -55,10 +56,10 @@ export function UnscheduledSheet({
               'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
             )}
           >
-            Disetujui
+            Approved
           </Badge>
         );
-      case 'AKTIF':
+      case QueueStatus.AKTIF:
         return (
           <Badge
             variant="outline"
@@ -67,10 +68,10 @@ export function UnscheduledSheet({
               'bg-blue-500/10 text-blue-600 border-blue-500/20',
             )}
           >
-            Aktif
+            Active
           </Badge>
         );
-      case 'SELESAI':
+      case QueueStatus.SELESAI:
         return (
           <Badge
             variant="outline"
@@ -79,7 +80,7 @@ export function UnscheduledSheet({
               'bg-muted text-muted-foreground border-border',
             )}
           >
-            Selesai
+            Completed
           </Badge>
         );
       default:

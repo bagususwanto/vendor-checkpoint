@@ -48,13 +48,13 @@ export function AiApdControl() {
       {
         onSuccess: () => {
           toast.success(
-            `Deteksi APD AI berhasil di${pendingValue ? 'aktifkan' : 'nonaktifkan'}.`
+            `AI PPE detection successfully ${pendingValue ? 'enabled' : 'disabled'}.`
           );
           setDialogOpen(false);
         },
         onError: (error) => {
-          toast.error('Gagal mengubah konfigurasi deteksi APD', {
-            description: error.message || 'Terjadi kesalahan sistem',
+          toast.error('Failed to change PPE detection configuration', {
+            description: error.message || 'System error occurred',
           });
           setDialogOpen(false);
         },
@@ -85,16 +85,16 @@ export function AiApdControl() {
               </div>
               <div>
                 <CardTitle className="text-xl flex items-center gap-3">
-                  Deteksi APD berbasis AI
+                  AI-Based PPE Detection
                   <Badge
                     variant={isEnabled ? 'default' : 'secondary'}
                     className="ml-2"
                   >
-                    {isEnabled ? 'AKTIF' : 'NON-AKTIF'}
+                    {isEnabled ? 'ACTIVE' : 'INACTIVE'}
                   </Badge>
                 </CardTitle>
                 <CardDescription className="mt-1 max-w-[600px]">
-                  Saat mode dikonfigurasi sebagai <strong>AKTIF</strong>, vendor diwajibkan melakukan scan kamera untuk verifikasi pemakaian Alat Pelindung Diri (APD) sebelum masuk. Jika <strong>NON-AKTIF</strong>, Step pemeriksaan APD dilewati dan status dicatat sebagai <em>Skipped</em>.
+                  When mode is configured as <strong>ACTIVE</strong>, vendors are required to perform a camera scan to verify the use of Personal Protective Equipment (PPE) before entering. If <strong>INACTIVE</strong>, the PPE inspection step is skipped and the status is recorded as <em>Skipped</em>.
                 </CardDescription>
               </div>
             </div>
@@ -112,26 +112,26 @@ export function AiApdControl() {
       <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Ubah Konfigurasi Deteksi APD?</AlertDialogTitle>
+            <AlertDialogTitle>Change PPE Detection Configuration?</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-2 text-sm text-muted-foreground">
                 <span className="block">
-                  Anda akan{' '}
+                  You are about to{' '}
                   <strong className={pendingValue ? 'text-primary' : 'text-muted-foreground'}>
-                    {pendingValue ? 'mengaktifkan' : 'menonaktifkan'}
+                    {pendingValue ? 'enable' : 'disable'}
                   </strong>{' '}
-                  fitur Deteksi APD berbasis AI.
+                  the AI-based PPE Detection feature.
                 </span>
                 {!pendingValue && (
                   <span className="block text-destructive font-medium">
-                    Peringatan: Vendor tidak lagi diwajibkan scan APD. Status APD akan menjadi <em>Skipped</em> pada setiap check-in.
+                    Warning: Vendors will no longer be required to scan PPE. PPE status will be <em>Skipped</em> on every check-in.
                   </span>
                 )}
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Batal</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -140,7 +140,7 @@ export function AiApdControl() {
               disabled={isPending}
             >
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Ya, Ubah Konfigurasi
+              Yes, Change Configuration
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

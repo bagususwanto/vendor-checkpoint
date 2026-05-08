@@ -109,11 +109,11 @@ export function ChecklistItemDialog({
         toast.success('Item berhasil diperbarui');
       } else {
         await checklistService.createItem(data);
-        toast.success('Item berhasil dibuat');
+        toast.success('Item created successfully');
       }
       onSuccess();
     } catch (error) {
-      toast.error(item ? 'Gagal memperbarui item' : 'Gagal membuat item');
+      toast.error(item ? 'Failed to update item' : 'Failed to create item');
       console.error(error);
     }
   };
@@ -122,20 +122,20 @@ export function ChecklistItemDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{item ? 'Edit Item' : 'Tambah Item'}</DialogTitle>
+          <DialogTitle>{item ? 'Edit Item' : 'Add Item'}</DialogTitle>
           <DialogDescription>
             {item
-              ? 'Ubah informasi item checklist.'
-              : 'Buat item checklist baru untuk kategori ini.'}
+              ? 'Change checklist item information.'
+              : 'Create a new checklist item for this category.'}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Field>
-            <FieldLabel required>Teks Item (Pertanyaan)</FieldLabel>
+            <FieldLabel required>Item Text (Question)</FieldLabel>
             <FieldContent>
               <Input
-                placeholder="Apakah supir menggunakan APD?"
+                placeholder="Does the driver use PPE?"
                 {...form.register('item_text')}
               />
             </FieldContent>
@@ -143,7 +143,7 @@ export function ChecklistItemDialog({
           </Field>
 
           <Field>
-            <FieldLabel required>Kode Item</FieldLabel>
+            <FieldLabel required>Item Code</FieldLabel>
             <FieldContent>
               <Input placeholder="ITEM-001" {...form.register('item_code')} />
             </FieldContent>
@@ -151,7 +151,7 @@ export function ChecklistItemDialog({
           </Field>
 
           <Field>
-            <FieldLabel required>Tipe Input</FieldLabel>
+            <FieldLabel required>Input Type</FieldLabel>
             <FieldContent>
               <RadioGroup
                 onValueChange={(value) =>
@@ -161,21 +161,21 @@ export function ChecklistItemDialog({
                 className="flex gap-4 pt-2"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value={ChecklistItemType.UMUM} id="umum" />
-                  <Label htmlFor="umum" className="font-normal cursor-pointer">
-                    Umum
+                  <RadioGroupItem value={ChecklistItemType.UMUM} id="general" />
+                  <Label htmlFor="general" className="font-normal cursor-pointer">
+                    General
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem
                     value={ChecklistItemType.KHUSUS}
-                    id="khusus"
+                    id="specific"
                   />
                   <Label
-                    htmlFor="khusus"
+                    htmlFor="specific"
                     className="font-normal cursor-pointer"
                   >
-                    Khusus
+                    Specific
                   </Label>
                 </div>
               </RadioGroup>
@@ -186,7 +186,7 @@ export function ChecklistItemDialog({
           {form.watch('item_type') === ChecklistItemType.KHUSUS && (
             <div className="py-2">
               <Field>
-                <FieldLabel required>Kategori Vendor</FieldLabel>
+                <FieldLabel required>Vendor Category</FieldLabel>
                 <FieldContent>
                   <Select
                     onValueChange={(value) =>
@@ -199,7 +199,7 @@ export function ChecklistItemDialog({
                     }
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Pilih kategori vendor" />
+                      <SelectValue placeholder="Select vendor category" />
                     </SelectTrigger>
                     <SelectContent>
                       {materialCategories?.map((category) => (
@@ -223,7 +223,7 @@ export function ChecklistItemDialog({
           <div className="grid grid-cols-2 gap-4 py-2">
             <Field orientation="horizontal">
               <FieldContent>
-                <FieldLabel>Wajib Diisi</FieldLabel>
+                <FieldLabel>Required</FieldLabel>
               </FieldContent>
               <FieldContent className="flex flex-1 justify-end">
                 <Switch
@@ -237,7 +237,7 @@ export function ChecklistItemDialog({
 
             <Field orientation="horizontal">
               <FieldContent>
-                <FieldLabel>Status Aktif</FieldLabel>
+                <FieldLabel>Active Status</FieldLabel>
               </FieldContent>
               <FieldContent className="flex flex-1 justify-end">
                 <Switch
@@ -260,10 +260,10 @@ export function ChecklistItemDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Batal
+              Cancel
             </Button>
             <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? 'Menyimpan...' : 'Simpan'}
+              {form.formState.isSubmitting ? 'Saving...' : 'Save'}
             </Button>
           </DialogFooter>
         </form>

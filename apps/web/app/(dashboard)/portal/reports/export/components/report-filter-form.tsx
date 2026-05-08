@@ -15,6 +15,7 @@ import {
 import { useInfiniteVendorCategories } from '@/hooks/api/use-vendor-categories';
 import { Button } from '@/components/ui/button';
 import { Filter, X } from 'lucide-react';
+import { QueueStatus } from '@repo/types';
 
 interface ReportFilterFormProps {
   date: DateRange | undefined;
@@ -80,16 +81,16 @@ export function ReportFilterForm({
               >
                 <Filter className="mr-2 h-4 w-4" />
                 {status
-                  ? status === 'MENUNGGU'
-                    ? 'Menunggu'
-                    : status === 'DISETUJUI'
-                      ? 'Disetujui'
-                      : status === 'AKTIF'
-                        ? 'Aktif'
-                        : status === 'SELESAI'
-                          ? 'Selesai'
-                          : status === 'DITOLAK'
-                            ? 'Ditolak'
+                  ? status === QueueStatus.MENUNGGU
+                    ? 'Waiting'
+                    : status === QueueStatus.DISETUJUI
+                      ? 'Approved'
+                      : status === QueueStatus.AKTIF
+                        ? 'Active'
+                        : status === QueueStatus.SELESAI
+                          ? 'Completed'
+                          : status === QueueStatus.DITOLAK
+                            ? 'Rejected'
                             : 'Status'
                   : 'Status'}
               </Button>
@@ -102,22 +103,22 @@ export function ReportFilterForm({
                 onValueChange={(val) => setStatus(val === 'ALL' ? '' : val)}
               >
                 <DropdownMenuRadioItem value="">
-                  Semua Status
+                  All Statuses
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="MENUNGGU">
-                  Menunggu
+                <DropdownMenuRadioItem value={QueueStatus.MENUNGGU}>
+                  Waiting
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="DISETUJUI">
-                  Disetujui
+                <DropdownMenuRadioItem value={QueueStatus.DISETUJUI}>
+                  Approved
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="AKTIF">
-                  Aktif
+                <DropdownMenuRadioItem value={QueueStatus.AKTIF}>
+                  Active
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="SELESAI">
-                  Selesai
+                <DropdownMenuRadioItem value={QueueStatus.SELESAI}>
+                  Completed
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="DITOLAK">
-                  Ditolak
+                <DropdownMenuRadioItem value={QueueStatus.DITOLAK}>
+                  Rejected
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
@@ -151,7 +152,7 @@ export function ReportFilterForm({
                 onValueChange={(val) => setArrivalStatus(val)}
               >
                 <DropdownMenuRadioItem value="">
-                  Semua Arrival Status
+                  All Arrival Statuses
                 </DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="On-Time">
                   On-Time
@@ -193,7 +194,7 @@ export function ReportFilterForm({
                 onValueChange={(val) => setDepartureStatus(val)}
               >
                 <DropdownMenuRadioItem value="">
-                  Semua Departure Status
+                  All Departure Statuses
                 </DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="On-Time">
                   On-Time
@@ -227,7 +228,7 @@ export function ReportFilterForm({
                 onValueChange={(val) => setVendorCategoryId(val || undefined)}
               >
                 <DropdownMenuRadioItem value="">
-                  Semua Kategori
+                  All Categories
                 </DropdownMenuRadioItem>
                 {vendorCategoryOptions.map((option) => (
                   <DropdownMenuRadioItem

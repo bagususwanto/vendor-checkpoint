@@ -81,7 +81,7 @@ export class SystemConfigService {
     });
 
     if (!config) {
-      throw new NotFoundException('Konfigurasi sistem tidak ditemukan');
+      throw new NotFoundException('System configuration not found');
     }
 
     return config;
@@ -108,7 +108,7 @@ export class SystemConfigService {
     // Check if editable
     if (!existing.is_editable) {
       throw new BadRequestException(
-        'Konfigurasi sistem ini tidak dapat diubah',
+        'This system configuration cannot be modified',
       );
     }
 

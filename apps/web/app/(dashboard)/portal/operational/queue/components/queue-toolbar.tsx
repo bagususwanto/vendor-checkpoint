@@ -45,7 +45,7 @@ export function QueueToolbar({
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div className="flex flex-1 items-center space-x-2 min-w-[300px]">
         <Input
-          placeholder="Cari driver, perusahaan..."
+          placeholder="Search driver, company..."
           value={searchTerm}
           onChange={onSearchChange}
           className="w-full"
@@ -62,12 +62,12 @@ export function QueueToolbar({
               <Filter className="mr-2 h-4 w-4" />
               {status
                 ? status === QueueStatus.DISETUJUI
-                  ? 'Disetujui'
+                  ? 'Approved'
                   : status === QueueStatus.AKTIF
-                    ? 'Aktif'
+                    ? 'Active'
                     : status === QueueStatus.DITOLAK
-                      ? 'Ditolak'
-                      : 'Menunggu'
+                      ? 'Rejected'
+                      : 'Waiting'
                 : 'Status'}
             </Button>
           </DropdownMenuTrigger>
@@ -76,19 +76,19 @@ export function QueueToolbar({
             <DropdownMenuSeparator />
             <DropdownMenuRadioGroup value={status} onValueChange={setStatus}>
               <DropdownMenuRadioItem value="">
-                Semua Status
+                All Statuses
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value={QueueStatus.DISETUJUI}>
-                Disetujui
+                Approved
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value={QueueStatus.AKTIF}>
-                Aktif
+                Active
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value={QueueStatus.DITOLAK}>
-                Ditolak
+                Rejected
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value={QueueStatus.MENUNGGU}>
-                Menunggu
+                Waiting
               </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
@@ -104,19 +104,19 @@ export function QueueToolbar({
               {categoryId
                 ? categories?.find(
                     (c: any) => String(c.vendor_category_id) === categoryId,
-                  )?.category_name || 'Kategori'
-                : 'Kategori'}
+                  )?.category_name || 'Category'
+                : 'Category'}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[200px]">
-            <DropdownMenuLabel>Filter Kategori</DropdownMenuLabel>
+            <DropdownMenuLabel>Filter Category</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuRadioGroup
               value={categoryId}
               onValueChange={setCategoryId}
             >
               <DropdownMenuRadioItem value="">
-                Semua Kategori
+                All Categories
               </DropdownMenuRadioItem>
               {categories?.map((category: any) => (
                 <DropdownMenuRadioItem

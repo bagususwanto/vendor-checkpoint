@@ -106,35 +106,32 @@ export function MonitorHeader() {
 
         {/* Time Display */}
         <div className="flex items-center gap-4 pl-6 border-l border-border">
-          <div className="text-right">
-            <div className="text-3xl font-mono font-black text-foreground tabular-nums tracking-tighter leading-none">
-              {currentTime.toLocaleTimeString('id-ID', {
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-              <span className="text-xl text-primary/70 ml-1">
-                {currentTime
-                  .toLocaleTimeString('id-ID', {
-                    second: '2-digit',
-                  })
-                  .slice(-2)}
-              </span>
+            <div className="text-right tabular-nums">
+              <div className="text-2xl font-black text-primary leading-tight">
+                {currentTime.toLocaleTimeString('en-US', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false,
+                })}
+                <span className="text-base text-muted-foreground ml-1">
+                  {currentTime
+                    .toLocaleTimeString('en-US', {
+                      second: '2-digit',
+                    })
+                    .slice(-2)}
+                </span>
+              </div>
+              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-tight">
+                {currentTime.toLocaleDateString('en-US', { weekday: 'long' })}
+              </div>
+              <div className="text-[10px] font-black text-foreground/70 uppercase tracking-widest leading-tight mt-0.5">
+                {currentTime.toLocaleDateString('en-US', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </div>
             </div>
-          </div>
-          <div className="w-px h-8 bg-border" />
-          <div className="text-left min-w-[90px]">
-            <div className="text-foreground font-black text-xs uppercase leading-tight">
-              {currentTime.toLocaleDateString('id-ID', { weekday: 'long' })}
-            </div>
-            <div className="text-muted-foreground font-bold text-[10px] uppercase tracking-wider">
-              {currentTime.toLocaleDateString('id-ID', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-              })}
-            </div>
-          </div>
         </div>
       </div>
     </header>

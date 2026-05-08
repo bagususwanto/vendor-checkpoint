@@ -168,7 +168,10 @@ async function seedDelayReasons() {
       { category: 'Departure', reason_text: 'Proses Bongkar/Muat Lama' },
       { category: 'Departure', reason_text: 'Menunggu Surat Jalan / Dokumen' },
       { category: 'Departure', reason_text: 'Kendala Internal Pabrik' },
-      { category: 'Departure', reason_text: 'Akumulasi Keterlambatan Kedatangan' },
+      {
+        category: 'Departure',
+        reason_text: 'Akumulasi Keterlambatan Kedatangan',
+      },
     ],
   });
 }
@@ -236,7 +239,7 @@ async function seedCheckIns() {
   }
 
   const today = new Date();
-  const statuses = ['MENUNGGU', 'DISETUJUI', 'DITOLAK', 'SELESAI'];
+  const statuses = ['WAITING', 'APPROVED', 'REJECTED', 'COMPLETED'];
   const driverNames = [
     'Budi Santoso',
     'Ahmad Wijaya',
@@ -274,7 +277,7 @@ async function seedCheckIns() {
     // Get relevant checklist items for this material category
     const relevantItems = checklistItems.filter(
       (item) =>
-        item.item_type === 'UMUM' ||
+        item.item_type === 'GENERAL' ||
         item.vendor_category_id === vendorCategory.vendor_category_id,
     );
 
@@ -337,10 +340,10 @@ async function seedCheckIns() {
 
     // Create queue status
     const statusTexts = {
-      MENUNGGU: 'Menunggu Verifikasi',
-      DISETUJUI: 'Sedang Diproses',
-      DITOLAK: 'Ditolak',
-      SELESAI: 'Selesai',
+      WAITING: 'Waiting Verification',
+      APPROVED: 'Processing',
+      REJECTED: 'Rejected',
+      COMPLETED: 'Completed',
     };
 
     await prisma.ops_queue_status.create({
@@ -351,7 +354,7 @@ async function seedCheckIns() {
         status_display_text:
           statusTexts[status as keyof typeof statusTexts] || status,
         priority_order: queueCounter,
-        estimated_wait_minutes: status === 'MENUNGGU' ? 30 : null,
+        estimated_wait_minutes: status === 'WAITING' ? 30 : null,
         last_updated: submissionTime,
       },
     });
@@ -360,7 +363,7 @@ async function seedCheckIns() {
     const checkinTime = new Date(submissionTime);
     // checkin_time in service is same as submission_time, so we don't add 5 minutes
 
-    const isCheckedOut = status === 'SELESAI';
+    const isCheckedOut = status === 'COMPLETED';
     const checkoutTime = isCheckedOut
       ? new Date(checkinTime.getTime() + (20 + i * 5) * 60000)
       : null;
@@ -392,8 +395,8 @@ async function seedCheckIns() {
       },
     });
 
-    // Create verification for non-MENUNGGU statuses
-    if (status !== 'MENUNGGU') {
+    // Create verification for non-WAITING statuses
+    if (status !== 'WAITING') {
       const verificationTime = new Date(checkinTime);
       verificationTime.setMinutes(verificationTime.getMinutes() + 2);
 
@@ -403,8 +406,8 @@ async function seedCheckIns() {
           verified_by_user_id: adminUser.user_id,
           verification_status: status,
           rejection_reason:
-            status === 'DITOLAK'
-              ? 'Dokumen tidak lengkap atau tidak sesuai standar'
+            status === 'REJECTED'
+              ? 'Incomplete documents or does not meet standards'
               : null,
           verification_time: verificationTime,
           created_at: verificationTime,

@@ -77,7 +77,7 @@ export default function MonitorPage() {
     const latestEntry = slot.ops_checkin_entry?.[0];
     if (latestEntry && latestEntry.submission_time) {
       arrivalTime = new Date(latestEntry.submission_time).toLocaleTimeString(
-        'id-ID',
+        'en-US',
         {
           hour12: false,
           hour: '2-digit',
@@ -87,7 +87,7 @@ export default function MonitorPage() {
     }
     let expectedDate = '-';
     if (slot.expected_date) {
-      expectedDate = new Date(slot.expected_date).toLocaleDateString('id-ID', {
+      expectedDate = new Date(slot.expected_date).toLocaleDateString('en-US', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -146,7 +146,7 @@ export default function MonitorPage() {
               </div>
               <div className="flex flex-col items-start">
                 <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-1">
-                  Tidak Terjadwal
+                  Unscheduled
                 </span>
                 <span className="text-lg font-black text-primary leading-none">
                   Vendor

@@ -20,7 +20,7 @@ export class PerformanceAdjustmentService {
       dto.override_has_non_compliant !== undefined;
 
     if (!hasAdjustment) {
-      throw new BadRequestException('Minimal satu field adjustment harus diisi');
+      throw new BadRequestException('At least one adjustment field must be filled');
     }
 
     // 2. Find the entry and current values
@@ -33,7 +33,7 @@ export class PerformanceAdjustmentService {
     });
 
     if (!entry) {
-      throw new NotFoundException('Data check-in tidak ditemukan');
+      throw new NotFoundException('Check-in data not found');
     }
 
     // 3. Prepare original values
@@ -180,7 +180,7 @@ export class PerformanceAdjustmentService {
 
     // Only creator or SUPER_ADMIN can delete
     if (adjustment.adjusted_by_user_id !== localUserId && user?.role !== UserRole.SUPER_ADMIN) {
-      throw new BadRequestException('Anda tidak memiliki izin untuk menghapus adjustment ini');
+      throw new BadRequestException('You do not have permission to delete this adjustment');
     }
 
     await this.prisma.ops_performance_adjustment.delete({
@@ -199,6 +199,6 @@ export class PerformanceAdjustmentService {
     });
     if (userByExternal) return userByExternal.user_id;
 
-    throw new BadRequestException('User tidak ditemukan dalam database lokal');
+    throw new BadRequestException('User not found in local database');
   }
 }

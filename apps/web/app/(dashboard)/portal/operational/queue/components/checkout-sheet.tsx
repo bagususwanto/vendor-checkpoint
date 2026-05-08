@@ -108,8 +108,8 @@ export function CheckoutSheet({
 
   const handleCheckout = () => {
     if (detectedStatus === 'Late' && !delayReasonId) {
-      toast.error('Alasan Diperlukan', {
-        description: 'Mohon pilih alasan keterlambatan keberangkatan.',
+      toast.error('Reason Required', {
+        description: 'Please select a departure delay reason.',
       });
       return;
     }
@@ -122,16 +122,16 @@ export function CheckoutSheet({
       },
       {
         onSuccess: () => {
-          toast.success('Checkout Berhasil', {
-            description: `Driver ${checkin.driver} telah berhasil check-out.`,
+          toast.success('Checkout Successful', {
+            description: `Driver ${checkin.driver} has successfully checked out.`,
           });
           setOpen(false);
           onSuccess?.();
         },
         onError: (error) => {
-          toast.error('Gagal Checkout', {
+          toast.error('Checkout Failed', {
             description:
-              error.message || 'Terjadi kesalahan saat memproses checkout.',
+              error.message || 'An error occurred while processing checkout.',
           });
         },
       },
@@ -154,15 +154,14 @@ export function CheckoutSheet({
           <div className="flex items-center justify-between">
             <SheetTitle className="flex items-center gap-2">
               <LogOut className="h-5 w-5 text-orange-500" />
-              Konfirmasi Check-Out
+              Check-Out Confirmation
             </SheetTitle>
             <Badge variant="outline" className="text-base px-3 py-1">
               {checkin.id}
             </Badge>
           </div>
           <SheetDescription>
-            Pastikan seluruh proses telah selesai sebelum mengizinkan driver
-            keluar.
+            Ensure all processes are completed before allowing the driver to exit.
           </SheetDescription>
         </SheetHeader>
 
@@ -178,17 +177,16 @@ export function CheckoutSheet({
                 <div className="flex items-center gap-4 bg-orange-50 p-4 rounded-lg border border-orange-100 text-orange-800">
                   <AlertTriangle className="h-5 w-5 shrink-0" />
                   <p className="text-sm">
-                    Tindakan ini akan menyelesaikan sesi kunjungan driver ini di
-                    area perusahaan.
+                    This action will complete this driver's visit session in the company area.
                   </p>
                 </div>
 
                 {detailData.ops_officer_discrepancy?.length > 0 && (
                   <Alert variant="destructive" className="border-2 border-rose-200 bg-rose-50/50">
                     <ShieldAlert className="h-4 w-4 text-rose-600" />
-                    <AlertTitle className="text-rose-800 font-bold">Temuan Petugas Keamanan</AlertTitle>
+                    <AlertTitle className="text-rose-800 font-bold">Officer Discrepancy Found</AlertTitle>
                     <AlertDescription className="text-rose-700 text-xs">
-                      <p className="mb-2">Terdapat {detailData.ops_officer_discrepancy.length} temuan ketidaksesuaian fisik yang perlu ditinjau pada bagian:</p>
+                      <p className="mb-2">There are {detailData.ops_officer_discrepancy.length} physical discrepancy findings that need to be reviewed on:</p>
                       <div className="flex flex-wrap gap-1.5">
                         {detailData.checklist_responses?.map((cat: any) => {
                           const count = cat.items.filter((item: any) => item.officer_discrepancy).length;
@@ -212,7 +210,7 @@ export function CheckoutSheet({
               {/* Identitas Section */}
               <div>
                 <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
-                  Identitas Pengirim
+                  Shipper Identity
                 </h4>
                 <div className="space-y-4">
                   <Card className="p-4 shadow-sm">
@@ -222,7 +220,7 @@ export function CheckoutSheet({
                       </div>
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Perusahaan
+                          Company
                         </p>
                         <p className="font-semibold text-base leading-tight">
                           {detailData.snapshot_company_name}
@@ -240,7 +238,7 @@ export function CheckoutSheet({
                       </div>
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Kategori Vendor
+                          Vendor Category
                         </p>
                         <p className="font-semibold text-base">
                           {detailData.snapshot_category_name}
@@ -418,7 +416,7 @@ export function CheckoutSheet({
                                 </div>
                               </div>
                               <span className="text-[10px] font-medium text-muted-foreground mt-2">
-                                Bukti Foto Scan
+                                Evidence Photo
                               </span>
                             </div>
                           )}
@@ -432,7 +430,7 @@ export function CheckoutSheet({
               {/* Status Keberangkatan Section */}
               <div>
                 <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
-                  Status Keberangkatan
+                  Departure Status
                 </h4>
                 <Card className={cn(
                   "border-2 transition-all overflow-hidden",
@@ -457,7 +455,7 @@ export function CheckoutSheet({
                             detectedStatus === 'On-Time' ? "text-emerald-700" : 
                             detectedStatus === 'Late' ? "text-rose-700" : "text-muted-foreground"
                           )}>
-                            {departureCheckMutation.isPending ? 'Memeriksa...' : (detectedStatus || '-')}
+                            {departureCheckMutation.isPending ? 'Checking...' : (detectedStatus || '-')}
                           </p>
                         </div>
                       </div>
@@ -482,14 +480,14 @@ export function CheckoutSheet({
                       <div className="mt-4 pt-4 border-t border-rose-200/50 space-y-3">
                         <div className="space-y-2">
                           <Label htmlFor="delayReason" className="text-[10px] font-bold uppercase tracking-wider text-rose-800">
-                            Pilih Alasan Keterlambatan <span className="text-rose-500">*</span>
+                            Select Delay Reason <span className="text-rose-500">*</span>
                           </Label>
                           <Select
                             value={delayReasonId}
                             onValueChange={setDelayReasonId}
                           >
                             <SelectTrigger id="delayReason" className="w-full bg-white/50 border-rose-200 focus:ring-rose-500">
-                              <SelectValue placeholder="--- Pilih Alasan ---" />
+                              <SelectValue placeholder="--- Select Reason ---" />
                             </SelectTrigger>
                             <SelectContent>
                               {delayReasons?.data?.map((reason: any) => (
@@ -508,7 +506,7 @@ export function CheckoutSheet({
                           <div className="text-[10px] text-amber-700 font-medium bg-amber-100/50 p-2.5 rounded-md border border-amber-200/50 flex items-start gap-2 animate-in fade-in slide-in-from-top-1">
                             <AlertTriangle className="h-3 w-3 shrink-0 mt-0.5" />
                             <p>
-                              <span className="font-bold">Saran:</span> Vendor ini tercatat datang terlambat, Anda dapat memilih alasan <span className="underline italic">"Akumulasi Keterlambatan Kedatangan"</span>.
+                              <span className="font-bold">Suggestion:</span> This vendor is recorded as arriving late, you can select the reason <span className="underline italic">"Accumulated Arrival Delay"</span>.
                             </p>
                           </div>
                         )}
@@ -521,7 +519,7 @@ export function CheckoutSheet({
               {/* Log Waktu Section */}
               <div>
                 <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
-                  Log Waktu
+                  Time Logs
                 </h4>
                 <div className="grid grid-cols-2 gap-4">
                   <Card className="p-4 shadow-sm">
@@ -567,7 +565,7 @@ export function CheckoutSheet({
                     <Card className="p-4 shadow-sm">
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Status Verifikasi
+                          Verification Status
                         </p>
                         <StatusBadge
                           status={
@@ -579,7 +577,7 @@ export function CheckoutSheet({
                     <Card className="p-4 shadow-sm text-right">
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Diverifikasi Oleh
+                          Verified By
                         </p>
                         <p className="font-semibold text-sm">
                           {detailData.ops_verification.user?.full_name || '-'}
@@ -589,7 +587,7 @@ export function CheckoutSheet({
                     <Card className="p-4 shadow-sm col-span-2">
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Waktu Verifikasi
+                          Verification Time
                         </p>
                         <p className="font-semibold text-sm">
                           {detailData.ops_verification.verification_time
@@ -608,16 +606,15 @@ export function CheckoutSheet({
               {/* Checklist Section */}
               <div>
                 <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
-                  Hasil Pemeriksaan
+                  Inspection Results
                 </h4>
 
                 {nonCompliantCount > 0 && (
                   <Alert variant="destructive" className="mb-4">
                     <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Perhatian</AlertTitle>
+                    <AlertTitle>Attention</AlertTitle>
                     <AlertDescription>
-                      {nonCompliantCount} item tidak memenuhi standar pada saat
-                      check-in.
+                      {nonCompliantCount} items did not meet standards during check-in.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -757,7 +754,7 @@ export function CheckoutSheet({
             </div>
           ) : (
             <div className="text-center py-4 text-muted-foreground">
-              Gagal memuat data detail.
+              Failed to load detail data.
             </div>
           )}
         </div>
@@ -769,7 +766,7 @@ export function CheckoutSheet({
             onClick={handleCheckout}
             disabled={checkoutMutation.isPending || !detailData}
           >
-            {checkoutMutation.isPending ? 'Memproses...' : 'Proses Check-Out'}
+            {checkoutMutation.isPending ? 'Processing...' : 'Process Check-Out'}
           </Button>
           <SheetClose asChild>
             <Button
@@ -777,7 +774,7 @@ export function CheckoutSheet({
               size="lg"
               className="w-full sm:w-auto"
             >
-              Batal
+              Cancel
             </Button>
           </SheetClose>
         </SheetFooter>

@@ -95,19 +95,18 @@ export function DisplayHeaderQueue() {
         {/* Time Display */}
         <div className="text-right">
           <div className="text-5xl font-mono font-bold text-foreground tabular-nums tracking-tight">
-            {currentTime.toLocaleTimeString('id-ID', {
-              hour12: false,
+            {currentTime.toLocaleTimeString('en-US', {
               hour: '2-digit',
               minute: '2-digit',
+              hour12: false,
             })}
-            <span className="text-2xl text-muted-foreground ml-1">
-              {currentTime.toLocaleTimeString('id-ID', {
-                second: '2-digit',
-              }).slice(-2)}
-            </span>
+            <span className="text-4xl opacity-50 mx-2">:</span>
+            {currentTime.toLocaleTimeString('en-US', {
+              second: '2-digit',
+            })}
           </div>
-          <div className="text-muted-foreground font-medium text-sm capitalize">
-            {currentTime.toLocaleDateString('id-ID', {
+          <div className="text-2xl font-medium tracking-wide">
+            {currentTime.toLocaleDateString('en-US', {
               weekday: 'long',
               day: 'numeric',
               month: 'long',

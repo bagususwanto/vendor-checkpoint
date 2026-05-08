@@ -8,17 +8,17 @@ export enum UserRole {
 }
 
 export enum QueueStatus {
-  MENUNGGU = 'MENUNGGU',
-  DISETUJUI = 'DISETUJUI',
-  AKTIF = 'AKTIF',
-  TERTAHAN = 'TERTAHAN',
-  DITOLAK = 'DITOLAK',
-  SELESAI = 'SELESAI',
+  MENUNGGU = 'WAITING',
+  DISETUJUI = 'APPROVED',
+  AKTIF = 'ACTIVE',
+  TERTAHAN = 'ON_HOLD',
+  DITOLAK = 'REJECTED',
+  SELESAI = 'COMPLETED',
 }
 
 export enum ChecklistItemType {
-  UMUM = 'UMUM',
-  KHUSUS = 'KHUSUS',
+  UMUM = 'GENERAL',
+  KHUSUS = 'SPECIFIC',
 }
 
 export enum AuditLogAction {
@@ -73,14 +73,14 @@ export enum DayOfWeek {
 }
 
 export const DAY_NAMES: Record<number, string> = {
-  [DayOfWeek.EVERYDAY]: 'Setiap Hari',
-  [DayOfWeek.MONDAY]: 'Senin',
-  [DayOfWeek.TUESDAY]: 'Selasa',
-  [DayOfWeek.WEDNESDAY]: 'Rabu',
-  [DayOfWeek.THURSDAY]: 'Kamis',
-  [DayOfWeek.FRIDAY]: 'Jumat',
-  [DayOfWeek.SATURDAY]: 'Sabtu',
-  [DayOfWeek.SUNDAY]: 'Minggu',
+  [DayOfWeek.EVERYDAY]: 'Everyday',
+  [DayOfWeek.MONDAY]: 'Monday',
+  [DayOfWeek.TUESDAY]: 'Tuesday',
+  [DayOfWeek.WEDNESDAY]: 'Wednesday',
+  [DayOfWeek.THURSDAY]: 'Thursday',
+  [DayOfWeek.FRIDAY]: 'Friday',
+  [DayOfWeek.SATURDAY]: 'Saturday',
+  [DayOfWeek.SUNDAY]: 'Sunday',
 };
 
 export const DAY_OPTIONS = [

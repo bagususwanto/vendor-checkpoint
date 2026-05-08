@@ -65,15 +65,15 @@ export function QueueTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>No. Antrean</TableHead>
-            <TableHead>Perusahaan</TableHead>
+            <TableHead>Queue No.</TableHead>
+            <TableHead>Company</TableHead>
             <TableHead>Driver</TableHead>
-            <TableHead>Kedatangan</TableHead>
-            <TableHead>Keberangkatan</TableHead>
-            <TableHead>AI APD</TableHead>
-            <TableHead>Waktu</TableHead>
+            <TableHead>Arrival</TableHead>
+            <TableHead>Departure</TableHead>
+            <TableHead>PPE Scan</TableHead>
+            <TableHead>Time</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">Aksi</TableHead>
+            <TableHead className="text-right">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -86,7 +86,7 @@ export function QueueTable({
           ) : checkins.length === 0 ? (
             <TableRow>
               <TableCell colSpan={10} className="text-center py-4">
-                Tidak ada data ditemukan
+                No data found
               </TableCell>
             </TableRow>
           ) : (
@@ -156,7 +156,7 @@ export function QueueTable({
                       }}
                       trigger={
                         <Button size="sm" variant="outline">
-                          Detail
+                          Details
                         </Button>
                       }
                       readonly={true}
@@ -173,7 +173,7 @@ export function QueueTable({
                             time: checkin.submission_time,
                             status: checkin.current_status.toLowerCase(),
                           }}
-                          trigger={<Button size="sm">Verifikasi</Button>}
+                          trigger={<Button size="sm">Verify</Button>}
                           onSuccess={handleSuccess}
                         />
                       )}
@@ -210,7 +210,7 @@ export function QueueTable({
                             }}
                             trigger={
                               <Button size="sm" variant="outline">
-                                Detail
+                                Details
                               </Button>
                             }
                             readonly={true}
@@ -227,11 +227,11 @@ export function QueueTable({
 
       <div className="flex items-center justify-between px-2">
         <div className="flex-1 text-sm text-muted-foreground">
-          Total {totalRecords} data
+          Total {totalRecords} records
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Baris per halaman</p>
+            <p className="text-sm font-medium">Rows per page</p>
             <Select
               value={`${limit}`}
               onValueChange={(value) => {
@@ -252,7 +252,7 @@ export function QueueTable({
             </Select>
           </div>
           <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Halaman {page} dari {totalPages}
+            Page {page} of {totalPages}
           </div>
           <div className="flex items-center space-x-2">
             <Button

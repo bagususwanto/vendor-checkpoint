@@ -3,6 +3,7 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { useChecklistStore } from '@/stores/use-checklist.store';
 import { Badge } from '@/components/ui/badge';
+import { ChecklistItemType } from '@repo/types';
 
 interface ReviewChecklistProps {
   step2Data: {
@@ -18,7 +19,7 @@ export function ReviewChecklist({ step2Data }: ReviewChecklistProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Ringkasan Checklist</CardTitle>
+        <CardTitle className="text-lg">Checklist Summary</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6 h-[300px] overflow-y-scroll">
         {(checklistCategories || []).map((category) => {
@@ -36,9 +37,9 @@ export function ReviewChecklist({ step2Data }: ReviewChecklistProps) {
                 step2Data.checklistItems[item.checklist_item_id.toString()],
             )
             .sort((a, b) => {
-              // Primary sort: item_type (UMUM before KHUSUS)
-              if (a.item_type === 'UMUM' && b.item_type !== 'UMUM') return -1;
-              if (a.item_type !== 'UMUM' && b.item_type === 'UMUM') return 1;
+              // Primary sort: item_type (GENERAL before SPECIFIC)
+              if (a.item_type === ChecklistItemType.UMUM && b.item_type !== ChecklistItemType.UMUM) return -1;
+              if (a.item_type !== ChecklistItemType.UMUM && b.item_type === ChecklistItemType.UMUM) return 1;
 
               // Secondary sort: display_order
               return (a.display_order || 0) - (b.display_order || 0);
@@ -87,14 +88,14 @@ export function ReviewChecklist({ step2Data }: ReviewChecklistProps) {
                           <>
                             <CheckCircle2 className="w-4 h-4 text-status-success-fg" />
                             <span className="text-status-success-fg text-sm">
-                              YA
+                              YES
                             </span>
                           </>
                         ) : (
                           <>
                             <XCircle className="w-4 h-4 text-destructive" />
                             <span className="text-destructive text-sm">
-                              TIDAK
+                              NO
                             </span>
                           </>
                         )}

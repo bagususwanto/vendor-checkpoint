@@ -149,9 +149,9 @@ export function VerificationSheet({
           [responseId]: { ...current, imagePath: result.image_path },
         };
       });
-      toast.success('Foto bukti berhasil diunggah');
+      toast.success('Evidence photo uploaded successfully');
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Gagal mengunggah foto bukti';
+      const message = error.response?.data?.message || 'Failed to upload evidence photo';
       toast.error(message);
     }
   };
@@ -186,23 +186,23 @@ export function VerificationSheet({
         },
         {
           onSuccess: () => {
-            toast.success('Verifikasi Berhasil', {
-              description: `Check-in telah berhasil di-${decision === 'approve' ? 'setujui' : 'tolak'}.`,
+            toast.success('Verification Successful', {
+              description: `Check-in has been successfully ${decision === 'approve' ? 'approved' : 'rejected'}.`,
             });
             setOpen(false);
             onSuccess?.();
           },
           onError: (error) => {
-            toast.error('Gagal Verifikasi', {
+            toast.error('Verification Failed', {
               description:
-                error.message || 'Terjadi kesalahan saat menyimpan verifikasi.',
+                error.message || 'An error occurred while saving verification.',
             });
           },
         },
       );
     } catch (error: any) {
-      const message = error.response?.data?.message || error.message || 'Terjadi kesalahan saat menyimpan catatan ketidaksesuaian.';
-      toast.error('Gagal menyimpan temuan', {
+      const message = error.response?.data?.message || error.message || 'An error occurred while saving discrepancy notes.';
+      toast.error('Failed to save findings', {
         description: message,
       });
     }
@@ -223,7 +223,7 @@ export function VerificationSheet({
         <SheetHeader>
           <div className="flex items-center justify-between">
             <SheetTitle>
-              {readonly ? 'Detail Check-in' : 'Verifikasi Check-in'}
+              {readonly ? 'Check-in Details' : 'Check-in Verification'}
             </SheetTitle>
             <Badge variant="outline" className="text-base px-3 py-1">
               {checkin.id}
@@ -231,8 +231,8 @@ export function VerificationSheet({
           </div>
           <SheetDescription>
             {readonly
-              ? 'Informasi detail check-in dan riwayat verifikasi.'
-              : 'Tinjau detail dan berikan keputusan verifikasi.'}
+              ? 'Detailed check-in information and verification history.'
+              : 'Review details and provide verification decision.'}
           </SheetDescription>
         </SheetHeader>
 
@@ -248,9 +248,9 @@ export function VerificationSheet({
                 {Object.values(officerFindings).some(f => f.marked) && (
                   <Alert variant="destructive" className="border-2 border-rose-200 bg-rose-50/50">
                     <ShieldAlert className="h-4 w-4 text-rose-600" />
-                    <AlertTitle className="text-rose-800 font-bold">Temuan Petugas Lapangan</AlertTitle>
+                    <AlertTitle className="text-rose-800 font-bold">Field Officer Findings</AlertTitle>
                     <AlertDescription className="text-rose-700 text-xs">
-                      <p className="mb-2">Terdapat {Object.values(officerFindings).filter(f => f.marked).length} temuan ketidaksesuaian fisik yang perlu ditinjau pada bagian:</p>
+                      <p className="mb-2">There are {Object.values(officerFindings).filter(f => f.marked).length} physical discrepancy findings that need to be reviewed on:</p>
                       <div className="flex flex-wrap gap-1.5">
                         {detailData?.checklist_responses?.map((cat: any) => {
                           const count = cat.items.filter((item: any) => officerFindings[item.response_id]?.marked).length;
@@ -272,7 +272,7 @@ export function VerificationSheet({
 
                 <div>
                   <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
-                    Identitas Pengirim
+                    Shipper Identity
                   </h4>
                   <div className="space-y-4">
                     <Card className="p-4 shadow-sm">
@@ -282,7 +282,7 @@ export function VerificationSheet({
                         </div>
                         <div className="space-y-1">
                           <p className="text-xs font-medium text-muted-foreground">
-                            Perusahaan
+                            Company
                           </p>
                           <p className="font-semibold text-base leading-tight">
                             {detailData.snapshot_company_name}
@@ -300,7 +300,7 @@ export function VerificationSheet({
                         </div>
                         <div className="space-y-1">
                           <p className="text-xs font-medium text-muted-foreground">
-                            Kategori Vendor
+                            Vendor Category
                           </p>
                           <p className="font-semibold text-base">
                             {detailData.snapshot_category_name}
@@ -330,7 +330,7 @@ export function VerificationSheet({
                         </div>
                         <div className="space-y-1">
                           <p className="text-xs font-medium text-muted-foreground">
-                            Waktu Submit
+                            Submission Time
                           </p>
                           <p className="font-semibold text-base">
                             {detailData.submission_time
@@ -421,7 +421,7 @@ export function VerificationSheet({
                             </Badge>
                           ) : (
                             <p className="text-xs text-muted-foreground italic mt-1">
-                              Belum Check-out
+                              Not Checked-out Yet
                             </p>
                           )}
                           {detailData.ops_timelog?.departure_status === 'Late' && detailData.ops_timelog?.delay_departure_reason?.reason_text && (
@@ -503,8 +503,8 @@ export function VerificationSheet({
                                   }`}
                                 >
                                   {detailData.ops_ppe_scan.is_compliant
-                                    ? 'APD Lengkap'
-                                    : 'Atribut Tidak Lengkap'}
+                                    ? 'PPE Complete'
+                                    : 'Incomplete Attributes'}
                                 </span>
                               </div>
 
@@ -559,7 +559,7 @@ export function VerificationSheet({
                                 </div>
                               </div>
                               <span className="text-[10px] font-medium text-muted-foreground mt-2">
-                                Bukti Foto Scan
+                                Evidence Photo
                               </span>
                             </div>
                           )}
@@ -574,13 +574,13 @@ export function VerificationSheet({
               {detailData.ops_timelog && (
                 <div>
                   <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
-                    Log Waktu
+                    Time Logs
                   </h4>
                   <div className="grid grid-cols-2 gap-4">
                     <Card className="p-4 shadow-sm">
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Waktu Check-in
+                          Check-in Time
                         </p>
                         <p className="font-semibold text-sm">
                           {detailData.ops_timelog.checkin_time
@@ -595,7 +595,7 @@ export function VerificationSheet({
                     <Card className="p-4 shadow-sm">
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Waktu Check-out
+                          Check-out Time
                         </p>
                         <p className="font-semibold text-sm">
                           {detailData.ops_timelog.checkout_time
@@ -610,11 +610,11 @@ export function VerificationSheet({
                     <Card className="p-4 shadow-sm">
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Durasi
+                          Duration
                         </p>
                         <p className="font-semibold text-sm">
                           {detailData.ops_timelog.duration_minutes
-                            ? `${detailData.ops_timelog.duration_minutes} Menit`
+                            ? `${detailData.ops_timelog.duration_minutes} Minutes`
                             : '-'}
                         </p>
                       </div>
@@ -622,7 +622,7 @@ export function VerificationSheet({
                     <Card className="p-4 shadow-sm">
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Checkout Oleh
+                          Checkout By
                         </p>
                         <p className="font-semibold text-sm">
                           {detailData.ops_timelog.user?.full_name || '-'}
@@ -637,13 +637,13 @@ export function VerificationSheet({
               {detailData.ops_verification && (
                 <div>
                   <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
-                    Informasi Verifikasi
+                    Verification Information
                   </h4>
                   <div className="grid grid-cols-2 gap-4">
                     <Card className="p-4 shadow-sm">
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Status Verifikasi
+                          Verification Status
                         </p>
                         <StatusBadge
                           status={
@@ -655,7 +655,7 @@ export function VerificationSheet({
                     <Card className="p-4 shadow-sm">
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Diverifikasi Oleh
+                          Verified By
                         </p>
                         <p className="font-semibold text-sm">
                           {detailData.ops_verification.user?.full_name || '-'}
@@ -665,7 +665,7 @@ export function VerificationSheet({
                     <Card className="p-4 shadow-sm col-span-2">
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">
-                          Waktu Verifikasi
+                          Verification Time
                         </p>
                         <p className="font-semibold text-sm">
                           {detailData.ops_verification.verification_time
@@ -681,7 +681,7 @@ export function VerificationSheet({
                       <Card className="p-4 shadow-sm col-span-2 bg-status-error-bg border-status-error-border">
                         <div className="space-y-1">
                           <p className="text-xs font-medium text-destructive">
-                            Alasan Penolakan
+                            Rejection Reason
                           </p>
                           <p className="text-sm text-destructive font-medium">
                             {detailData.ops_verification.rejection_reason}
@@ -697,15 +697,15 @@ export function VerificationSheet({
                 {/* Checklist */}
                 <div>
                   <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
-                    Pemeriksaan
+                    Inspection
                   </h4>
 
                   {nonCompliantCount > 0 && (
                     <Alert variant="destructive" className="mb-4">
                       <AlertTriangle className="h-4 w-4" />
-                      <AlertTitle>Perhatian</AlertTitle>
+                      <AlertTitle>Attention</AlertTitle>
                       <AlertDescription>
-                        {nonCompliantCount} item tidak memenuhi standar
+                        {nonCompliantCount} items did not meet standards
                       </AlertDescription>
                     </Alert>
                   )}
@@ -792,8 +792,7 @@ export function VerificationSheet({
                                           )}
                                           {!item.is_compliant && (
                                             <p className="text-xs text-muted-foreground self-center">
-                                              Item ini memerlukan perhatian
-                                              khusus.
+                                              This item requires special attention.
                                             </p>
                                           )}
                                         </div>
@@ -840,7 +839,7 @@ export function VerificationSheet({
                                               </TooltipTrigger>
                                               <TooltipContent>
                                                 <p>
-                                                  Tandai Ketidaksesuaian Fisik
+                                                  Mark Physical Discrepancy
                                                 </p>
                                               </TooltipContent>
                                             </Tooltip>
@@ -865,7 +864,7 @@ export function VerificationSheet({
                                             ) : (
                                               <XCircle className="mr-1 h-3 w-3" />
                                             )}
-                                            Ya
+                                            Yes
                                           </Badge>
                                         ) : (
                                           <Badge
@@ -885,7 +884,7 @@ export function VerificationSheet({
                                             ) : (
                                               <XCircle className="mr-1 h-3 w-3" />
                                             )}
-                                            Tidak
+                                            No
                                           </Badge>
                                         )}
                                       </div>
@@ -900,7 +899,7 @@ export function VerificationSheet({
                                             <div className={`flex items-center gap-2 ${readonly ? 'text-rose-700' : 'text-destructive'}`}>
                                               <ShieldAlert className="h-4 w-4" />
                                               <span className="text-xs font-bold uppercase tracking-tight">
-                                                {readonly ? 'Catatan Temuan Petugas' : 'Temuan Petugas'}
+                                                {readonly ? 'Officer Finding Note' : 'Officer Finding'}
                                               </span>
                                             </div>
                                             
@@ -915,7 +914,7 @@ export function VerificationSheet({
                                                   />
                                                 ) : (
                                                   <Textarea
-                                                    placeholder="Berikan catatan ketidaksesuaian fisik yang ditemukan..."
+                                                    placeholder="Provide notes on the physical discrepancies found..."
                                                     className="min-h-[80px] bg-white/50 border-destructive/20 focus-visible:ring-destructive text-sm"
                                                     value={officerFindings[item.response_id]?.note ?? ''}
                                                     onChange={(e) => handleUpdateNote(item.response_id, e.target.value)}
@@ -947,7 +946,7 @@ export function VerificationSheet({
                                                     ) : (
                                                       <>
                                                         <ImagePlus className="h-6 w-6 text-muted-foreground mb-1" />
-                                                        <span className="text-[10px] text-muted-foreground font-medium">Foto Bukti</span>
+                                                        <span className="text-[10px] text-muted-foreground font-medium">Evidence Photo</span>
                                                       </>
                                                     )}
                                                   </div>
@@ -1004,7 +1003,7 @@ export function VerificationSheet({
                 {!readonly && (
                   <div>
                     <h4 className="mb-4 text-sm font-medium leading-none text-muted-foreground uppercase tracking-wider">
-                      Keputusan Akhir
+                      Final Decision
                     </h4>
                     <RadioGroup
                       value={decision || ''}
@@ -1028,9 +1027,9 @@ export function VerificationSheet({
                               <CheckCircle className="h-5 w-5" />
                             </div>
                             <div>
-                              <p className="font-semibold text-sm">Setujui</p>
+                              <p className="font-semibold text-sm">Approve</p>
                               <p className="text-xs text-muted-foreground">
-                                Lanjutkan proses
+                                Continue process
                               </p>
                             </div>
                           </div>
@@ -1051,9 +1050,9 @@ export function VerificationSheet({
                               <XCircle className="h-5 w-5" />
                             </div>
                             <div>
-                              <p className="font-semibold text-sm">Tolak</p>
+                              <p className="font-semibold text-sm">Reject</p>
                               <p className="text-xs text-muted-foreground">
-                                Hentikan proses
+                                Stop process
                               </p>
                             </div>
                           </div>
@@ -1064,12 +1063,12 @@ export function VerificationSheet({
                     {decision === 'reject' && (
                       <div className="mt-3 animate-in fade-in slide-in-from-top-2">
                         <Label htmlFor="reason" className="sr-only">
-                          Alasan Penolakan
+                          Rejection Reason
                         </Label>
                         <textarea
                           id="reason"
                           className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                          placeholder="Tuliskan alasan penolakan di sini..."
+                          placeholder="Write the rejection reason here..."
                           value={reason}
                           onChange={(e) => setReason(e.target.value)}
                         />
@@ -1081,7 +1080,7 @@ export function VerificationSheet({
             </div>
           ) : (
             <div className="text-center py-4 text-muted-foreground">
-              Gagal memuat data verifikasi.
+              Failed to load verification data.
             </div>
           )}
         </div>
@@ -1096,12 +1095,12 @@ export function VerificationSheet({
               }
               onClick={handleSave}
             >
-              {verifyMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+              {verifyMutation.isPending ? 'Saving...' : 'Save'}
             </Button>
           )}
           <SheetClose asChild>
             <Button variant={readonly ? 'default' : 'outline'}>
-              {readonly ? 'Tutup' : 'Batal'}
+              {readonly ? 'Close' : 'Cancel'}
             </Button>
           </SheetClose>
         </SheetFooter>

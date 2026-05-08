@@ -6,6 +6,7 @@ import { UpdateChecklistItemDto } from './dto/update-item.dto';
 import { ReorderDto } from './dto/reorder.dto';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { VendorCategoryService } from '../vendor_category/vendor_category.service';
+import { ChecklistItemType } from '@repo/types';
 
 @Injectable()
 export class ChecklistService {
@@ -42,14 +43,20 @@ export class ChecklistService {
 
     return categories.map((category) => {
       const sortedItems = category.mst_checklist_item.sort((a, b) => {
-        const typeA = a.item_type?.toLowerCase();
-        const typeB = b.item_type?.toLowerCase();
+        const typeA = a.item_type?.toUpperCase();
+        const typeB = b.item_type?.toUpperCase();
 
-        // Primary sort: item_type ('umum' first, 'khusus' last)
-        if (typeA === 'umum' && typeB !== 'umum') {
+        // Primary sort: item_type ('GENERAL' first, 'SPECIFIC' last)
+        if (
+          typeA === ChecklistItemType.UMUM &&
+          typeB !== ChecklistItemType.UMUM
+        ) {
           return -1;
         }
-        if (typeA !== 'umum' && typeB === 'umum') {
+        if (
+          typeA !== ChecklistItemType.UMUM &&
+          typeB === ChecklistItemType.UMUM
+        ) {
           return 1;
         }
 

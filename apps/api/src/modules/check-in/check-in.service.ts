@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import FormData from 'form-data';
 import { CreateCheckInDto } from './dto/create-check-in.dto';
@@ -16,7 +20,10 @@ import { SystemConfigService } from '../system-config/system-config.service';
 import { extractSequence } from 'src/common/utils/extract-sequence.util';
 import { ChecklistService } from '../checklist/checklist.service';
 import { getStartOfToday } from 'src/common/utils/today-date.util';
-import { getOperationalDate, getPlannedDateTime } from 'src/common/utils/operational-date.util';
+import {
+  getOperationalDate,
+  getPlannedDateTime,
+} from 'src/common/utils/operational-date.util';
 
 // Removed TimeLogService import
 
@@ -28,6 +35,7 @@ import {
   PaginatedResponse,
   VerificationList,
   QueueStatus,
+  ChecklistItemType,
 } from '@repo/types';
 
 @Injectable()
@@ -68,7 +76,7 @@ export class CheckInService {
     } catch (error: any) {
       throw new InternalServerErrorException(
         error?.response?.data?.detail ||
-          'Gagal menghubungi layanan PPE Detection',
+          'Failed to connect to PPE Detection service',
       );
     }
   }
@@ -228,7 +236,7 @@ export class CheckInService {
             driver_name: createCheckInDto.driver_name,
             status_display_text:
               statusDisplayText?.config_value ||
-              (initialStatus === QueueStatus.AKTIF ? 'Diterima' : 'Menunggu'),
+              (initialStatus === QueueStatus.AKTIF ? 'Accepted' : 'Waiting'),
             estimated_wait_minutes: estimatedWaitMinutes?.config_value
               ? toInt(estimatedWaitMinutes.config_value)
               : 0,
@@ -282,10 +290,12 @@ export class CheckInService {
       },
     });
 
-    const actualTimeStr = dateNow.toLocaleTimeString('en-GB', {
-      timeZone: 'Asia/Jakarta',
-      hour12: false,
-    }).substring(0, 5);
+    const actualTimeStr = dateNow
+      .toLocaleTimeString('en-GB', {
+        timeZone: 'Asia/Jakarta',
+        hour12: false,
+      })
+      .substring(0, 5);
 
     if (!slot) {
       return {
@@ -331,7 +341,7 @@ export class CheckInService {
     });
 
     if (!entry) {
-      throw new BadRequestException('Nomor antrean tidak ditemukan');
+      throw new BadRequestException('Queue number not found');
     }
 
     const actualTimeStr = dateNow
@@ -345,7 +355,8 @@ export class CheckInService {
 
     return {
       departure_status: status,
-      planned_departure_time: entry.delivery_slot?.schedule?.departure_time || null,
+      planned_departure_time:
+        entry.delivery_slot?.schedule?.departure_time || null,
       actual_time: actualTimeStr,
     };
   }
@@ -415,7 +426,12 @@ export class CheckInService {
         take: limit,
         where: {
           current_status: {
-            in: ['MENUNGGU', 'DISETUJUI', 'TERTAHAN', 'AKTIF'],
+            in: [
+              QueueStatus.MENUNGGU,
+              QueueStatus.DISETUJUI,
+              QueueStatus.TERTAHAN,
+              QueueStatus.AKTIF,
+            ],
           },
           submission_time: {
             gte: windowStart,
@@ -533,7 +549,9 @@ export class CheckInService {
 
       if (filter.status) {
         if (typeof filter.status === 'string' && filter.status.includes(',')) {
-          where.current_status = { in: filter.status.split(',') as QueueStatus[] };
+          where.current_status = {
+            in: filter.status.split(',') as QueueStatus[],
+          };
         } else {
           where.current_status = filter.status;
         }
@@ -728,7 +746,7 @@ export class CheckInService {
 
     const checklist_responses = this.formatCheckinResponses(
       entry.ops_checkin_response,
-      entry.ops_officer_discrepancy
+      entry.ops_officer_discrepancy,
     );
 
     const { ops_checkin_response, ...rest } = entry;
@@ -762,7 +780,7 @@ export class CheckInService {
     // Validate rejection_reason is required for REJECT action
     if (action === 'REJECT' && !rejection_reason?.trim()) {
       throw new BadRequestException(
-        'Alasan penolakan harus diisi untuk aksi REJECT',
+        'Rejection reason must be filled for REJECT action',
       );
     }
 
@@ -779,12 +797,12 @@ export class CheckInService {
       });
 
       if (!entry) {
-        throw new BadRequestException('Nomor antrean tidak ditemukan');
+        throw new BadRequestException('Queue number not found');
       }
 
       if (entry.current_status !== QueueStatus.MENUNGGU) {
         throw new BadRequestException(
-          `Check-in sudah diverifikasi dengan status: ${entry.current_status}`,
+          `Check-in has already been verified with status: ${entry.current_status}`,
         );
       }
 
@@ -883,7 +901,7 @@ export class CheckInService {
       });
 
       if (!entry) {
-        throw new BadRequestException('Nomor antrean tidak ditemukan');
+        throw new BadRequestException('Queue number not found');
       }
 
       if (
@@ -891,16 +909,16 @@ export class CheckInService {
         entry.current_status !== QueueStatus.AKTIF
       ) {
         throw new BadRequestException(
-          `Checkout hanya dapat dilakukan untuk status DISETUJUI atau AKTIF. Status saat ini: ${entry.current_status}`,
+          `Checkout can only be performed for APPROVED or ACTIVE status. Current status: ${entry.current_status}`,
         );
       }
 
       if (!entry.ops_timelog) {
-        throw new BadRequestException('Data timelog tidak ditemukan');
+        throw new BadRequestException('Timelog data not found');
       }
 
       if (entry.ops_timelog.is_checked_out) {
-        throw new BadRequestException('Antrean sudah melakukan checkout');
+        throw new BadRequestException('Queue has already checked out');
       }
 
       // 2. Calculate duration
@@ -1007,12 +1025,12 @@ export class CheckInService {
       });
 
       if (!entry) {
-        throw new BadRequestException('Nomor antrean tidak ditemukan');
+        throw new BadRequestException('Queue number not found');
       }
 
       if (entry.current_status !== QueueStatus.DISETUJUI) {
         throw new BadRequestException(
-          `Hanya antrean dengan status DISETUJUI yang dapat ditahan. Status saat ini: ${entry.current_status}`,
+          `Only queues with APPROVED status can be held. Current status: ${entry.current_status}`,
         );
       }
 
@@ -1034,7 +1052,7 @@ export class CheckInService {
         where: { entry_id: entry.entry_id },
         data: {
           current_status: QueueStatus.TERTAHAN,
-          status_display_text: statusDisplayText?.config_value || 'Tertahan',
+          status_display_text: statusDisplayText?.config_value || 'On Hold',
           last_updated: updateTime,
         },
       });
@@ -1062,7 +1080,7 @@ export class CheckInService {
         user_id: localUserId,
         queue_number,
         status: QueueStatus.TERTAHAN,
-        status_display_text: statusDisplayText?.config_value || 'Tertahan',
+        status_display_text: statusDisplayText?.config_value || 'On Hold',
         driver_name: entry.driver_name,
         company_name: entry.snapshot_company_name,
         hold_time: updateTime,
@@ -1091,12 +1109,12 @@ export class CheckInService {
       });
 
       if (!entry) {
-        throw new BadRequestException('Nomor antrean tidak ditemukan');
+        throw new BadRequestException('Queue number not found');
       }
 
       if (entry.current_status !== QueueStatus.TERTAHAN) {
         throw new BadRequestException(
-          `Hanya antrean dengan status TERTAHAN yang dapat dilanjutkan. Status saat ini: ${entry.current_status}`,
+          `Only queues with ON_HOLD status can be resumed. Current status: ${entry.current_status}`,
         );
       }
 
@@ -1118,8 +1136,7 @@ export class CheckInService {
         where: { entry_id: entry.entry_id },
         data: {
           current_status: QueueStatus.DISETUJUI,
-          status_display_text:
-            statusDisplayText?.config_value || 'Sedang Diproses',
+          status_display_text: statusDisplayText?.config_value || 'Processing',
           last_updated: updateTime,
         },
       });
@@ -1140,8 +1157,7 @@ export class CheckInService {
         user_id: localUserId,
         queue_number,
         status: QueueStatus.DISETUJUI,
-        status_display_text:
-          statusDisplayText?.config_value || 'Sedang Diproses',
+        status_display_text: statusDisplayText?.config_value || 'Processing',
         driver_name: entry.driver_name,
         company_name: entry.snapshot_company_name,
         resume_time: updateTime,
@@ -1165,7 +1181,7 @@ export class CheckInService {
     });
 
     if (!entry) {
-      throw new BadRequestException('Nomor antrean tidak ditemukan');
+      throw new BadRequestException('Queue number not found');
     }
 
     return await this.prisma.$transaction(async (tx) => {
@@ -1237,13 +1253,13 @@ export class CheckInService {
     });
     if (userByExternal) return userByExternal.user_id;
 
-    throw new BadRequestException('User tidak ditemukan dalam database lokal');
+    throw new BadRequestException('User not found in local database');
   }
 
   private async validateVendor(vendor_id: number) {
     const vendor = await this.vendorService.findOne(vendor_id);
     if (!vendor) {
-      throw new BadRequestException('Vendor tidak ditemukan');
+      throw new BadRequestException('Vendor not found');
     }
     return vendor;
   }
@@ -1262,7 +1278,9 @@ export class CheckInService {
       }
 
       // Find if this response has a discrepancy from the officer
-      const discrepancy = discrepancies.find(d => d.response_id === response.response_id);
+      const discrepancy = discrepancies.find(
+        (d) => d.response_id === response.response_id,
+      );
 
       acc[categoryName].items.push({
         response_id: response.response_id,
@@ -1274,11 +1292,13 @@ export class CheckInService {
         vendor_category_name:
           response.checklist_item?.vendor_category?.category_name,
         vendor_category_id: response.checklist_item?.vendor_category_id,
-        officer_discrepancy: discrepancy ? {
-          officer_note: discrepancy.officer_note,
-          evidence_image_path: discrepancy.evidence_image_path,
-          officer_name: discrepancy.user?.full_name
-        } : null
+        officer_discrepancy: discrepancy
+          ? {
+              officer_note: discrepancy.officer_note,
+              evidence_image_path: discrepancy.evidence_image_path,
+              officer_name: discrepancy.user?.full_name,
+            }
+          : null,
       });
       return acc;
     }, {});
@@ -1289,11 +1309,17 @@ export class CheckInService {
           const typeA = a.item_type?.toLowerCase();
           const typeB = b.item_type?.toLowerCase();
 
-          // Primary sort: item_type ('umum' first, 'khusus' last)
-          if (typeA === 'umum' && typeB !== 'umum') {
+          // Primary sort: item_type ('general' first, 'specific' last)
+          if (
+            typeA === ChecklistItemType.UMUM.toLowerCase() &&
+            typeB !== ChecklistItemType.UMUM.toLowerCase()
+          ) {
             return -1;
           }
-          if (typeA !== 'umum' && typeB === 'umum') {
+          if (
+            typeA !== ChecklistItemType.UMUM.toLowerCase() &&
+            typeB === ChecklistItemType.UMUM.toLowerCase()
+          ) {
             return 1;
           }
 
@@ -1318,7 +1344,7 @@ export class CheckInService {
     const vendorCategory =
       await this.vendorCategoryService.findOne(vendor_category_id);
     if (!vendorCategory) {
-      throw new BadRequestException('Vendor Category tidak ditemukan');
+      throw new BadRequestException('Vendor Category not found');
     }
     return vendorCategory;
   }

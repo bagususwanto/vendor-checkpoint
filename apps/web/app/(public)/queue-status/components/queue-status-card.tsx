@@ -105,9 +105,11 @@ export function QueueStatusCard({ data, onRefresh }: QueueStatusCardProps) {
             </div>
             <div className="text-base font-semibold text-foreground">
               {data.submissionTime
-                ? new Date(data.submissionTime).toLocaleString('id-ID', {
-                    dateStyle: 'long',
-                    timeStyle: 'short',
+                ? new Date(data.submissionTime).toLocaleString('en-US', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
                   })
                 : '-'}
             </div>
@@ -130,7 +132,7 @@ export function QueueStatusCard({ data, onRefresh }: QueueStatusCardProps) {
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex items-center text-xs font-medium text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-full">
               <Clock className="w-3 h-3 mr-2" />
-              Update: {new Date(data.updatedAt).toLocaleTimeString('id-ID')}
+              Update: {new Date(data.updatedAt).toLocaleTimeString('en-US')}
             </div>
 
             <Button
