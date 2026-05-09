@@ -265,12 +265,30 @@ export class VendorPerformanceService {
       this.prisma.ops_checkin_entry.findMany({
         where: whereClause,
         include: {
-          ops_timelog: true,
+          ops_timelog: {
+            include: {
+              delay_departure_reason: true,
+            },
+          },
+          delay_arrival_reason: true,
+          ops_ppe_scan: true,
+          ops_officer_discrepancy: {
+            include: {
+              user: {
+                select: {
+                  full_name: true,
+                },
+              },
+            },
+            orderBy: { created_at: 'desc' },
+            take: 5,
+          },
           ops_performance_adjustment: {
             orderBy: { created_at: 'desc' },
             take: 1,
           },
         },
+        orderBy: { submission_time: 'desc' },
       }),
       this.prisma.ops_delivery_slot.count({
         where: {
@@ -299,6 +317,22 @@ export class VendorPerformanceService {
     let totalLeadTime = 0;
     let leadTimeCount = 0;
 
+    // Aggregations
+    const arrivalDelayReasons: Record<string, number> = {};
+    const departureDelayReasons: Record<string, number> = {};
+    const ppeStats = {
+      total_scans: 0,
+      compliant_scans: 0,
+      missing_hardhat: 0,
+      missing_vest: 0,
+    };
+    const leadTimeDistribution = {
+      under_30: 0,
+      between_30_60: 0,
+      over_60: 0,
+    };
+    const recentDiscrepancies: any[] = [];
+
     entries.forEach((entry) => {
       const adjustment = (entry as any).ops_performance_adjustment?.[0];
       const arrivalStatus = adjustment?.adjusted_arrival_status ?? entry.arrival_status;
@@ -309,16 +343,50 @@ export class VendorPerformanceService {
       if (arrivalStatus === 'On-Time') onTimeArrivals++;
       if (!hasNonCompliant) compliantCheckins++;
       
+      // Delay Reason Aggregation
+      if (arrivalStatus === 'Late' && entry.delay_arrival_reason) {
+        const reason = entry.delay_arrival_reason.reason_text;
+        arrivalDelayReasons[reason] = (arrivalDelayReasons[reason] || 0) + 1;
+      }
+
       if (isCheckedOut && departureStatus && departureStatus !== 'Unscheduled') {
         totalCheckouts++;
         if (departureStatus === 'On-Time') {
           onTimeDepartures++;
+        } else if (departureStatus === 'Overdue' && entry.ops_timelog?.delay_departure_reason) {
+          const reason = entry.ops_timelog.delay_departure_reason.reason_text;
+          departureDelayReasons[reason] = (departureDelayReasons[reason] || 0) + 1;
         }
       }
 
+      // Lead Time Distribution
       if (entry.ops_timelog?.duration_minutes !== null && entry.ops_timelog?.duration_minutes !== undefined) {
-        totalLeadTime += entry.ops_timelog.duration_minutes;
+        const mins = entry.ops_timelog.duration_minutes;
+        totalLeadTime += mins;
         leadTimeCount++;
+
+        if (mins < 30) leadTimeDistribution.under_30++;
+        else if (mins <= 60) leadTimeDistribution.between_30_60++;
+        else leadTimeDistribution.over_60++;
+      }
+
+      // PPE Stats
+      if (entry.ops_ppe_scan) {
+        ppeStats.total_scans++;
+        if (entry.ops_ppe_scan.is_compliant) ppeStats.compliant_scans++;
+        if (!entry.ops_ppe_scan.has_hardhat) ppeStats.missing_hardhat++;
+        if (!entry.ops_ppe_scan.has_safety_vest) ppeStats.missing_vest++;
+      }
+
+      // Collect discrepancies
+      if (entry.ops_officer_discrepancy && entry.ops_officer_discrepancy.length > 0) {
+        entry.ops_officer_discrepancy.forEach(d => {
+          recentDiscrepancies.push({
+            ...d,
+            queue_number: entry.queue_number,
+            submission_time: entry.submission_time,
+          });
+        });
       }
     });
 
@@ -336,6 +404,12 @@ export class VendorPerformanceService {
         compliance_rate: totalCheckins > 0 ? Math.round((compliantCheckins / totalCheckins) * 100) : 0,
         avg_lead_time: leadTimeCount > 0 ? Math.round(totalLeadTime / leadTimeCount) : 0,
         missed_cycles: missedCycles,
+        // New advanced stats
+        arrival_delay_reasons: Object.entries(arrivalDelayReasons).map(([reason, count]) => ({ reason, count })),
+        departure_delay_reasons: Object.entries(departureDelayReasons).map(([reason, count]) => ({ reason, count })),
+        ppe_compliance_stats: ppeStats,
+        lead_time_distribution: leadTimeDistribution,
+        recent_discrepancies: recentDiscrepancies.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 10),
       },
       entries: entries.map(entry => ({
         ...entry,
