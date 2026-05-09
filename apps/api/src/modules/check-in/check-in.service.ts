@@ -121,7 +121,7 @@ export class CheckInService {
             },
             orderBy: {
               schedule: {
-                arrival_time: 'asc',
+                rit: 'asc',
               },
             },
           });
@@ -285,7 +285,7 @@ export class CheckInService {
       },
       orderBy: {
         schedule: {
-          arrival_time: 'asc',
+          rit: 'asc',
         },
       },
     });
