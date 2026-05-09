@@ -58,7 +58,7 @@ export function DisplayHeaderQueue() {
         </div>
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground uppercase">
-            Antrean Vendor
+            Vendor Queues
           </h1>
           <p className="text-muted-foreground text-sm font-medium">
             PT. Toyota Motor Manufacturing Indonesia
@@ -86,7 +86,7 @@ export function DisplayHeaderQueue() {
         <Button
           variant="outline"
           onClick={toggleFullscreen}
-          title={isFullscreen ? 'Keluar Fullscreen' : 'Fullscreen'}
+          title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
         >
           {isFullscreen ? <Minimize /> : <Maximize />}
           {isFullscreen ? 'Exit' : 'Fullscreen'}

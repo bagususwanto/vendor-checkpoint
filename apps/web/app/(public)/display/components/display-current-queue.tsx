@@ -25,10 +25,10 @@ export function DisplayCurrentQueue({
           <Sparkles className="w-12 h-12 text-muted-foreground" />
         </div>
         <p className="font-bold text-muted-foreground text-2xl">
-          Tidak ada antrean dipanggil
+          No queues called
         </p>
         <p className="mt-2 text-muted-foreground/60 text-lg">
-          Menunggu antrean berikutnya...
+          Waiting for the next queue...
         </p>
       </div>
     );
@@ -52,7 +52,7 @@ export function DisplayCurrentQueue({
       {/* Queue Number - Main Focus */}
       <div className="flex flex-col justify-center items-center px-4 overflow-hidden">
         <p className="mb-2 font-medium text-muted-foreground text-base uppercase tracking-widest">
-          Nomor Antrean
+          Queue Number
         </p>
         {/* Split queue number for better display */}
         {(() => {
@@ -79,7 +79,7 @@ export function DisplayCurrentQueue({
           <div className="flex items-center gap-2 mb-1 text-muted-foreground">
             <Building2 className="w-4 h-4" />
             <span className="font-semibold text-xs uppercase tracking-wider">
-              Perusahaan
+              Company
             </span>
           </div>
           <p className="font-bold text-foreground text-lg line-clamp-2 leading-snug">

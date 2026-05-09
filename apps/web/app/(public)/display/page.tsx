@@ -65,7 +65,7 @@ export default function DisplayPage() {
           <div className="col-span-7 h-full min-h-0">
             <DisplayTableQueue
               queues={waitingQueues}
-              title="Antrean Berikutnya"
+              title="Next Queues"
             />
           </div>
         </main>

@@ -12,7 +12,7 @@ interface DisplayTableQueueProps {
 
 export function DisplayTableQueue({
   queues,
-  title = 'Antrean Berikutnya',
+  title = 'Next Queues',
 }: DisplayTableQueueProps) {
   return (
     <div className="h-full rounded-3xl bg-card/60 backdrop-blur-xl border border-border flex flex-col overflow-hidden">
@@ -31,7 +31,7 @@ export function DisplayTableQueue({
           <span className="text-lg font-bold text-foreground">
             {queues.length}
           </span>
-          <span className="text-muted-foreground text-sm">menunggu</span>
+          <span className="text-muted-foreground text-sm">waiting</span>
         </div>
       </div>
 
@@ -41,10 +41,10 @@ export function DisplayTableQueue({
           #
         </div>
         <div className="col-span-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">
-          No. Antrean
+          Queue No.
         </div>
         <div className="col-span-5 text-xs font-bold text-muted-foreground uppercase tracking-wider">
-          Perusahaan
+          Company
         </div>
         <div className="col-span-2 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">
           Status
@@ -56,7 +56,7 @@ export function DisplayTableQueue({
         {queues.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-8">
             <Users className="w-16 h-16 mb-4 opacity-30" />
-            <p className="text-xl font-medium">Tidak ada antrean menunggu</p>
+            <p className="text-xl font-medium">No queues waiting</p>
           </div>
         ) : (
           <div className="divide-y divide-border">
