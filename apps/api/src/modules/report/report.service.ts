@@ -246,6 +246,10 @@ export class ReportService {
         ops_officer_discrepancy: {
           include: { user: true },
         },
+        ops_performance_adjustment: {
+          orderBy: { created_at: 'desc' },
+          take: 1,
+        },
       },
       orderBy: { submission_time: 'desc' },
     });
@@ -483,6 +487,11 @@ export class ReportService {
       'Officer Notes Summary',
       'PPE Status',
       'PPE Incomplete Detail',
+      // Adjustment columns (side-by-side, original data above is preserved)
+      'Adjusted Arrival Status',
+      'Adjusted Departure Status',
+      'Adjusted Compliance',
+      'Adjustment Note',
     ];
 
     const headerRow = sheet.addRow(headers);
@@ -497,6 +506,17 @@ export class ReportService {
         bottom: { style: 'thin' },
       };
     });
+
+    // Style the adjustment header columns differently
+    const adjColStart = 22; // column index of 'Adjusted Arrival Status' (1-based)
+    for (let col = adjColStart; col <= adjColStart + 3; col++) {
+      const cell = headerRow.getCell(col);
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFFD966' }, // yellow header for adjustment columns
+      };
+    }
 
     // Data rows
     entries.forEach((entry, index) => {
@@ -521,7 +541,20 @@ export class ReportService {
             .join(' | ')
         : '-';
 
-      sheet.addRow([
+      // Adjustment data (original columns above are NOT changed)
+      const adj = (entry as any).ops_performance_adjustment?.[0];
+      const hasAdjustment = !!adj;
+      const adjArrival = adj?.adjusted_arrival_status ?? '-';
+      const adjDeparture = adj?.adjusted_departure_status ?? '-';
+      const adjCompliance =
+        adj != null
+          ? adj.override_has_non_compliant
+            ? 'NON-COMPLIANT'
+            : 'COMPLIANT'
+          : '-';
+      const adjNote = adj?.adjustment_reason ?? '-';
+
+      const row = sheet.addRow([
         index + 1,
         entry.queue_number,
         entry.snapshot_company_name,
@@ -548,7 +581,32 @@ export class ReportService {
         officerNotes,
         ppeStatus,
         ppeDetail,
+        adjArrival,
+        adjDeparture,
+        adjCompliance,
+        adjNote,
       ]);
+
+      // Highlight entire row yellow if it has an adjustment
+      if (hasAdjustment) {
+        row.eachCell((cell) => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFFFFFF0' }, // very light yellow for the row
+          };
+        });
+        // Make the adjustment cells more prominent
+        for (let col = adjColStart; col <= adjColStart + 3; col++) {
+          const cell = row.getCell(col);
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFFFD966' }, // deeper yellow for adjustment cells
+          };
+          cell.font = { bold: true };
+        }
+      }
     });
 
     // Auto-fit columns
