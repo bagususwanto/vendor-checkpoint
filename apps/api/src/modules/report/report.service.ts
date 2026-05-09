@@ -482,7 +482,8 @@ export class ReportService {
       'Duration (min)',
       'Departure Status',
       'Departure Delay Reason',
-      'Non-Compliant Count',
+      'Compliance Status',      // COMPLIANT / NON-COMPLIANT
+      'Non-Compliant Count',   // numeric count
       'Officer Findings Status',
       'Officer Notes Summary',
       'PPE Status',
@@ -507,8 +508,7 @@ export class ReportService {
       };
     });
 
-    // Style the adjustment header columns differently
-    const adjColStart = 22; // column index of 'Adjusted Arrival Status' (1-based)
+    const adjColStart = 23; // 1-based: col 23 = 'Adjusted Arrival Status'
     for (let col = adjColStart; col <= adjColStart + 3; col++) {
       const cell = headerRow.getCell(col);
       cell.fill = {
