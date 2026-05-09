@@ -55,6 +55,7 @@ export function CheckinList({ status }: CheckinListProps) {
       end_date: format(new Date(), 'yyyy-MM-dd'),
       status: status,
     },
+    undefined,
     refreshInterval,
   );
 
