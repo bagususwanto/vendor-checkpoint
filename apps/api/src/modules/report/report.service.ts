@@ -542,12 +542,26 @@ export class ReportService {
         : '-';
 
       // Adjustment data (original columns above are NOT changed)
-      const adj = (entry as any).ops_performance_adjustment?.[0];
+      // Note: each field can be individually null even when an adjustment record
+      // exists, because user may only adjust one field at a time.
+      const adj = (entry as any).ops_performance_adjustment?.[0] ?? null;
       const hasAdjustment = !!adj;
-      const adjArrival = adj?.adjusted_arrival_status ?? '-';
-      const adjDeparture = adj?.adjusted_departure_status ?? '-';
+
+      // Show '-' if this specific field was not part of the adjustment
+      const adjArrival =
+        adj?.adjusted_arrival_status != null
+          ? adj.adjusted_arrival_status
+          : '-';
+      const adjDeparture =
+        adj?.adjusted_departure_status != null
+          ? adj.adjusted_departure_status
+          : '-';
+      // override_has_non_compliant is a nullable Boolean:
+      //   null  = not adjusted
+      //   true  = adjusted to NON-COMPLIANT
+      //   false = adjusted to COMPLIANT
       const adjCompliance =
-        adj != null
+        adj != null && adj.override_has_non_compliant != null
           ? adj.override_has_non_compliant
             ? 'NON-COMPLIANT'
             : 'COMPLIANT'
