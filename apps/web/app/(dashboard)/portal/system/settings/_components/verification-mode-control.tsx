@@ -30,7 +30,7 @@ export function VerificationModeControl() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pendingValue, setPendingValue] = useState<boolean | null>(null);
 
-  // Cari config dengan key yang tepat
+  // Find config with the correct key
   const config = data?.data?.find((c) => c.config_key === 'VERIFICATION_MODE_ENABLED');
   const isEnabled = config?.config_value === 'true';
 
@@ -74,7 +74,7 @@ export function VerificationModeControl() {
     );
   }
 
-  // Jika config belum di-seed, kita tidak bisa menampilkan toggle-nya
+  // If config is not seeded, we cannot show the toggle
   if (!config) {
     return null;
   }
