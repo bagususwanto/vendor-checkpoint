@@ -42,6 +42,7 @@ export default function QueuePage() {
       vendor_category_id: categoryId || undefined,
       status: status || undefined,
     },
+    'desc',
   );
 
   const checkins = data?.data || [];

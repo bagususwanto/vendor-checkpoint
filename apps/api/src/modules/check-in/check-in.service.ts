@@ -512,7 +512,7 @@ export class CheckInService {
   async findVerificationList(
     query: PaginatedParamsDto,
   ): Promise<PaginatedResponse<VerificationList>> {
-    const { page, limit, search, filter } = query;
+    const { page, limit, search, filter, sort_order } = query;
     const skip = (page - 1) * limit;
     const where: any = {};
 
@@ -564,18 +564,19 @@ export class CheckInService {
     );
     const priorityMode = priorityModeConfig?.config_value || 'STANDARD';
 
-    // Determine orderBy based on priority mode
+    // Determine orderBy based on client sort_order or priority mode
+    const order = (sort_order || 'asc') as 'asc' | 'desc';
     let orderBy: any;
     if (priorityMode === 'PRIORITY') {
       // PRIORITY mode: non-compliant items first, then by submission time
       orderBy = [
         { has_non_compliant_items: 'desc' as const },
-        { submission_time: 'asc' as const },
+        { submission_time: order },
       ];
     } else {
-      // STANDARD mode: order by submission time (FIFO)
+      // STANDARD mode: order by submission time
       orderBy = {
-        submission_time: 'asc' as const,
+        submission_time: order,
       };
     }
 

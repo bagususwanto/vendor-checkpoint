@@ -71,6 +71,7 @@ export const checkInService = {
       vendor_category_id?: string;
       status?: string;
     };
+    sort_order?: string;
   }) => {
     try {
       const response = await axiosInstance.get<PaginatedResponse<any>>(

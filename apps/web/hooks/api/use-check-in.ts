@@ -39,16 +39,18 @@ export function useVerificationList(
     vendor_category_id?: string;
     status?: string;
   },
+  sortOrder?: 'asc' | 'desc',
   refetchInterval?: number,
 ) {
   return useQuery({
-    queryKey: ['verification-list', page, limit, search, filter],
+    queryKey: ['verification-list', page, limit, search, filter, sortOrder],
     queryFn: () =>
       checkInService.getVerificationList({
         page,
         limit,
         search,
         filter,
+        sort_order: sortOrder,
       }),
     refetchInterval: refetchInterval ?? 10000, // Default 10 seconds if not provided
   });
