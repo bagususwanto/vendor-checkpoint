@@ -74,7 +74,7 @@ export function MonitorSummaryPanel({ stats }: MonitorSummaryPanelProps) {
 
       <CardContent className="flex-1 p-4 flex flex-col gap-2 overflow-y-auto custom-scrollbar-hidden">
         <CardItem
-          label="Total Rencana"
+          label="Total Scheduled"
           value={stats.total}
           icon={BarChart3}
           colorClass="bg-primary text-primary-foreground"
@@ -85,7 +85,7 @@ export function MonitorSummaryPanel({ stats }: MonitorSummaryPanelProps) {
 
         <div className="grid grid-cols-1 gap-3">
           <CardItem
-            label="Tepat Waktu"
+            label="On Time"
             value={stats.onTime}
             icon={CheckCircle2}
             colorClass="bg-emerald-500 text-white"
@@ -93,7 +93,7 @@ export function MonitorSummaryPanel({ stats }: MonitorSummaryPanelProps) {
           />
 
           <CardItem
-            label="Terlambat"
+            label="Late"
             value={stats.late}
             icon={Timer}
             colorClass="bg-red-500 text-white"
@@ -101,7 +101,7 @@ export function MonitorSummaryPanel({ stats }: MonitorSummaryPanelProps) {
           />
 
           <CardItem
-            label="Lebih Awal"
+            label="Early"
             value={stats.early}
             icon={Zap}
             colorClass="bg-blue-500 text-white"
@@ -109,7 +109,7 @@ export function MonitorSummaryPanel({ stats }: MonitorSummaryPanelProps) {
           />
 
           <CardItem
-            label="Menunggu"
+            label="Pending"
             value={stats.pending}
             icon={Clock}
             colorClass="bg-slate-400 text-white"
@@ -117,7 +117,7 @@ export function MonitorSummaryPanel({ stats }: MonitorSummaryPanelProps) {
           />
 
           <CardItem
-            label="Belum Tiba"
+            label="Overdue"
             value={stats.overdue}
             icon={AlertTriangle}
             colorClass="bg-orange-500 text-white"

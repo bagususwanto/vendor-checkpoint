@@ -98,7 +98,7 @@ export function UnscheduledSheet({
         <SheetHeader className="pb-6">
           <SheetTitle className="text-xl font-black uppercase tracking-tighter flex items-center gap-2">
             <Users className="w-5 h-5 text-primary" />
-            Vendor Tidak Terjadwal
+            Unscheduled Vendors
           </SheetTitle>
         </SheetHeader>
 
@@ -108,7 +108,7 @@ export function UnscheduledSheet({
               <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/30">
                 <Users className="w-12 h-12 mb-2 opacity-10" />
                 <p className="text-sm font-bold uppercase tracking-widest">
-                  Tidak Ada Vendor Tidak Terjadwal
+                  No Unscheduled Vendors Found
                 </p>
               </div>
             ) : (
@@ -116,10 +116,10 @@ export function UnscheduledSheet({
                 <TableHeader className="bg-muted/50">
                   <TableRow>
                     <TableHead className="text-[10px] font-black uppercase tracking-widest">
-                      Perusahaan
+                      Company
                     </TableHead>
                     <TableHead className="text-[10px] font-black uppercase tracking-widest text-center">
-                      Tiba
+                      Arrival
                     </TableHead>
                     <TableHead className="text-[10px] font-black uppercase tracking-widest text-right">
                       Status

@@ -60,7 +60,7 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
               'bg-muted text-muted-foreground border-border gap-1.5',
             )}
           >
-            <Clock className="w-3 h-3" /> Menunggu
+            <Clock className="w-3 h-3" /> Pending
           </Badge>
         );
       case 'OVERDUE':
@@ -72,7 +72,7 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
               'bg-orange-500/10 text-orange-500 border-orange-500/20 animate-pulse gap-1.5',
             )}
           >
-            <AlertTriangle className="w-3 h-3" /> Belum Tiba
+            <AlertTriangle className="w-3 h-3" /> Overdue
           </Badge>
         );
       case 'ON_TIME':
@@ -84,7 +84,7 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
               'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 gap-1.5',
             )}
           >
-            <CheckCircle2 className="w-3 h-3" /> Tepat Waktu
+            <CheckCircle2 className="w-3 h-3" /> On Time
           </Badge>
         );
       case 'LATE':
@@ -96,7 +96,7 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
               'bg-red-500/10 text-red-500 border-red-500/20 animate-pulse gap-1.5',
             )}
           >
-            <Timer className="w-3 h-3" /> Terlambat
+            <Timer className="w-3 h-3" /> Late
           </Badge>
         );
       case 'EARLY':
@@ -108,7 +108,7 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
               'bg-blue-500/10 text-blue-500 border-blue-500/20 gap-1.5',
             )}
           >
-            <Zap className="w-3 h-3" /> Lebih Awal
+            <Zap className="w-3 h-3" /> Early
           </Badge>
         );
     }
@@ -120,10 +120,10 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
         <TableHeader className="bg-muted/30 sticky top-0 z-20">
           <TableRow className="hover:bg-transparent border-b border-border">
             <TableHead className="w-[12%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-              Jadwal
+              Schedule
             </TableHead>
             <TableHead className="w-[35%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-              Perusahaan
+              Company
             </TableHead>
             <TableHead className="w-[8%] px-4 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] text-center">
               Rit
@@ -132,7 +132,7 @@ export function MonitorSlotTable({ slots }: MonitorSlotTableProps) {
               Station
             </TableHead>
             <TableHead className="w-[12%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-              Tiba
+              Arrival
             </TableHead>
             <TableHead className="w-[18%] px-8 h-14 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] text-right">
               Status
