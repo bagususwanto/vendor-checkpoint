@@ -152,6 +152,17 @@ export const navData: NavData = {
       icon: FileText,
       items: [
         {
+          title: 'Vendor Performance',
+          url: '/portal/reports/vendor-performance',
+          icon: TrendingUp,
+          roles: [
+            UserRole.SUPER_ADMIN,
+            UserRole.GROUP_HEAD,
+            UserRole.LINE_HEAD,
+            UserRole.SECTION_HEAD,
+          ],
+        },
+        {
           title: 'Export Reports',
           url: '/portal/reports/export',
           icon: FileText,
@@ -166,17 +177,6 @@ export const navData: NavData = {
           title: 'Export Logs',
           url: '/portal/reports/log-export',
           icon: FileText, // Using same icon for now
-          roles: [
-            UserRole.SUPER_ADMIN,
-            UserRole.GROUP_HEAD,
-            UserRole.LINE_HEAD,
-            UserRole.SECTION_HEAD,
-          ],
-        },
-        {
-          title: 'Vendor Performance',
-          url: '/portal/reports/vendor-performance',
-          icon: TrendingUp,
           roles: [
             UserRole.SUPER_ADMIN,
             UserRole.GROUP_HEAD,
