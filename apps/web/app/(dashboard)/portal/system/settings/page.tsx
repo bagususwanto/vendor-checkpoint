@@ -35,18 +35,18 @@ export default function SettingsPage() {
         <div className="flex items-center justify-between space-y-2">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">
-              Pengaturan Sistem
+              System Settings
             </h2>
             <p className="text-muted-foreground text-sm">
-              Kelola konfigurasi dan sinkronisasi sistem
+              Manage system configuration and synchronization
             </p>
           </div>
         </div>
 
         <Tabs defaultValue="sync" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="sync">Sinkronisasi</TabsTrigger>
-            <TabsTrigger value="config">Konfigurasi Sistem</TabsTrigger>
+            <TabsTrigger value="sync">Synchronization</TabsTrigger>
+            <TabsTrigger value="config">System Configuration</TabsTrigger>
           </TabsList>
 
           <TabsContent value="sync" className="space-y-4">
@@ -59,17 +59,17 @@ export default function SettingsPage() {
                       <Building2 className="h-5 w-5" />
                     </div>
                     <div>
-                      <CardTitle>Sinkronisasi Vendor</CardTitle>
+                      <CardTitle>Vendor Synchronization</CardTitle>
                       <CardDescription>
-                        Sync data vendor dari sistem eksternal
+                        Sync vendor data from external system
                       </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1">
                   <p className="text-sm text-muted-foreground">
-                    Sinkronkan data vendor terbaru dari sistem eksternal. Data
-                    vendor digunakan untuk proses check-in dan verifikasi.
+                    Sync latest vendor data from the external system. Vendor data
+                    is used for check-in and verification processes.
                   </p>
                 </CardContent>
                 <CardFooter>
@@ -86,7 +86,7 @@ export default function SettingsPage() {
                     ) : (
                       <>
                         <RefreshCw className="mr-2 h-4 w-4" />
-                        Sync Vendor
+                        Sync Vendors
                       </>
                     )}
                   </Button>
@@ -101,17 +101,17 @@ export default function SettingsPage() {
                       <Users className="h-5 w-5" />
                     </div>
                     <div>
-                      <CardTitle>Sinkronisasi User</CardTitle>
+                      <CardTitle>User Synchronization</CardTitle>
                       <CardDescription>
-                        Sync data user dari sistem eksternal
+                        Sync user data from external system
                       </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1">
                   <p className="text-sm text-muted-foreground">
-                    Sinkronkan data user terbaru dari sistem eksternal. Data user
-                    digunakan untuk autentikasi dan otorisasi sistem.
+                    Sync latest user data from the external system. User data is
+                    used for system authentication and authorization.
                   </p>
                 </CardContent>
                 <CardFooter>
@@ -129,7 +129,7 @@ export default function SettingsPage() {
                     ) : (
                       <>
                         <RefreshCw className="mr-2 h-4 w-4" />
-                        Sync User
+                        Sync Users
                       </>
                     )}
                   </Button>
@@ -143,10 +143,10 @@ export default function SettingsPage() {
             <AiApdControl />
             <Card>
               <CardHeader>
-                <CardTitle>Konfigurasi Sistem</CardTitle>
+                <CardTitle>System Configuration</CardTitle>
                 <CardDescription>
-                  Daftar konfigurasi variabel sistem. Ubah hanya jika Anda tahu
-                  dampaknya.
+                  List of system configuration variables. Change only if you
+                  know the impact.
                 </CardDescription>
               </CardHeader>
               <CardContent>

@@ -53,7 +53,7 @@ export function SystemConfigList() {
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Cari konfigurasi..."
+              placeholder="Search configuration..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -89,7 +89,7 @@ export function SystemConfigList() {
             ) : data?.data?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center">
-                  Tidak ada data konfigurasi
+                  No configuration data
                 </TableCell>
               </TableRow>
             ) : (
@@ -127,7 +127,7 @@ export function SystemConfigList() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuItem onClick={() => handleEdit(config)}>
                             <Pencil className="mr-2 h-4 w-4" />
                             Edit

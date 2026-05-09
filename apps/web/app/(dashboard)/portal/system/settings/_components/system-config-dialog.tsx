@@ -74,9 +74,9 @@ export function SystemConfigDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Edit Konfigurasi</DialogTitle>
+          <DialogTitle>Edit Configuration</DialogTitle>
           <DialogDescription>
-            Ubah nilai untuk konfigurasi <strong>{config.config_key}</strong>.
+            Change the value for configuration <strong>{config.config_key}</strong>.
           </DialogDescription>
         </DialogHeader>
 
@@ -86,23 +86,23 @@ export function SystemConfigDialog({
             <FieldContent>
               <Input value={config.config_key} disabled readOnly />
               <FieldDescription>
-                Identifier unik untuk konfigurasi ini
+                Unique identifier for this configuration
               </FieldDescription>
             </FieldContent>
           </Field>
 
           <Field>
-            <FieldLabel>Tipe</FieldLabel>
+            <FieldLabel>Type</FieldLabel>
             <FieldContent>
               <Input value={config.config_type} disabled readOnly />
               <FieldDescription>
-                Tipe data dari nilai konfigurasi
+                Data type of the configuration value
               </FieldDescription>
             </FieldContent>
           </Field>
 
           <Field>
-            <FieldLabel required>Nilai</FieldLabel>
+            <FieldLabel required>Value</FieldLabel>
             <FieldContent>
               {config.config_type === 'boolean' ? (
                 <div className="flex items-center space-x-2">
@@ -114,15 +114,15 @@ export function SystemConfigDialog({
                   />
                   <Label>
                     {form.watch('config_value') === 'true'
-                      ? 'Aktif'
-                      : 'Tidak Aktif'}
+                      ? 'Active'
+                      : 'Inactive'}
                   </Label>
                 </div>
               ) : config.config_type === 'text' ||
                 config.config_type === 'json' ? (
                 <Textarea
                   {...form.register('config_value')}
-                  placeholder="Masukkan nilai konfigurasi"
+                  placeholder="Enter configuration value"
                   rows={5}
                   className="font-mono text-sm"
                 />
@@ -130,7 +130,7 @@ export function SystemConfigDialog({
                 <Input
                   {...form.register('config_value')}
                   type={config.config_type === 'number' ? 'number' : 'text'}
-                  placeholder="Masukkan nilai konfigurasi"
+                  placeholder="Enter configuration value"
                 />
               )}
               <FieldError>
@@ -140,7 +140,7 @@ export function SystemConfigDialog({
           </Field>
 
           <Field>
-            <FieldLabel>Deskripsi</FieldLabel>
+            <FieldLabel>Description</FieldLabel>
             <FieldContent>
               <p className="text-sm text-muted-foreground">
                 {config.description || '-'}
@@ -155,11 +155,11 @@ export function SystemConfigDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Batal
+              Cancel
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Simpan
+              Save
             </Button>
           </DialogFooter>
         </form>
