@@ -63,12 +63,12 @@ export function QueueSearchForm({
                       icon={QrCode}
                       required
                     >
-                      Nomor Antrean
+                      Queue Number
                     </IconLabel>
                     <div className="relative">
                       <Search className="top-2.5 left-3 z-10 absolute w-5 h-5 text-muted-foreground" />
                       <Input
-                        placeholder="Contoh: 20251212-001"
+                        placeholder="Example: 20251212-001"
                         className="bg-background/80 pl-10 h-12 text-lg vendor-text"
                         id="queueNumber"
                         type="text"
@@ -96,10 +96,10 @@ export function QueueSearchForm({
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 w-5 h-5 animate-spin" />
-                  Mengecek...
+                  Checking...
                 </>
               ) : (
-                'Cek Status'
+                'Check Status'
               )}
             </Button>
           </FieldGroup>

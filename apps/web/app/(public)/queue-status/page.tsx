@@ -48,13 +48,13 @@ function QueueStatusContent() {
     return {
       queueNumber: qStatus.queue_number,
       status: opsStatus.status || 'WAITING',
-      statusDisplayText: opsStatus.status_display_text || 'Menunggu',
+      statusDisplayText: opsStatus.status_display_text || 'Waiting',
       updatedAt: new Date().toISOString(),
       companyName: qStatus.snapshot_company_name || qStatus.company_name,
       driverName: qStatus.driver_name,
       submissionTime: qStatus.submission_time,
       estimatedWaitTime: opsStatus.estimated_wait_minutes
-        ? `${opsStatus.estimated_wait_minutes} Menit`
+        ? `${opsStatus.estimated_wait_minutes} Minutes`
         : undefined,
     };
   }, [qStatus]);
@@ -69,10 +69,10 @@ function QueueStatusContent() {
             <QrCode className="w-8 h-8 text-primary" />
           </div>
           <h1 className="bg-clip-text bg-linear-to-b from-foreground to-muted-foreground font-bold text-4xl text-transparent tracking-tight sm:text-5xl">
-            Cek Status Antrean
+            Check Queue Status
           </h1>
           <p className="mx-auto max-w-[85%] text-lg text-muted-foreground leading-relaxed">
-            Pantau posisi antrean dan estimasi waktu tunggu Anda secara
+            Monitor your queue position and estimated wait time in
             real-time.
           </p>
         </div>
@@ -93,10 +93,10 @@ function QueueStatusContent() {
                   </div>
                   <div className="space-y-1">
                     <p className="font-semibold text-destructive">
-                      Terjadi Kesalahan
+                      An Error Occurred
                     </p>
                     <p className="text-sm text-destructive/80">
-                      Gagal mencari data antrean. Silakan coba lagi.
+                      Failed to find queue data. Please try again.
                     </p>
                   </div>
                 </CardContent>
@@ -111,14 +111,14 @@ function QueueStatusContent() {
                   </div>
                   <div className="space-y-1">
                     <p className="font-semibold text-orange-600">
-                      Antrean Tidak Ditemukan
+                      Queue Not Found
                     </p>
                     <p className="text-sm text-orange-600/80">
-                      Nomor antrean{' '}
+                      Queue number{' '}
                       <span className="font-mono font-bold">
                         {activeQueueNumber}
                       </span>{' '}
-                      tidak terdaftar.
+                      is not registered.
                     </p>
                   </div>
                 </CardContent>
