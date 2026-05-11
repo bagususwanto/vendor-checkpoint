@@ -109,11 +109,12 @@ export default function VendorPerformancePage() {
             onLimitChange={setLimit}
             onVendorClick={(id) => {
               const query = new URLSearchParams({
+                vendorId: id.toString(),
                 dateFrom: filter.dateFrom,
                 dateTo: filter.dateTo,
                 granularity: filter.granularity,
               }).toString();
-              router.push(`/portal/reports/vendor-performance/${id}?${query}`);
+              router.push(`/portal/reports/vendor-performance/detail?${query}`);
             }}
           />
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useVendorDetail } from '@/hooks/api/use-vendor-performance';
 import { VendorPerformanceFilter } from '@repo/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,12 +28,11 @@ import { AdjustmentDialog } from '../components/adjustment-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function VendorDetailPage() {
-  const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useUser();
 
-  const vendorIdStr = params.vendorId as string;
+  const vendorIdStr = searchParams.get('vendorId');
   const vendorId = vendorIdStr ? parseInt(vendorIdStr, 10) : null;
 
   const filter = React.useMemo<VendorPerformanceFilter>(() => {
