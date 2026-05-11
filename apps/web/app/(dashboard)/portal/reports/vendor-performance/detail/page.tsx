@@ -31,7 +31,7 @@ function VendorDetailContent() {
   const vendorId = vendorIdStr ? parseInt(vendorIdStr, 10) : null;
 
   const [historyPage, setHistoryPage] = React.useState(1);
-  const [historyLimit] = React.useState(10);
+  const [historyLimit] = React.useState(2);
 
   const filter = React.useMemo<VendorPerformanceFilter>(() => {
     return {
