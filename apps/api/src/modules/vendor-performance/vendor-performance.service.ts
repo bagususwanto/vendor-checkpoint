@@ -287,6 +287,16 @@ export class VendorPerformanceService {
             orderBy: { created_at: 'desc' },
             take: 1,
           },
+          delivery_slot: {
+            include: {
+              schedule: {
+                select: {
+                  arrival_time: true,
+                  departure_time: true,
+                },
+              },
+            },
+          },
         },
       }),
       this.prisma.ops_delivery_slot.count({

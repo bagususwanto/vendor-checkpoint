@@ -3,10 +3,16 @@
 import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { History, Edit2 } from 'lucide-react';
+import { History, Edit2, Timer, Truck, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { AdjustmentBadge } from './adjustment-badge';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface DetailHistoryProps {
   entries: any[];
@@ -14,7 +20,11 @@ interface DetailHistoryProps {
   onAdjust: (entry: any) => void;
 }
 
-export function DetailHistory({ entries, canAdjust, onAdjust }: DetailHistoryProps) {
+export function DetailHistory({
+  entries,
+  canAdjust,
+  onAdjust,
+}: DetailHistoryProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'On-Time':
@@ -87,6 +97,57 @@ export function DetailHistory({ entries, canAdjust, onAdjust }: DetailHistoryPro
                     >
                       {entry.arrival_status}
                     </Badge>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6 my-3 p-3 rounded-lg bg-muted/30 border border-dashed">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                      <Truck className="h-3 w-3" />
+                      Arrival
+                    </span>
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-muted-foreground">
+                          Actual
+                        </span>
+                        <span className="text-xs font-bold">
+                          {format(new Date(entry.submission_time), 'HH:mm')}
+                        </span>
+                      </div>
+                      <div className="w-px h-4 bg-muted-foreground/20" />
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-muted-foreground">
+                          Schedule
+                        </span>
+                        <span className="text-xs font-bold text-muted-foreground">
+                          {entry.delivery_slot?.schedule?.arrival_time ||
+                            '--:--'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1 ml-auto text-right">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center justify-end gap-1 cursor-help">
+                            <Timer className="h-3 w-3" />
+                            Lead Time
+                            <Info className="h-2.5 w-2.5 opacity-50" />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p className="text-[10px]">Durasi dari Check-in sampai Checkout</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <span className="text-xs font-bold">
+                      {entry.ops_timelog?.duration_minutes
+                        ? `${entry.ops_timelog.duration_minutes}m`
+                        : '-'}
+                    </span>
                   </div>
                 </div>
 
