@@ -26,6 +26,7 @@ import { format } from 'date-fns';
 import { AdjustmentBadge } from '../components/adjustment-badge';
 import { AdjustmentDialog } from '../components/adjustment-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RoleGuard } from '@/components/auth/role-guard';
 
 export default function VendorDetailPage() {
   const searchParams = useSearchParams();
@@ -98,50 +99,53 @@ export default function VendorDetailPage() {
   }
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <Button variant="ghost" className="gap-2" onClick={() => router.back()}>
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
-        </Button>
-      </div>
-
-      <div className="bg-card rounded-xl border shadow-sm p-6 md:p-8">
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
-          <div>
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
-              <ListFilter className="h-3 w-3" />
-              Vendor Detail
+    <RoleGuard
+      allowedRoles={[
+        UserRole.SUPER_ADMIN,
+        UserRole.GROUP_HEAD,
+        UserRole.LINE_HEAD,
+        UserRole.SECTION_HEAD,
+      ]}
+    >
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="h-8 w-8"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold tracking-tight">
+                  {detail.company_name}
+                </h1>
+                <Badge
+                  variant="secondary"
+                  className="rounded-sm px-2 py-0.5 font-normal uppercase text-[10px]"
+                >
+                  {detail.category_name}
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className="rounded-sm px-2 py-0.5 font-mono text-[10px] bg-muted/30"
+                >
+                  {detail.vendor_code}
+                </Badge>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Detailed performance analytics for period: {filter.dateFrom || '-'} to {filter.dateTo || '-'}
+              </p>
             </div>
-            <h1 className="text-3xl font-bold mb-2">{detail.company_name}</h1>
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge
-                variant="secondary"
-                className="rounded-sm px-2 py-0.5 font-normal uppercase text-xs"
-              >
-                {detail.category_name}
-              </Badge>
-              <Badge
-                variant="outline"
-                className="rounded-sm px-2 py-0.5 font-mono text-xs bg-muted/30"
-              >
-                Code: {detail.vendor_code}
-              </Badge>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1 text-right text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg border border-dashed">
-            <span className="font-semibold text-foreground">
-              Reporting Period
-            </span>
-            <span>From: {filter.dateFrom || '-'}</span>
-            <span>To: {filter.dateTo || '-'}</span>
           </div>
         </div>
 
-        <Separator className="my-8" />
+        <Separator className="mb-6" />
 
-        <div className="grid md:grid-cols-12 gap-8">
+        <div className="grid md:grid-cols-12 gap-6">
           <div className="md:col-span-4 space-y-8">
             <div className="space-y-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -377,6 +381,6 @@ export default function VendorDetailPage() {
           setSelectedEntry(null);
         }}
       />
-    </div>
+    </RoleGuard>
   );
 }
