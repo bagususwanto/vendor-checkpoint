@@ -19,6 +19,7 @@ import {
   History,
   Edit2,
   ArrowLeft,
+  Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/hooks/api/use-auth';
@@ -125,21 +126,18 @@ function VendorDetailContent() {
                   {detail.company_name}
                 </h1>
                 <Badge
-                  variant="secondary"
-                  className="rounded-sm px-2 py-0.5 font-normal uppercase text-[10px]"
-                >
-                  {detail.category_name}
-                </Badge>
-                <Badge
                   variant="outline"
                   className="rounded-sm px-2 py-0.5 font-mono text-[10px] bg-muted/30"
                 >
                   {detail.vendor_code}
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Detailed performance analytics for period: {filter.dateFrom || '-'} to {filter.dateTo || '-'}
-              </p>
+              <div className="flex items-center gap-2 mt-2 px-2.5 py-1 rounded-md bg-primary/5 border border-primary/10 w-fit">
+                <Calendar className="h-3.5 w-3.5 text-primary" />
+                <span className="text-xs font-semibold text-primary/80 uppercase tracking-tight">
+                  Period: {filter.dateFrom || '-'} — {filter.dateTo || '-'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -388,7 +386,7 @@ function VendorDetailContent() {
 
 export default function VendorDetailPage() {
   return (
-    <Suspense 
+    <Suspense
       fallback={
         <div className="flex h-full min-h-[500px] items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
