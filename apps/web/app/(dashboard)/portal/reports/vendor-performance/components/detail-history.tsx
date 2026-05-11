@@ -109,14 +109,21 @@ export function DetailHistory({
                     </span>
                     <div className="flex items-center gap-3">
                       <div className="flex flex-col">
-                        <span className="text-[10px] text-muted-foreground">Actual</span>
-                        <span className="text-xs font-bold">{format(new Date(entry.submission_time), 'HH:mm')}</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          Actual
+                        </span>
+                        <span className="text-xs font-bold">
+                          {format(new Date(entry.submission_time), 'HH:mm')}
+                        </span>
                       </div>
                       <div className="w-px h-4 bg-muted-foreground/20" />
                       <div className="flex flex-col">
-                        <span className="text-[10px] text-muted-foreground">Schedule</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          Schedule
+                        </span>
                         <span className="text-xs font-bold text-muted-foreground">
-                          {entry.delivery_slot?.schedule?.arrival_time || '--:--'}
+                          {entry.delivery_slot?.schedule?.arrival_time ||
+                            '--:--'}
                         </span>
                       </div>
                     </div>
@@ -130,18 +137,26 @@ export function DetailHistory({
                     </span>
                     <div className="flex items-center gap-3">
                       <div className="flex flex-col">
-                        <span className="text-[10px] text-muted-foreground">Actual</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          Actual
+                        </span>
                         <span className="text-xs font-bold">
-                          {entry.ops_timelog?.checkout_time 
-                            ? format(new Date(entry.ops_timelog.checkout_time), 'HH:mm')
+                          {entry.ops_timelog?.checkout_time
+                            ? format(
+                                new Date(entry.ops_timelog.checkout_time),
+                                'HH:mm',
+                              )
                             : '--:--'}
                         </span>
                       </div>
                       <div className="w-px h-4 bg-muted-foreground/20" />
                       <div className="flex flex-col">
-                        <span className="text-[10px] text-muted-foreground">Schedule</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          Schedule
+                        </span>
                         <span className="text-xs font-bold text-muted-foreground">
-                          {entry.delivery_slot?.schedule?.departure_time || '--:--'}
+                          {entry.delivery_slot?.schedule?.departure_time ||
+                            '--:--'}
                         </span>
                       </div>
                     </div>
@@ -173,25 +188,52 @@ export function DetailHistory({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 mt-3 pt-3 border-t border-dashed bg-muted/20 -mx-4 -mb-4 p-4 rounded-b-lg">
-                  <div className="space-y-1.5">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 pt-3 border-t border-dashed bg-muted/20 -mx-4 -mb-4 p-4 rounded-b-lg">
+                  <div className="space-y-1">
                     <span className="text-[10px] uppercase font-bold text-muted-foreground block">
                       Safety Compliance
                     </span>
                     <div className="flex items-center gap-1.5">
                       {entry.is_compliant ? (
-                        <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100 text-xs px-2 py-0.5">
+                        <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100 text-[10px] px-1.5 py-0 h-4 leading-none">
                           Compliant
                         </Badge>
                       ) : (
                         <Badge
                           variant="destructive"
-                          className="text-xs px-2 py-0.5"
+                          className="text-[10px] px-1.5 py-0 h-4 leading-none"
                         >
                           Non-Compliant
                         </Badge>
                       )}
                     </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground block text-ellipsis overflow-hidden whitespace-nowrap">
+                      Driver Name
+                    </span>
+                    <span className="text-[11px] font-medium block truncate">
+                      {entry.driver_name || '-'}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+                      Station
+                    </span>
+                    <span className="text-[11px] font-medium block">
+                      {entry.delivery_slot?.schedule?.truck_station || '-'}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+                      Reference (DN/PO)
+                    </span>
+                    <span className="text-[11px] font-medium block truncate">
+                      {entry.dn_number || entry.po_number || '-'}
+                    </span>
                   </div>
                 </div>
               </div>
