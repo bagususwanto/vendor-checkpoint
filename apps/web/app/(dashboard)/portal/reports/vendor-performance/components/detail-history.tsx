@@ -139,7 +139,9 @@ export function DetailHistory({
                           </span>
                         </TooltipTrigger>
                         <TooltipContent side="top">
-                          <p className="text-[10px]">Durasi dari Check-in sampai Checkout</p>
+                          <p className="text-[10px]">
+                            Duration from check-in until checkout
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
