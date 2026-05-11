@@ -30,6 +30,9 @@ function VendorDetailContent() {
   const vendorIdStr = searchParams.get('vendorId');
   const vendorId = vendorIdStr ? parseInt(vendorIdStr, 10) : null;
 
+  const [historyPage, setHistoryPage] = React.useState(1);
+  const [historyLimit] = React.useState(10);
+
   const filter = React.useMemo<VendorPerformanceFilter>(() => {
     return {
       dateFrom: searchParams.get('dateFrom') || '',
@@ -37,10 +40,15 @@ function VendorDetailContent() {
       granularity:
         (searchParams.get('granularity') as 'daily' | 'monthly' | 'yearly') ||
         'daily',
-      page: parseInt(searchParams.get('page') || '1'),
-      limit: parseInt(searchParams.get('limit') || '10'),
+      page: historyPage,
+      limit: historyLimit,
     };
-  }, [searchParams]);
+  }, [searchParams, historyPage, historyLimit]);
+
+  // Reset history page when search params (dates/granularity) change
+  React.useEffect(() => {
+    setHistoryPage(1);
+  }, [searchParams.get('dateFrom'), searchParams.get('dateTo'), searchParams.get('granularity')]);
 
   const { data: detail, isLoading } = useVendorDetail(vendorId, filter);
 
@@ -107,7 +115,11 @@ function VendorDetailContent() {
 
           <div className="md:col-span-8 space-y-4">
             <DetailHistory 
-              entries={detail.entries}
+              entries={Array.isArray(detail.entries) ? detail.entries : (detail.entries?.data || [])}
+              total={Array.isArray(detail.entries) ? detail.entries.length : (detail.entries?.meta?.total || 0)}
+              page={Array.isArray(detail.entries) ? 1 : (detail.entries?.meta?.page || 1)}
+              limit={Array.isArray(detail.entries) ? 10 : (detail.entries?.meta?.limit || 10)}
+              onPageChange={setHistoryPage}
               canAdjust={canAdjust}
               onAdjust={(entry) => {
                 setSelectedEntry(entry);

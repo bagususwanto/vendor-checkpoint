@@ -3,7 +3,15 @@
 import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { History, Edit2, Timer, Truck, Info } from 'lucide-react';
+import {
+  History,
+  Edit2,
+  Timer,
+  Truck,
+  Info,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { AdjustmentBadge } from './adjustment-badge';
@@ -16,15 +24,25 @@ import {
 
 interface DetailHistoryProps {
   entries: any[];
+  total: number;
+  page: number;
+  limit: number;
+  onPageChange: (page: number) => void;
   canAdjust: boolean;
   onAdjust: (entry: any) => void;
 }
 
 export function DetailHistory({
   entries,
+  total,
+  page,
+  limit,
+  onPageChange,
   canAdjust,
   onAdjust,
 }: DetailHistoryProps) {
+  const totalPages = Math.ceil(total / limit);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'On-Time':
@@ -240,6 +258,40 @@ export function DetailHistory({
             ))
           )}
         </div>
+        
+        {/* Pagination Controls */}
+        {total > 0 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t bg-muted/10">
+            <div className="text-xs text-muted-foreground">
+              Showing <span className="font-medium">{(page - 1) * limit + 1}</span> to{' '}
+              <span className="font-medium">{Math.min(page * limit, total)}</span> of{' '}
+              <span className="font-medium">{total}</span> entries
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => onPageChange(page - 1)}
+                disabled={page === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <div className="text-xs font-medium px-2">
+                Page {page} of {totalPages}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => onPageChange(page + 1)}
+                disabled={page >= totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

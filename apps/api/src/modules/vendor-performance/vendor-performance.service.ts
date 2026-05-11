@@ -350,6 +350,12 @@ export class VendorPerformanceService {
     });
 
     const totalCheckins = entries.length;
+    
+    // Pagination for entries
+    const page = filter.page || 1;
+    const limit = filter.limit || 10;
+    const skip = (page - 1) * limit;
+    const paginatedEntries = entries.slice(skip, skip + limit);
 
     return {
       vendor_id: vendor.vendor_id,
@@ -364,13 +370,21 @@ export class VendorPerformanceService {
         avg_lead_time: leadTimeCount > 0 ? Math.round(totalLeadTime / leadTimeCount) : 0,
         missed_cycles: missedCycles,
       },
-      entries: entries.map(entry => ({
-        ...entry,
-        arrival_status: (entry as any).ops_performance_adjustment?.[0]?.adjusted_arrival_status ?? entry.arrival_status,
-        departure_status: (entry as any).ops_performance_adjustment?.[0]?.adjusted_departure_status ?? entry.ops_timelog?.departure_status,
-        is_compliant: !((entry as any).ops_performance_adjustment?.[0]?.override_has_non_compliant ?? entry.has_non_compliant_items),
-        adjustment: (entry as any).ops_performance_adjustment?.[0] || null,
-      })),
+      entries: {
+        data: paginatedEntries.map(entry => ({
+          ...entry,
+          arrival_status: (entry as any).ops_performance_adjustment?.[0]?.adjusted_arrival_status ?? entry.arrival_status,
+          departure_status: (entry as any).ops_performance_adjustment?.[0]?.adjusted_departure_status ?? entry.ops_timelog?.departure_status,
+          is_compliant: !((entry as any).ops_performance_adjustment?.[0]?.override_has_non_compliant ?? entry.has_non_compliant_items),
+          adjustment: (entry as any).ops_performance_adjustment?.[0] || null,
+        })),
+        meta: {
+          total: totalCheckins,
+          page,
+          limit,
+          totalPages: Math.ceil(totalCheckins / limit),
+        }
+      },
     };
   }
 }

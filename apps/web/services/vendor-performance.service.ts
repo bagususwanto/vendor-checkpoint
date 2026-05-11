@@ -42,7 +42,15 @@ export interface VendorDetailData {
     avg_lead_time: number;
     missed_cycles: number;
   };
-  entries: any[];
+  entries: {
+    data: any[];
+    meta: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  };
 }
 
 export const vendorPerformanceService = {
