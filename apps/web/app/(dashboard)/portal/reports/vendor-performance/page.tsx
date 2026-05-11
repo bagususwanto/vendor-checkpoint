@@ -7,7 +7,6 @@ import { Separator } from '@/components/ui/separator';
 import { PerformanceFilterBar } from './components/performance-filter-bar';
 import { VendorTrendChart } from './components/vendor-trend-chart';
 import { VendorRankingTable } from './components/vendor-ranking-table';
-import { VendorDetailSheet } from './components/vendor-detail-sheet';
 import { useVendorRanking, useVendorTrend } from '@/hooks/api/use-vendor-performance';
 import { VendorPerformanceFilter } from '@repo/types';
 import { RoleGuard } from '@/components/auth/role-guard';
@@ -24,7 +23,6 @@ export default function VendorPerformancePage() {
   });
   const [granularity, setGranularity] = React.useState<'daily' | 'monthly' | 'yearly'>('daily');
   const [vendorCategoryId, setVendorCategoryId] = React.useState<string | undefined>(undefined);
-  const [selectedVendorId, setSelectedVendorId] = React.useState<number | null>(null);
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(10);
 
@@ -109,16 +107,16 @@ export default function VendorPerformancePage() {
             limit={limit}
             onPageChange={setPage}
             onLimitChange={setLimit}
-            onVendorClick={(id) => setSelectedVendorId(id)}
+            onVendorClick={(id) => {
+              const query = new URLSearchParams({
+                dateFrom: filter.dateFrom,
+                dateTo: filter.dateTo,
+                granularity: filter.granularity,
+              }).toString();
+              router.push(`/portal/reports/vendor-performance/${id}?${query}`);
+            }}
           />
         </div>
-
-        <VendorDetailSheet 
-          vendorId={selectedVendorId}
-          isOpen={selectedVendorId !== null}
-          onClose={() => setSelectedVendorId(null)}
-          filter={filter}
-        />
       </div>
     </RoleGuard>
   );
