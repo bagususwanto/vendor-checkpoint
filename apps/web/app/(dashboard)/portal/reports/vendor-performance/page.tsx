@@ -25,6 +25,8 @@ export default function VendorPerformancePage() {
   const [vendorCategoryId, setVendorCategoryId] = React.useState<string | undefined>(undefined);
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(10);
+  const [sortBy, setSortBy] = React.useState<string>('on_time_arrival_rate');
+  const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('desc');
 
   const filter = React.useMemo<VendorPerformanceFilter>(() => {
     return {
@@ -34,8 +36,10 @@ export default function VendorPerformancePage() {
       vendorCategoryId: vendorCategoryId ? parseInt(vendorCategoryId) : undefined,
       page,
       limit,
+      sortBy,
+      sortOrder,
     };
-  }, [date, granularity, vendorCategoryId, page, limit]);
+  }, [date, granularity, vendorCategoryId, page, limit, sortBy, sortOrder]);
 
   const { data: trendData, isLoading: isTrendLoading } = useVendorTrend(filter);
   const { data: rankingData, isLoading: isRankingLoading } = useVendorRanking(filter);
@@ -105,8 +109,19 @@ export default function VendorPerformancePage() {
             total={rankingData?.meta.total || 0}
             page={page}
             limit={limit}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
             onPageChange={setPage}
             onLimitChange={setLimit}
+            onSort={(column) => {
+              if (sortBy === column) {
+                setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+              } else {
+                setSortBy(column);
+                setSortOrder('desc');
+              }
+              setPage(1);
+            }}
             onVendorClick={(id) => {
               const query = new URLSearchParams({
                 vendorId: id.toString(),

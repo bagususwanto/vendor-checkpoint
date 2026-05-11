@@ -30,6 +30,8 @@ export const vendorPerformanceFilterSchema = z.object({
   vendorCategoryId: z.coerce.number().optional(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(10),
+  sortBy: z.string().optional(),
+  sortOrder: z.enum(['asc', 'desc']).optional(),
 });
 
 export type VendorPerformanceFilter = z.infer<typeof vendorPerformanceFilterSchema>;

@@ -29,6 +29,9 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from 'lucide-react';
 
 interface VendorRankingTableProps {
@@ -37,9 +40,12 @@ interface VendorRankingTableProps {
   total: number;
   page: number;
   limit: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
   onPageChange: (page: number) => void;
   onLimitChange: (limit: number) => void;
   onVendorClick: (vendorId: number) => void;
+  onSort: (column: string) => void;
 }
 
 export function VendorRankingTable({
@@ -48,9 +54,12 @@ export function VendorRankingTable({
   total,
   page,
   limit,
+  sortBy,
+  sortOrder,
   onPageChange,
   onLimitChange,
   onVendorClick,
+  onSort,
 }: VendorRankingTableProps) {
   const totalPages = Math.ceil(total / limit);
 
@@ -83,7 +92,10 @@ export function VendorRankingTable({
       <CardHeader>
         <CardTitle>Vendor Performance Ranking</CardTitle>
         <CardDescription>
-          Based on arrival timeliness (On-Time Arrival)
+          {sortBy === 'on_time_arrival_rate' ? 'Sorted by Arrival' : 
+           sortBy === 'on_time_departure_rate' ? 'Sorted by Departure' :
+           sortBy === 'compliance_rate' ? 'Sorted by Compliance' : 
+           'Based on arrival timeliness'}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -94,9 +106,45 @@ export function VendorRankingTable({
                 <TableHead className="w-[60px] text-center">Rank</TableHead>
                 <TableHead className="min-w-[200px]">Vendor</TableHead>
                 <TableHead className="text-right">Total Check-in</TableHead>
-                <TableHead className="text-center">Arrival</TableHead>
-                <TableHead className="text-center">Departure</TableHead>
-                <TableHead className="text-center">Compliance</TableHead>
+                <TableHead 
+                  className="text-center cursor-pointer hover:bg-muted transition-colors"
+                  onClick={() => onSort('on_time_arrival_rate')}
+                >
+                  <div className="flex items-center justify-center gap-1">
+                    Arrival
+                    {sortBy === 'on_time_arrival_rate' ? (
+                      sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                    ) : (
+                      <ArrowUpDown className="h-3 w-3 text-muted-foreground/50" />
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead 
+                  className="text-center cursor-pointer hover:bg-muted transition-colors"
+                  onClick={() => onSort('on_time_departure_rate')}
+                >
+                  <div className="flex items-center justify-center gap-1">
+                    Departure
+                    {sortBy === 'on_time_departure_rate' ? (
+                      sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                    ) : (
+                      <ArrowUpDown className="h-3 w-3 text-muted-foreground/50" />
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead 
+                  className="text-center cursor-pointer hover:bg-muted transition-colors"
+                  onClick={() => onSort('compliance_rate')}
+                >
+                  <div className="flex items-center justify-center gap-1">
+                    Compliance
+                    {sortBy === 'compliance_rate' ? (
+                      sortOrder === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                    ) : (
+                      <ArrowUpDown className="h-3 w-3 text-muted-foreground/50" />
+                    )}
+                  </div>
+                </TableHead>
                 <TableHead className="text-right">Avg Lead Time</TableHead>
                 <TableHead className="text-center">Missed</TableHead>
               </TableRow>

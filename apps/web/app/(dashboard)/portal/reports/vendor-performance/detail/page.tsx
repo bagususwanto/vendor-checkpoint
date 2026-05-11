@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import { useVendorDetail } from '@/hooks/api/use-vendor-performance';
 import { VendorPerformanceFilter } from '@repo/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,7 +29,7 @@ import { AdjustmentDialog } from '../components/adjustment-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RoleGuard } from '@/components/auth/role-guard';
 
-export default function VendorDetailPage() {
+function VendorDetailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useUser();
@@ -382,5 +383,19 @@ export default function VendorDetailPage() {
         }}
       />
     </RoleGuard>
+  );
+}
+
+export default function VendorDetailPage() {
+  return (
+    <Suspense 
+      fallback={
+        <div className="flex h-full min-h-[500px] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <VendorDetailContent />
+    </Suspense>
   );
 }

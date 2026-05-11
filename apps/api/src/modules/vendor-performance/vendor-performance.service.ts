@@ -152,8 +152,25 @@ export class VendorPerformanceService {
       missed_cycles: s.missed_cycles,
     }));
 
-    // Sort by on-time arrival rate descending
-    const sortedResult = result.sort((a, b) => b.on_time_arrival_rate - a.on_time_arrival_rate);
+    // Sorting
+    const { sortBy = 'on_time_arrival_rate', sortOrder = 'desc' } = filter;
+    
+    const sortedResult = result.sort((a, b) => {
+      const valA = a[sortBy as keyof typeof a];
+      const valB = b[sortBy as keyof typeof b];
+      
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return sortOrder === 'asc' ? valA - valB : valB - valA;
+      }
+      
+      const strA = String(valA).toLowerCase();
+      const strB = String(valB).toLowerCase();
+      
+      if (sortOrder === 'asc') {
+        return strA.localeCompare(strB);
+      }
+      return strB.localeCompare(strA);
+    });
     
     const total = sortedResult.length;
     const total_pages = Math.ceil(total / limit);
