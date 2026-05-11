@@ -258,14 +258,17 @@ export function DetailHistory({
             ))
           )}
         </div>
-        
+
         {/* Pagination Controls */}
         {total > 0 && (
           <div className="flex items-center justify-between px-4 py-3 border-t bg-muted/10">
             <div className="text-xs text-muted-foreground">
-              Showing <span className="font-medium">{(page - 1) * limit + 1}</span> to{' '}
-              <span className="font-medium">{Math.min(page * limit, total)}</span> of{' '}
-              <span className="font-medium">{total}</span> entries
+              Showing{' '}
+              <span className="font-medium">{(page - 1) * limit + 1}</span> to{' '}
+              <span className="font-medium">
+                {Math.min(page * limit, total)}
+              </span>{' '}
+              of <span className="font-medium">{total}</span> entries
             </div>
             <div className="flex items-center gap-2">
               <Button
