@@ -177,19 +177,11 @@ export function VendorRankingTable({
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold group-hover:text-primary transition-colors">
-                              {item.company_name}
-                            </span>
-                            <Badge
-                              variant="outline"
-                              className="text-[9px] font-mono py-0 h-3.5 px-1 text-muted-foreground border-muted-foreground/20 rounded-sm"
-                            >
-                              {item.vendor_code}
-                            </Badge>
-                          </div>
-                          <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
-                            {item.category_name}
+                          <span className="font-semibold group-hover:text-primary transition-colors">
+                            {item.company_name}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground font-mono tracking-wider">
+                            {item.vendor_code}
                           </span>
                         </div>
                       </TableCell>
