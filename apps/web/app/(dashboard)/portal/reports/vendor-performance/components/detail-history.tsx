@@ -100,7 +100,8 @@ export function DetailHistory({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-6 my-3 p-3 rounded-lg bg-muted/30 border border-dashed">
+                <div className="flex flex-wrap items-center gap-y-4 gap-x-8 my-3 p-3 rounded-lg bg-muted/30 border border-dashed">
+                  {/* Arrival Comparison */}
                   <div className="flex flex-col gap-1">
                     <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
                       <Truck className="h-3 w-3" />
@@ -108,26 +109,45 @@ export function DetailHistory({
                     </span>
                     <div className="flex items-center gap-3">
                       <div className="flex flex-col">
-                        <span className="text-[10px] text-muted-foreground">
-                          Actual
-                        </span>
-                        <span className="text-xs font-bold">
-                          {format(new Date(entry.submission_time), 'HH:mm')}
-                        </span>
+                        <span className="text-[10px] text-muted-foreground">Actual</span>
+                        <span className="text-xs font-bold">{format(new Date(entry.submission_time), 'HH:mm')}</span>
                       </div>
                       <div className="w-px h-4 bg-muted-foreground/20" />
                       <div className="flex flex-col">
-                        <span className="text-[10px] text-muted-foreground">
-                          Schedule
-                        </span>
+                        <span className="text-[10px] text-muted-foreground">Schedule</span>
                         <span className="text-xs font-bold text-muted-foreground">
-                          {entry.delivery_slot?.schedule?.arrival_time ||
-                            '--:--'}
+                          {entry.delivery_slot?.schedule?.arrival_time || '--:--'}
                         </span>
                       </div>
                     </div>
                   </div>
 
+                  {/* Departure Comparison */}
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                      <Truck className="h-3 w-3 rotate-180" />
+                      Departure
+                    </span>
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-muted-foreground">Actual</span>
+                        <span className="text-xs font-bold">
+                          {entry.ops_timelog?.checkout_time 
+                            ? format(new Date(entry.ops_timelog.checkout_time), 'HH:mm')
+                            : '--:--'}
+                        </span>
+                      </div>
+                      <div className="w-px h-4 bg-muted-foreground/20" />
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-muted-foreground">Schedule</span>
+                        <span className="text-xs font-bold text-muted-foreground">
+                          {entry.delivery_slot?.schedule?.departure_time || '--:--'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Lead Time */}
                   <div className="flex flex-col gap-1 ml-auto text-right">
                     <TooltipProvider>
                       <Tooltip>
@@ -153,7 +173,7 @@ export function DetailHistory({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-dashed bg-muted/20 -mx-4 -mb-4 p-4 rounded-b-lg">
+                <div className="grid grid-cols-1 gap-4 mt-3 pt-3 border-t border-dashed bg-muted/20 -mx-4 -mb-4 p-4 rounded-b-lg">
                   <div className="space-y-1.5">
                     <span className="text-[10px] uppercase font-bold text-muted-foreground block">
                       Safety Compliance
@@ -170,28 +190,6 @@ export function DetailHistory({
                         >
                           Non-Compliant
                         </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] uppercase font-bold text-muted-foreground block">
-                      Departure
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      {entry.departure_status ? (
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            'text-xs px-2 py-0.5 border',
-                            getStatusColor(entry.departure_status),
-                          )}
-                        >
-                          {entry.departure_status}
-                        </Badge>
-                      ) : (
-                        <span className="text-xs text-muted-foreground italic px-1">
-                          On-Site
-                        </span>
                       )}
                     </div>
                   </div>
