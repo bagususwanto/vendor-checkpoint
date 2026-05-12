@@ -1,21 +1,21 @@
-# 4. ERD — Versi 2 (Revisi Besar)
+# 4. ERD — Versi 2.3 (Revisi Besar)
 
 > Menggunakan ChartDB — DBML/Json
-> **Versi:** 2.2 | **Tanggal Revisi:** 2026-04-15
+> **Versi:** 2.3 | **Tanggal Revisi:** 2026-05-12
 > **Changelog v2.0:** Penambahan `ops_delivery_slot`, `mst_delay_reason`, `mst_vendor_schedule`; update kolom pada `ops_checkin_entry` dan `ops_timelog`.
 > **Changelog v2.1:** Proses verifikasi Staff dinonaktifkan secara default. Alur menjadi fully self-service.
-> **Changelog v2.2:** `ops_verification` **dikembalikan** — tidak dihapus, melainkan dikontrol via feature flag `VERIFICATION_MODE_ENABLED` di `cfg_system`. Bisa diaktifkan kembali kapan saja.
+> **Changelog v2.2:** `ops_verification` dikembalikan via feature flag `VERIFICATION_MODE_ENABLED`.
+> **Changelog v2.3:** Penambahan `ops_ppe_scan`, `ops_officer_discrepancy`, dan `ops_performance_adjustment`. Update field pada `mst_vendor_schedule` (rit, truck_station) dan `ops_checkin_entry`.
 
 ---
 
 ## Ringkasan Perubahan dari v1
 
-| Status | Tabel | Keterangan |
-|---|---|---|
-| 🆕 Baru | `mst_vendor_schedule` | Master jadwal kedatangan & keberangkatan vendor per vendor per hari |
-| 🆕 Baru | `ops_delivery_slot` | Wadah monitoring siklus harian untuk mendeteksi Missed Cycle |
-| 🆕 Baru | `mst_delay_reason` | Master alasan keterlambatan (Arrival / Departure) |
-| 🔄 Update | `ops_checkin_entry` | Tambah: `dn_number`, `po_number`, `slot_id`, `arrival_status`, `delay_arrival_reason_id`, `ai_safety_status`. Status mendukung 2 mode: Self-Service (`AKTIF`/`SELESAI`) & Verification (`MENUNGGU`/`DISETUJUI`/`DITOLAK`/`SELESAI`) |
+| 🆕 Baru | `ops_performance_adjustment` | Log penyesuaian manual status performa oleh Section Head / Admin |
+| 🆕 Baru | `ops_officer_discrepancy` | Penandaan ketidaksesuaian jawaban checklist oleh petugas lapangan |
+| 🆕 Baru | `ops_ppe_scan` | Hasil verifikasi APD otomatis (Hardhat, Safety Vest) |
+| 🔄 Update | `mst_vendor_schedule` | Tambah: `rit`, `truck_station` |
+| 🔄 Update | `ops_checkin_entry` | Tambah: `dn_number`, `po_number`, `slot_id`, `arrival_status`, `delay_arrival_reason_id`, `ai_safety_status`. Status: `WAITING`, `AKTIF`, `SELESAI`, `DISETUJUI`, `DITOLAK`. |
 | 🔄 Update | `ops_timelog` | Tambah: `departure_status`, `delay_departure_reason_id` |
 | 🔄 Update | `ops_verification` | **Tetap ada** — hanya aktif jika `VERIFICATION_MODE_ENABLED = true` di `cfg_system` |
 | 🔄 Update | `cfg_system` | Tambah key: `VERIFICATION_MODE_ENABLED` (BOOLEAN) untuk toggle fitur verifikasi |
@@ -67,18 +67,21 @@ Table "mst_vendor" {
 Table "mst_vendor_schedule" {
   "schedule_id" int [pk, not null, increment]
   "vendor_id" int [not null, ref: < "mst_vendor"."vendor_id"]
-  "day_of_week" varchar(10) [not null, note: 'MON, TUE, WED, THU, FRI, SAT, SUN']
-  "planned_arrival_time" time [not null, note: 'Jam rencana datang, e.g., 11:00:00']
-  "planned_departure_time" time [not null, note: 'Jam rencana keluar, e.g., 11:43:00']
+  "day_of_week" int [not null, note: '1=Monday ... 7=Sunday']
+  "rit" int [not null, default: 1]
+  "arrival_time" varchar(10) [not null, note: 'HH:mm']
+  "departure_time" varchar(10) [not null, note: 'HH:mm']
+  "truck_station" varchar(100)
   "is_active" boolean [not null, default: `true`]
   "created_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
   "updated_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
 
   Indexes {
-    (vendor_id, day_of_week, is_active) [name: "idx_mst_vendor_schedule_vendor_day"]
+    (vendor_id, is_active) [name: "idx_mst_vendor_schedule_vendor_active"]
+    (day_of_week, is_active) [name: "idx_mst_vendor_schedule_day_active"]
   }
 
-  Note: 'Master jadwal kedatangan & keberangkatan vendor per hari. Acuan utama untuk planned_arrival_time & planned_departure_time. v2'
+  Note: 'Master jadwal kedatangan & keberangkatan vendor per hari. v2.3'
 }
 
 // =====================================================
@@ -163,7 +166,7 @@ Table "mst_checklist_item" {
 
 Table "mst_user" {
   "user_id" int [pk, not null, increment]
-  "external_user_id" varchar(255) [unique, not null, note: 'User ID dari JWT eksternal']
+  "external_user_id" int [unique, not null, note: 'User ID dari JWT eksternal']
   "username" varchar(255) [not null]
   "full_name" varchar(500) [not null]
   "role" varchar(50) [not null, note: 'Warehouse Staff, Group Leader, Section Head, Admin']
@@ -185,29 +188,29 @@ Table "mst_user" {
 //         delay_arrival_reason_id, ai_safety_status
 // =====================================================
 Table "ops_checkin_entry" {
-  "entry_id" int [pk, not null, increment, ref: < "ops_queue_status"."entry_id", ref: < "ops_timelog"."entry_id", ref: < "ops_verification"."entry_id"]
+  "entry_id" int [pk, not null, increment, ref: < "ops_queue_status"."entry_id", ref: < "ops_timelog"."entry_id", ref: < "ops_verification"."entry_id", ref: < "ops_ppe_scan"."entry_id", ref: < "ops_officer_discrepancy"."entry_id", ref: < "ops_performance_adjustment"."entry_id"]
   "queue_number" varchar(50) [unique, not null, note: 'Format: YYYYMMDD-XXX']
   "vendor_id" int [not null, ref: < "mst_vendor"."vendor_id"]
 
   // 🆕 v2: Hasil scan DN & PO
-  "dn_number" varchar(100) [not null, note: 'Nomor DN hasil scan, e.g., 2100248426']
-  "po_number" varchar(100) [not null, note: 'Nomor PO hasil scan, e.g., 4550152955']
+  "dn_number" varchar(100) [null, note: 'Nomor DN hasil scan, e.g., 2100248426']
+  "po_number" varchar(100) [null, note: 'Nomor PO hasil scan, e.g., 4550152955']
 
   // 🆕 v2: Relasi ke slot monitoring cycle
-  "slot_id" int [not null, ref: < "ops_delivery_slot"."slot_id", note: 'Dijodohkan otomatis ke slot paling awal yang Open']
+  "slot_id" int [null, ref: < "ops_delivery_slot"."slot_id", note: 'Dijodohkan otomatis ke slot paling awal yang Open']
 
   "driver_name" varchar(500) [not null]
   "snapshot_vendor_category_id" int [not null, note: 'Snapshot kategori vendor saat check-in', ref: < "mst_vendor_category"."vendor_category_id"]
   "snapshot_company_name" varchar(500) [not null, note: 'Snapshot nama perusahaan']
   "snapshot_category_name" varchar(255) [not null, note: 'Snapshot nama kategori']
   "submission_time" datetime [not null, default: `CURRENT_TIMESTAMP`]
-  // v2.2: Status mendukung 2 mode:
-  //   Self-Service mode (VERIFICATION_MODE_ENABLED=false): AKTIF | SELESAI
-  //   Verification mode (VERIFICATION_MODE_ENABLED=true) : MENUNGGU | DISETUJUI | DITOLAK | SELESAI
-  "current_status" varchar(50) [not null, default: `AKTIF`, note: 'AKTIF | SELESAI (self-service) / MENUNGGU | DISETUJUI | DITOLAK | SELESAI (verification mode)']
+  // v2.3: Status mendukung 2 mode:
+  //   Self-Service mode: WAITING | AKTIF | SELESAI
+  //   Verification mode: WAITING | DISETUJUI | DITOLAK | SELESAI
+  "current_status" varchar(50) [not null, default: `WAITING`, note: 'WAITING | AKTIF | SELESAI | DISETUJUI | DITOLAK']
 
   // 🆕 v2: Status ketepatan waktu kedatangan
-  "arrival_status" varchar(20) [not null, note: 'On-Time | Late | Early']
+  "arrival_status" varchar(20) [null, note: 'On-Time | Late | Early']
   "delay_arrival_reason_id" int [null, ref: < "mst_delay_reason"."reason_id", note: 'Wajib diisi jika arrival_status = Late']
 
   // 🆕 v2: Hasil verifikasi APD oleh AI
@@ -230,7 +233,7 @@ Table "ops_checkin_entry" {
     dn_number [name: "idx_ops_checkin_entry_dn_number"]
   }
 
-  Note: 'Entri check-in vendor. FR-04. v2: +dn_number, +po_number, +slot_id, +arrival_status, +delay_arrival_reason_id, +ai_safety_status. v2.1: status = AKTIF/SELESAI (no verification gate). NFR-P2: Support 500K+ records'
+  Note: 'Entri check-in vendor. v2.3'
 }
 
 // =====================================================
@@ -300,7 +303,7 @@ Table "ops_verification" {
 Table "ops_timelog" {
   "timelog_id" int [pk, not null, increment]
   "entry_id" int [unique, not null]
-  "checkin_time" datetime [note: 'Diisi saat status APPROVED']
+  "checkin_time" datetime [note: 'Diisi saat status APPROVED atau AKTIF']
   "checkout_time" datetime [note: 'Diisi sekali saat Check-Out / Departure Scan']
   "checkout_by_user_id" int [ref: < "mst_user"."user_id"]
   "duration_minutes" int [note: 'Calculated: checkout_time - checkin_time']
@@ -319,7 +322,82 @@ Table "ops_timelog" {
     departure_status [name: "idx_ops_timelog_departure_status"]
   }
 
-  Note: 'Log waktu check-in dan check-out. FR-10. v2: +departure_status, +delay_departure_reason_id'
+  Note: 'Log waktu check-in dan check-out. v2.3'
+}
+
+// =====================================================
+// 🆕 BARU v2.3: Hasil Scan PPE Otomatis
+// =====================================================
+Table "ops_ppe_scan" {
+  "ppe_scan_id" int [pk, not null, increment]
+  "entry_id" int [unique, not null]
+  "has_hardhat" boolean [not null]
+  "has_safety_vest" boolean [not null]
+  "is_compliant" boolean [not null]
+  "image_path" varchar(1000)
+  "scan_time" datetime [not null]
+  "created_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    entry_id [unique, name: "idx_ops_ppe_scan_entry_id"]
+    is_compliant [name: "idx_ops_ppe_scan_is_compliant"]
+  }
+
+  Note: 'Hasil verifikasi APD otomatis oleh AI. v2.3'
+}
+
+// =====================================================
+// 🆕 BARU v2.3: Penandaan Diskrepansi Checklist
+// =====================================================
+Table "ops_officer_discrepancy" {
+  "discrepancy_id" int [pk, not null, increment]
+  "entry_id" int [not null]
+  "response_id" int [null, ref: < "ops_checkin_response"."response_id"]
+  "item_text_snapshot" text [not null]
+  "officer_note" text
+  "evidence_image_path" varchar(1000)
+  "marked_by_user_id" int [not null, ref: < "mst_user"."user_id"]
+  "created_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    entry_id [name: "idx_ops_officer_discrepancy_entry_id"]
+  }
+
+  Note: 'Penandaan ketidaksesuaian jawaban vendor oleh petugas. v2.3'
+}
+
+// =====================================================
+// 🆕 BARU v2.3: Penyesuaian Performa (Manual Adjustment)
+// =====================================================
+Table "ops_performance_adjustment" {
+  "adjustment_id" int [pk, not null, increment]
+  "entry_id" int [not null]
+  "adjusted_by_user_id" int [not null, ref: < "mst_user"."user_id"]
+  
+  "original_arrival_status" varchar(50)
+  "adjusted_arrival_status" varchar(50)
+  
+  "original_ai_safety_status" varchar(50)
+  "adjusted_ai_safety_status" varchar(50)
+  
+  "original_ppe_compliant" boolean
+  "adjusted_ppe_compliant" boolean
+  
+  "original_departure_status" varchar(50)
+  "adjusted_departure_status" varchar(50)
+  
+  "override_has_non_compliant" boolean
+  
+  "adjustment_reason" text [not null]
+  "created_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    entry_id [name: "idx_ops_performance_adjustment_entry_id"]
+    adjusted_by_user_id [name: "idx_ops_performance_adjustment_user_id"]
+  }
+
+  Note: 'Log penyesuaian manual status performa oleh atasan. v2.3'
 }
 
 Table "ops_queue_status" {
@@ -364,8 +442,8 @@ Table "log_report_export" {
   "export_id" int [pk, not null, increment]
   "exported_by_user_id" int [not null, ref: < "mst_user"."user_id"]
   "report_type" varchar(100) [not null, note: 'DAILY/CUSTOM/COMPLIANCE/CYCLE_MONITORING']
-  "date_from" date [not null]
-  "date_to" date [not null]
+  "date_from" datetime [not null]
+  "date_to" datetime [not null]
   "filter_criteria" text [note: 'JSON filter yang digunakan']
   "total_records" int [not null]
   "file_name" varchar(500) [not null]
@@ -376,7 +454,7 @@ Table "log_report_export" {
     (export_time, report_type) [name: "idx_log_report_export_time_type"]
   }
 
-  Note: 'Log export report. FR-12: Export XLSX 4 sheet. v2: +CYCLE_MONITORING report_type'
+  Note: 'Log export report. v2.3'
 }
 
 Table "cfg_system" {

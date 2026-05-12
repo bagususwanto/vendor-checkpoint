@@ -1,10 +1,11 @@
-# 3. User Flow — Versi 2.3 (Revisi Besar)
+# 3. User Flow — Versi 2.4 (Revisi Besar)
 
 > Copy paste code ke https://mermaid.live/edit untuk view yang lebih jelas
-> **Versi:** 2.3 | **Tanggal Revisi:** 2026-04-27
+> **Versi:** 2.4 | **Tanggal Revisi:** 2026-05-12
 > **Changelog v2.1:** Proses verifikasi Staff dinonaktifkan secara default (self-service mode).
 > **Changelog v2.2:** Verifikasi Staff **dikembalikan sebagai fitur opsional** yang dikontrol via `cfg_system.VERIFICATION_MODE_ENABLED`.
-> **Changelog v2.3:** Penambahan konsep **expected_date (Operational Date)** & **Cut-off Time (misal: 07:15 AM)** untuk mengakomodir cycle yang melewati tengah malam (hingga 07:00 AM hari berikutnya).
+> **Changelog v2.3:** Penambahan konsep **expected_date (Operational Date)** & **Cut-off Time**.
+> **Changelog v2.4:** Penambahan flow **Officer Discrepancy Marking** dan **Performance Adjustment** pada dashboard detail.
 
 ---
 
@@ -19,7 +20,7 @@ Sistem mendukung 2 mode yang dapat diubah kapan saja melalui halaman Admin tanpa
 
 ---
 
-## 1. Main Operational Flow v2.3 — Dual Mode
+## 1. Main Operational Flow v2.4 — Dual Mode & Post-Submission Activities
 
 ```mermaid
 flowchart TD
@@ -29,37 +30,44 @@ flowchart TD
     classDef new fill:#e8f5e9,stroke:#2e7d32,color:#000
     classDef optional fill:#fce4ec,stroke:#c62828,color:#000,stroke-dasharray: 4 4
     classDef endpoint fill:#000,stroke:#000,color:#fff
+    classDef adjustment fill:#fff9c4,stroke:#fbc02d,color:#000
 
     %% --- SYSTEM: CUT-OFF AWAL HARI ---
-    S_SlotGen["🕗 Awal Hari Operasional (Scheduler: 07:15 AM) Generate ops_delivery_slot Set expected_date = Hari Ini Berdasarkan mst_vendor_schedule Status: Open"]:::new
+    S_SlotGen["🕗 Awal Hari Operasional (07:15 AM) Generate ops_delivery_slot Set expected_date Status: Open"]:::new
 
     %% --- VENDOR ARRIVAL ---
     subgraph VENDOR_ARRIVAL ["🚛 VENDOR — Kedatangan (Arrival)"]
-        V_ScanDN["Scan DN & PO (dn_number, po_number)"]:::new
-        V_MatchSlot["Sistem: Jodohkan ke Slot Open Paling Awal Slot status → Filled"]:::new
+        V_ScanDN["Scan DN & PO"]:::new
+        V_MatchSlot["Sistem: Jodohkan ke Slot Open Paling Awal"]:::new
         V_ArrivalCheck{"Waktu aktual vs planned_arrival_time"}:::new
         V_ArrivalStatus["Set arrival_status: On-Time / Late / Early"]:::new
-        V_LateReason["Pilih alasan keterlambatan (mst_delay_reason: Arrival) Wajib jika Late"]:::new
+        V_LateReason["Pilih alasan keterlambatan Wajib jika Late"]:::new
     end
 
     %% --- VENDOR SQPE ---
     subgraph VENDOR_SQPE ["🔍 VENDOR — Self-Inspection SQPE"]
-        V_AICheck["Verifikasi APD via Kamera (AI Safety Check) Set ai_safety_status: Pass/Fail"]:::new
-        V_Checklist["Isi Checklist SQPE Mandiri (Ya/Tidak per item) FR-03"]:::vendor
-        V_Submit["Submit Generate Queue Number FR-04"]:::vendor
+        V_AICheck["Verifikasi APD via Kamera (AI Safety Check) Set ai_safety_status & Record PPE Scan"]:::new
+        V_Checklist["Isi Checklist SQPE Mandiri"]:::vendor
+        V_Submit["Submit Generate Queue Number"]:::vendor
     end
 
     %% --- VERIFICATION GATE (OPSIONAL) ---
     V_ModeCheck{"VERIFICATION_MODE _ENABLED?"}:::system
 
     subgraph VERIFICATION_OPTIONAL ["⚙️ OPSIONAL — Aktif jika VERIFICATION_MODE_ENABLED = true"]
-        V_Wait["Status → MENUNGGU Masuk antrian Staff"]:::optional
-        P_List["Staff: Monitoring List FR-09"]:::staff
-        P_Drawer["Staff: Review Entry (Identitas, DN/PO, AI Status, Checklist) FR-09"]:::staff
-        P_Approve{"Approve? FR-09"}:::staff
-        P_RejectReason["Input Alasan Reject FR-09"]:::staff
-        S_Rejected(["Status → DITOLAK + Alasan log_audit"]):::optional
-        S_Approved(["Status → DISETUJUI log_audit"]):::optional
+        V_Wait["Status → MENUNGGU"]:::optional
+        P_List["Staff: Monitoring List"]:::staff
+        P_Drawer["Staff: Review Entry"]:::staff
+        P_Approve{"Approve?"}:::staff
+        P_RejectReason["Input Alasan Reject"]:::staff
+        S_Rejected(["Status → DITOLAK"])::::optional
+        S_Approved(["Status → DISETUJUI"]):::optional
+    end
+
+    %% --- STAFF / ADMIN POST-ACTIVITIES ---
+    subgraph POST_ACTIVITIES ["📊 DASHBOARD — Post-Submission & Analytics"]
+        D_Discrepancy["Staff: Mark Discrepancy (Catatan + Bukti Foto)"]:::staff
+        D_Adjustment["SH/Admin: Manual Adjustment (Override Status)"]:::adjustment
     end
 
     %% --- VENDOR DEPARTURE ---
@@ -67,13 +75,9 @@ flowchart TD
         V_ScanOut["Scan Keluar (Departure)"]:::vendor
         V_DepartureCheck{"Waktu aktual vs planned_departure_time"}:::new
         V_DepartureStatus["Set departure_status: On-Time / Overdue"]:::new
-        V_OverdueReason["Pilih alasan terlambat keluar (mst_delay_reason: Departure) Wajib jika Overdue"]:::new
-        V_Done(["Status → SELESAI Record ops_timelog lengkap"]):::endpoint
+        V_OverdueReason["Pilih alasan terlambat keluar Wajib jika Overdue"]:::new
+        V_Done(["Status → SELESAI"]):::endpoint
     end
-
-    %% --- SYSTEM EOD ---
-    S_MissedCheck["🌅 End of Operational Day (Scheduler: 07:00 AM) Cek ops_delivery_slot untuk expected_date kemarin yang entry_id masih NULL"]:::system
-    S_MissedCycle["Set status → Missed log_audit: SLOT_MISSED"]:::system
 
     %% FLOW
     S_SlotGen --> V_ScanDN
@@ -82,23 +86,19 @@ flowchart TD
     V_ArrivalCheck -- "On-Time / Early" --> V_ArrivalStatus --> V_AICheck
     V_AICheck --> V_Checklist --> V_Submit
 
-    %% MODE SWITCH
     V_Submit --> V_ModeCheck
-
-    %% Self-Service Path
-    V_ModeCheck -- "false (Self-Service) Status → AKTIF" --> V_ScanOut
-
-    %% Verification Path
+    V_ModeCheck -- "false (Self-Service)" --> V_ScanOut
     V_ModeCheck -- "true (Verification Mode)" --> V_Wait --> P_List --> P_Drawer --> P_Approve
     P_Approve -- "Rejected" --> P_RejectReason --> S_Rejected
-    P_Approve -- "Approved Status → AKTIF" --> S_Approved --> V_ScanOut
+    P_Approve -- "Approved" --> S_Approved --> V_ScanOut
 
-    %% Departure
+    %% Post-Activities can happen anytime after submission
+    V_Submit -.-> D_Discrepancy
+    V_ScanOut -.-> D_Adjustment
+
     V_ScanOut --> V_DepartureCheck
     V_DepartureCheck -- "Overdue" --> V_DepartureStatus --> V_OverdueReason --> V_Done
     V_DepartureCheck -- "On-Time" --> V_DepartureStatus --> V_Done
-
-    S_MissedCheck --> S_MissedCycle
 ```
 
 ---
@@ -112,13 +112,17 @@ stateDiagram-v2
         AKTIF_SS --> SELESAI_SS : Departure Scan
     }
 
-    state "Verification Mode (VERIFICATION_MODE_ENABLED = true)" as VM {
+ state "Verification Mode (VERIFICATION_MODE_ENABLED = true)" as VM {
         [*] --> MENUNGGU : Submit
         MENUNGGU --> DISETUJUI : Staff Approve
         MENUNGGU --> DITOLAK : Staff Reject
         DISETUJUI --> AKTIF_VM : Status aktif
         AKTIF_VM --> SELESAI_VM : Departure Scan
     }
+    
+    SELESAI_SS --> [*]
+    SELESAI_VM --> [*]
+    DITOLAK --> [*]
 ```
 
 > 💡 Perubahan mode dilakukan di halaman **Admin → Konfigurasi Sistem**, berlaku instan tanpa restart maupun perubahan database.
@@ -149,7 +153,28 @@ flowchart LR
 
 ---
 
-## 4. Support, Monitoring & Admin Flow v2.3
+---
+
+## 3. Performance Adjustment Flow (Detail View)
+
+```mermaid
+flowchart LR
+    classDef actor fill:#fff3e0,stroke:#ef6c00
+    classDef action fill:#fff9c4,stroke:#fbc02d
+    classDef result fill:#e8f5e9,stroke:#2e7d32
+
+    STAFF["Section Head / Admin"]:::actor
+    DIALOG["Buka Adjustment Dialog pada Detail History"]:::action
+    INPUT["Input Status Baru & Alasan Penyesuaian"]:::action
+    SAVE["Simpan Penyesuaian (Record ops_performance_adjustment)"]:::action
+    UPDATE["Status Entry & Dashboard KPI Terupdate"]:::result
+
+    STAFF --> DIALOG --> INPUT --> SAVE --> UPDATE
+```
+
+---
+
+## 4. Support, Monitoring & Admin Flow v2.4
 
 ```mermaid
 flowchart TD
@@ -159,20 +184,17 @@ flowchart TD
     classDef monitoring fill:#fff3e0,stroke:#ef6c00
     classDef config fill:#fce4ec,stroke:#c62828
 
-    %% --- ADMIN ---
     subgraph ADMIN ["🔧 Admin — Master Management"]
-        A_Login["Admin Login JWT & Role FR-08"]:::admin
-        A_VendorMaster["Manage Vendor Master CRUD & Sync FR-15"]:::admin
-        A_ScheduleMaster["Manage Jadwal Vendor mst_vendor_schedule"]:::admin
-        A_DelayReasonMaster["Manage Alasan Delay mst_delay_reason"]:::admin
-        A_ChecklistMaster["Manage Checklist SQPE FR-16"]:::admin
-        A_Config["Konfigurasi Sistem Toggle VERIFICATION_MODE_ENABLED Berubah instan tanpa restart"]:::config
+        A_Login["Admin Login"]:::admin
+        A_VendorMaster["Manage Vendor Master"]:::admin
+        A_ScheduleMaster["Manage Jadwal (Rit, Station)"]:::admin
+        A_Config["Konfigurasi Sistem (Toggle Verifikasi)"]:::config
     end
 
     subgraph SYSTEMSYNC ["⚙️ System Scheduler"]
-        SYNC["Sync Vendor Master FR-15"]:::system
-        SLOT_GEN["Slot Generator Harian (Jam Cut-off: 07:15 AM)"]:::system
-        MISSED_CHECK["EOD Missed Cycle Checker (Sebelum Cut-off: 07:00 AM)"]:::system
+        SYNC["Sync Vendor Master"]:::system
+        SLOT_GEN["Slot Generator (07:15 AM)"]:::system
+        MISSED_CHECK["Missed Cycle Checker (07:00 AM)"]:::system
     end
 
     A_Login --> A_VendorMaster
@@ -180,19 +202,18 @@ flowchart TD
     A_ScheduleMaster -.-> SLOT_GEN
     SLOT_GEN --> MISSED_CHECK
 
-    %% --- MONITORING ---
     subgraph MONITORING ["📊 Staff / Leader — Monitoring"]
-        M_Login["Staff / Leader Login FR-08"]:::monitoring
-        M_Dashboard["Monitoring Dashboard • Arrival On-Time % • Departure On-Time % • Missed Cycle Count • Mode: Self-Service / Verification FR-13"]:::monitoring
-        M_Report["Reporting & Export XLSX FR-14"]:::monitoring
+        M_Login["Staff / Leader Login"]:::monitoring
+        M_Dashboard["Dashboard Detail: KPI Cards, Success Rates, History"]:::monitoring
+        M_Adjustment["Performance Adjustment (SH/Admin)"]:::monitoring
+        M_Report["Reporting & Export XLSX"]:::monitoring
     end
 
-    M_Login --> M_Dashboard --> M_Report
+    M_Login --> M_Dashboard --> M_Adjustment --> M_Report
 
-    %% --- PUBLIC VIEW ---
     subgraph PUBLIC ["📺 Public Display"]
-        TV_Refresh{"Auto-Refresh 10s FR-07"}:::system
-        TV_Display["Queue Display FR-07"]:::public
+        TV_Refresh{"Auto-Refresh 10s"}:::system
+        TV_Display["Queue Display"]:::public
     end
 
     TV_Refresh --> TV_Display --> TV_Refresh
