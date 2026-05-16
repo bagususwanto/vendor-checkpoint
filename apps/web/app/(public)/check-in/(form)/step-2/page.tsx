@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ArrowLeft, CircleArrowRight, RotateCcw } from 'lucide-react';
@@ -26,6 +26,8 @@ export default function CheckInStep2() {
   const router = useRouter();
   const { step1Data, ppeData, setPPEData, checklistCategories } =
     useChecklistStore();
+
+  const [isPending, startTransition] = useTransition();
 
   const [capturedImage, setCapturedImage] = useState<string | null>(
     ppeData?.capturedImage || null,
@@ -155,7 +157,9 @@ export default function CheckInStep2() {
       capturedImage: capturedImage || undefined,
     });
 
-    router.push('/check-in/step-3');
+    startTransition(() => {
+      router.push('/check-in/step-3');
+    });
   };
 
   return (
@@ -221,9 +225,9 @@ export default function CheckInStep2() {
             type="button"
             className="w-1/2 h-12 sm:h-14 text-sm sm:text-base"
             onClick={handleContinue}
-            disabled={!complianceResult || isDetecting}
+            disabled={!complianceResult || isDetecting || isPending}
           >
-            Lanjut
+            {isPending ? 'Memuat...' : 'Lanjut'}
             <CircleArrowRight className="ml-1 sm:ml-2 h-5 w-5 sm:h-6 sm:w-6" />
           </Button>
         </CardFooter>

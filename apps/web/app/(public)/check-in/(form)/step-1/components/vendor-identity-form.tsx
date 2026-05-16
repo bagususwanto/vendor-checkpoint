@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   ArrowLeft,
   Building2,
@@ -180,7 +181,9 @@ export function VendorIdentityForm() {
         }
       } catch (error) {
         console.error('Failed to fetch checklist', error);
-      } finally {
+        toast.error('Gagal memproses data', {
+          description: 'Terjadi kesalahan pada sistem. Silakan coba lagi.',
+        });
         setIsSubmitting(false);
       }
     },
@@ -449,7 +452,7 @@ export function VendorIdentityForm() {
         </Button>
         <Button
           type="submit"
-          onClick={form.handleSubmit}
+          form="vendor-identity-form"
           className="w-1/2 h-12 sm:h-14 text-sm sm:text-base"
           disabled={isSubmitting}
         >

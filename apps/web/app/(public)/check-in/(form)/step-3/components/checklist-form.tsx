@@ -1,5 +1,7 @@
 'use client';
 
+import { useTransition } from 'react';
+
 import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
 import { useChecklistStore } from '@/stores/use-checklist.store';
@@ -19,6 +21,8 @@ export function ChecklistForm() {
     useChecklistStore();
   const vendorCategory = step1Data?.vendorCategory.label;
 
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm({
     defaultValues: {
       checklistItems: step2Data?.checklistItems || {},
@@ -28,7 +32,9 @@ export function ChecklistForm() {
     },
     onSubmit: async ({ value }) => {
       setStep2Data(value);
-      router.push('/check-in/step-4');
+      startTransition(() => {
+        router.push('/check-in/step-4');
+      });
     },
   });
 
@@ -157,9 +163,9 @@ export function ChecklistForm() {
                 type="submit"
                 className="w-1/2 h-12 sm:h-14 text-sm sm:text-base"
                 form="checklist-form"
-                disabled={Math.round(progress) < 100}
+                disabled={Math.round(progress) < 100 || isPending}
               >
-                Lanjut
+                {isPending ? 'Memuat...' : 'Lanjut'}
                 <Icons.CircleArrowRight className="ml-1 sm:ml-2 w-5 h-5 sm:w-6 sm:h-6" />
               </Button>
             );
