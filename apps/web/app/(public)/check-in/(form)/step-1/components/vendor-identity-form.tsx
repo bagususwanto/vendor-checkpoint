@@ -453,8 +453,8 @@ export function VendorIdentityForm() {
           Kembali
         </Button>
         <Button
-          type="submit"
-          form="vendor-identity-form"
+          type="button"
+          onClick={() => form.handleSubmit()}
           className="w-1/2 h-12 sm:h-14 text-sm sm:text-base"
           disabled={isSubmitting}
         >
