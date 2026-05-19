@@ -422,6 +422,8 @@ export function VendorIdentityForm() {
                           'vendorCategory.description',
                           mat.description || '',
                         );
+                        // Trigger field-level validation and state change in TanStack Form
+                        field.handleChange(mat.value);
                       }
                     }}
                     isLoading={isFetchingVendorCategories}
