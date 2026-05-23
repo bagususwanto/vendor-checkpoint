@@ -26,6 +26,21 @@ export interface ExternalUser {
 
 @Injectable()
 export class UserService {
+  private lastSyncStatus: {
+    inProgress: boolean;
+    created: number;
+    updated: number;
+    total: number;
+    syncTime?: Date;
+    completedAt?: Date;
+    error?: string;
+  } = {
+    inProgress: false,
+    created: 0,
+    updated: 0,
+    total: 0,
+  };
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly httpService: HttpService,
@@ -48,6 +63,27 @@ export class UserService {
   }
 
   async syncFromExternalApi(token: string): Promise<SyncResult> {
+    this.syncFromExternalApiAsync(token).catch((err) =>
+      console.error('Background sync error:', err),
+    );
+
+    return {
+      data: {
+        message: 'Sync started in background',
+        status: 'processing',
+      },
+    } as any;
+  }
+
+  private async syncFromExternalApiAsync(token: string): Promise<void> {
+    if (this.lastSyncStatus.inProgress) {
+      console.warn('Sync already in progress, skipping...');
+      return;
+    }
+
+    this.lastSyncStatus.inProgress = true;
+    this.lastSyncStatus.error = undefined;
+
     try {
       const resp$ = this.httpService.get(
         `${process.env.EXTERNAL_API_URL}/user-public`,
@@ -64,11 +100,33 @@ export class UserService {
         ? data
         : data.data || [];
 
+      if (externalUsers.length === 0) {
+        console.log('No users to sync');
+        this.lastSyncStatus = {
+          inProgress: false,
+          created: 0,
+          updated: 0,
+          total: 0,
+          completedAt: new Date(),
+        };
+        return;
+      }
+
+      const syncTime = new Date();
+      const externalUserIds = externalUsers.map((u) => u.id).filter(Boolean);
+
+      const existingUsers = await this.prisma.mst_user.findMany({
+        where: {
+          external_user_id: { in: externalUserIds },
+        },
+        select: { external_user_id: true },
+      });
+      const existingIdSet = new Set(
+        existingUsers.map((u) => u.external_user_id),
+      );
+
       let created = 0;
       let updated = 0;
-      const syncTime = new Date();
-
-      // Optimize: Create a map of operations
       const operations: any[] = [];
 
       for (const user of externalUsers) {
@@ -78,6 +136,12 @@ export class UserService {
           role: user.Role.roleName,
           updated_at: syncTime,
         };
+
+        if (existingIdSet.has(user.id)) {
+          updated++;
+        } else {
+          created++;
+        }
 
         operations.push(
           this.prisma.mst_user.upsert({
@@ -92,57 +156,51 @@ export class UserService {
         );
       }
 
-      // Execute in batches
-      const BATCH_SIZE = 50;
-      const chunks = [];
-
-      for (let i = 0; i < operations.length; i += BATCH_SIZE) {
-        chunks.push(operations.slice(i, i + BATCH_SIZE));
-      }
+      const BATCH_SIZE = 20;
+      const batchErrors: { batchIndex: number; error: any }[] = [];
 
       console.log(
-        `Syncing ${operations.length} users in ${chunks.length} batches...`,
+        `Syncing ${operations.length} users (${created} new, ${updated} updates) in batches of ${BATCH_SIZE}...`,
       );
 
-      for (const [index, chunk] of chunks.entries()) {
-        console.log(`Processing batch ${index + 1} of ${chunks.length}...`);
+      for (let i = 0; i < operations.length; i += BATCH_SIZE) {
+        const batchIndex = Math.floor(i / BATCH_SIZE) + 1;
+        const totalBatches = Math.ceil(operations.length / BATCH_SIZE);
+        const chunk = operations.slice(i, i + BATCH_SIZE);
+
+        console.log(
+          `Processing batch ${batchIndex} of ${totalBatches} (${chunk.length} items)...`,
+        );
+
         try {
           await Promise.all(chunk);
-        } catch (e) {
-          console.error(`Failed to sync batch ${index + 1}:`, e);
-          continue;
+          console.log(`✓ Batch ${batchIndex} completed successfully`);
+        } catch (error) {
+          console.error(
+            `✗ Batch ${batchIndex} failed:`,
+            error instanceof Error ? error.message : error,
+          );
+          batchErrors.push({ batchIndex, error });
         }
       }
 
-      // Calculate stats
-      const existingIds = await this.prisma.mst_user.findMany({
-        select: { external_user_id: true },
-        where: {
-          external_user_id: {
-            in: externalUsers.map((u) => u.id),
-          },
-        },
-      });
-      const existingIdSet = new Set(existingIds.map((u) => u.external_user_id));
+      if (batchErrors.length > 0) {
+        console.warn(
+          `Sync completed with ${batchErrors.length} batch(es) failed`,
+        );
+        console.warn(
+          'Failed batches:',
+          batchErrors.map((b) => b.batchIndex),
+        );
+      }
 
-      created = 0;
-      updated = 0;
-
-      externalUsers.forEach((u) => {
-        if (existingIdSet.has(u.id)) {
-          updated++;
-        } else {
-          created++;
-        }
-      });
-
-      return {
-        data: {
-          created,
-          updated,
-          total: externalUsers.length,
-          syncTime,
-        },
+      this.lastSyncStatus = {
+        inProgress: false,
+        created,
+        updated,
+        total: externalUsers.length,
+        syncTime,
+        completedAt: new Date(),
       };
     } catch (err: any) {
       console.error('Sync user error:', {
@@ -150,9 +208,18 @@ export class UserService {
         data: err?.response?.data,
         message: err?.message,
       });
-      throw new InternalServerErrorException(
-        'Failed to sync users from external API',
-      );
+      this.lastSyncStatus = {
+        inProgress: false,
+        created: 0,
+        updated: 0,
+        total: 0,
+        error: err?.message || 'Failed to sync users from external API',
+        completedAt: new Date(),
+      };
     }
+  }
+
+  getSyncStatus() {
+    return this.lastSyncStatus;
   }
 }

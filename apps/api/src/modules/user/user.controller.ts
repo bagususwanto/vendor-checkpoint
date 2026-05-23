@@ -40,4 +40,10 @@ export class UserController {
   syncFromExternal(@Headers('authorization') authHeader: string) {
     return this.userService.syncFromExternalApi(authHeader);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('sync/status')
+  getSyncStatus() {
+    return this.userService.getSyncStatus();
+  }
 }
