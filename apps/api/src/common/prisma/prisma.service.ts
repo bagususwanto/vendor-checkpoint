@@ -16,7 +16,7 @@ export class PrismaService
       pool: {
         max: 10,
         min: 0,
-        idleTimeoutMillis: 30000,
+        idleTimeoutMillis: 60000,
       },
       options: {
         encrypt: false, // for azure
