@@ -11,7 +11,14 @@ export function useSyncUsers() {
 
   return useMutation({
     mutationFn: () => userService.syncUsers(),
+    onMutate: () => {
+      toast.loading('Sync User dimulai...', {
+        duration: Infinity,
+        id: 'sync-user',
+      });
+    },
     onSuccess: (data) => {
+      toast.dismiss('sync-user');
       queryClient.invalidateQueries({ queryKey: userKeys.all });
       toast.success('Sync User Berhasil', {
         description: `${data.created} user baru, ${data.updated} diperbarui dari ${data.total} total data.`,
@@ -19,9 +26,12 @@ export function useSyncUsers() {
       });
     },
     onError: (error: any) => {
+      toast.dismiss('sync-user');
       toast.error('Gagal Sync User', {
         description:
-          error.response?.data?.message || 'Terjadi kesalahan saat sync user.',
+          error.response?.data?.message ||
+          error.message ||
+          'Terjadi kesalahan saat sync user.',
         duration: 10000,
       });
     },
