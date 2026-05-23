@@ -45,4 +45,11 @@ export class VendorController {
   syncFromExternal(@Headers('authorization') authHeader: string) {
     return this.vendorService.syncFromExternalApi(authHeader);
   }
+
+  // PROTECTED - Get sync status (non-blocking)
+  @UseGuards(JwtAuthGuard)
+  @Get('sync/status')
+  getSyncStatus() {
+    return this.vendorService.getSyncStatus();
+  }
 }

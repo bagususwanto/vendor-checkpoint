@@ -10,6 +10,7 @@ import { mst_vendor } from 'generated/prisma/client';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import * as https from 'https';
+import { setTimeout } from 'timers/promises';
 
 // Agent untuk bypass validasi SSL (mengatasi error "unable to verify the first certificate")
 const httpsAgent = new https.Agent({
@@ -24,6 +25,21 @@ interface ExternalVendor {
 
 @Injectable()
 export class VendorService {
+  private lastSyncStatus: {
+    inProgress: boolean;
+    created: number;
+    updated: number;
+    total: number;
+    syncTime?: Date;
+    completedAt?: Date;
+    error?: string;
+  } = {
+    inProgress: false,
+    created: 0,
+    updated: 0,
+    total: 0,
+  };
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly httpService: HttpService,
@@ -88,6 +104,33 @@ export class VendorService {
   }
 
   async syncFromExternalApi(token: string): Promise<SyncResult> {
+    // Trigger background sync without waiting
+    this.syncFromExternalApiAsync(token).catch((err) =>
+      console.error('Background sync error:', err),
+    );
+
+    // Return immediately with status
+    return {
+      data: {
+        message: 'Sync started in background',
+        status: 'processing',
+      },
+    } as any;
+  }
+
+  /**
+   * Actual sync logic that runs in background
+   * Triggered by syncFromExternalApi but doesn't block the response
+   */
+  private async syncFromExternalApiAsync(token: string): Promise<void> {
+    if (this.lastSyncStatus.inProgress) {
+      console.warn('Sync already in progress, skipping...');
+      return;
+    }
+
+    this.lastSyncStatus.inProgress = true;
+    this.lastSyncStatus.error = undefined;
+
     try {
       const resp$ = this.httpService.get(
         `${process.env.EXTERNAL_API_URL}/supplier-public`,
@@ -106,14 +149,14 @@ export class VendorService {
 
       if (externalVendors.length === 0) {
         console.log('No vendors to sync');
-        return {
-          data: {
-            created: 0,
-            updated: 0,
-            total: 0,
-            syncTime: new Date(),
-          },
+        this.lastSyncStatus = {
+          inProgress: false,
+          created: 0,
+          updated: 0,
+          total: 0,
+          completedAt: new Date(),
         };
+        return;
       }
 
       const syncTime = new Date();
@@ -220,13 +263,14 @@ export class VendorService {
         `Sync completed: ${created} created, ${updated} updated, total ${externalVendors.length}`,
       );
 
-      return {
-        data: {
-          created,
-          updated,
-          total: externalVendors.length,
-          syncTime,
-        },
+      // Update status
+      this.lastSyncStatus = {
+        inProgress: false,
+        created,
+        updated,
+        total: externalVendors.length,
+        syncTime,
+        completedAt: new Date(),
       };
     } catch (err: any) {
       console.error('Sync error:', {
@@ -234,9 +278,20 @@ export class VendorService {
         data: err?.response?.data,
         message: err?.message,
       });
-      throw new InternalServerErrorException(
-        'Failed to sync vendors from external API',
-      );
+      this.lastSyncStatus = {
+        inProgress: false,
+        created: 0,
+        updated: 0,
+        total: 0,
+        error: err?.message || 'Failed to sync vendors from external API',
+      };
     }
+  }
+
+  /**
+   * Get current sync status
+   */
+  getSyncStatus(): any {
+    return this.lastSyncStatus;
   }
 }
