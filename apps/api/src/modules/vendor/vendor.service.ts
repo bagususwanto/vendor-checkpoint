@@ -104,11 +104,38 @@ export class VendorService {
         ? data
         : data.data || [];
 
+      if (externalVendors.length === 0) {
+        console.log('No vendors to sync');
+        return {
+          data: {
+            created: 0,
+            updated: 0,
+            total: 0,
+            syncTime: new Date(),
+          },
+        };
+      }
+
+      const syncTime = new Date();
+      const vendorCodes = externalVendors
+        .map((v) => v.supplierCode)
+        .filter(Boolean);
+
+      // Get existing records BEFORE sync to accurately count created vs updated
+      const existingVendors = await this.prisma.mst_vendor.findMany({
+        where: {
+          vendor_code: { in: vendorCodes },
+        },
+        select: { vendor_code: true },
+      });
+      const existingCodesSet = new Set(
+        existingVendors.map((v) => v.vendor_code),
+      );
+
       let created = 0;
       let updated = 0;
-      const syncTime = new Date();
 
-      // Optimize: Create a map of operations
+      // Create upsert operations
       const operations: any[] = [];
 
       for (const vendor of externalVendors) {
@@ -121,9 +148,13 @@ export class VendorService {
         const companyName = vendor.supplierName;
         const isActive = vendor.flag === 1;
 
-        // Use upsert to handle both create and update in one operation per vendor
-        // This is safe but still 1 query per vendor.
-        // To truly optimize, we can use transaction.
+        // Count before adding to operations
+        if (existingCodesSet.has(vendorCode)) {
+          updated++;
+        } else {
+          created++;
+        }
+
         operations.push(
           this.prisma.mst_vendor.upsert({
             where: { vendor_code: vendorCode },
@@ -145,53 +176,49 @@ export class VendorService {
         );
       }
 
-      // Execute in batches to avoid MSSQL transaction limits/timeouts
-      const BATCH_SIZE = 50;
-      const chunks = [];
+      // Execute in smaller batches to avoid MSSQL limits and prevent final batch errors
+      const BATCH_SIZE = 20; // Reduced from 50 for safety with large datasets
+      const batchErrors: { batchIndex: number; error: any }[] = [];
+
+      console.log(
+        `Syncing ${operations.length} vendors (${created} new, ${updated} updates) in batches of ${BATCH_SIZE}...`,
+      );
 
       for (let i = 0; i < operations.length; i += BATCH_SIZE) {
-        chunks.push(operations.slice(i, i + BATCH_SIZE));
+        const batchIndex = Math.floor(i / BATCH_SIZE) + 1;
+        const totalBatches = Math.ceil(operations.length / BATCH_SIZE);
+        const chunk = operations.slice(i, i + BATCH_SIZE);
+
+        console.log(
+          `Processing batch ${batchIndex} of ${totalBatches} (${chunk.length} items)...`,
+        );
+
+        try {
+          await Promise.all(chunk);
+          console.log(`✓ Batch ${batchIndex} completed successfully`);
+        } catch (error) {
+          console.error(
+            `✗ Batch ${batchIndex} failed:`,
+            error instanceof Error ? error.message : error,
+          );
+          batchErrors.push({ batchIndex, error });
+          // Continue with next batch instead of stopping
+        }
+      }
+
+      if (batchErrors.length > 0) {
+        console.warn(
+          `Sync completed with ${batchErrors.length} batch(es) failed`,
+        );
+        console.warn(
+          'Failed batches:',
+          batchErrors.map((b) => b.batchIndex),
+        );
       }
 
       console.log(
-        `Syncing ${operations.length} vendors in ${chunks.length} batches...`,
+        `Sync completed: ${created} created, ${updated} updated, total ${externalVendors.length}`,
       );
-
-      for (const [index, chunk] of chunks.entries()) {
-        console.log(`Processing batch ${index + 1} of ${chunks.length}...`);
-        try {
-          // Use Promise.all to run in parallel without transaction overhead
-          // This prevents the 'EREQINPROG' rollback error in MSSQL
-          await Promise.all(chunk);
-        } catch (e) {
-          console.error(`Failed to sync batch ${index + 1}:`, e);
-          // We continue to try next batches
-          continue;
-        }
-      }
-
-      const existingCodes = await this.prisma.mst_vendor.findMany({
-        select: { vendor_code: true },
-        where: {
-          vendor_code: {
-            in: externalVendors.map((v) => v.supplierCode).filter(Boolean),
-          },
-        },
-      });
-      const existingCodeSet = new Set(existingCodes.map((v) => v.vendor_code));
-
-      created = 0;
-      updated = 0;
-
-      // Re-loop to count (cheap in memory)
-      externalVendors.forEach((v) => {
-        if (!v.supplierCode) return;
-        if (existingCodeSet.has(v.supplierCode)) {
-          updated++;
-        } else {
-          created++;
-        }
-      });
 
       return {
         data: {
