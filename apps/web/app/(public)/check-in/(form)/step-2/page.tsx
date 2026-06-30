@@ -119,11 +119,14 @@ export default function CheckInStep2() {
           description: 'Beberapa perlengkapan keselamatan belum terdeteksi.',
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       setCapturedImage(null);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Terjadi kesalahan saat memindai. Pastikan APD API sudah berjalan.';
       toast.error('Gagal Melakukan Scan', {
-        description:
-          'Terjadi kesalahan saat memindai. Pastikan APD API sudah berjalan.',
+        description: errorMessage,
       });
     }
   };
