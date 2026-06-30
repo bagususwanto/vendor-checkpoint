@@ -161,6 +161,48 @@ vendor-checkpoint/
 
 ---
 
+## ⚠️ Catatan: Development di Jaringan Perusahaan (Local Server)
+
+Jika Anda menjalankan aplikasi ini **di laptop/server yang terhubung ke jaringan internal perusahaan** (corporate network), perhatikan hal-hal berikut:
+
+### Masalah: HTTP 407 Proxy Authentication Required
+
+Saat menjalankan development di lokal (dalam jaringan kantor), NestJS backend bisa gagal melakukan request ke external API (`wh-backend-1`) dengan error:
+
+```
+Login error: { status: 407, message: 'Request failed with status code 407' }
+```
+
+**Penyebab:** Axios secara otomatis membaca environment variable `HTTP_PROXY` / `http_proxy` dari sistem operasi dan meneruskan semua HTTP request melalui corporate proxy. Karena `wh-backend-1` adalah host internal, proxy tersebut menolak request dengan 407.
+
+### Solusi: Tambahkan `proxy: false` pada Axios Config
+
+Buka `apps/api/src/modules/auth/auth.service.ts` dan tambahkan `proxy: false` pada setiap Axios request config:
+
+```typescript
+// Untuk development di jaringan perusahaan
+this.httpService.post(url, dto, { httpsAgent, proxy: false });
+
+// Atau pada config object
+const config: AxiosRequestConfig = {
+  headers: { Cookie: cookies },
+  httpsAgent,
+  proxy: false, // Bypass corporate proxy untuk internal host
+};
+```
+
+### Masalah: SSL Certificate Error
+
+Jika muncul error `unable to verify the first certificate`, backend sudah dikonfigurasi untuk bypass validasi SSL via `httpsAgent`:
+
+```typescript
+const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+```
+
+Konfigurasi ini sudah aktif secara default dan tidak perlu diubah.
+
+---
+
 ## 🌐 Backend Production (PM2)
 
 Untuk menjalankan Backend API di lingkungan production menggunakan PM2:
