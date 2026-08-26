@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  trailingSlash: false,
+  trailingSlash: true,
+  basePath: '/vendor-checkpoint',
+  assetPrefix: '/vendor-checkpoint',
   allowedDevOrigins: ['http://localhost:3000'],
 };
 
