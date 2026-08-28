@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import {
   BadgeCheck,
   Bell,
@@ -37,6 +39,7 @@ export function NavUser({
     avatar: string;
   };
 }) {
+  const router = useRouter();
   const { isMobile } = useSidebar();
 
   // Generate initials from name
@@ -57,13 +60,16 @@ export function NavUser({
   const handleLogout = async () => {
     try {
       await logout();
-      window.location.href = '/login';
     } catch (error) {
       console.error('Logout failed:', error);
       // Fallback: force client logout
       if (typeof window !== 'undefined') {
         localStorage.removeItem('accessToken');
-        window.location.href = '/login';
+      }
+    } finally {
+      router.replace('/login');
+      if (typeof window !== 'undefined') {
+        window.location.reload();
       }
     }
   };
